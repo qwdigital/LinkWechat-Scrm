@@ -108,10 +108,23 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         }
 
 
-        //设置活动状态
-        if((weFission.getFassionStartTime()//设置为进行中
-                .before(new Date()))){
+//        //设置活动状态
+//        if((weFission.getFassionStartTime()//设置为进行中
+//                .before(new Date()))){
+//            weFission.setFassionState(2);
+//        }
+
+        //如果当前时间在裂变结束时间之前,则裂变结束
+        if(new Date().after(weFission.getFassionEndTime())){
+            weFission.setFassionState(3);
+        }
+
+        //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
+        if(new Date().after(weFission.getFassionStartTime())&&
+                new Date().before(weFission.getFassionEndTime())
+        ) {
             weFission.setFassionState(2);
+
         }
 
 
@@ -120,41 +133,9 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             //裂变消息入库
             List<WeFissionNotice> weFissionNotices =new ArrayList<>();
 
-            WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-            messageQuery.setIsAll(false);
-            messageQuery.setMsgSource(5);
-            messageQuery.setLoginUser(SecurityUtils.getLoginUser());
-            messageQuery.setContent(weFission.getContent());
-            messageQuery.setBusinessIds(weFission.getId().toString());
-
-            WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
-            if(null != weMaterial){
-                //构建发送素材
-                messageQuery.setAttachmentsList(
-                        ListUtil.toList(WeMessageTemplate.builder()
-                                .title(weMaterial.getMaterialName())
-                                .msgType(MediaType.LINK.getMediaType())
-                                .linkUrl(weFission.getFissionUrl())
-                                .build())
-                );
-            }
-
-
-            if(weFission.getFassionStartTime()//定时发送,活动时间
-                    .after(new Date())){
-                messageQuery.setSendTime(weFission.getFassionStartTime());
-                messageQuery.setIsTask(1);
-            }else{ //立即发送
-                messageQuery.setIsTask(0);
-            }
-
-            //构建群发时间
-            List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
-
             //任务宝
             if(TaskFissionType.USER_FISSION.getCode()
                     .equals(weFission.getFassionType())){
-                messageQuery.setChatType(1);
                 List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
                         weFission.getExecuteUserOrGroup()
                 );
@@ -163,14 +144,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                    weCustomersVos.stream()
                             .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
                            .forEach((k,v)->{
-                               senderInfos.add(
-                                       WeAddGroupMessageQuery
-                                               .SenderInfo
-                                               .builder()
-                                               .userId(k)
-                                               .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
-                                               .build()
-                               );
                                v.stream().forEach(kk->{
                                    weFissionNotices.add(WeFissionNotice.builder()
                                            .fissionId(weFission.getId())
@@ -185,7 +158,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             //群裂变
             }else if(TaskFissionType.GROUP_FISSION.getCode()
                     .equals(weFission.getFassionType())){
-                messageQuery.setChatType(2);
                 WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
                 List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
                         .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
@@ -202,24 +174,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                     });
 
-                    senderInfos.add(
-                            WeAddGroupMessageQuery
-                                    .SenderInfo
-                                    .builder()
-                                    .userId(executeUserOrGroup.getWeUserIds())
-                                    .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
-                                    .build()
-                    );
                 }
             }
-
-            messageQuery.setSenderList(senderInfos);
 
             //删除以前的
             iWeFissionNoticeService.physicalDelete(weFission.getId());
             iWeFissionNoticeService.saveBatch(weFissionNotices);
-            //通知员工群发
-            iWeMessagePushService.officialPushMessage(messageQuery);
+
         }
 
     }
@@ -430,6 +391,132 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
     }
 
+    @Override
+    public void handleFission() {
+
+        //查询处未期的裂变任务
+        List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
+                .ne(WeFission::getFassionState, 3));
+
+        if(CollectionUtil.isNotEmpty(weFissions)){
+            weFissions.stream().forEach(weFission -> {
+
+                //如果当前时间在裂变结束时间之前,则裂变结束
+               if(new Date().after(weFission.getFassionEndTime())){
+                   weFission.setFassionState(3);
+               }
+
+               //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
+                if(new Date().after(weFission.getFassionStartTime())&&
+                        new Date().before(weFission.getFassionEndTime())
+                ){
+
+                    //发送通知逻辑
+                  if(weFission.getIsTip().equals(new Integer(2))){
+
+                        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+                        messageQuery.setIsAll(false);
+                        messageQuery.setMsgSource(5);
+                        messageQuery.setIsTask(0);
+                        messageQuery.setLoginUser(SecurityUtils.getLoginUser());
+                        messageQuery.setContent(weFission.getContent());
+                        messageQuery.setBusinessIds(weFission.getId().toString());
+
+
+                        WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
+                        if(null != weMaterial){
+                            //构建发送素材
+                            messageQuery.setAttachmentsList(
+                                    ListUtil.toList(WeMessageTemplate.builder()
+                                            .title(weMaterial.getMaterialName())
+                                            .msgType(MediaType.LINK.getMediaType())
+                                            .linkUrl(weFission.getFissionUrl())
+                                            .build())
+                            );
+                        }
+
+
+//                        if(weFission.getFassionStartTime()//定时发送,活动时间
+//                                .after(new Date())){
+//                            messageQuery.setSendTime(weFission.getFassionStartTime());
+//                            messageQuery.setIsTask(1);
+//                        }else{ //立即发送
+//                            messageQuery.setIsTask(0);
+//                        }
+
+                        //构建群发时间
+                        List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
+
+                        //任务宝
+                        if(TaskFissionType.USER_FISSION.getCode()
+                                .equals(weFission.getFassionType())){
+                            messageQuery.setChatType(1);
+                            List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
+                                    weFission.getExecuteUserOrGroup()
+                            );
+
+                            if(CollectionUtil.isNotEmpty(weCustomersVos)){
+                                weCustomersVos.stream()
+                                        .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
+                                        .forEach((k,v)->{
+                                            senderInfos.add(
+                                                    WeAddGroupMessageQuery
+                                                            .SenderInfo
+                                                            .builder()
+                                                            .userId(k)
+                                                            .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
+                                                            .build()
+                                            );
+
+                                        });
+                            }
+                            //群裂变
+                        }else if(TaskFissionType.GROUP_FISSION.getCode()
+                                .equals(weFission.getFassionType())){
+                            messageQuery.setChatType(2);
+                            WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
+                            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                                    .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
+                                            ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
+                            if(CollectionUtil.isNotEmpty(weGroups)){
+
+                                senderInfos.add(
+                                        WeAddGroupMessageQuery
+                                                .SenderInfo
+                                                .builder()
+                                                .userId(executeUserOrGroup.getWeUserIds())
+                                                .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
+                                                .build()
+                                );
+                            }
+                        }
+
+                        messageQuery.setSenderList(senderInfos);
+
+                         weFission.setIsTip(1);
+                        //通知员工群发
+                        iWeMessagePushService.officialPushMessage(messageQuery);
+                    }
+
+
+                    weFission.setFassionState(2);
+                }
+
+
+
+
+
+            });
+
+
+            this.updateBatchById(weFissions);
+
+        }
+
+
+
+
+    }
 
 
     private void handleFissionRecord(String fissionInviterRecordId,WeFissionInviterRecordSub weFissionInviterRecordSub){
@@ -476,7 +563,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 weFissionInviterRecord = WeFissionInviterRecord.builder()
                         .fissionId(Long.parseLong(fissionId))
                         .inviterUnionid(unionid)
-                        .inviterNumber(weFission.getExchangeTip())
+//                        .inviterNumber(weFission.getExchangeTip())
                         .build();
                 //入库一份邀请记录
                 iWeFissionInviterRecordService.save(

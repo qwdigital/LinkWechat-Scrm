@@ -1,9 +1,6 @@
 package com.linkwechat.domain.fission;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -12,7 +9,10 @@ import com.linkwechat.domain.fission.vo.WeGroupMessageExecuteUserOrGroupTipVo;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -22,6 +22,9 @@ import java.util.Date;
  */
 @Data
 @TableName(value ="we_fission",autoResultMap = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeFission extends BaseEntity {
     /**
      * 主键
@@ -108,6 +111,16 @@ public class WeFission extends BaseEntity {
 
     @TableField(exist = false)
     private WeMaterial wematerial;
+
+
+    /**
+     * 是否发送过消息通知 1:发送过 2:未发送过
+     */
+    private Integer isTip;
+
+
+    @TableLogic
+    private Integer delFlag;
 
 
     @Data

@@ -56,7 +56,7 @@
             ) AS completeTaskOldCustomerNum,
             (
                 SELECT
-                    sum(wfd.inviter_number)
+                    (SELECT COUNT(*) from we_fission_inviter_record_sub wfirs WHERE wfirs.fission_inviter_record_id=wfd.id)
                 FROM
                     we_fission_inviter_record wfd
                 WHERE
@@ -84,7 +84,7 @@
 
             (
                 SELECT
-                    sum(wfd.inviter_number)
+                  IFNULL(sum(wfd.inviter_number),0)
                 FROM
                     we_fission_inviter_record wfd
                 WHERE
@@ -94,12 +94,12 @@
 
             (
                 SELECT
-                    sum(wfd.inviter_number)
+                    IFNULL(sum(wfd.inviter_number),0)
                 FROM
                     we_fission_inviter_record wfd
                 WHERE
                     wfd.fission_id = wf.id
-                  and  date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                  and  date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')  and wfd.inviter_state=1
             ) AS tdFissionCustomerNum
         FROM
             we_fission wf WHERE wf.id=#{fissionId}
@@ -113,8 +113,12 @@
              WHERE DATE_FORMAT(wfd.create_time,'%Y-%m-%d')=DATE_FORMAT(sdd.date,'%Y-%m-%d') AND wfd.fission_id=#{weFission.id}) as inviterOldCustomerNum,
             (SELECT COUNT(*) from we_fission_inviter_record wfd
              WHERE DATE_FORMAT(wfd.create_time,'%Y-%m-%d')=DATE_FORMAT(sdd.date,'%Y-%m-%d') AND wfd.inviter_state=1 AND wfd.fission_id=#{weFission.id}) as completeTaskOldCustomerNum,
-            (SELECT IFNULL(SUM(wfd.inviter_number),0) from we_fission_inviter_record wfd
-             WHERE DATE_FORMAT(wfd.create_time,'%Y-%m-%d')=DATE_FORMAT(sdd.date,'%Y-%m-%d') AND wfd.fission_id=#{weFission.id}) as fissionCustomerNum
+            IFNULL(
+                    (SELECT
+                         (SELECT COUNT(*) from we_fission_inviter_record_sub wfirs WHERE wfirs.fission_inviter_record_id=wfd.id)
+                     from we_fission_inviter_record wfd
+                     WHERE DATE_FORMAT(wfd.create_time,'%Y-%m-%d')=DATE_FORMAT(sdd.date,'%Y-%m-%d') AND wfd.fission_id=#{weFission.id})
+                ,0)  as fissionCustomerNum
         FROM
             sys_dim_date sdd
         WHERE 	DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{weFission.beginTime} AND #{weFission.endTime}
@@ -124,7 +128,7 @@
     <select id="findWeFissionDataReport" resultType="com.linkwechat.domain.fission.vo.WeFissionDataReportVo">
         SELECT
             DATE_FORMAT(create_time,'%Y-%m-%d') as date,
-	        COUNT(id) as completeTaskOldCustomerNum,
+	        COUNT( if(inviter_state=1,id,NULL) ) AS completeTaskOldCustomerNum,
 	        SUM(inviter_number) as fissionCustomerNum,
             (SELECT COUNT(*) FROM we_fission_inviter_record wfd WHERE wfd.inviter_state=1 AND date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')) as tdCompleteTaskOldCustomerNum,
             (SELECT SUM(wfd.inviter_number) FROM we_fission_inviter_record wfd WHERE  date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')) as tdFissionCustomerNum
@@ -177,7 +181,7 @@
           we_fission_inviter_record wfir
         LEFT JOIN we_fission_notice wfn ON wfir.fission_id = wfn.fission_id
         LEFT JOIN we_customer wc ON wc.external_userid = wfn.target_id
-        LEFT JOIN sys_user su ON su.we_user_id = wfn.send_we_userid AND wfn.target_id = wfir.inviter_member_id
+        LEFT JOIN sys_user su ON su.we_user_id = wfn.send_we_userid
         <where>
             <if test="customerName != null and customerName != ''">
                 and wc.customer_name like concat('%',#{customerName},'%')

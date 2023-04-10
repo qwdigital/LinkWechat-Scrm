@@ -360,10 +360,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
+
+
+                weCustomers.stream().forEach(fWeCustomer->{
+
+                    iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(),fWeCustomer);
+
+                });
+
+
             }
 
-
         }
+
+
 
 
     }

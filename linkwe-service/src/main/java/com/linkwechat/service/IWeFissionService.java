@@ -108,4 +108,10 @@ public interface IWeFissionService extends IService<WeFission> {
      * @param weGroupMember 邀请进群的成员
      */
     void handleGroupFissionRecord(String state, WeGroupMember weGroupMember);
+
+
+    /**
+     * 裂变处理(状态维护，过期状态维护)
+     */
+    void handleFission();
 }
