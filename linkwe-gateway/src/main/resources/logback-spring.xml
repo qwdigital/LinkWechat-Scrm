@@ -25,7 +25,7 @@
     <property name="app_name" value="linkwe-gateway"/>
     <!-- 日志根目录-->
     <springProperty scope="context" name="log.path" source="logging.path"
-                    defaultValue="1/logs/linkwe-gateway"/>
+                    defaultValue="./logs/linkwe-gateway"/>
 
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
