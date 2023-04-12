@@ -13,7 +13,7 @@
                        FROM
                            we_fission_notice wfn
                        WHERE
-                           wfn.fission_id = wf.id
+                           wfn.fission_id = wf.id and wfn.msg_id is NOT NULL
                    ),0)  AS inviterOldCustomerNum,
             IFNULL((
                        SELECT
@@ -44,7 +44,7 @@
                 FROM
                     we_fission_notice wfn
                 WHERE
-                    wfn.fission_id = wf.id
+                    wfn.fission_id = wf.id and wfn.msg_id is NOT NULL
             ) AS inviterOldCustomerNum,
             (
                 SELECT

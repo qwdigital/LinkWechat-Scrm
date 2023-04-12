@@ -183,13 +183,19 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             }else if(TaskFissionType.GROUP_FISSION.getCode()
                     .equals(weFission.getFassionType())){
                 WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
-                List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
-                        .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
-                                ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
+
+                LambdaQueryWrapper<WeGroup> weGroupLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                if(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds())){
+                    weGroupLambdaQueryWrapper.in(
+                            WeGroup::getOwner,
+                            ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))
+                    );
+                }
+                List<WeGroup> weGroups = iWeGroupService.list(weGroupLambdaQueryWrapper);
                 if(CollectionUtil.isNotEmpty(weGroups)){
 
                     List<WeGroupMember> weGroupMembers = iWeGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>()
-                                    .eq(WeGroupMember::getCustomerType,1)
+                                    .eq(WeGroupMember::getType,1)
                             .in(WeGroupMember::getChatId, weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
                     if(CollectionUtil.isNotEmpty(weGroupMembers)){
 
