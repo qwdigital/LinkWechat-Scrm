@@ -46,6 +46,12 @@ public class WeFissionNotice extends BaseEntity {
 
 
     /**
+     * 当target_type为2时，当前字段为具体群成员的userId;当target_type为1时,当前字段客户的微信uid
+     */
+    private String targetSubId;
+
+
+    /**
      * 消息id
      */
     private String msgId;

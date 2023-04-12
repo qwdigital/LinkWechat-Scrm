@@ -27,6 +27,7 @@ import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
@@ -95,6 +96,9 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
 
+    @Autowired
+    private IWeGroupMemberService iWeGroupMemberService;
+
     @Override
     @Transactional
     public void buildWeFission(WeFission weFission) {
@@ -108,11 +112,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         }
 
 
-//        //设置活动状态
-//        if((weFission.getFassionStartTime()//设置为进行中
-//                .before(new Date()))){
-//            weFission.setFassionState(2);
-//        }
 
         //如果当前时间在裂变结束时间之前,则裂变结束
         if(new Date().after(weFission.getFassionEndTime())){
@@ -124,6 +123,30 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 new Date().before(weFission.getFassionEndTime())
         ) {
             weFission.setFassionState(2);
+
+        }
+
+        WeFission.ExchangeContent exchangeContent = weFission.getExchangeContent();
+
+        if(null != exchangeContent){
+
+            if(StringUtils.isNotEmpty(exchangeContent.getWeUserId())){
+                WeAddWayVo weAddWayVo = iWeQrCodeService.createQrbyWeUserIds(
+                        ListUtil.toList(exchangeContent.getWeUserId()),
+                        WeConstans.FISSION_CUSTOMER_SERVICE + weFission.getId()
+                );
+
+                if(weAddWayVo.getErrCode() !=null && WeConstans.WE_SUCCESS_CODE.equals(weAddWayVo.getErrCode())) {
+                    exchangeContent.setCustomerServiceCodeUrl(
+                            weAddWayVo.getQrCode()
+                    );
+                    weFission.setExchangeContent(
+                            exchangeContent
+                    );
+                }
+
+            }
+
 
         }
 
@@ -148,6 +171,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                    weFissionNotices.add(WeFissionNotice.builder()
                                            .fissionId(weFission.getId())
                                            .targetId(kk.getExternalUserid())
+                                           .targetSubId(kk.getUnionid())
                                            .targetType(1)
                                            .sendWeUserid(k)
                                            .build());
@@ -163,16 +187,27 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
                                 ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
                 if(CollectionUtil.isNotEmpty(weGroups)){
-                    weGroups.stream().forEach(weGroup -> {
 
-                        weFissionNotices.add(WeFissionNotice.builder()
-                                .fissionId(weFission.getId())
-                                .targetId(weGroup.getChatId())
-                                .targetType(2)
-                                .sendWeUserid(weGroup.getOwner())
-                                .build());
+                    List<WeGroupMember> weGroupMembers = iWeGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>()
+                                    .eq(WeGroupMember::getCustomerType,1)
+                            .in(WeGroupMember::getChatId, weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
+                    if(CollectionUtil.isNotEmpty(weGroupMembers)){
 
-                    });
+                        weGroupMembers.stream().forEach(weGroupMember -> {
+                            weFissionNotices.add(WeFissionNotice.builder()
+                                    .fissionId(weFission.getId())
+                                    .targetId(weGroupMember.getChatId())
+                                    .targetType(2)
+                                     .targetSubId(weGroupMember.getUnionId())
+                                    .sendWeUserid(
+                                            weGroups.stream().filter(weGroup -> weGroup.getChatId().equals(weGroupMember.getChatId())).findAny().get().getOwner()
+                                    )
+                                    .build());
+
+                        });
+
+                    }
+
 
                 }
             }
@@ -211,13 +246,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     }
 
     @Override
-    public List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String customerName, String weUserId,String chatId) {
-        return this.baseMapper.findWeGroupFissionDetail(customerName, weUserId,chatId);
+    public List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String fissionId,String customerName, String weUserId,String chatId) {
+        return this.baseMapper.findWeGroupFissionDetail(fissionId,customerName, weUserId,chatId);
     }
 
     @Override
-    public List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String customerName, String weUserId) {
-        return this.baseMapper.findWeTaskFissionDetail(customerName, weUserId);
+    public List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String fissionId,String customerName, String weUserId) {
+        return this.baseMapper.findWeTaskFissionDetail(fissionId,customerName, weUserId);
     }
 
     @Override
@@ -317,17 +352,21 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         weGroupCode.setState(WeConstans.FISSION_PREFIX_QLB + weFissionInviterRecord.getId());
 
 
-                        WeGroupChatAddJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(weGroupCode);
+                        WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(weGroupCode);
 
-                        if(null != addJoinWayVo && StringUtils.isNotEmpty(addJoinWayVo.getConfig_id())){
+                        if(null != addJoinWayVo){
+                            WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
+                            if(joinWay != null){
 
-                            weFissionInviterPoster.setState(weGroupCode.getState());
-                            weFissionInviterPoster.setConfig(weGroupCode.getConfigId());
+                                weFissionInviterPoster.setState(weGroupCode.getState());
+                                weFissionInviterPoster.setConfig(joinWay.getConfig_id());
 
-                            WeMaterial material = materialService.builderPosterWeMaterial( weGroupCode.getCodeUrl(),weFission.getPosterId());
-                            if(null != material){
-                                weFissionInviterPoster.setFissionPosterUrl(material.getMaterialUrl());
+                                WeMaterial material = materialService.builderPosterWeMaterial( joinWay.getQr_code(),weFission.getPosterId());
+                                if(null != material){
+                                    weFissionInviterPoster.setFissionPosterUrl(material.getMaterialUrl());
+                                }
                             }
+
 
                         }
 
@@ -358,6 +397,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             .addTargetId(weCustomer.getAddUserId())
                             .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
                             .addTargetType(1)
+                            .avatar(weCustomer.getAvatar())
                             .inviterUserName(weCustomer.getCustomerName())
                             .build()
             );

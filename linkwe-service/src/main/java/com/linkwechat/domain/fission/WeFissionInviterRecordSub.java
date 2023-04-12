@@ -1,6 +1,7 @@
 package com.linkwechat.domain.fission;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -49,5 +50,18 @@ public class WeFissionInviterRecordSub extends BaseEntity {
      * 1:企业员工;2:群
      */
     private Integer addTargetType;
+
+
+    /**
+     * 头像
+     */
+    private String avatar;
+
+
+    /**
+     * 是否删除
+     */
+    @TableLogic
+    private Integer delFlag;
 
 }

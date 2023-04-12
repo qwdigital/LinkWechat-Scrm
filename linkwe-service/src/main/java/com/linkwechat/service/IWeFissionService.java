@@ -61,20 +61,22 @@ public interface IWeFissionService extends IService<WeFission> {
 
     /**
      * 裂变明细(群裂变)
+     * @param fissionId
      * @param customerName
      * @param weUserId
      * @return
      */
-    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String customerName, String weUserId,String chatId);
+    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String fissionId,String customerName, String weUserId,String chatId);
 
 
     /**
      * 裂变明细(任务宝)
+     * @param fissionId
      * @param customerName
      * @param weUserId
      * @return
      */
-    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String customerName,String weUserId);
+    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String fissionId,String customerName,String weUserId);
 
 
     /**

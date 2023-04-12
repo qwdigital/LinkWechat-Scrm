@@ -29,6 +29,9 @@ public class WeGroupMessageExecuteUsertipVo {
     //跟进状态
     private Integer trackState;
 
+    //客户类型
+    private Integer customerType;
+
 
 
 }

@@ -131,6 +131,12 @@ public class WeConstans {
 
 
     /**
+     * 裂变-客服
+     */
+    public static final String FISSION_CUSTOMER_SERVICE="fis-kf-";
+
+
+    /**
      * 裂变-群裂变
      */
     public static final String FISSION_PREFIX_QLB="fis-qlb-";

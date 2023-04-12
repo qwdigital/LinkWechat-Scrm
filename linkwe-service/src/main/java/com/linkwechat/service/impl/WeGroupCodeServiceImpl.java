@@ -130,7 +130,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                 WeComeStateContants.QHM_STATE + UUID.get16UUID()
         );
         //配置进群方式
-        WeGroupChatAddJoinWayVo addJoinWayVo = this.builderGroupCodeUrl(weGroupCode);
+        WeGroupChatAddJoinWayVo addJoinWayVo = this.builderGroupCodeConfig(weGroupCode);
 
         if(null != addJoinWayVo && StringUtils.isNotEmpty(addJoinWayVo.getConfig_id())){
 
@@ -182,7 +182,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                         .state(weGroupCode.getState())
                         .build()
         ).getData();
-        if(null != weResultVo && weResultVo.getErrCode() == WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()){
+        if(null != weResultVo && weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
             if(updateById(weGroupCode)){
                 String tagIds = weGroupCode.getTagIds();
                 if(StringUtils.isNotEmpty(tagIds)){
@@ -241,7 +241,26 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
     }
 
     @Override
-    public WeGroupChatAddJoinWayVo builderGroupCodeUrl(WeGroupCode weGroupCode) {
+    public WeGroupChatGetJoinWayVo builderGroupCodeUrl(WeGroupCode weGroupCode) {
+
+        WeGroupChatAddJoinWayVo addJoinWayVo = this.builderGroupCodeConfig(weGroupCode);
+
+        if(null != addJoinWayVo && StringUtils.isNotEmpty(addJoinWayVo.getConfig_id())){
+
+            //获取进群二维码
+            return qwCustomerClient.getJoinWayForGroupChat(WeGroupChatJoinWayQuery.builder()
+                    .config_id(addJoinWayVo.getConfig_id())
+                    .build()).getData();
+
+        }
+
+
+
+        return  null;
+    }
+
+    @Override
+    public WeGroupChatAddJoinWayVo builderGroupCodeConfig(WeGroupCode weGroupCode) {
 
         //配置进群方式
         WeGroupChatAddJoinWayVo addJoinWayVo = qwCustomerClient.addJoinWayForGroupChat(
@@ -255,7 +274,8 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                         .build()
         ).getData();
 
-        return  addJoinWayVo;
+
+        return addJoinWayVo;
     }
 
 

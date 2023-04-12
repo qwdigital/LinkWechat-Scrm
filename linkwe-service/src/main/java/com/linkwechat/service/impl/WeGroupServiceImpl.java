@@ -327,9 +327,12 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                 //物理删除已有的del_flag为非0的数据
                 groupMemberList.stream().forEach(kk->{
                     weGroupMemberService.physicalDelete(kk.getChatId(),kk.getUserId());
+                    iWeFissionService.handleGroupFissionRecord(kk.getState(),kk);
                 });
 
                 weGroupMemberService.saveBatch(groupMemberList);
+
+
             }
         }
     }

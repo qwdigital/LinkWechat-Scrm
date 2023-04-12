@@ -7,6 +7,7 @@ import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatAddJoinWayQuery;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.text.ParseException;
@@ -81,6 +82,14 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @param weGroupCode
      * @return
      */
-    WeGroupChatAddJoinWayVo builderGroupCodeUrl(WeGroupCode weGroupCode);
+    WeGroupChatGetJoinWayVo builderGroupCodeUrl(WeGroupCode weGroupCode);
+
+
+    /**
+     * 构建群活码config
+     * @param weGroupCode
+     * @return
+     */
+    WeGroupChatAddJoinWayVo builderGroupCodeConfig(WeGroupCode weGroupCode);
 
 }

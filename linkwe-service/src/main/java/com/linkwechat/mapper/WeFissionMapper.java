@@ -54,11 +54,12 @@ public interface WeFissionMapper extends BaseMapper<WeFission> {
 
     /**
      * 群裂变-裂变明细
+     * @param fissionId
      * @param customerName
      * @param weUserId
      * @return
      */
-    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(@Param("customerName") String customerName, @Param("weUserId") String weUserId,@Param("chatId") String chatId);
+    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(@Param("fissionId") String fissionId,@Param("customerName") String customerName, @Param("weUserId") String weUserId,@Param("chatId") String chatId);
 
 
     /**
@@ -67,7 +68,7 @@ public interface WeFissionMapper extends BaseMapper<WeFission> {
      * @param weUserId
      * @return
      */
-    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(@Param("customerName") String customerName, @Param("weUserId") String weUserId);
+    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(@Param("fissionId") String fissionId,@Param("customerName") String customerName, @Param("weUserId") String weUserId);
 
     /**
      * 裂变明细sub

@@ -122,6 +122,24 @@ public class WeFission extends BaseEntity {
     @TableLogic
     private Integer delFlag;
 
+    /**
+     * 邀请老客数量
+     */
+    @TableField(exist = false)
+    private Integer inviterOldCustomerNum;
+
+    /**
+     * 完成任务老客数
+     */
+    @TableField(exist = false)
+    private Integer completeTaskOldCustomerNum;
+
+    /**
+     * 裂变新客数
+     */
+    @TableField(exist = false)
+    private Integer fissionCustomerNum;
+
 
     @Data
     public static class ExchangeContent{
