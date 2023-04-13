@@ -19,7 +19,6 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerSeas;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
-import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.qr.WeQrAttachments;
