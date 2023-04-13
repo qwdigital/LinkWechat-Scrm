@@ -2,6 +2,9 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.fission.WeFissionInviterRecordSub;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author robin
@@ -10,6 +13,7 @@ import com.linkwechat.domain.fission.WeFissionInviterRecordSub;
 * @Entity com.linkwechat.WeFissionDetailSub
 */
 public interface WeFissionInviterRecordSubMapper extends BaseMapper<WeFissionInviterRecordSub> {
+    void batchSaveOrUpdate(@Param("weFissionInviterRecordSubList") List<WeFissionInviterRecordSub> weFissionInviterRecordSubList);
 
 }
 

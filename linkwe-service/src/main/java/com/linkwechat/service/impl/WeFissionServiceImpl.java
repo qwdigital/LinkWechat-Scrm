@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MediaType;
@@ -195,7 +196,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 if(CollectionUtil.isNotEmpty(weGroups)){
 
                     List<WeGroupMember> weGroupMembers = iWeGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>()
-                                    .eq(WeGroupMember::getType,1)
+                                    .eq(WeGroupMember::getType,2)
                             .in(WeGroupMember::getChatId, weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList())));
                     if(CollectionUtil.isNotEmpty(weGroupMembers)){
 
@@ -232,6 +233,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 .like(StringUtils.isNotEmpty(weFission.getFassionName()),WeFission::getFassionName,weFission.getFassionName())
                 .eq(weFission.getFassionType() != null,WeFission::getFassionType,weFission.getFassionType())
                 .eq(weFission.getFassionState() != null,WeFission::getFassionState,weFission.getFassionState())
+                        .eq(WeFission::getDelFlag, Constants.NORMAL_CODE)
                 .orderByDesc(WeFission::getUpdateTime));
         return weFissions;
     }
@@ -398,14 +400,17 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         if(StringUtils.isNotEmpty(state) && state.startsWith(WeConstans.FISSION_PREFIX_RWB)){
             String fissionInviterRecordId = state.substring(WeConstans.FISSION_PREFIX_RWB.length());
+
+            WeFissionInviterRecordSub weFissionInviterRecordSub = WeFissionInviterRecordSub.builder()
+                    .addTargetId(weCustomer.getAddUserId())
+                    .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
+                    .userId(weCustomer.getExternalUserid())
+                    .addTargetType(1)
+                    .avatar(weCustomer.getAvatar())
+                    .inviterUserName(weCustomer.getCustomerName())
+                    .build();
             this.handleFissionRecord(fissionInviterRecordId,
-                    WeFissionInviterRecordSub.builder()
-                            .addTargetId(weCustomer.getAddUserId())
-                            .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
-                            .addTargetType(1)
-                            .avatar(weCustomer.getAvatar())
-                            .inviterUserName(weCustomer.getCustomerName())
-                            .build()
+                    weFissionInviterRecordSub
             );
         }
 
@@ -425,6 +430,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             this.handleFissionRecord(fissionInviterRecordId,
                     WeFissionInviterRecordSub.builder()
                             .addTargetId(weGroupMember.getChatId())
+                            .userId(weGroupMember.getUserId())
                             .fissionInviterRecordId(Long.parseLong(fissionInviterRecordId))
                             .addTargetType(2)
                             .inviterUserName(weGroupMember.getName())
@@ -570,7 +576,15 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         WeFissionInviterRecord weFissionInviterRecord
                 = iWeFissionInviterRecordService.getById(fissionInviterRecordId);
         if(null != weFissionInviterRecord){
-            iWeFissionInviterRecordSubService.save(weFissionInviterRecordSub);
+            weFissionInviterRecordSub.setId(SnowFlakeUtil.nextId());
+            weFissionInviterRecordSub.setCreateBy(SecurityUtils.getUserName());
+            weFissionInviterRecordSub.setCreateTime(new Date());
+            weFissionInviterRecordSub.setCreateById(SecurityUtils.getUserId());
+            weFissionInviterRecordSub.setUpdateBy(SecurityUtils.getUserName());
+            weFissionInviterRecordSub.setUpdateTime(new Date());
+            weFissionInviterRecordSub.setUpdateById(SecurityUtils.getUserId());
+            weFissionInviterRecordSub.setDelFlag(Constants.COMMON_STATE);
+            iWeFissionInviterRecordSubService.batchSaveOrUpdate(ListUtil.toList(weFissionInviterRecordSub));
 
             int inviterRecordNumber = iWeFissionInviterRecordSubService.count(new LambdaQueryWrapper<WeFissionInviterRecordSub>()
                     .eq(WeFissionInviterRecordSub::getFissionInviterRecordId, fissionInviterRecordId));

@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
 * @author robin
 * @description 针对表【we_fission_detail_sub(裂变明细子表)】的数据库操作Service实现
@@ -61,6 +63,12 @@ public class WeFissionInviterRecordSubServiceImpl extends ServiceImpl<WeFissionI
         }
 
         return weFissionProgressVo;
+    }
+
+    @Override
+    public void batchSaveOrUpdate(List<WeFissionInviterRecordSub> weFissionInviterRecordSubList) {
+
+        this.baseMapper.batchSaveOrUpdate(weFissionInviterRecordSubList);
     }
 }
 

@@ -59,6 +59,12 @@ public class WeFissionInviterRecordSub extends BaseEntity {
 
 
     /**
+     * 任务宝时当前id代表客户id，群裂变时当前id代表群成员id
+     */
+    private String userId;
+
+
+    /**
      * 是否删除
      */
     @TableLogic
