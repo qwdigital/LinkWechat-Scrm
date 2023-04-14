@@ -75,21 +75,25 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper, WeTag> implements
 
     @Override
     public void removeWxTag(String groupId, List<WeTag> removeWeTags,boolean removeGroup) {
+       this.removeWxTag(groupId,removeWeTags,removeGroup,true);
+    }
+
+    @Override
+    public void removeWxTag(String groupId, List<WeTag> removeWeTags, boolean removeGroup, Boolean qwNotify) {
         //同步删除微信端的标签
         try {
-            WeCorpTagListQuery tagListQuery = WeCorpTagListQuery.builder().build();
-            if (removeGroup) {
-                tagListQuery.setGroup_id(ListUtil.toList(groupId));
-            } else {
-                tagListQuery.setTag_id(
-                        removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()
-                        ));
+            if(qwNotify){
+                WeCorpTagListQuery tagListQuery = WeCorpTagListQuery.builder().build();
+                if (removeGroup) {
+                    tagListQuery.setGroup_id(ListUtil.toList(groupId));
+                } else {
+                    tagListQuery.setTag_id(
+                            removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()
+                            ));
+                }
+
+                qwCustomerClient.delCorpTag(tagListQuery);
             }
-
-
-            qwCustomerClient.delCorpTag(
-                    tagListQuery
-                    );
         }catch (Exception e){
             log.error(e.getMessage());
         } finally {

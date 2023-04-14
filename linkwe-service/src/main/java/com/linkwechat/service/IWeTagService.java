@@ -23,7 +23,15 @@ public interface IWeTagService extends IService<WeTag> {
      * @param removeWeTags
      * @param removeGroup 移除组
      */
-    void removeWxTag(String groupId,List<WeTag> removeWeTags,boolean removeGroup);
+    void removeWxTag(String groupId,List<WeTag> removeWeTags,boolean removeGroup );
+    /**
+     * 从企业微信端移除抱歉
+     * @param groupId
+     * @param removeWeTags
+     * @param removeGroup 移除组
+     * @param qwNotify 是否调用企微接口
+     */
+    void removeWxTag(String groupId,List<WeTag> removeWeTags,boolean removeGroup, Boolean qwNotify);
 
 
     /**

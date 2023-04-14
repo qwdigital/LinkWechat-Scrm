@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFissionInviterRecordSubMapper">
+
+    <insert id="batchSaveOrUpdate">
+        INSERT INTO we_fission_inviter_record_sub(
+            id,
+            fission_inviter_record_id,
+            inviter_user_name,
+            user_id,
+            avatar,
+            add_target_id,
+            add_target_type,
+            create_by,
+            create_by_id,
+            create_time,
+            update_by,
+            update_by_id,
+            update_time,
+            del_flag
+        ) values
+        <foreach collection="weFissionInviterRecordSubList" item="item" index="index" separator=",">
+            (#{item.id},#{item.fissionInviterRecordId},#{item.inviterUserName},#{item.userId},#{item.avatar},#{item.addTargetId}, #{item.addTargetType},#{item.createBy},
+            #{item.createById},#{item.createTime},#{item.updateBy}, #{item.updateById},
+            #{item.updateTime},#{item.delFlag}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+           avatar=IFNULL(VALUES(avatar),we_fission_inviter_record_sub.avatar),
+           inviter_user_name=IFNULL(VALUES(inviter_user_name),we_fission_inviter_record_sub.inviter_user_name),
+           update_by=IFNULL(VALUES(update_by),we_fission_inviter_record_sub.update_by),
+           update_by_id=IFNULL(VALUES(update_by_id),we_fission_inviter_record_sub.update_by_id),
+           update_time=IFNULL(VALUES(update_time),we_fission_inviter_record_sub.update_time);
+    </insert>
+
+
+</mapper>
