@@ -36,6 +36,8 @@ import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.*;
+import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
+import com.linkwechat.domain.tag.vo.WeTagVo;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
@@ -54,6 +56,7 @@ import com.linkwechat.mapper.WeCustomerMapper;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +86,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Autowired
+    @Lazy
     private IWeGroupService iWeGroupService;
 
     @Autowired
@@ -101,6 +105,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Autowired
     private IWeCustomerInfoExpandService iWeCustomerInfoExpandService;
+
+    @Autowired
+    @Lazy
+    private  IWeFissionService iWeFissionService;
 
 
     @Override
@@ -352,10 +360,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
+
+
+                weCustomers.stream().forEach(fWeCustomer->{
+
+                    iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(),fWeCustomer);
+
+                });
+
+
             }
 
-
         }
+
+
 
 
     }
@@ -956,13 +974,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             }
 
+            iWeFissionService.handleTaskFissionRecord(state,weCustomer);
 
-//            if(StringUtils.isNotEmpty(state)){
+
             //生成轨迹
-            iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId, userId, true, true);
+            iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId,userId,true,true);
             //为被添加员工发送一条消息提醒
-            iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@" + weCustomer.getCustomerName() + "刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(), false);
-//            }
+            iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@"+weCustomer.getCustomerName()+"刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(),false);
+
 
         }
     }
@@ -1111,10 +1130,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         if (CollectionUtil.isNotEmpty(weMakeCustomerTagList)) {
 
 
-            weMakeCustomerTagList.stream().forEach(weMakeCustomerTag -> {
+            weMakeCustomerTagList.forEach(weMakeCustomerTag -> {
 
 
-                if (makeCustomerTags.isAddOrRemove()) {//新增标签
+                //新增标签
+                if(makeCustomerTags.isAddOrRemove()){
 
                     //当前客户已存在的标签
                     List<String> exitTagIds = new ArrayList<>();
@@ -1176,7 +1196,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                 } else { //标签移除
 
-
+                    //标签移除
                     List<WeTag> addTag = weMakeCustomerTag.getAddTag();
 
 
@@ -1185,7 +1205,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                         .in(WeFlowerCustomerTagRel::getTagId, addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
                                         .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
-                                        .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+                                        .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
+                                        .eq(WeFlowerCustomerTagRel::getDelFlag,0));
 
                         if (CollectionUtil.isNotEmpty(customerTagRels)) {
 
@@ -1218,6 +1239,53 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
         }
+    }
+
+    @Override
+    public List<WeCustomersVo> findWeCustomersForCommonAssembly(WeGroupMessageExecuteUsertipVo executeUserOrGroup) {
+
+
+        WeCustomersQuery weCustomersQuery = WeCustomersQuery.builder()
+                .delFlag(Constants.COMMON_STATE)
+                .build();
+
+        if(executeUserOrGroup != null){
+            weCustomersQuery.setUserIds(
+                    executeUserOrGroup.getWeUserIds()
+            );
+            weCustomersQuery.setGender(
+                    executeUserOrGroup.getGender()
+            );
+
+
+            if(executeUserOrGroup.getBeginTime() != null){
+                weCustomersQuery.setBeginTime(
+                        DateUtils.dateTime(executeUserOrGroup.getBeginTime())
+                );
+            }
+
+
+            weCustomersQuery.setTagIds(
+                    executeUserOrGroup.getTagIds()
+            );
+
+            if(executeUserOrGroup.getEndTime() != null){
+                weCustomersQuery.setEndTime(
+                        DateUtils.dateTime(executeUserOrGroup.getEndTime())
+                );
+            }
+
+            weCustomersQuery.setTrackState(
+                    executeUserOrGroup.getTrackState()
+            );
+
+        }
+
+
+        return this.findWeCustomerList(
+                weCustomersQuery, null
+        );
+
     }
 
 

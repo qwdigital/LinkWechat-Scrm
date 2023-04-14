@@ -88,6 +88,9 @@ public class WeCustomersVo {
     //标签名称，使用逗号隔开(企业标签名)
     private String tagNames;
 
+    //外部联系人在微信开放平台的唯一身份标识,通过此字段企业可将外部联系人与公众号/小程序用户关联起来。
+    private String unionid;
+
 
     //跟进时间或流失时间
     private Date trackTime;
