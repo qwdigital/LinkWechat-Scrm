@@ -177,5 +177,15 @@ public interface IWeMaterialService extends IService<WeMaterial> {
     String importData(MultipartFile file) throws IOException;
 
 
+    /**
+     * 替换海报中占位符,生成实际二维码
+     * @param actualCodeUrl
+     * @param posterId
+     * @return
+     */
+    WeMaterial builderPosterWeMaterial(String actualCodeUrl,Long posterId);
+
+
+
 
 }

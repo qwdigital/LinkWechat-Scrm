@@ -190,12 +190,13 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                 .in(WeTagGroup::getGroupId,ListUtil.toList(ids)));
 
         if(CollectionUtil.isNotEmpty(weTagGroups)){
-            weTagGroups.stream().forEach(k->{
+            weTagGroups.forEach(k->{
                 if(this.removeById(k.getId())){
                     iWeTagService.removeWxTag(k.getGroupId(),
                             iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                     .eq(WeTag::getGroupId, k.getId())),
-                            true
+                            true,
+                            k.getGroupTagType() == 1
                     );
                 }
             });
