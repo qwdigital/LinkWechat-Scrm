@@ -1,17 +1,18 @@
 package com.linkwechat.domain.fission;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
 import com.linkwechat.domain.fission.vo.WeGroupMessageExecuteUserOrGroupTipVo;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -20,7 +21,10 @@ import java.util.Date;
  * @TableName we_fission
  */
 @Data
-@TableName(value ="we_fission")
+@TableName(value ="we_fission",autoResultMap = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeFission extends BaseEntity {
     /**
      * 主键
@@ -46,11 +50,13 @@ public class WeFission extends BaseEntity {
     /**
      * 任务开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date fassionStartTime;
 
     /**
      * 任务结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date fassionEndTime;
 
     /**
@@ -105,6 +111,34 @@ public class WeFission extends BaseEntity {
 
     @TableField(exist = false)
     private WeMaterial wematerial;
+
+
+    /**
+     * 是否发送过消息通知 1:发送过 2:未发送过
+     */
+    private Integer isTip;
+
+
+    @TableLogic
+    private Integer delFlag;
+
+    /**
+     * 邀请老客数量
+     */
+    @TableField(exist = false)
+    private Integer inviterOldCustomerNum;
+
+    /**
+     * 完成任务老客数
+     */
+    @TableField(exist = false)
+    private Integer completeTaskOldCustomerNum;
+
+    /**
+     * 裂变新客数
+     */
+    @TableField(exist = false)
+    private Integer fissionCustomerNum;
 
 
     @Data

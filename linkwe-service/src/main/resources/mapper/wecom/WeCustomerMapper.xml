@@ -178,6 +178,7 @@
     <select id="findWeCustomerList" resultType="com.linkwechat.domain.customer.vo.WeCustomersVo">
         SELECT
         wc.id,
+        wc.unionid,
         wc.avatar,
         wc.customer_name,
         wc.customer_type as customerType,

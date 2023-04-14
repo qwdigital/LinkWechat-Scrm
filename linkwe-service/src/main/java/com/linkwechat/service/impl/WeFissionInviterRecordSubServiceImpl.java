@@ -8,12 +8,15 @@ import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.WeFissionInviterRecord;
 import com.linkwechat.domain.fission.WeFissionInviterRecordSub;
 import com.linkwechat.domain.fission.vo.WeFissionProgressVo;
+import com.linkwechat.mapper.WeFissionInviterRecordSubMapper;
 import com.linkwechat.service.IWeFissionInviterRecordService;
 import com.linkwechat.service.IWeFissionInviterRecordSubService;
-import com.linkwechat.mapper.WeFissionInviterRecordSubMapper;
 import com.linkwechat.service.IWeFissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author robin
@@ -25,6 +28,7 @@ public class WeFissionInviterRecordSubServiceImpl extends ServiceImpl<WeFissionI
     implements IWeFissionInviterRecordSubService {
 
     @Autowired
+    @Lazy
     private IWeFissionService iWeFissionService;
 
 
@@ -59,6 +63,12 @@ public class WeFissionInviterRecordSubServiceImpl extends ServiceImpl<WeFissionI
         }
 
         return weFissionProgressVo;
+    }
+
+    @Override
+    public void batchSaveOrUpdate(List<WeFissionInviterRecordSub> weFissionInviterRecordSubList) {
+
+        this.baseMapper.batchSaveOrUpdate(weFissionInviterRecordSubList);
     }
 }
 

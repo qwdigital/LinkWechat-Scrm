@@ -3,7 +3,6 @@ package com.linkwechat.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.fission.WeFissionInviterRecord;
 import com.linkwechat.service.IWeFissionInviterRecordService;
-import com.linkwechat.mapper.WeFissionInviterRecordMapper;
 import org.springframework.stereotype.Service;
 
 /**

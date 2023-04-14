@@ -1,7 +1,7 @@
 package com.linkwechat.service;
 
-import com.linkwechat.domain.fission.WeFissionInviterRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.fission.WeFissionInviterRecord;
 
 /**
 * @author robin

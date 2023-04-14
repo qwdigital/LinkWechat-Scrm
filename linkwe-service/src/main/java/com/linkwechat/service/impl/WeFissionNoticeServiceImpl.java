@@ -2,8 +2,8 @@ package com.linkwechat.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.fission.WeFissionNotice;
-import com.linkwechat.service.IWeFissionNoticeService;
 import com.linkwechat.mapper.WeFissionNoticeMapper;
+import com.linkwechat.service.IWeFissionNoticeService;
 import org.springframework.stereotype.Service;
 
 /**

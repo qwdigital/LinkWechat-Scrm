@@ -46,8 +46,20 @@ public class WeFissionNotice extends BaseEntity {
 
 
     /**
+     * 当target_type为2时，当前字段为具体群成员的userId;当target_type为1时,当前字段客户的微信uid
+     */
+    private String targetSubId;
+
+
+    /**
      * 消息id
      */
     private String msgId;
+
+
+    /**
+     * 员工是否已经将消息发送给老客： -1：失败  0：未执行 1：完成 2：取消
+     */
+    private Integer status;
 
 }

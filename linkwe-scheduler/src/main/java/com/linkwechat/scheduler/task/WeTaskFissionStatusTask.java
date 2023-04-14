@@ -1,5 +1,6 @@
 package com.linkwechat.scheduler.task;
 
+import com.linkwechat.service.IWeFissionService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class WeTaskFissionStatusTask {
-//    @Autowired
-//    private IWeTaskFissionService weTaskFissionService;
+
+    @Autowired
+    private IWeFissionService iWeFissionService;
 
     @XxlJob("weTaskFissionStatusTask")
     public void taskFissionExpiredStatusHandle() {
-        log.info("任务宝过期时间处理--------------------------start");
-//        weTaskFissionService.updateExpiredWeTaskFission();
-        log.info("任务宝过期时间处理--------------------------end");
+        log.info("裂变相关处理--------------------------start");
+        iWeFissionService.handleFission();
+        log.info("裂变相关处理--------------------------end");
     }
 }

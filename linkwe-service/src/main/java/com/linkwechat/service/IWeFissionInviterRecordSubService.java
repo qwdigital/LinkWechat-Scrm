@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.fission.WeFissionInviterRecordSub;
 import com.linkwechat.domain.fission.vo.WeFissionProgressVo;
 
+import java.util.List;
+
 /**
 * @author robin
 * @description 针对表【we_fission_detail_sub(裂变明细子表)】的数据库操作Service
@@ -18,5 +20,12 @@ public interface IWeFissionInviterRecordSubService extends IService<WeFissionInv
      * @return
      */
     WeFissionProgressVo findWeFissionProgress(String unionid,String fissionId);
+
+
+    /**
+     * 批量报错或更新
+     * @param weFissionInviterRecordSubList
+     */
+    void batchSaveOrUpdate(List<WeFissionInviterRecordSub> weFissionInviterRecordSubList);
 
 }

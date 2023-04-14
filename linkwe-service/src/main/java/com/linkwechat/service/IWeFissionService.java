@@ -2,10 +2,11 @@ package com.linkwechat.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.WeFissionInviterPoster;
 import com.linkwechat.domain.fission.vo.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -58,20 +59,22 @@ public interface IWeFissionService extends IService<WeFission> {
 
     /**
      * 裂变明细(群裂变)
+     * @param fissionId
      * @param customerName
      * @param weUserId
      * @return
      */
-    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String customerName, String weUserId,String chatId);
+    List<WeGroupFissionDetailVo> findWeGroupFissionDetail(String fissionId,String customerName, String weUserId,String chatId);
 
 
     /**
      * 裂变明细(任务宝)
+     * @param fissionId
      * @param customerName
      * @param weUserId
      * @return
      */
-    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String customerName,String weUserId);
+    List<WeTaskFissionDetailVo> findWeTaskFissionDetail(String fissionId,String customerName,String weUserId);
 
 
     /**
@@ -89,4 +92,26 @@ public interface IWeFissionService extends IService<WeFission> {
      * @return
      */
     WeFissionInviterPoster findFissionPoster(String unionid, String fissionId);
+
+
+    /**
+     * 裂变要成功处理逻辑(任务宝)
+     * @param state 渠道标识
+     * @param weCustomer 邀请的客户
+     */
+    void handleTaskFissionRecord(String state,WeCustomer weCustomer);
+
+
+    /**
+     * 裂变要成功处理逻辑(群裂变)
+     * @param state 渠道标识
+     * @param weGroupMember 邀请进群的成员
+     */
+    void handleGroupFissionRecord(String state, WeGroupMember weGroupMember);
+
+
+    /**
+     * 裂变处理(状态维护，过期状态维护)
+     */
+    void handleFission();
 }
