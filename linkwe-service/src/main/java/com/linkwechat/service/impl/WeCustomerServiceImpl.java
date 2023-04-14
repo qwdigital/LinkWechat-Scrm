@@ -1129,11 +1129,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         if(CollectionUtil.isNotEmpty(weMakeCustomerTagList)){
 
 
-            weMakeCustomerTagList.stream().forEach(weMakeCustomerTag -> {
+            weMakeCustomerTagList.forEach(weMakeCustomerTag -> {
 
 
-
-                if(makeCustomerTags.isAddOrRemove()){//新增标签
+                //新增标签
+                if(makeCustomerTags.isAddOrRemove()){
 
                     //当前客户已存在的标签
                     List<String> exitTagIds=new ArrayList<>();
@@ -1193,9 +1193,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
                     }
 
-                }else{ //标签移除
+                }else{
 
-
+                    //标签移除
                     List<WeTag> addTag = weMakeCustomerTag.getAddTag();
 
 
@@ -1204,7 +1204,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                 .list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                         .in(WeFlowerCustomerTagRel::getTagId,addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
                                         .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId())
-                                        .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid()));
+                                        .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
+                                        .eq(WeFlowerCustomerTagRel::getDelFlag,0));
 
                         if(CollectionUtil.isNotEmpty(customerTagRels)){
 

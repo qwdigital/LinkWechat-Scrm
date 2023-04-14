@@ -113,7 +113,7 @@ public class WeCustomerController extends BaseController {
         try {
             weCustomerService.synchWeCustomer();
         }catch (CustomException e){
-            log.error("客户同步失败：ex:{}",e.getStackTrace());
+            log.error("客户同步失败：ex:{}",e.getMessage(),e);
             return AjaxResult.error(e.getMessage());
         }
 
