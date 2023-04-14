@@ -6,6 +6,7 @@ import com.linkwechat.domain.wecom.query.media.WeGetMediaQuery;
 import com.linkwechat.domain.wecom.query.media.WeMediaQuery;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenFileInterceptor;
+import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -15,7 +16,8 @@ import java.io.InputStream;
  *
  * @Author: leejoker
  */
-@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WeAccessTokenFileInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WeAccessTokenFileInterceptor.class, connectTimeout = 10000, readTimeout = 10000)
+@Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeMediaClient {
     /**
      * 上传图片
