@@ -65,6 +65,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     private IWeFissionNoticeService iWeFissionNoticeService;
 
     @Autowired
+    @Lazy
     private IWeCustomerService iWeCustomerService;
 
 
