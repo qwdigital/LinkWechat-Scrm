@@ -57,11 +57,6 @@ public class QwKfChatMsgKfTimeOutListener {
     @Autowired
     private IWeKfPoolService weKfPoolService;
 
-    @Autowired
-    private RedisService redisService;
-
-    @Resource
-    private QwKfClient qwKfClient;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;

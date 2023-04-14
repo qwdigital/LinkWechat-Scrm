@@ -48,8 +48,6 @@ public class QwKfChatMsgEndListener {
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
 
-    @Autowired
-    private RedisService redisService;
 
     @Autowired
     private IWeKfMsgService weKfMsgService;
@@ -58,14 +56,6 @@ public class QwKfChatMsgEndListener {
     @Autowired
     private IWeKfPoolService weKfPoolService;
 
-    @Resource
-    private QwKfClient qwKfClient;
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private RabbitMQSettingConfig rabbitMQSettingConfig;
 
 
     @RabbitListener(queues = "${wecom.mq.queue.kf-chat-end-msg:Qu_KfChatEndMsg}")

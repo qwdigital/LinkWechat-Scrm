@@ -29,8 +29,8 @@ import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwSysUserClient;
-import com.linkwechat.mapper.WeFissionMapper;
 import com.linkwechat.service.*;
+import com.linkwechat.mapper.WeFissionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -441,6 +441,10 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
     }
 
+
+    /**
+     * 处理裂变任务
+     */
     @Override
     public void handleFission() {
 
@@ -563,6 +567,12 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         }
 
+        //处理消息群发状态
+//        List<WeFissionNotice> weFissionNotices = iWeFissionNoticeService.list(new LambdaQueryWrapper<WeFissionNotice>()
+//                .eq(WeFissionNotice::getStatus, 0));
+//        if(CollectionUtil.isNotEmpty(weFissionNotices)){
+//
+//        }
 
 
 
