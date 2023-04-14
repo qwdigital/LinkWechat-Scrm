@@ -73,6 +73,9 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Autowired
     private IWeMessagePushService iWeMessagePushService;
 
+    @Autowired
+    private IWeFissionService iWeFissionService;
+
 
     @Override
     public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
@@ -195,11 +198,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         WeGroupChatListVo groupChatListVo = qwCustomerClient.getGroupChatList(chatListQuery).getData();
         if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
                 && CollectionUtil.isNotEmpty(groupChatListVo.getGroupChatList())) {
-              groupChatList.addAll(groupChatListVo.getGroupChatList());
-              if(StringUtils.isNotEmpty(groupChatListVo.getNextCursor())){
-                  chatListQuery.setCursor(groupChatListVo.getNextCursor());
-                  getGroupChatList(groupChatList,chatListQuery);
-              }
+            groupChatList.addAll(groupChatListVo.getGroupChatList());
+            if(StringUtils.isNotEmpty(groupChatListVo.getNextCursor())){
+                chatListQuery.setCursor(groupChatListVo.getNextCursor());
+                getGroupChatList(groupChatList,chatListQuery);
+            }
 
         }
 
@@ -324,9 +327,12 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                 //物理删除已有的del_flag为非0的数据
                 groupMemberList.stream().forEach(kk->{
                     weGroupMemberService.physicalDelete(kk.getChatId(),kk.getUserId());
+                    iWeFissionService.handleGroupFissionRecord(kk.getState(),kk);
                 });
 
                 weGroupMemberService.saveBatch(groupMemberList);
+
+
             }
         }
     }
@@ -359,6 +365,8 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     weGroupMember.setChatId(chatId);
                     weGroupMember.transformQwParams(groupMember);
                     weGroupMember.setDelFlag(Constants.COMMON_STATE);
+                    //任务宝处理逻辑
+                    iWeFissionService.handleGroupFissionRecord(weGroupMember.getState(),weGroupMember);
                     return weGroupMember;
                 }).collect(Collectors.toList());
                 weGroupMemberService.insertBatch(members);
@@ -404,9 +412,9 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     weGroupMemberService.quitGroup(quitScene,memeber.getUserId(),memeber.getChatId());
                     //为被添加员工发送一条消息提醒
                     iWeMessagePushService.pushMessageSelfH5( ListUtil.toList(
-                                        groupChat.getOwner()
-                                )
-                     , "【客群动态】<br/><br/> 客户@"+memeber.getName()+" 刚刚退出群聊"+groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(),false);
+                                    groupChat.getOwner()
+                            )
+                            , "【客群动态】<br/><br/> 客户@"+memeber.getName()+" 刚刚退出群聊"+groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(),false);
                 });
 
                 weCustomerTrajectoryService.createJoinOrExitGroupTrajectory(needQuitMemberList,groupChat.getName(),false);
