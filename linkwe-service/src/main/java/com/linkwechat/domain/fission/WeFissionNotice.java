@@ -56,4 +56,10 @@ public class WeFissionNotice extends BaseEntity {
      */
     private String msgId;
 
+
+    /**
+     * 员工是否已经将消息发送给老客： -1：失败  0：未执行 1：完成 2：取消
+     */
+    private Integer status;
+
 }

@@ -11,7 +11,6 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.TaskFissionType;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -27,7 +26,6 @@ import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
-import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwSysUserClient;
@@ -443,6 +441,10 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
     }
 
+
+    /**
+     * 处理裂变任务
+     */
     @Override
     public void handleFission() {
 
@@ -565,6 +567,12 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         }
 
+        //处理消息群发状态
+//        List<WeFissionNotice> weFissionNotices = iWeFissionNoticeService.list(new LambdaQueryWrapper<WeFissionNotice>()
+//                .eq(WeFissionNotice::getStatus, 0));
+//        if(CollectionUtil.isNotEmpty(weFissionNotices)){
+//
+//        }
 
 
 

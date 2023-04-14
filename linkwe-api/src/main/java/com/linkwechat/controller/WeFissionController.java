@@ -263,11 +263,6 @@ public class WeFissionController  extends BaseController {
     }
 
 
-    @GetMapping("/getXXX")
-    public void getXXX(){
-        iWeFissionService.handleFission();
-
-    }
 
 
 
