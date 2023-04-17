@@ -170,7 +170,7 @@ public class SysUser extends BaseEntity {
      */
     @ApiModelProperty(value = "企微用户激活状态(1=已激活，2=已禁用，4=未激活，5=退出企业)")
     @TableField("we_user_status")
-    private String weUserStatus;
+    private Integer weUserStatus;
 
     /**
      * 员工个人二维码
@@ -268,7 +268,6 @@ public class SysUser extends BaseEntity {
      * 删除标志（0代表存在 1代表删除）
      */
     @TableField("del_flag")
-    @TableLogic
     private Integer delFlag;
 
     /**

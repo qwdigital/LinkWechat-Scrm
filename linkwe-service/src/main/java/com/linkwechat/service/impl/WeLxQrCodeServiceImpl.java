@@ -245,7 +245,7 @@ public class WeLxQrCodeServiceImpl extends ServiceImpl<WeLxQrCodeMapper, WeLxQrC
         List<WeLxQrScopeUserVo> qrUserInfos = detail.getQrUserInfos();
         if (isNeedName && CollectionUtil.isNotEmpty(qrUserInfos)) {
             Set<String> userIdSet = qrUserInfos.stream().map(WeLxQrScopeUserVo::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            Set<Integer> deptIdSet = qrUserInfos.stream().map(WeLxQrScopeUserVo::getParty).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<Long> deptIdSet = qrUserInfos.stream().map(WeLxQrScopeUserVo::getParty).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> userId2NameMap = new HashMap<>();
             Map<Integer, String> deptId2NameMap = new HashMap<>();
 

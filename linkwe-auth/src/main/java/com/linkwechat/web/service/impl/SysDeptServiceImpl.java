@@ -22,18 +22,17 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.domain.wecom.entity.department.WeDeptEntity;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fegin.QwDeptClient;
 import com.linkwechat.web.mapper.SysDeptMapper;
 import com.linkwechat.web.service.ISysDeptService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +40,7 @@ import java.util.stream.Collectors;
  *
  * @author ruoyi
  */
+@Slf4j
 @Service
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> implements ISysDeptService {
     @Resource
@@ -277,57 +277,53 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         return deptMapper.deleteDeptById(deptId);
     }
 
+
     @Override
     public List<SysDept> syncWeDepartment(String corpId) {
         WeDeptQuery query = new WeDeptQuery();
         query.setCorpid(corpId);
-        AjaxResult<WeDeptVo> deptList = deptClient.getDeptList(query);
-        List<SysDept> sysDeptList = deptList.getData().getDepartment().stream().map(dept -> {
+        WeDeptVo weDeptVo = deptClient.getDeptList(query).getData();
+        if(Objects.isNull(weDeptVo)){
+            log.error("拉取企微部门接口失败 query：{}",query.getCorpid());
+            return new ArrayList<>();
+        }
+        List<SysDept> sysDeptList = weDeptVo.getDepartment().stream().map(dept -> {
             LoginUser user = SecurityUtils.getLoginUser();
             SysDept d = new SysDept();
-            d.setDeptId(Long.parseLong(String.valueOf(dept.getId())));
-            d.setParentId(Long.parseLong(String.valueOf(dept.getParentId())));
+            d.setDeptId(dept.getId());
+            d.setParentId(dept.getParentId());
             //设置ancestors
-            if (dept.getId() == 1) {
-                d.setAncestors("0");
-            } else {
-                SysDept parentDept = new LambdaQueryChainWrapper<>(baseMapper).eq(SysDept::getDeptId,
-                        Long.parseLong(String.valueOf(dept.getParentId()))).eq(SysDept::getDelFlag, "0").one();
-                if (parentDept != null) {
-                    d.setAncestors(String.format("%s,%d",
-                            StringUtils.isNotBlank(parentDept.getAncestors()) ? parentDept.getAncestors() : "0",
-                            dept.getParentId()));
-                }
-            }
+            TreeSet<Long> parentIds = new TreeSet<>();
+            getParentDeptIds(weDeptVo.getDepartment(),dept.getId(),parentIds);
+            d.setAncestors(parentIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
             d.setDeptName(dept.getName());
             d.setDeptEnName(dept.getNameEn());
             d.setLeader(String.join(",", dept.getDepartmentLeader()));
-            d.setOrderNum(String.valueOf(dept.getOrder()));
-            SysDept existsDept = getById(d.getDeptId());
-            if (existsDept != null) {
-                if (user != null) {
-                    d.setUpdateBy(user.getUserName());
-                }
-                d.setUpdateTime(new Date());
-            } else {
-                if (user != null) {
-                    d.setCreateBy(user.getUserName());
-                }
-                d.setCreateTime(new Date());
-            }
+            d.setOrderNum(dept.getOrder());
             return d;
         }).collect(Collectors.toList());
-
-        //不存在的移除
-        if(CollectionUtil.isNotEmpty(sysDeptList)){
-            this.remove(
-                    new LambdaQueryWrapper<SysDept>()
-                            .notIn(SysDept::getDeptId,sysDeptList.stream().map(SysDept::getDeptId).collect(Collectors.toList())
-                            ));
-        }
-
-        saveOrUpdateBatch(sysDeptList);
+        saveOrUpdateBatch(sysDeptList,200);
         return sysDeptList;
+    }
+
+    /**
+     * 递归获取父级ids
+     * @param weDeptEntityList 列表
+     * @param currentId 当前节点
+     * @param parentIds 父节点ID列表
+     */
+    private static void getParentDeptIds(List<WeDeptEntity> weDeptEntityList, Long currentId, TreeSet<Long> parentIds){
+        for (WeDeptEntity weDept : weDeptEntityList) {
+
+            if(Objects.equals(0L,currentId)){
+                return;
+            }
+            //判断是否有父节点
+            if (currentId.equals(weDept.getId())) {
+                parentIds.add(weDept.getParentId());
+                getParentDeptIds(weDeptEntityList, weDept.getParentId(), parentIds);
+            }
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.linkwechat.web.controller.system;
 
 import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -106,7 +107,6 @@ public class SysUserController extends BaseController {
     /**
      * 获取用户列表
      */
-    ////@PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
     @ApiOperation(value = "用户列表")
     public TableDataInfo list(SysUser user) {
@@ -136,8 +136,6 @@ public class SysUserController extends BaseController {
         ));
     }
 
-    //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-    ////@PreAuthorize("@ss.hasPermi('system:user:export')")
     @GetMapping("/export")
     public AjaxResult export(SysUser user) {
         List<SysUser> list = userService.selectUserList(user);
@@ -183,18 +181,30 @@ public class SysUserController extends BaseController {
     /**
      * 新增用户
      */
-    @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysUserDTO user) {
-        userService.addUser(user);
+    @PostMapping("/callback/add")
+    public AjaxResult callBackAdd(@RequestBody SysUserQuery query) {
+        userService.addUser(query);
         return AjaxResult.success();
     }
 
     /**
      * 修改用户
      */
-    @PutMapping
-    public AjaxResult edit(@Validated @RequestBody SysUserDTO user) {
-        userService.updateUser(user);
+    @PutMapping("/callback/edit")
+    public AjaxResult callbackEdit(@RequestBody SysUserQuery query) {
+        userService.updateUser(query);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 回掉移除用户
+     *
+     * @param weUserIds
+     * @return
+     */
+    @DeleteMapping("/callback/{userIds}")
+    public AjaxResult callBackRemove(@PathVariable("userIds") List<String> weUserIds) {
+        userService.leaveUser(weUserIds);
         return AjaxResult.success();
     }
 
@@ -213,39 +223,8 @@ public class SysUserController extends BaseController {
     }
 
     /**
-     * 删除用户
-     */
-    ////@PreAuthorize("@ss.hasPermi('system:user:remove')")
-//    @Log(title = "用户管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{userIds}")
-    public AjaxResult remove(@PathVariable String[] userIds) {
-        userService.leaveUser(userIds);
-        return AjaxResult.success();
-    }
-
-
-
-    /**
-     * 回掉移除用户
-     *
-     * @param corpId
-     * @param userIds
-     * @return
-     */
-    @DeleteMapping("/callBackRemove/{corpId}/{userIds}")
-    public AjaxResult callBackRemove(@PathVariable String corpId, @PathVariable String[] userIds) {
-
-        userService.leaveUser(userIds);
-
-        return AjaxResult.success();
-
-    }
-
-    /**
      * 重置密码
      */
-    ////@PreAuthorize("@ss.hasPermi('system:user:edit')")
-//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping("/resetPwd")
     public AjaxResult resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
@@ -375,9 +354,9 @@ public class SysUserController extends BaseController {
      *
      * @param msg
      */
-    @GetMapping("/syncUserAndDeptHandler")
-    public AjaxResult syncUserAndDeptHandler(String msg) {
-        userService.syncUserAndDeptHandler(msg);
+    @PostMapping("/syncUserHandler")
+    public AjaxResult syncUserHandler(@RequestBody JSONObject msg) {
+        userService.syncUserHandler(msg);
         return AjaxResult.success();
     }
 

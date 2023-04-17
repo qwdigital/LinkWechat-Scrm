@@ -198,6 +198,27 @@ public class RabbitMQConfig {
 
 
     /**
+     * 员工队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quSysUser() {
+        return new Queue(rabbitMQSettingConfig.getSysUserQu());
+    }
+
+    /**
+     * 员工部门同步队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncSysUser() {
+        return BindingBuilder.bind(quSysUser()).to(syncEx()).with(rabbitMQSettingConfig.getSysUserRk()).noargs();
+    }
+
+
+    /**
      * 客户标签同步队列
      *
      * @return

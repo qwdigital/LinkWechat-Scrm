@@ -204,10 +204,10 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createWaitAllocateCustomerAndGroup(String[] weUserIds) {
+    public void createWaitAllocateCustomerAndGroup(List<String> weUserIds) {
         List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
         List<WeAllocateGroup> weAllocateGroups=new ArrayList<>();
-        Arrays.asList(weUserIds).forEach(weUserId->{
+        weUserIds.forEach(weUserId->{
             //客户分配
             List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                     .delFlag(Constants.COMMON_STATE)
@@ -338,10 +338,10 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                  WeAllocateCustomer.builder()
                                          .id(SnowFlakeUtil.nextId())
                                          .allocateTime(new Date())
-                                         .extentType(new Integer(0))
+                                         .extentType(0)
                                          .externalUserid(vv.getExternalUserid())
                                          .handoverUserid(k)
-                                         .status(new Integer(1))
+                                         .status(1)
                                          .failReason("离职继承")
                                          .build()
                          );
@@ -369,7 +369,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                                 .id(SnowFlakeUtil.nextId())
                                                 .chatId(chat.getChatId())
                                                 .oldOwner(k)
-                                                .status(new Integer(1))
+                                                .status(1)
                                                 .build()
                                 );
                             });
@@ -396,13 +396,10 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
 
                      //更新
-                     SysUserDTO sysUserDTO=new SysUserDTO();
-                     sysUserDTO.setIsUserLeave(1);
-                     sysUserDTO.setWeUserId(sysUser.getWeUserId());
-                     qwSysUserClient.edit(
-                             sysUserDTO
-                     );
-
+                     SysUserQuery userQuery=new SysUserQuery();
+                     userQuery.setIsUserLeave(1);
+                     userQuery.setWeUserId(sysUser.getWeUserId());
+                     qwSysUserClient.edit(userQuery);
                  }
 
              });

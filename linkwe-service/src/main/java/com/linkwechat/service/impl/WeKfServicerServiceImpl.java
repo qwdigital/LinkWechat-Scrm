@@ -60,7 +60,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
         List<WeKfUser> servicers = this.baseMapper.getServicerByKfId(kfId);
         if(CollectionUtil.isNotEmpty(servicers)){
             Set<String> userIdSet = servicers.stream().map(WeKfUser::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            Set<Integer> deptIdSet = servicers.stream().map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<Long> deptIdSet = servicers.stream().map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> userId2NameMap = new HashMap<>();
             Map<Integer, String> deptId2NameMap = new HashMap<>();
             if(CollectionUtil.isNotEmpty(userIdSet)){
@@ -122,7 +122,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
     }
 
     @Override
-    public void updateServicer(Long id, String openKfId, List<String> userIds, List<Integer> departmentIdList) {
+    public void updateServicer(Long id, String openKfId, List<String> userIds, List<Long> departmentIdList) {
         List<WeKfUser> servicers = getServicerByKfId(id);
         //需要添加的接待人员
         List<String> addUserList = userIds.stream().filter(userId -> Optional.ofNullable(servicers).orElseGet(ArrayList::new)
@@ -130,7 +130,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 .noneMatch(servicer -> ObjectUtil.equal(servicer, userId)))
                 .collect(Collectors.toList());
         //需要添加的接待部门
-        List<Integer> addDepartmentList = departmentIdList.stream().filter(userId -> Optional.ofNullable(servicers).orElseGet(ArrayList::new)
+        List<Long> addDepartmentList = departmentIdList.stream().filter(userId -> Optional.ofNullable(servicers).orElseGet(ArrayList::new)
                         .stream().map(WeKfUser::getDepartmentId)
                         .noneMatch(servicer -> ObjectUtil.equal(servicer, userId)))
                 .collect(Collectors.toList());
@@ -140,7 +140,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 .filter(servicer -> userIds.stream().noneMatch(userId -> ObjectUtil.equal(servicer.getUserId(), userId)))
                 .map(WeKfUser::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 
-        List<Integer> removeDeptList = Optional.ofNullable(servicers).orElseGet(ArrayList::new).stream()
+        List<Long> removeDeptList = Optional.ofNullable(servicers).orElseGet(ArrayList::new).stream()
                 .filter(servicer -> departmentIdList.stream().noneMatch(departmentId -> ObjectUtil.equal(servicer.getDepartmentId(), departmentId)))
                 .map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toList());
         if(CollectionUtil.isNotEmpty(removeUserList) || CollectionUtil.isNotEmpty(removeDeptList)){
@@ -208,7 +208,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
         List<WeKfUser> servicers = this.baseMapper.getServicerByKfId(kfId);
         if(CollectionUtil.isNotEmpty(servicers)) {
             Set<String> userIdSet = servicers.stream().map(WeKfUser::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            Set<Integer> deptIdSet = servicers.stream().map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
+            Set<Long> deptIdSet = servicers.stream().map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
 
             if(CollectionUtil.isNotEmpty(userIdSet) || CollectionUtil.isNotEmpty(deptIdSet)){
                 SysUserQuery userQuery = new SysUserQuery();

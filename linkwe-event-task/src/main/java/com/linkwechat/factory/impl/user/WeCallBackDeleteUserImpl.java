@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
+
 
 /**
  * @author danmo
@@ -18,22 +21,17 @@ import org.springframework.stereotype.Component;
 @Component("delete_user")
 public class WeCallBackDeleteUserImpl extends WeEventStrategy {
 
-    @Autowired
+    @Resource
     private QwSysUserClient qwSysUserClient;
 
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackUserVo userInfo = (WeBackUserVo) message;
         try {
-
-            qwSysUserClient.callBackRemove(userInfo.getToUserName(),
-                    userInfo.getUserID().split(",")
-            );
-
+            qwSysUserClient.delete(Arrays.asList(userInfo.getUserID().split(",")));
         } catch (Exception e) {
             log.error("deleteUser>>>>>>>>>param:{},ex:{}",((WeBackUserVo) message).getUserID(),e);
         }
     }
-
 
 }

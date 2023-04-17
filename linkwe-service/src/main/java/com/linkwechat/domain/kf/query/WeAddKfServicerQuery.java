@@ -82,5 +82,5 @@ public class WeAddKfServicerQuery {
 
     @Size(message = "部门列表超出限制", max = 20)
     @ApiModelProperty("接待人员部门id列表")
-    private List<Integer> departmentIdList;
+    private List<Long> departmentIdList;
 }
