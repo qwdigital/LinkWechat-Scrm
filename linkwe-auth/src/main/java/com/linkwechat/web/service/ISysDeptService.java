@@ -144,4 +144,22 @@ public interface ISysDeptService {
      * @return
      */
     public List<SysDeptVo> getListByDeptIds(SysDeptQuery query);
+
+    /**
+     * 回调新增部门
+     * @param query
+     */
+    void callbackAdd(SysDeptQuery query);
+
+    /**
+     * 回调删除部门
+     * @param query
+     */
+    void callbackDelete(SysDeptQuery query);
+
+    /**
+     * 回调更新部门
+     * @param query
+     */
+    void callbackUpdate(SysDeptQuery query);
 }

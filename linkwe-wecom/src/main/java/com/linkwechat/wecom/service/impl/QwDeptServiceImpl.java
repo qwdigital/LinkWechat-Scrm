@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptIdVo;
+import com.linkwechat.domain.wecom.vo.department.WeDeptInfoVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.wecom.client.WeDeptClient;
 import com.linkwechat.wecom.service.IQwDeptService;
@@ -27,5 +28,10 @@ public class QwDeptServiceImpl implements IQwDeptService {
     @Override
     public WeDeptIdVo getDeptSimpleList(WeDeptQuery query) {
         return client.getDeptSimpleList(query);
+    }
+
+    @Override
+    public WeDeptInfoVo getDeptDetail(WeDeptQuery query) {
+        return client.getDeptDetail(query);
     }
 }

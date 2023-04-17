@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataScope;
@@ -24,6 +25,7 @@ import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.entity.department.WeDeptEntity;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
+import com.linkwechat.domain.wecom.vo.department.WeDeptInfoVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fegin.QwDeptClient;
 import com.linkwechat.web.mapper.SysDeptMapper;
@@ -385,5 +387,48 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             }).collect(Collectors.toList());
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public void callbackAdd(SysDeptQuery query) {
+        List<Long> deptIds = query.getDeptIds();
+        if(CollectionUtil.isNotEmpty(deptIds)){
+            WeDeptQuery weDeptQuery = new WeDeptQuery();
+            weDeptQuery.setId(query.getDeptIds().get(0));
+            WeDeptInfoVo deptInfo = deptClient.getDeptDetail(weDeptQuery).getData();
+
+            if(Objects.nonNull(deptInfo)){
+                WeDeptEntity department = deptInfo.getDepartment();
+                SysDept parentInfo = deptMapper.selectDeptById(department.getParentId());
+                SysDept dept = new SysDept();
+                dept.setDeptId(department.getId());
+                dept.setParentId(department.getParentId());
+                //设置ancestors
+                if(Objects.nonNull(parentInfo)){
+                    dept.setAncestors(parentInfo.getAncestors() + "," + dept.getParentId());
+                }else {
+                    dept.setAncestors(dept.getParentId() + "");
+                }
+                dept.setDeptName(department.getName());
+                dept.setDeptEnName(department.getNameEn());
+                dept.setLeader(String.join(",", department.getDepartmentLeader()));
+                dept.setOrderNum(department.getOrder());
+                saveOrUpdate(dept);
+            }
+        }
+
+    }
+
+    @Override
+    public void callbackDelete(SysDeptQuery query) {
+        List<Long> deptIds = query.getDeptIds();
+        if(CollectionUtil.isNotEmpty(deptIds)){
+            update(new LambdaUpdateWrapper<SysDept>().set(SysDept::getDelFlag,1).in(SysDept::getDeptId,deptIds));
+        }
+    }
+
+    @Override
+    public void callbackUpdate(SysDeptQuery query) {
+        callbackAdd(query);
     }
 }
