@@ -202,4 +202,25 @@ public class SysDeptController extends BaseController {
     public AjaxResult<List<SysDeptVo>> getListByDeptIds(@Validated @RequestBody SysDeptQuery query) {
         return AjaxResult.success(deptService.getListByDeptIds(query));
     }
+
+    @ApiOperation(value = "回调新增部门")
+    @PostMapping("/callback/add")
+    public AjaxResult callbackAdd(@RequestBody SysDeptQuery query) {
+        deptService.callbackAdd(query);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation(value = "回调删除部门")
+    @PostMapping("/callback/delete")
+    public AjaxResult callbackDelete(@RequestBody SysDeptQuery query) {
+        deptService.callbackDelete(query);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation(value = "回调更新部门")
+    @PostMapping("/callback/update")
+    public AjaxResult callbackUpdate(@RequestBody SysDeptQuery query) {
+        deptService.callbackUpdate(query);
+        return AjaxResult.success();
+    }
 }

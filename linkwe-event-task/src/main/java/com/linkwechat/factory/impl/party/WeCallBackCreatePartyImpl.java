@@ -1,10 +1,16 @@
 package com.linkwechat.factory.impl.party;
 
+import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.callback.WeBackDeptVo;
 import com.linkwechat.factory.WeEventStrategy;
+import com.linkwechat.fegin.QwSysDeptClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Collections;
 
 /**
  * @author danmo
@@ -15,8 +21,15 @@ import org.springframework.stereotype.Component;
 @Component("create_party")
 public class WeCallBackCreatePartyImpl extends WeEventStrategy {
 
+    @Resource
+    private QwSysDeptClient qwSysDeptClient;
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackDeptVo deptInfo = (WeBackDeptVo) message;
+
+        SysDeptQuery query = new SysDeptQuery();
+        query.setDeptIds(Collections.singletonList(Long.parseLong(deptInfo.getId())));
+        qwSysDeptClient.addDept(query);
     }
 }

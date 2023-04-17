@@ -24,4 +24,19 @@ public class QwSysDeptFallbackFactory implements QwSysDeptClient {
     public AjaxResult<List<SysDeptVo>> getListByDeptIds(SysDeptQuery query) {
         return null;
     }
+
+    @Override
+    public AjaxResult addDept(SysDeptQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult delDept(SysDeptQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult updateDept(SysDeptQuery query) {
+        return null;
+    }
 }

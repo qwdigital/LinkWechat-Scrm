@@ -3,6 +3,7 @@ package com.linkwechat.wecom.controller;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptIdVo;
+import com.linkwechat.domain.wecom.vo.department.WeDeptInfoVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.wecom.service.IQwDeptService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,18 @@ public class QwDeptController {
     @PostMapping("/simplelist")
     public AjaxResult<WeDeptIdVo> getDeptSimpleList(@RequestBody WeDeptQuery query) {
         WeDeptIdVo weDeptList = deptService.getDeptSimpleList(query);
+        return AjaxResult.success(weDeptList);
+    }
+
+    /**
+     * 获取部门详情
+     *
+     * @param query
+     * @return
+     */
+    @PostMapping("/get")
+    public AjaxResult<WeDeptInfoVo> getDeptDetail(@RequestBody WeDeptQuery query) {
+        WeDeptInfoVo weDeptList = deptService.getDeptDetail(query);
         return AjaxResult.success(weDeptList);
     }
 }
