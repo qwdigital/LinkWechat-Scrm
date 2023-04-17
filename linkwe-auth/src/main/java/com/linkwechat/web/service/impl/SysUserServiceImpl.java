@@ -501,6 +501,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             boolean result = update(new LambdaUpdateWrapper<SysUser>()
                     .set(SysUser::getIsAllocate, CorpUserEnum.NO_IS_ALLOCATE.getKey())
                     .set(SysUser::getDimissionTime, new Date())
+                    .set(SysUser::getDelFlag, 1)
                     .in(SysUser::getWeUserId, weUserIds)
                     .eq(SysUser::getDelFlag, 0));
             if (result) {
@@ -870,9 +871,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             if (Objects.nonNull(existUser)) {
                 sysUser.setUserId(existUser.getUserId());
                 updateById(sysUser);
-            } else {
-                if (save(sysUser)) {
-
+            } else if (save(sysUser)) {
                     Long newUserId = sysUser.getUserId();
 
                     List<SysUserDept> userDeptList = new LinkedList<>();
@@ -888,8 +887,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     //保存员工部门关系
                     sysUserDeptService.saveBatch(userDeptList);
 
-                    Optional<RoleType> optionalRoleType = RoleType.of(5);
-                    List<SysRole> defaultRoles = sysRoleService.selectRoleList(new SysRole(optionalRoleType.get().getSysRoleKey()));
+
+                    List<SysRole> defaultRoles = sysRoleService.selectRoleList(new SysRole( RoleType.WECOME_USER_TYPE_CY.getSysRoleKey()));
                     if (CollectionUtil.isNotEmpty(defaultRoles)) {
                         SysUserRole sysUserRole = SysUserRole.builder()
                                 .roleId(defaultRoles.get(0).getRoleId())
@@ -898,7 +897,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                         newSysUserRoles.add(sysUserRole);
                     }
                     userRoleMapper.batchUserRole(newSysUserRoles);
-                }
             }
             redisService.unLock(detailVo.getUserId(), "lock");
         }
