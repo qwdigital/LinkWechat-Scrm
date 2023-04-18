@@ -7,7 +7,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.exception.CustomException;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.WeMoments;
 import com.linkwechat.service.IWeMomentsService;
 import com.linkwechat.service.IWeSynchRecordService;
 import org.springframework.web.bind.annotation.*;

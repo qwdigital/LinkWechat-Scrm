@@ -34,7 +34,7 @@
         <forest.version>1.5.24</forest.version>
         <lombok.version>1.18.16</lombok.version>
         <reflectasm.version>1.11.9</reflectasm.version>
-        <hutool.version>5.8.6</hutool.version>
+        <hutool.version>5.8.16</hutool.version>
         <zxing.version>3.3.3</zxing.version>
         <mybatis-plus.version>3.4.0</mybatis-plus.version>
         <vertx.version>4.0.0</vertx.version>

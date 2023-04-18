@@ -1,7 +1,7 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.WeMoments;
 
 import java.util.List;
 
