@@ -86,89 +86,87 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      */
     @Override
     public void addOrUpdateMoments(WeMoments weMoments) throws InterruptedException {
-        if (weMoments.getType().equals(0)) {//企业动态
-            MomentsParamDto momentsParamDto = new MomentsParamDto();
-            weMoments.setPushTime(new Date());
-            weMoments.setIsLwPush(1);
-            if (StringUtils.isNotEmpty(weMoments.getContent())) {
-                weMoments.getOtherContent().add(WeMoments.OtherContent.builder().annexType(MediaType.TEXT.getMediaType()).other(weMoments.getContent()).build());
-                momentsParamDto.setText(MomentsParamDto.Text.builder().content(weMoments.getContent()).build());
-            }
-            //设置附件
-            List<WeMoments.OtherContent> otherContent = weMoments.getOtherContent();
-            if (CollectionUtil.isNotEmpty(otherContent)) {
-                List<WeMoments.OtherContent> otherContents = otherContent.stream().filter(s -> StringUtils.isNotEmpty(s.getAnnexType()) && StringUtils.isNotEmpty(s.getAnnexUrl())).collect(Collectors.toList());
-                if (CollectionUtil.isNotEmpty(otherContents)) {
-                    List<Object> attachments = new ArrayList<>();
-                    //图片
-                    if (weMoments.getContentType().equals(MediaType.IMAGE.getMediaType())) {
-                        otherContents.forEach(image -> {
-                            String media_id = iWeMaterialService.uploadAttachmentMaterial(image.getAnnexUrl(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
-                            if (StringUtils.isNotEmpty(media_id)) {
-                                attachments.add(MomentsParamDto.ImageAttachments.builder().msgtype(MediaType.IMAGE.getMediaType()).image(MomentsParamDto.Image.builder().media_id(media_id).build()).build());
-                                weMoments.setContent(image.getAnnexUrl());
-                            }
-                        });
-                    }
-                    //视频
-                    if (weMoments.getContentType().equals(MediaType.VIDEO.getMediaType())) {
-                        otherContents.forEach(video -> {
-                            String media_id = iWeMaterialService.uploadAttachmentMaterial(video.getAnnexUrl(), MediaType.VIDEO.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
-                            if (StringUtils.isNotEmpty(media_id)) {
-                                attachments.add(MomentsParamDto.VideoAttachments.builder().msgtype(MediaType.VIDEO.getMediaType()).video(MomentsParamDto.Video.builder().media_id(media_id).build()).build());
-                                weMoments.setContent(video.getAnnexUrl());
-                            }
-                        });
-                    }
-                    //网页链接
-                    if (weMoments.getContentType().equals(MediaType.LINK.getMediaType())) {
-                        otherContents.forEach(link -> {
-                            String media_id = iWeMaterialService.uploadAttachmentMaterial(link.getOther(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
-                            if (StringUtils.isNotEmpty(media_id)) {
-                                MomentsParamDto.Link build = new MomentsParamDto.Link();
-                                build.setUrl(link.getAnnexUrl());
-                                build.setMedia_id(media_id);
-                                if (StringUtils.isNotEmpty(link.getTitle())) {
-                                    build.setTitle(link.getTitle());
-                                }
-                                attachments.add(MomentsParamDto.LinkAttachments.builder().msgtype(MediaType.LINK.getMediaType()).link(build).build());
-                                weMoments.setContent(link.getAnnexUrl());
-                            }
-                        });
-                    }
-                    momentsParamDto.setAttachments(attachments);
-                }
-            }
-            MomentsParamDto.VisibleRange visibleRange = MomentsParamDto.VisibleRange.builder().build();
-
-            //设置可见范围
-            if (weMoments.getScopeType().equals(0)) { //部分
-                if (StringUtils.isNotEmpty(weMoments.getCustomerTag())) { //客户标签
-                    visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(weMoments.getCustomerTag().split(",")).build());
-                }
-                if (StringUtils.isNotEmpty(weMoments.getNoAddUser())) {//指定发送人
-                    visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weMoments.getNoAddUser().split(",")).build());
-                }
-            } else { //全部
-                SysUser sysUser = new SysUser();
-                List<SysUser> weUsers = qwSysUserClient.list(sysUser).getData();
-                if (CollectionUtil.isNotEmpty(weUsers)) {
-                    visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUsers.stream().map(SysUser::getWeUserId).toArray(String[]::new)).build());
-                    weMoments.setNoAddUser(StringUtils.join(weUsers.stream().map(SysUser::getWeUserId).toArray(), ","));
-                }
-            }
-            momentsParamDto.setVisible_range(visibleRange);
-            MomentsResultDto weResultDto = qwMomentsClient.addMomentTask(momentsParamDto).getData();
-            if(Objects.isNull(weResultDto)){
-                throw new WeComException("调用企微接口失败");
-            }
-            if(ObjectUtil.notEqual(WeConstans.WE_SUCCESS_CODE,weResultDto.getErrCode())){
-                throw new WeComException(weResultDto.getErrCode(),weResultDto.getErrMsg());
-            }
-            weMoments.setJobId(weResultDto.getJobid());
-
-            this.save(weMoments);
+        MomentsParamDto momentsParamDto = new MomentsParamDto();
+        weMoments.setPushTime(new Date());
+        weMoments.setIsLwPush(1);
+        if (StringUtils.isNotEmpty(weMoments.getContent())) {
+            weMoments.getOtherContent().add(WeMoments.OtherContent.builder().annexType(MediaType.TEXT.getMediaType()).other(weMoments.getContent()).build());
+            momentsParamDto.setText(MomentsParamDto.Text.builder().content(weMoments.getContent()).build());
         }
+        //设置附件
+        List<WeMoments.OtherContent> otherContent = weMoments.getOtherContent();
+        if (CollectionUtil.isNotEmpty(otherContent)) {
+            List<WeMoments.OtherContent> otherContents = otherContent.stream().filter(s -> StringUtils.isNotEmpty(s.getAnnexType()) && StringUtils.isNotEmpty(s.getAnnexUrl())).collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(otherContents)) {
+                List<Object> attachments = new ArrayList<>();
+                //图片
+                if (weMoments.getContentType().equals(MediaType.IMAGE.getMediaType())) {
+                    otherContents.forEach(image -> {
+                        String media_id = iWeMaterialService.uploadAttachmentMaterial(image.getAnnexUrl(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
+                        if (StringUtils.isNotEmpty(media_id)) {
+                            attachments.add(MomentsParamDto.ImageAttachments.builder().msgtype(MediaType.IMAGE.getMediaType()).image(MomentsParamDto.Image.builder().media_id(media_id).build()).build());
+                            weMoments.setContent(image.getAnnexUrl());
+                        }
+                    });
+                }
+                //视频
+                if (weMoments.getContentType().equals(MediaType.VIDEO.getMediaType())) {
+                    otherContents.forEach(video -> {
+                        String media_id = iWeMaterialService.uploadAttachmentMaterial(video.getAnnexUrl(), MediaType.VIDEO.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
+                        if (StringUtils.isNotEmpty(media_id)) {
+                            attachments.add(MomentsParamDto.VideoAttachments.builder().msgtype(MediaType.VIDEO.getMediaType()).video(MomentsParamDto.Video.builder().media_id(media_id).build()).build());
+                            weMoments.setContent(video.getAnnexUrl());
+                        }
+                    });
+                }
+                //网页链接
+                if (weMoments.getContentType().equals(MediaType.LINK.getMediaType())) {
+                    otherContents.forEach(link -> {
+                        String media_id = iWeMaterialService.uploadAttachmentMaterial(link.getOther(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
+                        if (StringUtils.isNotEmpty(media_id)) {
+                            MomentsParamDto.Link build = new MomentsParamDto.Link();
+                            build.setUrl(link.getAnnexUrl());
+                            build.setMedia_id(media_id);
+                            if (StringUtils.isNotEmpty(link.getTitle())) {
+                                build.setTitle(link.getTitle());
+                            }
+                            attachments.add(MomentsParamDto.LinkAttachments.builder().msgtype(MediaType.LINK.getMediaType()).link(build).build());
+                            weMoments.setContent(link.getAnnexUrl());
+                        }
+                    });
+                }
+                momentsParamDto.setAttachments(attachments);
+            }
+        }
+        MomentsParamDto.VisibleRange visibleRange = MomentsParamDto.VisibleRange.builder().build();
+
+        //设置可见范围
+        if (weMoments.getScopeType().equals(0)) { //部分
+            if (StringUtils.isNotEmpty(weMoments.getCustomerTag())) { //客户标签
+                visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(weMoments.getCustomerTag().split(",")).build());
+            }
+            if (StringUtils.isNotEmpty(weMoments.getNoAddUser())) {//指定发送人
+                visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weMoments.getNoAddUser().split(",")).build());
+            }
+        } else { //全部
+            SysUser sysUser = new SysUser();
+            List<SysUser> weUsers = qwSysUserClient.list(sysUser).getData();
+            if (CollectionUtil.isNotEmpty(weUsers)) {
+                visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUsers.stream().map(SysUser::getWeUserId).toArray(String[]::new)).build());
+                weMoments.setNoAddUser(StringUtils.join(weUsers.stream().map(SysUser::getWeUserId).toArray(), ","));
+            }
+        }
+        momentsParamDto.setVisible_range(visibleRange);
+        MomentsResultDto weResultDto = qwMomentsClient.addMomentTask(momentsParamDto).getData();
+        if(Objects.isNull(weResultDto)){
+            throw new WeComException("调用企微接口失败");
+        }
+        if(ObjectUtil.notEqual(WeConstans.WE_SUCCESS_CODE,weResultDto.getErrCode())){
+            throw new WeComException(weResultDto.getErrCode(),weResultDto.getErrMsg());
+        }
+        weMoments.setJobId(weResultDto.getJobid());
+
+        this.save(weMoments);
     }
 
 

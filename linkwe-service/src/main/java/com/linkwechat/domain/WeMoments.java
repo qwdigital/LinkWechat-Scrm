@@ -77,9 +77,9 @@ public class WeMoments extends BaseEntity implements Serializable {
 
 
     /**
-     * 朋友圈类型:1:企业动态;2:个人动态
+     * 朋友圈类型:0:企业动态;1:个人动态
      */
-    @ApiModelProperty(value = "朋友圈类型:1:企业动态;2:个人动态")
+    @ApiModelProperty(value = "朋友圈类型:0:企业动态;1:个人动态")
     @TableField("type")
     private Integer type;
 
