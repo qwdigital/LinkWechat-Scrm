@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFissionMapper">
+
+    <select id="findWeFissions" resultType="com.linkwechat.domain.fission.WeFission">
+        SELECT
+            *,
+            IFNULL((
+                       SELECT
+                           COUNT(DISTINCT wfn.target_id)
+                       FROM
+                           we_fission_notice wfn
+                       WHERE
+                           wfn.fission_id = wf.id and wfn.msg_id is NOT NULL
+                   ),0)  AS inviterOldCustomerNum,
+            IFNULL((
+                       SELECT
+                           COUNT(*)
+                       FROM
+                           we_fission_inviter_record wfd
+                       WHERE
+                           wfd.fission_id = wf.id and wfd.inviter_state=1
+                   ),0)   AS completeTaskOldCustomerNum,
+            IFNULL((
+                       SELECT
+                           sum(wfd.inviter_number)
+                       FROM
+                           we_fission_inviter_record wfd
+                       WHERE
+                           wfd.fission_id = wf.id
+                   ),0)  AS fissionCustomerNum
+        FROM
+            we_fission wf ${ew.customSqlSegment}
+    </select>
+
+
+    <select id="findWeFissionTab" resultType="com.linkwechat.domain.fission.vo.WeFissionTabVo">
+        SELECT
+            (
+                SELECT
+                    COUNT(DISTINCT wfn.target_id)
+                FROM
+                    we_fission_notice wfn
+                WHERE
+                    wfn.fission_id = wf.id and wfn.msg_id is NOT NULL
+            ) AS inviterOldCustomerNum,
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    we_fission_inviter_record wfd
+                WHERE
+                    wfd.fission_id = wf.id and wfd.inviter_state=1
+            ) AS completeTaskOldCustomerNum,
+            (
+                SELECT
+                    sum(wfd.inviter_number)
+                FROM
+                    we_fission_inviter_record wfd
+                WHERE
+                    wfd.fission_id = wf.id
+            ) AS fissionCustomerNum,
+
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    we_fission_inviter_record wfd
+                WHERE
+                    wfd.fission_id = wf.id and wfd.inviter_state=1
+                  and  date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+            ) AS tdCompleteTaskOldCustomerNum,
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    we_fission_inviter_record wfd
+                WHERE
+                    wfd.fission_id = wf.id and wfd.inviter_state=1
+                  and  date_format(wfd.create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+            ) AS ydCompleteTaskOldCustomerNum,
+
+            (
+                SELECT
+                  IFNULL(sum(wfd.inviter_number),0)
+                FROM
+                    we_fission_inviter_record wfd
+                WHERE
+                    wfd.fission_id = wf.id
+                  and  date_format(wfd.create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+            ) AS ydFissionCustomerNum,
+
+            (
+                SELECT
+                    IFNULL(sum(wfd.inviter_number),0)
+                FROM
+                    we_fission_inviter_record wfd
+                WHERE
+                    wfd.fission_id = wf.id
+                  and  date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')  and wfd.inviter_state=1
+            ) AS tdFissionCustomerNum
+        FROM
+            we_fission wf WHERE wf.id=#{fissionId}
+    </select>
+
+
+    <select id="findWeFissionTrend" resultType="com.linkwechat.domain.fission.vo.WeFissionTrendVo">
+        SELECT
+            sdd.date,
+            (SELECT COUNT(*) from we_fission_inviter_record wfd
+             WHERE DATE_FORMAT(wfd.create_time,'%Y-%m-%d')=DATE_FORMAT(sdd.date,'%Y-%m-%d') AND wfd.fission_id=#{weFission.id}) as inviterOldCustomerNum,
+            (SELECT COUNT(*) from we_fission_inviter_record wfd
+             WHERE DATE_FORMAT(wfd.create_time,'%Y-%m-%d')=DATE_FORMAT(sdd.date,'%Y-%m-%d') AND wfd.inviter_state=1 AND wfd.fission_id=#{weFission.id}) as completeTaskOldCustomerNum,
+            IFNULL((
+                       SELECT
+                           sum(wfd.inviter_number)
+                       FROM
+                           we_fission_inviter_record wfd
+                       WHERE
+                               DATE_FORMAT( wfd.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
+                         AND wfd.fission_id =#{weFission.id}
+                   ),0) AS fissionCustomerNum
+        FROM
+            sys_dim_date sdd
+        WHERE 	DATE_FORMAT(sdd.date,'%Y-%m-%d') BETWEEN #{weFission.beginTime} AND #{weFission.endTime}
+    </select>
+
+
+    <select id="findWeFissionDataReport" resultType="com.linkwechat.domain.fission.vo.WeFissionDataReportVo">
+        SELECT
+            DATE_FORMAT(create_time,'%Y-%m-%d') as date,
+	        COUNT( if(inviter_state=1,id,NULL) ) AS completeTaskOldCustomerNum,
+	        SUM(inviter_number) as fissionCustomerNum,
+            (SELECT COUNT(*) FROM we_fission_inviter_record wfd WHERE wfd.inviter_state=1 AND date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')) as tdCompleteTaskOldCustomerNum,
+            (SELECT SUM(wfd.inviter_number) FROM we_fission_inviter_record wfd WHERE  date_format(wfd.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')) as tdFissionCustomerNum
+        FROM
+            we_fission_inviter_record
+        WHERE DATE_FORMAT(create_time,'%Y-%m-%d')  BETWEEN #{weFission.beginTime} AND #{weFission.endTime}
+          AND fission_id=#{weFission.id}
+        GROUP BY DATE_FORMAT(create_time,'%Y-%m-%d')
+    </select>
+
+    <select id="findWeGroupFissionDetail" resultType="com.linkwechat.domain.fission.vo.WeGroupFissionDetailVo">
+        SELECT
+            wfir.id as fissionInviterRecordId,
+            wgm.`name` as customerName,
+            GROUP_CONCAT(DISTINCT wg.group_name)  as chatName,
+            su.user_name as sendUserName,
+            wfir.inviter_state as inviterState,
+            wfir.inviter_number as inviterNumber,
+            wfn.target_sub_id
+        FROM
+        we_fission_inviter_record wfir
+        LEFT JOIN we_fission_notice wfn ON wfir.fission_id=wfn.fission_id and wfir.inviter_unionid=wfn.target_sub_id
+        LEFT JOIN we_group_member wgm ON wfn.target_sub_id=wgm.union_id AND wgm.del_flag=0
+        LEFT JOIN we_group wg ON 	wgm.chat_id=wg.chat_id
+        LEFT JOIN sys_user su ON su.we_user_id=wfn.send_we_userid
+        <where>
+           <if test="fissionId != null and fissionId !=''">
+               wfir.fission_id=#{fissionId}
+           </if>
+            <if test="customerName != null and customerName != ''">
+               and wgm.`name` like concat('%',#{customerName},'%')
+            </if>
+            <if test="chatId != null and chatId != ''">
+                and wg.chat_id=#{chatId}
+            </if>
+            <if test="weUserId != null and weUserId !=''">
+                and su.we_user_id=#{weUserId}
+            </if>
+        </where>
+        GROUP BY wfir.inviter_unionid
+    </select>
+
+    <select id="findWeTaskFissionDetail" resultType="com.linkwechat.domain.fission.vo.WeTaskFissionDetailVo">
+        SELECT
+            DISTINCT wfn.id,
+            wc.customer_name as oldCustomerName,
+            su.user_name as sendWeUserName,
+            IFNULL(wfir.inviter_state,2) AS inviterState,
+            IFNULL(wfir.inviter_number,0) AS inviterNumber,
+            IFNULL(wfir.id,0) AS fissionInviterRecordId
+        FROM
+          we_fission_inviter_record wfir
+        LEFT JOIN we_fission_notice wfn ON wfir.fission_id = wfn.fission_id and wfir.inviter_unionid=wfn.target_sub_id
+        LEFT JOIN we_customer wc ON wc.external_userid = wfn.target_id
+        LEFT JOIN sys_user su ON su.we_user_id = wfn.send_we_userid
+        <where>
+             <if test="fissionId != null and fissionId !=''">
+                 wfir.fission_id=#{fissionId}
+             </if>
+            <if test="customerName != null and customerName != ''">
+                and wc.customer_name like concat('%',#{customerName},'%')
+            </if>
+            <if test="weUserId != null and weUserId !=''">
+                and su.we_user_id=#{weUserId}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findWeFissionDetailSub" resultType="com.linkwechat.domain.fission.vo.WeFissionDetailSubVo">
+        SELECT
+            wfds.inviter_user_name,
+            case
+                WHEN wfds.add_target_type=1 THEN 	(SELECT GROUP_CONCAT(su.user_name) from sys_user su where su.we_user_id=wfds.add_target_id)
+                ELSE (SELECT GROUP_CONCAT(wg.group_name) from we_group wg where wg.chat_id=wfds.add_target_id)
+                end as targetName,
+            wfds.create_time as createTime
+        FROM
+            we_fission_inviter_record_sub wfds WHERE wfds.fission_inviter_record_id=#{fissionInviterRecordId}
+    </select>
+
+</mapper>

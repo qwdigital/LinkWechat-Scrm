@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
@@ -129,10 +130,14 @@ public class WeCategoryServiceImpl extends ServiceImpl<WeCategoryMapper, WeCateg
                 queryWrapper.eq(WeMaterial::getModuleType, moduleType);
                 queryWrapper.eq(WeMaterial::getDelFlag, 0);
                 List<WeMaterial> weMaterials = weMaterialMapper.selectList(queryWrapper);
-                Map<Long, List<WeMaterial>> collect = weMaterials.stream().collect(Collectors.groupingBy(WeMaterial::getCategoryId));
-                for (Map.Entry<Long, List<WeMaterial>> entry : collect.entrySet()) {
-                    countMap.put(entry.getKey(), entry.getValue().size());
+                if(CollectionUtil.isNotEmpty(weMaterials)){
+                    weMaterials.removeIf(Objects::isNull);
+                    Map<Long, List<WeMaterial>> collect = weMaterials.stream().collect(Collectors.groupingBy(WeMaterial::getCategoryId));
+                    for (Map.Entry<Long, List<WeMaterial>> entry : collect.entrySet()) {
+                        countMap.put(entry.getKey(), entry.getValue().size());
+                    }
                 }
+
             } else if (moduleType.equals(2)) {
                 //0企业话术，1客服话术
                 int type = mediaType.equals("13") ? 0 : 1;

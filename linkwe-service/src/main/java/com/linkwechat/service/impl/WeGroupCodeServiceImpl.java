@@ -130,16 +130,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                 WeComeStateContants.QHM_STATE + UUID.get16UUID()
         );
         //配置进群方式
-        WeGroupChatAddJoinWayVo addJoinWayVo = qwCustomerClient.addJoinWayForGroupChat(
-                WeGroupChatAddJoinWayQuery.builder()
-                        .scene(2)
-                        .auto_create_room(weGroupCode.getAutoCreateRoom())
-                        .room_base_name(weGroupCode.getRoomBaseName())
-                        .room_base_id(weGroupCode.getRoomBaseId())
-                        .chat_id_list(Arrays.asList(weGroupCode.getChatIdList().split(",")))
-                        .state(weGroupCode.getState())
-                        .build()
-        ).getData();
+        WeGroupChatAddJoinWayVo addJoinWayVo = this.builderGroupCodeConfig(weGroupCode);
 
         if(null != addJoinWayVo && StringUtils.isNotEmpty(addJoinWayVo.getConfig_id())){
 
@@ -191,7 +182,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                         .state(weGroupCode.getState())
                         .build()
         ).getData();
-        if(null != weResultVo && weResultVo.getErrCode() == WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()){
+        if(null != weResultVo && weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
             if(updateById(weGroupCode)){
                 String tagIds = weGroupCode.getTagIds();
                 if(StringUtils.isNotEmpty(tagIds)){
@@ -248,4 +239,45 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
                 = this.baseMapper.findWeGroupCodeCountTrend(state, beginTime, endTime);
         return weGroupCodeCountTrend;
     }
+
+    @Override
+    public WeGroupChatGetJoinWayVo builderGroupCodeUrl(WeGroupCode weGroupCode) {
+
+        WeGroupChatAddJoinWayVo addJoinWayVo = this.builderGroupCodeConfig(weGroupCode);
+
+        if(null != addJoinWayVo && StringUtils.isNotEmpty(addJoinWayVo.getConfig_id())){
+
+            //获取进群二维码
+            return qwCustomerClient.getJoinWayForGroupChat(WeGroupChatJoinWayQuery.builder()
+                    .config_id(addJoinWayVo.getConfig_id())
+                    .build()).getData();
+
+        }
+
+
+
+        return  null;
+    }
+
+    @Override
+    public WeGroupChatAddJoinWayVo builderGroupCodeConfig(WeGroupCode weGroupCode) {
+
+        //配置进群方式
+        WeGroupChatAddJoinWayVo addJoinWayVo = qwCustomerClient.addJoinWayForGroupChat(
+                WeGroupChatAddJoinWayQuery.builder()
+                        .scene(2)
+                        .auto_create_room(weGroupCode.getAutoCreateRoom())
+                        .room_base_name(weGroupCode.getRoomBaseName())
+                        .room_base_id(weGroupCode.getRoomBaseId())
+                        .chat_id_list(Arrays.asList(weGroupCode.getChatIdList().split(",")))
+                        .state(weGroupCode.getState())
+                        .build()
+        ).getData();
+
+
+        return addJoinWayVo;
+    }
+
+
+
 }
