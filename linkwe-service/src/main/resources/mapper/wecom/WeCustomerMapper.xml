@@ -8,9 +8,7 @@
 
     <select id="findWeCustomerListIds" resultType="java.lang.String">
         SELECT wcr.id FROM we_customer wcr
-        LEFT JOIN sys_user su on su.we_user_id=wcr.add_user_id
-        WHERE
-            su.del_flag=0 and su.is_user_leave=0
+       <where>
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>
@@ -38,7 +36,7 @@
                 AND wcr.del_flag = #{weCustomerList.delFlag}
             </if>
             <if test="weCustomerList.name != null and weCustomerList.name !=''">
-                AND  CONCAT( IFNULL(wcr.customer_name,''),IFNULL(su.user_name,''))
+                AND  CONCAT( IFNULL(wcr.customer_name,''))
                 LIKE CONCAT('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
             </if>
             <if test="weCustomerList.userIds !=null and weCustomerList.userIds !=''">
@@ -63,6 +61,7 @@
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
+       </where>
         ORDER BY wcr.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
@@ -224,7 +223,6 @@
 
     <select id="countWeCustomerList" resultType="long">
         SELECT count(0) FROM we_customer wcr
-        LEFT JOIN sys_user su on su.we_user_id=wcr.add_user_id
         <where>
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
@@ -254,7 +252,7 @@
                 AND wcr.del_flag = #{weCustomerList.delFlag}
             </if>
             <if test="weCustomerList.name != null and weCustomerList.name !=''">
-                AND  CONCAT( IFNULL(wcr.customer_name,''),IFNULL(su.user_name,''))
+                AND  CONCAT( IFNULL(wcr.customer_name,''))
                 LIKE CONCAT('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
             </if>
             <if test="weCustomerList.userIds !=null and weCustomerList.userIds !=''">
