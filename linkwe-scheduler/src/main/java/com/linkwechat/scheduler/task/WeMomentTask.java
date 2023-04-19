@@ -63,10 +63,12 @@ public class WeMomentTask {
     /**
      * 获取任务创建结果
      *
-     * @param params
      */
     @XxlJob("weMomentResultTask")
-    public ReturnT<String> weMomentResultHandle(String params) {
+    public void weMomentResultHandle() {
+
+        //获取页面传递的参数
+        String params = XxlJobHelper.getJobParam();
 
         XxlJobHelper.log("朋友圈获取任务创建结果>>>>>>>>>>>>>>>>>>> params:{}", params);
 
@@ -100,17 +102,19 @@ public class WeMomentTask {
                 }
             }
         }
-        return ReturnT.SUCCESS;
     }
 
 
     /**
      * 朋友圈定时拉取任务
      *
-     * @param params 入参
      */
     @XxlJob("weMomentPullTask")
-    public ReturnT<String> weMomentPullHandle(String params) {
+    public void weMomentPullHandle() {
+
+        //获取页面传递的参数
+        String params = XxlJobHelper.getJobParam();
+
         XxlJobHelper.log("朋友圈定时拉取任务>>>>>>>>>>>>>>>>>>> params:{}", params);
 
         Long startTime = DateUtil.beginOfDay(new Date()).getTime() / 1000;
@@ -136,8 +140,6 @@ public class WeMomentTask {
         MomentsListDetailParamDto detailParamDto = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).build();
         weMomentsService.getByMoment(null, moments, detailParamDto);
         weMomentsService.syncMentsDataHandle(moments);
-
-        return ReturnT.SUCCESS;
     }
 
     @Data
