@@ -7,13 +7,14 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.exception.CustomException;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.WeMoments;
 import com.linkwechat.service.IWeMomentsService;
 import com.linkwechat.service.IWeSynchRecordService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 朋友圈相关
@@ -65,7 +66,7 @@ public class WeMomentsController extends BaseController {
      * @return
      */
     @PostMapping("/addOrUpdate")
-    public AjaxResult addOrUpdate(@RequestBody WeMoments weMoments) throws InterruptedException {
+    public AjaxResult addOrUpdate(@RequestBody WeMoments weMoments){
         iWeMomentsService.addOrUpdateMoments(weMoments);
         return AjaxResult.success();
     }
@@ -79,17 +80,12 @@ public class WeMomentsController extends BaseController {
      */
     @GetMapping("/synchMoments")
     public AjaxResult synchMoments(@RequestParam(defaultValue = "0") Integer filterType) {
-        try {
-            if (filterType.equals(new Integer(0))) {
-                iWeMomentsService.synchEnterpriseMoments(filterType);
-            } else if (filterType.equals(new Integer(1))) {
-                iWeMomentsService.synchPersonMoments(filterType);
-            }
-        } catch (CustomException e) {
-            return AjaxResult.error(e.getMessage());
+
+        if (Objects.equals(0,filterType)) {
+            iWeMomentsService.synchEnterpriseMoments(filterType);
+        } else if (Objects.equals(1,filterType)) {
+            iWeMomentsService.synchPersonMoments(filterType);
         }
-
-
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 

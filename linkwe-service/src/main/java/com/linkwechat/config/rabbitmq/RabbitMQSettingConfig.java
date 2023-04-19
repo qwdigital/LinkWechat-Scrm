@@ -121,7 +121,7 @@ public class RabbitMQSettingConfig {
 
 
     //朋友圈互动同步路由
-    @Value("${wecom.mq.route.sync.we-moments:Rk_Hd_Moments}")
+    @Value("${wecom.mq.route.sync.we-hd-moments:Rk_Hd_Moments}")
     private String weHdMomentsRk;
 
     //客服账号同步路由
@@ -279,7 +279,7 @@ public class RabbitMQSettingConfig {
 
 
     //朋友圈互动队列
-    @Value("${wecom.mq.queue.sync.we-moments:Qu_Hd_Moments}")
+    @Value("${wecom.mq.queue.sync.we-hd-moments:Qu_Hd_Moments}")
     private String weHdMomentsQu;
 
 

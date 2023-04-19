@@ -3,7 +3,7 @@ package com.linkwechat.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.WeMoments;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
