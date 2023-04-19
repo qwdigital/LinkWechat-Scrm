@@ -1,6 +1,7 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -185,6 +186,10 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
     @Override
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_ENTERPRISE_MOMENTS)
     public void synchEnterpriseMoments(Integer filterType) {
+        int count = count(new LambdaQueryWrapper<WeMoments>().in(WeMoments::getStatus, ListUtil.toList(1, 2)).eq(WeMoments::getDelFlag, 0));
+        if(count > 0){
+            throw new WeComException("存在未完成任务，请稍后同步！");
+        }
         this.synchMoments(filterType);
     }
 
@@ -286,7 +291,6 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * 同步朋友圈
      */
     private void synchMoments(Integer filterType) {
-
         LoginUser loginUser = SecurityUtils.getLoginUser();
         loginUser.setFilterType(filterType);
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeMomentsRk(), JSONObject.toJSONString(loginUser));

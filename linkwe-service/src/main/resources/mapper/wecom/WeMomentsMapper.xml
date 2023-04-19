@@ -41,8 +41,9 @@
         content_type,
         wm.real_type,
         wm.material_id,
+        wm.status,
         IFNULL((SELECT GROUP_CONCAT(DISTINCT wu.user_name) as userName FROM sys_user wu WHERE wu.we_user_id=wm.creator),creator) as creator,
-        (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE  FIND_IN_SET(wu.we_user_id,wm.no_add_user)) as noAddUserName,
+        ifnull(wm.no_add_user, (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE  FIND_IN_SET(wu.we_user_id,wm.no_add_user))) as noAddUserName,
         (SELECT GROUP_CONCAT(wu.we_user_id) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,wm.no_add_user)) as noAddUser,
         (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,wm.add_user)) as addUserName,
         (SELECT GROUP_CONCAT(wu.we_user_id) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,wm.add_user)) as addUser,
@@ -76,11 +77,13 @@
         <result column="pointUserName" property="pointUserName"></result>
         <result column="momentCustomerName" property="momentCustomerName"></result>
         <result column="pointCustomerName" property="pointCustomerName"></result>
+        <result column="status" property="status"></result>
     </resultMap>
     <select id="findMomentsDetail" resultMap="MomentsDetailMapper">
         SELECT
             wm.content,
             wm.other_content,
+            wm.status,
             (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,wm.no_add_user)) as noAddUserName,
             (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu WHERE FIND_IN_SET(wu.we_user_id,wm.add_user)) as addUserName,
             (SELECT GROUP_CONCAT(wu.user_name) FROM sys_user wu

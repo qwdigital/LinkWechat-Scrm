@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 朋友圈相关
@@ -79,17 +80,12 @@ public class WeMomentsController extends BaseController {
      */
     @GetMapping("/synchMoments")
     public AjaxResult synchMoments(@RequestParam(defaultValue = "0") Integer filterType) {
-        try {
-            if (filterType.equals(new Integer(0))) {
-                iWeMomentsService.synchEnterpriseMoments(filterType);
-            } else if (filterType.equals(new Integer(1))) {
-                iWeMomentsService.synchPersonMoments(filterType);
-            }
-        } catch (CustomException e) {
-            return AjaxResult.error(e.getMessage());
+
+        if (Objects.equals(0,filterType)) {
+            iWeMomentsService.synchEnterpriseMoments(filterType);
+        } else if (Objects.equals(1,filterType)) {
+            iWeMomentsService.synchPersonMoments(filterType);
         }
-
-
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 
