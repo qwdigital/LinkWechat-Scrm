@@ -3,6 +3,7 @@ package com.linkwechat.common.handler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.linkwechat.common.constant.HttpConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.DemoModeException;
 import com.linkwechat.common.exception.InnerAuthException;
 import com.linkwechat.common.exception.ServiceException;
@@ -153,5 +154,13 @@ public class GlobalExceptionHandler {
             return AjaxResult.error(e.getMessage());
         }
 
+    }
+
+    /**
+     * 自定义异常
+     */
+    @ExceptionHandler(CustomException.class)
+    public AjaxResult handleCustomException(CustomException e) {
+        return AjaxResult.error(e.getCode(), e.getMessage());
     }
 }

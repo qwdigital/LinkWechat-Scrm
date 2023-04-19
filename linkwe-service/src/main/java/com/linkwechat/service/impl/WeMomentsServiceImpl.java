@@ -34,6 +34,7 @@ import com.linkwechat.service.IWeMaterialService;
 import com.linkwechat.service.IWeMomentsService;
 import com.linkwechat.service.WeMomentsInteracteService;
 import com.sun.corba.se.impl.orbutil.concurrent.Sync;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -294,7 +295,6 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
         LoginUser loginUser = SecurityUtils.getLoginUser();
         loginUser.setFilterType(filterType);
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeMomentsRk(), JSONObject.toJSONString(loginUser));
-
     }
 
 
