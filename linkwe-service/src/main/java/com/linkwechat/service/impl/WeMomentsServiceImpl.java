@@ -578,11 +578,11 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
 
         if (null != momentTask) {
             if (momentTask.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
-                List<MomentsResultDto.TaskList> task_list = momentTask.getTask_list();
-                if (CollectionUtil.isNotEmpty(task_list)) {
-                    task_list.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status))
+                List<MomentsResultDto.TaskList> taskList = momentTask.getTask_list();
+                if (CollectionUtil.isNotEmpty(taskList)) {
+                    taskList.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status))
                             .forEach((k, v) -> {
-                                if (k.equals(0)) {//未发表
+                                if (k.equals(0) && ObjectUtil.equal(weMoments.getScopeType(),0)) {//未发表
                                     weMoments.setNoAddUser(v.stream().map(MomentsResultDto.TaskList::getUserid)
                                             .collect(Collectors.joining(",")));
                                 } else if (k.equals(1)) {//已发表
@@ -590,11 +590,6 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
                                             .collect(Collectors.joining(",")));
                                 }
                             });
-                } else {
-                    List<SysUser> weUsers = qwSysUserClient.listAll().getData();
-                    if (CollectionUtil.isNotEmpty(weUsers)) {
-                        weMoments.setNoAddUser(weUsers.stream().map(SysUser::getWeUserId).collect(Collectors.joining(",")));
-                    }
                 }
             }
         }

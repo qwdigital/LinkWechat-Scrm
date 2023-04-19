@@ -61,9 +61,9 @@ public class WeMoments extends BaseEntity implements Serializable {
 
 
     /**
-     * 可见类型:1:全部;2:部分;
+     * 可见类型:0-部分可见 1-公开
      */
-    @ApiModelProperty(value = "可见类型:1:全部;2:部分;")
+    @ApiModelProperty(value = "可见类型:0-部分可见 1-公开")
     @TableField("scope_type")
     private Integer scopeType;
 
