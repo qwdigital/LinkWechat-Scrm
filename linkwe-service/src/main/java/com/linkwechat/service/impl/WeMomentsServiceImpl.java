@@ -87,7 +87,7 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @param weMoments
      */
     @Override
-    public void addOrUpdateMoments(WeMoments weMoments) throws InterruptedException {
+    public void addOrUpdateMoments(WeMoments weMoments) {
         MomentsParamDto momentsParamDto = new MomentsParamDto();
         weMoments.setPushTime(new Date());
         weMoments.setIsLwPush(1);
