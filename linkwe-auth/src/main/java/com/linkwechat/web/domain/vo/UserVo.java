@@ -1,6 +1,7 @@
 package com.linkwechat.web.domain.vo;
 
 import com.linkwechat.common.annotation.PhoneEncryptField;
+import com.linkwechat.common.core.domain.SysUserManageScop;
 import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysUserDept;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,6 +49,14 @@ public class UserVo {
 
     @ApiModelProperty(value = "自定义数据范围")
     private List<SysDept> roleDepts;
+
+    //数据范围(1:全部数据权限 2:自定义数据权限 3:本部门数据权限 4:本部门及以下数据权限 5:本人数据)
+    private Integer dataScope;
+
+    private String scopeDept;
+
+
+    private List<SysUserManageScop> sysUserManageScops;
 
     @Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
     public String getNickName() {

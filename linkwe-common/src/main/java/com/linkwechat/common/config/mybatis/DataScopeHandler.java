@@ -24,7 +24,7 @@ public interface DataScopeHandler {
     }
 
     /**
-     * 自定数据权限
+     * 自定数据权限(角色绑定部门)
      *
      * @param plainSelect
      * @param dataScope   数据范围注解
@@ -35,6 +35,17 @@ public interface DataScopeHandler {
     String setWhereForCustom(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser, Long roleId); /*{
         throw new UnsupportedOperationException("暂不支持的数据权限类型");
     }*/
+
+
+    /**
+     * 自定数据权限(员工绑定部门)
+     *
+     * @param plainSelect
+     * @param dataScope   数据范围注解
+     * @param sysUser
+     * @throws JSQLParserException SQL解析异常
+     */
+    String setWhereForSysUser(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser);
 
     /**
      * 部门数据权限
