@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeAgentMsg;
 import com.linkwechat.domain.agent.query.WeAgentAddQuery;
 import com.linkwechat.domain.agent.query.WeAgentEditQuery;
@@ -127,6 +128,10 @@ public class WeAgentController extends BaseController {
         log.info("撤销消息详情入参query:{}", id);
         weAgentMsgService.revokeMsgInfo(id);
         return AjaxResult.success();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(SecurityUtils.encryptPassword("123456"));
     }
 
 }
