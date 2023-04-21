@@ -1,7 +1,11 @@
 package com.linkwechat.web.service;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.entity.SysUserDept;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.domain.model.WxLoginUser;
 import com.linkwechat.common.enums.CommonErrorCodeEnum;
@@ -28,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 登录校验方法
@@ -62,6 +67,9 @@ public class SysLoginService {
 
     @Autowired
     private IWxUserService wxUserService;
+
+    @Autowired
+    private ISysUserDeptService iSysUserDeptService;
 
 
 
@@ -122,9 +130,20 @@ public class SysLoginService {
             throw new WeComException(CommonErrorCodeEnum.ERROR_CODE_10006.getErrorCode(),
                     CommonErrorCodeEnum.ERROR_CODE_10006.getErrorMsg());
         }
+        //获取用户所在部门
+        List<SysUserDept> sysUserDeptList = iSysUserDeptService.list(new LambdaQueryWrapper<SysUserDept>()
+                .eq(SysUserDept::getUserId, sysUser.getUserId())
+                .eq(SysUserDept::getDelFlag, Constants.NORMAL_CODE));
+        if(CollectionUtil.isNotEmpty(sysUserDeptList)){
+            sysUser.setDeptIds(
+                    StringUtils.join(
+                            sysUserDeptList.stream().map(SysUserDept::getDeptId).collect(Collectors.toList()),",")
+            );
+        }
         // 角色集合
         List<SysRole> sysRoles = sysRoleService.selectRolesPermissionByUserId(sysUser.getUserId());
         sysUser.setRoles(sysRoles);
+
         LoginUser sysUserVo = new LoginUser();
         sysUserVo.setSysUser(sysUser);
         sysUserVo.setUserType(sysUser.getUserType());
@@ -141,6 +160,9 @@ public class SysLoginService {
             sysUserVo.setCorpId(weCorpAccount.getCorpId());
             sysUserVo.setCorpName(weCorpAccount.getCompanyName());
         }
+
+
+
 
         return sysUserVo;
     }

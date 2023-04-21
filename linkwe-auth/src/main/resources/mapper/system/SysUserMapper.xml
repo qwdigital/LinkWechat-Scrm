@@ -6,6 +6,7 @@
     <resultMap type="com.linkwechat.common.core.domain.entity.SysUser" id="SysUserResult">
         <id property="userId" column="user_id"/>
         <result property="weUserId" column="we_user_id"/>
+        <result property="dataScope" column="data_scope"/>
         <result property="deptId" column="dept_id"/>
         <result property="userName" column="user_name"/>
         <result property="position" column="position"/>
@@ -43,6 +44,8 @@
     <resultMap id="userDeptResult" type="com.linkwechat.web.domain.vo.UserVo">
         <id property="userId" column="user_id"/>
         <result property="weUserId" column="we_user_id"/>
+        <result property="scopeDept" column="scopeDept"/>
+        <result property="dataScope" column="data_scope" />
         <result property="userName" column="user_name"/>
         <result property="position" column="position"/>
         <result property="phoneNumber" column="phone_number"/>
@@ -118,6 +121,7 @@
 
     <sql id="selectUserVo">
         select u.user_id,
+               ifnull(u.data_scope,5) as data_scope,
                u.we_user_id,
                u.dept_id,
                u.user_name,
@@ -180,6 +184,10 @@
     <select id="selectUserDeptList" resultMap="userDeptResult">
         select
         u.we_user_id,
+        ifnull(u.data_scope,5) as data_scope,
+        (SELECT GROUP_CONCAT(d.dept_name) FROM sys_user_manage_scop sums
+        LEFT JOIN sys_dept d ON d.dept_id=sums.dept_id
+        WHERE sums.user_id=u.user_id ) as scopeDept,
         u.user_id,
         u.user_name,
         u.position,
@@ -216,7 +224,7 @@
             AND ud.dept_id= #{sysUser.deptId}
         </if>
 
-         GROUP BY u.we_user_id
+        GROUP BY u.we_user_id
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
                 limit ${pageDomain.pageSize * (pageDomain.pageNum-1)}, #{pageDomain.pageSize}

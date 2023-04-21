@@ -150,7 +150,7 @@ public class QwDataSyncListener {
 
 
     @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.sync.we-moments:Qu_Hd_Moments}")
+    @RabbitListener(queues = "${wecom.mq.queue.sync.we-hd-moments:Qu_Hd_Moments}")
     public void weHdMomentsSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微朋友圈互动同步消息监听：msg:{}", msg);

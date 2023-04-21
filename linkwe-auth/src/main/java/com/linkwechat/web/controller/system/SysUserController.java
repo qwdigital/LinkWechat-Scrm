@@ -223,6 +223,45 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * 编辑数据权限
+     * @return
+     */
+    @PostMapping("/editDataScop")
+    public AjaxResult editDataScop(@RequestBody SysUserDTO user){
+        userService.editDataScop(user);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 删除用户
+     */
+    ////@PreAuthorize("@ss.hasPermi('system:user:remove')")
+//    @Log(title = "用户管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{userIds}")
+    public AjaxResult remove(@PathVariable String[] userIds) {
+        userService.leaveUser(userIds);
+        return AjaxResult.success();
+    }
+
+
+
+    /**
+     * 回掉移除用户
+     *
+     * @param corpId
+     * @param userIds
+     * @return
+     */
+    @DeleteMapping("/callBackRemove/{corpId}/{userIds}")
+    public AjaxResult callBackRemove(@PathVariable String corpId, @PathVariable String[] userIds) {
+
+        userService.leaveUser(userIds);
+
+        return AjaxResult.success();
+
+    }
+
+    /**
      * 重置密码
      */
     @PutMapping("/resetPwd")

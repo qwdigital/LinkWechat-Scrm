@@ -53,7 +53,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Resource
     @Lazy
     private ISysUserService iSysUserService;
-    
+
     public List<SysRole> selectSuperAdminBaseRoleList() {
         List<SysRole> roleList = roleMapper.selectSuperAdminBaseRoleList();
         return roleList.stream().peek(role -> {
@@ -84,7 +84,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 return  roleVos;
             }else if(UserTypes.USER_TYPE_FJ_ADMIN.getSysRoleKey().equals(SecurityUtils.getUserType())){//分级管理员(过滤超管与分管)
                 roleVos=roleVos.stream().filter(item->!item.getRoleKey().equals(RoleType.WECOME_USER_TYPE_VJZ.getSysRoleKey())
-                && !item.getRoleKey().equals(RoleType.WECOME_USER_TYPE_FJGLY.getSysRoleKey())).collect(Collectors.toList());
+                        && !item.getRoleKey().equals(RoleType.WECOME_USER_TYPE_FJGLY.getSysRoleKey())).collect(Collectors.toList());
             }else{//普通成员以及自定义角色(过滤超管与分管与普通成员)
                 roleVos=roleVos.stream().filter(item->!item.getRoleKey().equals(RoleType.WECOME_USER_TYPE_VJZ.getSysRoleKey())
                         && !item.getRoleKey().equals(RoleType.WECOME_USER_TYPE_FJGLY.getSysRoleKey())
@@ -161,9 +161,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         SysRole role = roleMapper.selectRoleById(roleId);
         RoleDetailVo roleDetail = BeanUtil.copyProperties(role, RoleDetailVo.class);
         roleDetail.setUsers(userRoleMapper.selectUserByRoleId(roleId));
-        if (DataScopeAspect.DATA_SCOPE_CUSTOM.equals(role.getDataScope())) {
-            roleDetail.setDepts(roleDeptMapper.selectRoleDeptList(roleId));
-        }
+//        if (DataScopeAspect.DATA_SCOPE_CUSTOM.equals(role.getDataScope())) {
+//            roleDetail.setDepts(roleDeptMapper.selectRoleDeptList(roleId));
+//        }
         roleDetail.setMenus(menuMapper.selectMenuListByRoleId(roleId));
         return roleDetail;
     }
@@ -316,22 +316,22 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     public int insertRoleDept(SysRole role) {
         int rows = 1;
-        if (DataScopeAspect.DATA_SCOPE_CUSTOM.equals(role.getDataScope())) {
-            // 新增角色与部门（数据权限）管理
-            List<SysRoleDept> list = new ArrayList<SysRoleDept>();
-            if(role.getDeptIds() !=null ){
-                for (Long deptId : role.getDeptIds()) {
-                    SysRoleDept rd = new SysRoleDept();
-                    rd.setRoleId(role.getRoleId());
-                    rd.setDeptId(deptId);
-                    list.add(rd);
-                }
-
-            }
-            if (list.size() > 0) {
-                rows = roleDeptMapper.batchRoleDept(list);
-            }
-        }
+//        if (DataScopeAspect.DATA_SCOPE_CUSTOM.equals(role.getDataScope())) {
+//            // 新增角色与部门（数据权限）管理
+//            List<SysRoleDept> list = new ArrayList<SysRoleDept>();
+//            if(role.getDeptIds() !=null ){
+//                for (Long deptId : role.getDeptIds()) {
+//                    SysRoleDept rd = new SysRoleDept();
+//                    rd.setRoleId(role.getRoleId());
+//                    rd.setDeptId(deptId);
+//                    list.add(rd);
+//                }
+//
+//            }
+//            if (list.size() > 0) {
+//                rows = roleDeptMapper.batchRoleDept(list);
+//            }
+//        }
         return rows;
     }
 
