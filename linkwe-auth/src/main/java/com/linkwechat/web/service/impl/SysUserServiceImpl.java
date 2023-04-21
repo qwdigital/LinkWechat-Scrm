@@ -134,7 +134,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
             List<UserRoleVo> userRoleList = userMapper.selectUserRoleList(userDeptList.stream().map(UserVo::getUserId).collect(Collectors.toList()));
 
+
+            List<SysUserManageScop> manageScops = iSysUserManageScopService.list(new LambdaQueryWrapper<SysUserManageScop>()
+                    .in(SysUserManageScop::getUserId, userDeptList.stream().map(UserVo::getUserId).collect(Collectors.toList())));
+
+
             Map<Long, List<UserRoleVo>> userRoleMap = userRoleList.stream().collect(Collectors.groupingBy(UserRoleVo::getUserId));
+
+            Map<Long, List<SysUserManageScop>> sysUserManageScopMap
+                    = manageScops.stream().collect(Collectors.groupingBy(SysUserManageScop::getUserId));
+
+
+
             Set<Long> roleIdSet = new HashSet<>();
             Map<Long, List<SysDept>> map = new HashMap<>();
             userDeptList.stream().filter(Objects::nonNull).forEach(u -> {
@@ -143,6 +154,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     u.setRoles(userRoleMap.get(u.getUserId()));
                     roleIdSet.addAll(roleIdList);
                 }
+
+
+                u.setSysUserManageScops(
+                        sysUserManageScopMap.get(u.getUserId())
+                );
+
             });
             roleIdSet.stream().filter(Objects::nonNull).forEach(roleId -> {
                 List<SysDept> depts = roleDeptMapper.selectRoleDeptList(roleId);
