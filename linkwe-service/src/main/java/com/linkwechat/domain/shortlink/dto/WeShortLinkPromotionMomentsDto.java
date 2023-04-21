@@ -1,7 +1,7 @@
 package com.linkwechat.domain.shortlink.dto;
 
 import com.linkwechat.common.core.domain.model.LoginUser;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.WeMoments;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

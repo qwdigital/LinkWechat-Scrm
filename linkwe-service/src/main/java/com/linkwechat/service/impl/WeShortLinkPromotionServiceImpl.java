@@ -466,7 +466,7 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
                     MomentsCreateResultDto.Result result = data.getResult();
                     //停止发送朋友圈
                     CancelMomentTaskDto cancelMomentTaskDto = new CancelMomentTaskDto();
-                    cancelMomentTaskDto.setMoment_id(result.getMoment_id());
+                    cancelMomentTaskDto.setMoment_id(result.getMomentId());
                     qwMomentsClient.cancel_moment_task(cancelMomentTaskDto);
                 });
             });

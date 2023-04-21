@@ -239,7 +239,7 @@ public class SysUserController extends BaseController {
 //    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
     public AjaxResult remove(@PathVariable String[] userIds) {
-        userService.leaveUser(userIds);
+        userService.leaveUser(ListUtil.toList(userIds));
         return AjaxResult.success();
     }
 
@@ -255,7 +255,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/callBackRemove/{corpId}/{userIds}")
     public AjaxResult callBackRemove(@PathVariable String corpId, @PathVariable String[] userIds) {
 
-        userService.leaveUser(userIds);
+        userService.leaveUser(ListUtil.toList(userIds));
 
         return AjaxResult.success();
 

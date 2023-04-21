@@ -185,14 +185,14 @@ public class QwShortLinkGroupMsgEndListener {
                         MomentsCreateResultDto.Result result = data.getResult();
                         //停止发送朋友圈
                         CancelMomentTaskDto cancelMomentTaskDto = new CancelMomentTaskDto();
-                        cancelMomentTaskDto.setMoment_id(result.getMoment_id());
+                        cancelMomentTaskDto.setMoment_id(result.getMomentId());
                         qwMomentsClient.cancel_moment_task(cancelMomentTaskDto);
 
                         //更新员工短链任务推广
                         LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
                         updateWrapper.eq(WeShortLinkUserPromotionTask::getId, one.getId());
                         updateWrapper.set(WeShortLinkUserPromotionTask::getSendStatus, 3);
-                        updateWrapper.set(WeShortLinkUserPromotionTask::getMomentId, result.getMoment_id());
+                        updateWrapper.set(WeShortLinkUserPromotionTask::getMomentId, result.getMomentId());
                         weShortLinkUserPromotionTaskService.update(updateWrapper);
 
                         //更新短链推广状态为已结束
