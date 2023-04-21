@@ -5,12 +5,14 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
 import com.linkwechat.service.IWeGroupCodeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  * @date 2020-10-07
  */
+@Slf4j
 @RestController
 @RequestMapping("/groupCode")
 public class WeGroupCodeController extends BaseController {
@@ -95,7 +98,8 @@ public class WeGroupCodeController extends BaseController {
         try {
             FileUtils.batchDownloadFile(fileList, response.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("群活码批量下载失败:"+e.getMessage());
+            throw new CustomException("群活码批量下载失败");
         }
     }
 
@@ -109,7 +113,8 @@ public class WeGroupCodeController extends BaseController {
         try {
             FileUtils.downloadFile(weGroupCode.getCodeUrl(), response.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("群活码下载失败:"+e.getMessage());
+            throw new CustomException("群活码下载失败");
         }
     }
 
