@@ -81,7 +81,7 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 批量下载群活码
      */
-    @Log(title = "群活码批量下载", businessType = BusinessType.OTHER)
+//    @Log(title = "群活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletResponse response) {
 
@@ -106,7 +106,6 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 下载群活码
      */
-    @Log(title = "群活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletResponse response) {
         WeGroupCode weGroupCode = groupCodeService.getById(Long.valueOf(id));
@@ -125,13 +124,6 @@ public class WeGroupCodeController extends BaseController {
     @Log(title = "客户群活码", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<WeGroupCode> add(@Validated @RequestBody WeGroupCode weGroupCode) {
-        //校验活码名称
-//       if(groupCodeService.count(new LambdaQueryWrapper<WeGroupCode>()
-//               .eq(WeGroupCode::getActivityName,weGroupCode.getActivityName()))>0){
-//           return AjaxResult.error(
-//                   "活码名称已存在"
-//           );
-//       }
 
         groupCodeService.insertWeGroupCode(weGroupCode);
         return AjaxResult.success(
@@ -146,15 +138,6 @@ public class WeGroupCodeController extends BaseController {
     @PutMapping
     public AjaxResult<WeGroupCode> edit(@Validated @RequestBody WeGroupCode weGroupCode) {
 
-//        if(!groupCodeService.getById(weGroupCode.getId())
-//                .getActivityName().equals(weGroupCode.getActivityName())){
-//            if(groupCodeService.count(new LambdaQueryWrapper<WeGroupCode>()
-//                    .eq(WeGroupCode::getActivityName,weGroupCode.getActivityName()))>0){
-//                return AjaxResult.error(HttpStatus.NOT_DATA_DUPLICATION,
-//                        "活码名称已存在"
-//                );
-//            }
-//        }
 
         return AjaxResult.success(
                 groupCodeService
