@@ -235,6 +235,12 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void editUserRole(SysUserDTO user);
 
+    /**
+     * 编辑数据权限
+     * @param user
+     */
+    void editDataScop(SysUserDTO user);
+
 
     /**
      * 批量更新角色
