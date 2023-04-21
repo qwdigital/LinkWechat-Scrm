@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 /**
  * spring security配置
  *
- * @author yiche
+ * @author danmo
  */
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)

@@ -43,7 +43,6 @@ public class DataScopeInterceptor extends JsqlParserSupport implements InnerInte
         try {
             dataScope = getDataScope(ms);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
             log.error("获取注解失败:", e);
             throw ExceptionUtils.mpe("获取注解失败", e);
         }
@@ -104,7 +103,8 @@ public class DataScopeInterceptor extends JsqlParserSupport implements InnerInte
             return;
         }
         if (selectBody instanceof PlainSelect) {
-            processPlainSelect((PlainSelect) selectBody, dataScope);
+//            processPlainSelect((PlainSelect) selectBody, dataScope);
+            processPlainSelectForSysUser((PlainSelect) selectBody, dataScope);
         } else if (selectBody instanceof WithItem) {
             // With关键字
             WithItem withItem = (WithItem) selectBody;
@@ -123,7 +123,7 @@ public class DataScopeInterceptor extends JsqlParserSupport implements InnerInte
     }
 
     /**
-     * 处理 PlainSelect
+     * 处理 PlainSelect(数据权限与角色绑定)
      */
     protected void processPlainSelect(PlainSelect plainSelect, DataScope dataScope) {
         LoginUser loginUser = SecurityUtils.getLoginUser();
@@ -163,9 +163,64 @@ public class DataScopeInterceptor extends JsqlParserSupport implements InnerInte
                 pearlDataScopeHandler.setWhere(plainSelect,expression);
             }
         } catch (JSQLParserException e) {
-            e.printStackTrace();
+            log.error("Failed to process, Error SQL:"+e);
             throw ExceptionUtils.mpe("Failed to process, Error SQL: %s", e);
         }
 
     }
+
+    /**
+     * 处理 PlainSelect(数据权限与用户绑定)
+     */
+    protected void processPlainSelectForSysUser(PlainSelect plainSelect, DataScope dataScope) {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        if (dataScope == null || loginUser ==null) {
+            return;
+        }
+
+        SysUser sysUser = loginUser.getSysUser();
+        StringBuilder sqlString = new StringBuilder();
+
+        if(null != sysUser){
+            DataScopeType type = DataScopeType.of(String.valueOf(sysUser.getDataScope()));
+
+
+            switch (type){
+                 case DATA_SCOPE_ALL:
+                    pearlDataScopeHandler.setWhereForAll(plainSelect, dataScope, sysUser);
+                    return;
+                case DATA_SCOPE_CUSTOM:
+                    sqlString.append(pearlDataScopeHandler.setWhereForSysUser(plainSelect, dataScope, sysUser));
+                    break;
+                case DATA_SCOPE_DEPT:
+                    sqlString.append(pearlDataScopeHandler.setWhereForDept(plainSelect, dataScope, sysUser));
+                    break;
+                case DATA_SCOPE_DEPT_AND_CHILD:
+                    sqlString.append(pearlDataScopeHandler.setWhereForDeptAndChild(plainSelect, dataScope, sysUser));
+                    break;
+                case DATA_SCOPE_SELF:
+                    sqlString.append(pearlDataScopeHandler.setWhereForSelf(plainSelect, dataScope, sysUser));
+                    break;
+                default:
+                    break;
+
+            }
+
+        }
+
+        try {
+            System.out.println("sqlString===="+sqlString);
+            if(StringUtils.isNotEmpty(sqlString)){
+                Expression expression = CCJSqlParserUtil.parseCondExpression(" (" + sqlString.substring(4) + ")");
+                pearlDataScopeHandler.setWhere(plainSelect,expression);
+            }
+        } catch (JSQLParserException e) {
+            log.error("Failed to process, Error SQL:"+e);
+            throw ExceptionUtils.mpe("Failed to process, Error SQL: %s", e);
+        }
+
+
+
+    }
+
 }

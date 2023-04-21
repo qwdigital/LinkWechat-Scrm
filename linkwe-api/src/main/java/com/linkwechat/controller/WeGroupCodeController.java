@@ -5,12 +5,14 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
 import com.linkwechat.service.IWeGroupCodeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
  * @author ruoyi
  * @date 2020-10-07
  */
+@Slf4j
 @RestController
 @RequestMapping("/groupCode")
 public class WeGroupCodeController extends BaseController {
@@ -78,7 +81,6 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 批量下载群活码
      */
-    @Log(title = "群活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletResponse response) {
 
@@ -95,21 +97,22 @@ public class WeGroupCodeController extends BaseController {
         try {
             FileUtils.batchDownloadFile(fileList, response.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("群活码批量下载失败:"+e.getMessage());
+            throw new CustomException("群活码批量下载失败");
         }
     }
 
     /**
      * 下载群活码
      */
-    @Log(title = "群活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletResponse response) {
         WeGroupCode weGroupCode = groupCodeService.getById(Long.valueOf(id));
         try {
             FileUtils.downloadFile(weGroupCode.getCodeUrl(), response.getOutputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("群活码下载失败:"+e.getMessage());
+            throw new CustomException("群活码下载失败");
         }
     }
 
@@ -120,13 +123,6 @@ public class WeGroupCodeController extends BaseController {
     @Log(title = "客户群活码", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult<WeGroupCode> add(@Validated @RequestBody WeGroupCode weGroupCode) {
-        //校验活码名称
-//       if(groupCodeService.count(new LambdaQueryWrapper<WeGroupCode>()
-//               .eq(WeGroupCode::getActivityName,weGroupCode.getActivityName()))>0){
-//           return AjaxResult.error(
-//                   "活码名称已存在"
-//           );
-//       }
 
         groupCodeService.insertWeGroupCode(weGroupCode);
         return AjaxResult.success(
@@ -141,15 +137,6 @@ public class WeGroupCodeController extends BaseController {
     @PutMapping
     public AjaxResult<WeGroupCode> edit(@Validated @RequestBody WeGroupCode weGroupCode) {
 
-//        if(!groupCodeService.getById(weGroupCode.getId())
-//                .getActivityName().equals(weGroupCode.getActivityName())){
-//            if(groupCodeService.count(new LambdaQueryWrapper<WeGroupCode>()
-//                    .eq(WeGroupCode::getActivityName,weGroupCode.getActivityName()))>0){
-//                return AjaxResult.error(HttpStatus.NOT_DATA_DUPLICATION,
-//                        "活码名称已存在"
-//                );
-//            }
-//        }
 
         return AjaxResult.success(
                 groupCodeService

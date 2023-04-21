@@ -22,8 +22,8 @@ import java.util.Objects;
  *
  * @author ruoyi
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class RequestArgsLogAspect {
     private static final Logger log = LoggerFactory.getLogger(RequestArgsLogAspect.class);
 

@@ -215,6 +215,18 @@ public class SysUser extends BaseEntity {
     private Integer kfStatus;
 
 
+    /**
+     * 数据范围(1:全部数据权限 2:自定义数据权限 3:本部门数据权限 4:本部门及以下数据权限)
+     */
+    private Integer dataScope;
+
+
+    /**
+     * 工号
+     */
+    private String jobNumber;
+
+
 
 
     /**
@@ -316,6 +328,14 @@ public class SysUser extends BaseEntity {
 
     @TableField(exist = false)
     private String companyName;
+
+    /**
+     * 员工所在部门id多个使用逗号隔开
+     */
+    @TableField(exist = false)
+    private String deptIds;
+
+
 
 
 

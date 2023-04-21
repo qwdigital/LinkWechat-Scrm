@@ -213,6 +213,16 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * 编辑数据权限
+     * @return
+     */
+    @PostMapping("/editDataScop")
+    public AjaxResult editDataScop(@RequestBody SysUserDTO user){
+        userService.editDataScop(user);
+        return AjaxResult.success();
+    }
+
+    /**
      * 删除用户
      */
     ////@PreAuthorize("@ss.hasPermi('system:user:remove')")

@@ -13,6 +13,7 @@ import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.SysUserManageScop;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysRole;
@@ -97,12 +98,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Resource
     private QwUserClient userClient;
 
-    @Resource
-    private QwCorpClient corpClient;
-
-    @Autowired
-    private IWeLeaveUserService iWeLeaveUserService;
-
     @Autowired
     private RabbitMQSettingConfig rabbitMQSettingConfig;
 
@@ -114,6 +109,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Autowired
     private ISysRoleService sysRoleService;
+
+
+    @Autowired
+    private ISysUserManageScopService iSysUserManageScopService;
 
 
     /**
@@ -135,7 +134,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
             List<UserRoleVo> userRoleList = userMapper.selectUserRoleList(userDeptList.stream().map(UserVo::getUserId).collect(Collectors.toList()));
 
+
+            List<SysUserManageScop> manageScops = iSysUserManageScopService.list(new LambdaQueryWrapper<SysUserManageScop>()
+                    .in(SysUserManageScop::getUserId, userDeptList.stream().map(UserVo::getUserId).collect(Collectors.toList())));
+
+
             Map<Long, List<UserRoleVo>> userRoleMap = userRoleList.stream().collect(Collectors.groupingBy(UserRoleVo::getUserId));
+
+            Map<Long, List<SysUserManageScop>> sysUserManageScopMap
+                    = manageScops.stream().collect(Collectors.groupingBy(SysUserManageScop::getUserId));
+
+
+
             Set<Long> roleIdSet = new HashSet<>();
             Map<Long, List<SysDept>> map = new HashMap<>();
             userDeptList.stream().filter(Objects::nonNull).forEach(u -> {
@@ -144,6 +154,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     u.setRoles(userRoleMap.get(u.getUserId()));
                     roleIdSet.addAll(roleIdList);
                 }
+
+
+                u.setSysUserManageScops(
+                        sysUserManageScopMap.get(u.getUserId())
+                );
+
             });
             roleIdSet.stream().filter(Objects::nonNull).forEach(roleId -> {
                 List<SysDept> depts = roleDeptMapper.selectRoleDeptList(roleId);
@@ -728,6 +744,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
             }
         }
+    }
+
+    @Override
+    public void editDataScop(SysUserDTO user) {
+
+        SysUser sysUser = this.getById(user.getUserId());
+        if(null != sysUser){
+            sysUser.setDataScope(user.getDataScope());
+
+            if(this.updateById(sysUser)){
+                List<SysUserManageScop> sysUserManageScops = user.getSysUserManageScops();
+
+                if(CollectionUtil.isNotEmpty(sysUserManageScops)){
+                    iSysUserManageScopService.remove(new LambdaQueryWrapper<SysUserManageScop>()
+                            .eq(SysUserManageScop::getUserId,user.getUserId()));
+                    iSysUserManageScopService.saveBatch(sysUserManageScops);
+                }
+            }
+        }
+
+
     }
 
     @Override

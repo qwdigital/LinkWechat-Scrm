@@ -3,7 +3,7 @@ package com.linkwechat.config.mybatis;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.domain.moments.dto.CustomerMessagePushDto;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.WeMoments;
 import com.linkwechat.domain.WeMsgTlp;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
