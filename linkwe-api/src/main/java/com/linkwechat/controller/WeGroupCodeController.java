@@ -81,7 +81,6 @@ public class WeGroupCodeController extends BaseController {
     /**
      * 批量下载群活码
      */
-//    @Log(title = "群活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(String ids, HttpServletResponse response) {
 
