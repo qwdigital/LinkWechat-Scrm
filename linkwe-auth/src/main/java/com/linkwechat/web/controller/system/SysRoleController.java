@@ -35,14 +35,7 @@ public class SysRoleController extends BaseController {
     @Autowired
     private ISysRoleService roleService;
 
-    @Autowired
-    private TokenService tokenService;
 
-    @Autowired
-    private SysPermissionService permissionService;
-
-    @Autowired
-    private ISysUserService userService;
 
     //@PreAuthorize("@ss.hasPermi('system:role:list')")
     @GetMapping("/list")

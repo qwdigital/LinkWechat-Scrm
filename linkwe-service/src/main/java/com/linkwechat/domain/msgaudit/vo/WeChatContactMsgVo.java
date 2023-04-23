@@ -1,5 +1,6 @@
 package com.linkwechat.domain.msgaudit.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -20,9 +21,11 @@ import java.util.Date;
 public class WeChatContactMsgVo {
 
     @ApiModelProperty("接收人id")
+    @ExcelIgnore
     private String receiver;
 
     @ApiModelProperty("发送人人id")
+    @ExcelIgnore
     private String fromId;
 
     @ExcelProperty("名称")
