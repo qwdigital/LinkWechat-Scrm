@@ -198,16 +198,17 @@ public class WeOperationCenterController extends BaseController {
 
 
 
+
     /**
      * 客群数据-客群成员实时数据-导出
      * @param query
      * @return
      */
     @GetMapping("/group/member/real/export")
-    public AjaxResult groupMemberRealExport(WeOperationGroupQuery query) {
-        List<WeGroupMemberRealCntVo> groupMemberRealCnt = weOperationCenterService.getGroupMemberRealCnt(query);
-        ExcelUtil<WeGroupMemberRealCntVo> util = new ExcelUtil<WeGroupMemberRealCntVo>(WeGroupMemberRealCntVo.class);
-        return util.exportExcel(groupMemberRealCnt, "客群成员实时数据");
+    public void groupMemberRealExport(WeOperationGroupQuery query) {
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeGroupMemberRealCntVo.class, weOperationCenterService.getGroupMemberRealCnt(query),"客群成员实时数据"
+        );
     }
 
 
