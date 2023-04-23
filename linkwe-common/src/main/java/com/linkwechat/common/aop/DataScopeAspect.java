@@ -144,10 +144,13 @@ public class DataScopeAspect {
                                 " OR {}.dept_id IN ( SELECT dept_id FROM sys_user_manage_scop WHERE user_id = {} ) ", controllerDataScope.deptAlias(),
                                 user.getUserId()));
                     }else {
-                        DataColumn dataColumn = controllerDataScope.value()[0];
-                        sqlString.append(StringUtils.format(
-                                " or {}.{} in ( select distinct sud.{} from sys_user_manage_scop srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0  where srd.user_id = {} )",
-                                dataColumn.alias(), dataColumn.name(),dataColumn.userid(), user.getUserId()));
+                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
+                            DataColumn dataColumn = controllerDataScope.value()[0];
+                            sqlString.append(StringUtils.format(
+                                    " or {}.{} in ( select distinct sud.{} from sys_user_manage_scop srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0  where srd.user_id = {} )",
+                                    dataColumn.alias(), dataColumn.name(),dataColumn.userid(), user.getUserId()));
+                        }
+
                     }
                     break;
                 case DATA_SCOPE_DEPT:
@@ -157,15 +160,21 @@ public class DataScopeAspect {
 
 
                         if(StringUtils.isNotEmpty(user.getDeptIds())){
-                            DataColumn dataColumn = controllerDataScope.value()[0];
-                            sqlString.append(StringUtils.format(" or {}.{} in (  SELECT {} from sys_user_dept where dept_id in ({}) ) ",
-                                    dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDeptIds()));
+                            if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
+                                DataColumn dataColumn = controllerDataScope.value()[0];
+                                sqlString.append(StringUtils.format(" or {}.{} in (  SELECT {} from sys_user_dept where dept_id in ({}) ) ",
+                                        dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDeptIds()));
+                            }
+
 
                         }else{
                             if(user.getDeptId() != null){
-                                DataColumn dataColumn = controllerDataScope.value()[0];
-                                sqlString.append(StringUtils.format(" or {}.{} in ( SELECT {} from sys_user_dept where dept_id in ({}) ) ",
-                                        dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDeptId()));
+                                if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
+                                    DataColumn dataColumn = controllerDataScope.value()[0];
+                                    sqlString.append(StringUtils.format(" or {}.{} in ( SELECT {} from sys_user_dept where dept_id in ({}) ) ",
+                                            dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDeptId()));
+                                }
+
                             }
                         }
 
@@ -178,10 +187,14 @@ public class DataScopeAspect {
                                 " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
                                 controllerDataScope.deptAlias(), user.getDeptId(), user.getDeptId()));
                     }else {
-                        DataColumn dataColumn = controllerDataScope.value()[0];
-                        sqlString.append(StringUtils.format(
-                                " or {}.{} in ( select distinct sud.{} from sys_dept sd inner join sys_user_dept sud on sd.dept_id = sud.dept_id and sud.del_flag = 0 where (sd.dept_id = {} or find_in_set( {} , sd.ancestors )) and sd.del_flag = 0 ) ",
-                                dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getDeptId(), user.getDeptId()));
+                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
+
+                            DataColumn dataColumn = controllerDataScope.value()[0];
+                            sqlString.append(StringUtils.format(
+                                    " or {}.{} in ( select distinct sud.{} from sys_dept sd inner join sys_user_dept sud on sd.dept_id = sud.dept_id and sud.del_flag = 0 where (sd.dept_id = {} or find_in_set( {} , sd.ancestors )) and sd.del_flag = 0 ) ",
+                                    dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getDeptId(), user.getDeptId()));
+                        }
+
                     }
                     break;
                 case DATA_SCOPE_SELF:
@@ -193,9 +206,13 @@ public class DataScopeAspect {
                             sqlString.append(" OR 1=0 ");
                         }
                     }else {
-                        DataColumn dataColumn = controllerDataScope.value()[0];
-                        sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user where user_id = {} and del_flag = 0 ) ",
-                                dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getUserId()));
+
+                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
+                            DataColumn dataColumn = controllerDataScope.value()[0];
+                            sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user where user_id = {} and del_flag = 0 ) ",
+                                    dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getUserId()));
+                        }
+
                     }
                     break;
                 default:
