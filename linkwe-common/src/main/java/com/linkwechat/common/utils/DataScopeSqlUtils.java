@@ -101,7 +101,6 @@ public class DataScopeSqlUtils {
             }
 
         }
-        System.out.println(sqlPart.toString());
         return sqlPart.toString();
 
     }

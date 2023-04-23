@@ -193,9 +193,13 @@ public class DataScopeAspect {
                             sqlString.append(" OR 1=0 ");
                         }
                     }else {
-                        DataColumn dataColumn = controllerDataScope.value()[0];
-                        sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user where user_id = {} and del_flag = 0 ) ",
-                                dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getUserId()));
+
+                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
+                            DataColumn dataColumn = controllerDataScope.value()[0];
+                            sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user where user_id = {} and del_flag = 0 ) ",
+                                    dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getUserId()));
+                        }
+
                     }
                     break;
                 default:
