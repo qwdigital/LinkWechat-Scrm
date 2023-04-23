@@ -6,7 +6,9 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeChatContactMsg;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.service.IWeChatContactMsgService;
@@ -126,19 +128,15 @@ public class WeChatContactMsgController extends BaseController {
         return getDataTable(list);
     }
 
+
     /**
      * 全文检索 会话列表
      */
     @ApiOperation("全文检索 导出列表")
-    @Log(title = "全文检索 导出列表" , businessType = BusinessType.OTHER)
-    @GetMapping("/selectFullSearchChatList/export" )
-    public void fullSearchChatListExport(WeChatContactMsg weChatContactMsg) throws IOException {
-        List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);
-        HttpServletResponse response = ServletUtils.getResponse();
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("全文检索", "UTF-8").replaceAll("\\+", "%20");
-        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-        EasyExcel.write(response.getOutputStream(), WeChatContactMsgVo.class).sheet("全文检索").doWrite(list);
+    @GetMapping("/selectFullSearchChatList/export")
+    public void fullSearchChatListExport(WeChatContactMsg weChatContactMsg) {
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeChatContactMsgVo.class, iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg),"全文检索"
+        );
     }
 }

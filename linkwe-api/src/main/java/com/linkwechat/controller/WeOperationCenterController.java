@@ -4,7 +4,9 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.operation.query.WeOperationCustomerQuery;
 import com.linkwechat.domain.operation.query.WeOperationGroupQuery;
 import com.linkwechat.domain.operation.vo.*;
@@ -96,10 +98,10 @@ public class WeOperationCenterController extends BaseController {
      * @return
      */
     @GetMapping("/customer/real/export")
-    public AjaxResult customerRealExport(WeOperationCustomerQuery query) {
-        List<WeCustomerRealCntVo> customerRealCnt = weOperationCenterService.getCustomerRealCnt(query);
-        ExcelUtil<WeCustomerRealCntVo> util = new ExcelUtil<WeCustomerRealCntVo>(WeCustomerRealCntVo.class);
-        return util.exportExcel(customerRealCnt, "客户实时数据");
+    public void customerRealExport(WeOperationCustomerQuery query) {
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCustomerRealCntVo.class, weOperationCenterService.getCustomerRealCnt(query),"客户实时数据"
+        );
     }
 
 
@@ -188,11 +190,13 @@ public class WeOperationCenterController extends BaseController {
      * @return
      */
     @GetMapping("/group/real/export")
-    public AjaxResult groupRealExport(WeOperationGroupQuery query) {
-        List<WeGroupRealCntVo> groupRealCnt = weOperationCenterService.getGroupRealCnt(query);
-        ExcelUtil<WeGroupRealCntVo> util = new ExcelUtil<WeGroupRealCntVo>(WeGroupRealCntVo.class);
-        return util.exportExcel(groupRealCnt, "客群实时数据");
+    public void groupRealExport(WeOperationGroupQuery query) {
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeGroupRealCntVo.class, weOperationCenterService.getGroupRealCnt(query),"客群实时数据"
+        );
     }
+
+
 
 
     /**
@@ -201,10 +205,10 @@ public class WeOperationCenterController extends BaseController {
      * @return
      */
     @GetMapping("/group/member/real/export")
-    public AjaxResult groupMemberRealExport(WeOperationGroupQuery query) {
-        List<WeGroupMemberRealCntVo> groupMemberRealCnt = weOperationCenterService.getGroupMemberRealCnt(query);
-        ExcelUtil<WeGroupMemberRealCntVo> util = new ExcelUtil<WeGroupMemberRealCntVo>(WeGroupMemberRealCntVo.class);
-        return util.exportExcel(groupMemberRealCnt, "客群成员实时数据");
+    public void groupMemberRealExport(WeOperationGroupQuery query) {
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeGroupMemberRealCntVo.class, weOperationCenterService.getGroupMemberRealCnt(query),"客群成员实时数据"
+        );
     }
 
 
@@ -263,17 +267,19 @@ public class WeOperationCenterController extends BaseController {
     }
 
 
+
     /**
      * 客群数据-会话总数-导出
      * @param query
      * @return
      */
     @GetMapping("/session/customer/total/export")
-    public AjaxResult customerSessionTotalExport(WeOperationCustomerQuery query) {
-        List<WeSessionCustomerTotalCntVo> customerSessionTotalCnt = weOperationCenterService.getCustomerSessionTotalCnt(query);
-        ExcelUtil<WeSessionCustomerTotalCntVo> util = new ExcelUtil<WeSessionCustomerTotalCntVo>(WeSessionCustomerTotalCntVo.class);
-        return util.exportExcel(customerSessionTotalCnt, "会话总数");
+    public void customerSessionTotalExport(WeOperationCustomerQuery query) {
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeSessionCustomerTotalCntVo.class,weOperationCenterService.getCustomerSessionTotalCnt(query),"会话总数"
+        );
     }
+
 
     /**
      * 会话分析-客群联系总数
