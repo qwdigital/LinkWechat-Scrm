@@ -2,7 +2,7 @@ package com.linkwechat.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.common.annotation.DataScope;
-import com.linkwechat.common.annotation.PhoneEncryptMethod;
+//import com.linkwechat.common.annotation.PhoneEncryptMethod;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.web.domain.vo.UserRoleVo;
@@ -24,7 +24,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @param sysUser
      * @return
      */
-    @PhoneEncryptMethod
+//    @PhoneEncryptMethod
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<UserVo> selectUserDeptList(@Param("sysUser") SysUser sysUser, @Param("pageDomain") PageDomain pageDomain);
 
