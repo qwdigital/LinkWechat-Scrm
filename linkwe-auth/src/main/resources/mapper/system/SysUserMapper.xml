@@ -85,6 +85,7 @@
 
     <sql id="simpleUserVo">
         select user_id,
+               ifnull(data_scope,5) as data_scope,
                dept_id,
                user_name,
                user_type,
