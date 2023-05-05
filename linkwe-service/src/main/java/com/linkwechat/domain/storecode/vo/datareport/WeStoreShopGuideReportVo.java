@@ -1,5 +1,7 @@
 package com.linkwechat.domain.storecode.vo.datareport;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.linkwechat.common.annotation.Excel;
 import lombok.Data;
 
@@ -10,20 +12,21 @@ import lombok.Data;
 @Data
 public class WeStoreShopGuideReportVo {
     //门店id
+    @ExcelIgnore
     private Long storeCodeId;
-    @Excel(name = "日期")
+    @ExcelProperty("日期")
     private String createTime;
-    @Excel(name = "所属地区")
+    @ExcelProperty("所属地区")
     private String area;
-    @Excel(name = "门店名称")
+    @ExcelProperty("门店名称")
     private String storeName;
-    @Excel(name = "点击/扫码总次数")
+    @ExcelProperty("点击/扫码总次数")
     private int totalScannNumber;
-    @Excel(name = "新增客户总数")
+    @ExcelProperty("新增客户总数")
     private int customerTotalNumber;
-    @Excel(name = "今日点击/扫码总次数")
+    @ExcelProperty("今日点击/扫码总次数")
     private int tdScannNumber;
-    @Excel(name = "今日新增客户数")
+    @ExcelProperty("今日新增客户数")
     private int tdCustomerNumber;
 
 }
