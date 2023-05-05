@@ -221,7 +221,7 @@
         <if test="sysUser.roleId != null ">
             AND sur.role_id = #{sysUser.roleId}
         </if>
-        <if test="sysUser.deptId != 1">
+        <if test="sysUser.deptId != null">
             AND ud.dept_id= #{sysUser.deptId}
         </if>
 
