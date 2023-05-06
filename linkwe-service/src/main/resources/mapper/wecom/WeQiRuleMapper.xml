@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeQiRule" id="WeQiRuleResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="timeOut" column="time_out" jdbcType="VARCHAR"/>
+        <result property="chatType" column="chat_type" jdbcType="INTEGER"/>
+        <result property="manageUser" column="manage_user" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+    <resultMap type="com.linkwechat.domain.qirule.vo.WeQiRuleListVo" id="WeQiRuleListResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="timeOut" column="time_out" jdbcType="VARCHAR"/>
+        <result property="chatType" column="chat_type" jdbcType="INTEGER"/>
+        <result property="manageUser" column="manage_user" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <collection property="qiRuleScope" ofType="com.linkwechat.domain.qirule.vo.WeQiRuleUserVo">
+            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectWeQiRuleVo">
+        select id,
+               name,
+               time_out,
+               chat_type,
+               manage_user,
+               create_by,
+               create_by_id,
+               create_time,
+               update_by,
+               update_by_id,
+               update_time,
+               del_flag
+        from we_qi_rule
+    </sql>
+
+    <select id="getQiRuleList" resultMap="WeQiRuleListResult">
+        select
+            wqr.id,
+            wqr.name,
+            wqr.time_out,
+            wqr.chat_type,
+            wqr.manage_user,
+            wqr.create_by,
+            wqr.create_by_id,
+            wqr.create_time,
+            wqr.update_by,
+            wqr.update_by_id,
+            wqr.update_time,
+            wqrs.user_id
+        from we_qi_rule wqr
+        left join we_qi_rule_scope wqrs on wqr.id = wqrs.qi_id and wqrs.del_flag = 0
+        <where>
+            <if test="name != null and name != ''">
+                and  wqr.name like concat('%', #{name}, '%')
+            </if>
+            <if test="chatType != null">
+                and  wqr.chat_type = #{chatType}
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(wqr.create_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(wqr.create_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+            </if>
+            <if test="userIds != null and userIds != ''">
+                and  wqrs.user_id in
+                <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            and wqr.del_flag = 0
+        </where>
+        order by wqr.create_time desc
+    </select>
+
+</mapper>
