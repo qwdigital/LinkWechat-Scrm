@@ -890,96 +890,128 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             List<WeCustomerFollowUserEntity> followUserList = weCustomerDetail.getFollowUser();
             if (CollectionUtil.isNotEmpty(followUserList)) {
-                WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
-
-                weCustomer.setState(state);
-                weCustomer.setAddTime(new Date(followUserEntity.getCreateTime() * 1000L));
-                weCustomer.setAddMethod(followUserEntity.getAddWay());
-                //如果添加方式为管理员分配,则属于在职继承客户新增回掉，删除当前客户上一级的继承人对应的数据
-                if (CustomerAddWay.ADD_WAY_GLYFP.getKey().equals(followUserEntity.getAddWay())) {
-                    this.remove(new LambdaQueryWrapper<WeCustomer>()
-                            .eq(WeCustomer::getExternalUserid, externalUserId)
-                            .eq(WeCustomer::getTakeoverUserId, userId));
-                }
-
-                weCustomer.setCorpName(followUserEntity.getRemarkCompany());
-                weCustomer.setRemarkName(followUserEntity.getRemark());
-                weCustomer.setOtherDescr(followUserEntity.getDescription());
-                weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
-
-                Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
-
-                if (CollectionUtil.isNotEmpty(currentTenantSysUser)) {
-                    SysUser sysUser = currentTenantSysUser.get(followUserEntity.getUserId());
-
-                    if (null != sysUser) {
-                        weCustomer.setCreateBy(sysUser.getUserName());
-                        weCustomer.setCreateById(sysUser.getUserId());
-                        weCustomer.setUpdateBy(sysUser.getUserName());
-                        weCustomer.setUpdateById(sysUser.getUserId());
-                    }
-                }
-
-                //设置标签
-                List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
-                if (CollectionUtil.isNotEmpty(tags)) {
-                    List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
-                            .id(SnowFlakeUtil.nextId())
-                            .externalUserid(externalContact.getExternalUserId())
-                            .tagId(tagInfo.getTagId())
-                            .userId(followUserEntity.getUserId())
-                            .isCompanyTag(true)
-                            .delFlag(0)
-                            .build()).collect(Collectors.toList());
-                    iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
-                    weCustomer.setTagIds(
-                            String.join(", ",
-                                    tagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toSet()))
-                    );
-                }
-            }
-            this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
+                Map<String, List<WeCustomerFollowUserEntity>> followUserEntityMap
+                        = followUserList.stream().collect(Collectors.groupingBy(WeCustomerFollowUserEntity::getUserId));
 
 
-            if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {//添加方式为手机号搜索,更新客户公海中对应的状态
+                if(CollectionUtil.isNotEmpty(followUserEntityMap)){
+                    List<WeCustomerFollowUserEntity> weCustomerFollowUserEntities = followUserEntityMap.get(userId);
 
-                if (StringUtils.isNotEmpty(weCustomer.getPhone())) {
-                    List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
-                            .eq(WeCustomerSeas::getAddUserId, weCustomer.getAddUserId())
-                            .eq(WeCustomerSeas::getPhone, weCustomer.getPhone()));
-                    if (CollectionUtil.isNotEmpty(weCustomerSeasList)) {
-                        weCustomerSeasList.stream().forEach(k -> k.setAddState(1));
-                        iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
-                        //更新用户标签
-                        WeCustomerSeas weCustomerSeas = weCustomerSeasList.stream().findFirst().get();
-                        if (StringUtils.isNotEmpty(weCustomerSeas.getTagIds())) {
-                            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                                    .in(WeTag::getTagId, ListUtil.toList(weCustomerSeas.getTagIds().split(","))));
-                            if (CollectionUtil.isNotEmpty(weTags)) {
-                                makeLabel(WeMakeCustomerTag.builder()
-                                        .userId(weCustomerSeas.getAddUserId())
-                                        .isCompanyTag(true)
-                                        .externalUserid(externalUserId)
-                                        .addTag(weTags)
-                                        .build());
+                    if(CollectionUtil.isNotEmpty(weCustomerFollowUserEntities)){
+                        WeCustomerFollowUserEntity followUserEntity
+                                = weCustomerFollowUserEntities.stream().findFirst().get();
+
+                        if(null != followUserEntity){
+
+                            weCustomer.setState(state);
+                            weCustomer.setAddTime(new Date(followUserEntity.getCreateTime() * 1000L));
+                            weCustomer.setAddMethod(followUserEntity.getAddWay());
+                            //如果添加方式为管理员分配,则属于在职继承客户新增回掉，删除当前客户上一级的继承人对应的数据
+                            if (CustomerAddWay.ADD_WAY_GLYFP.getKey().equals(followUserEntity.getAddWay())) {
+                                this.remove(new LambdaQueryWrapper<WeCustomer>()
+                                        .eq(WeCustomer::getExternalUserid, externalUserId)
+                                        .eq(WeCustomer::getTakeoverUserId, userId));
                             }
+
+                            weCustomer.setCorpName(followUserEntity.getRemarkCompany());
+                            weCustomer.setRemarkName(followUserEntity.getRemark());
+                            weCustomer.setOtherDescr(followUserEntity.getDescription());
+                            weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
+
+                            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+
+                            if (CollectionUtil.isNotEmpty(currentTenantSysUser)) {
+                                SysUser sysUser = currentTenantSysUser.get(followUserEntity.getUserId());
+
+                                if (null != sysUser) {
+                                    weCustomer.setCreateBy(sysUser.getUserName());
+                                    weCustomer.setCreateById(sysUser.getUserId());
+                                    weCustomer.setUpdateBy(sysUser.getUserName());
+                                    weCustomer.setUpdateById(sysUser.getUserId());
+                                }
+                            }
+
+                            //设置标签
+                            List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
+                            if (CollectionUtil.isNotEmpty(tags)) {
+                                List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
+                                        .id(SnowFlakeUtil.nextId())
+                                        .externalUserid(externalContact.getExternalUserId())
+                                        .tagId(tagInfo.getTagId())
+                                        .userId(followUserEntity.getUserId())
+                                        .isCompanyTag(true)
+                                        .delFlag(0)
+                                        .build()).collect(Collectors.toList());
+                                iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+                                weCustomer.setTagIds(
+                                        String.join(", ",
+                                                tagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toSet()))
+                                );
+                            }
+
+
+
+                            this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
+
+
+                            if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {//添加方式为手机号搜索,更新客户公海中对应的状态
+
+                                if (StringUtils.isNotEmpty(weCustomer.getPhone())) {
+                                    List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
+                                            .eq(WeCustomerSeas::getAddUserId, weCustomer.getAddUserId())
+                                            .eq(WeCustomerSeas::getPhone, weCustomer.getPhone()));
+                                    if (CollectionUtil.isNotEmpty(weCustomerSeasList)) {
+                                        weCustomerSeasList.stream().forEach(k -> k.setAddState(1));
+                                        iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
+                                        //更新用户标签
+                                        WeCustomerSeas weCustomerSeas = weCustomerSeasList.stream().findFirst().get();
+                                        if (StringUtils.isNotEmpty(weCustomerSeas.getTagIds())) {
+                                            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                                    .in(WeTag::getTagId, ListUtil.toList(weCustomerSeas.getTagIds().split(","))));
+                                            if (CollectionUtil.isNotEmpty(weTags)) {
+                                                makeLabel(WeMakeCustomerTag.builder()
+                                                        .userId(weCustomerSeas.getAddUserId())
+                                                        .isCompanyTag(true)
+                                                        .externalUserid(externalUserId)
+                                                        .addTag(weTags)
+                                                        .build());
+                                            }
+                                        }
+
+                                    }
+
+
+                                }
+
+
+                            }
+
+                            iWeFissionService.handleTaskFissionRecord(state,weCustomer);
+
+
+                            //生成轨迹
+                            iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId,userId,true,true);
+                            //为被添加员工发送一条消息提醒
+                            iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@"+weCustomer.getCustomerName()+"刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(),false);
+
                         }
 
-                    }
 
+
+
+                        }
+
+
+
+                    }
 
                 }
 
 
-            }
-
-            iWeFissionService.handleTaskFissionRecord(state,weCustomer);
+//                WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
 
 
-           //生成轨迹
-           iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId,userId,true,true);
-           //为被添加员工发送一条消息提醒
-           iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@"+weCustomer.getCustomerName()+"刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(),false);
+
 
 
         }
