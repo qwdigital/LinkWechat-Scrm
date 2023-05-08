@@ -260,7 +260,7 @@
         <if test="roleId != null ">
             AND sur.role_id = #{roleId}
         </if>
-        <if test="deptId != 1">
+        <if test="deptId  != null">
             AND ud.dept_id= #{deptId}
         </if>
 
