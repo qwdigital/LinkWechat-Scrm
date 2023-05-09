@@ -533,7 +533,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
     }
 
-    @Async
     @Override
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_MAIL_LIST)
     public void syncUserAndDept() {
