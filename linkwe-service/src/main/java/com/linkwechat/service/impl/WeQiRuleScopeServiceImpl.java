@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.WeQiRuleScope;
 import com.linkwechat.domain.qirule.query.WeQiUserInfoQuery;
-import com.linkwechat.domain.qirule.vo.WeQiRuleScopeVo;
 import com.linkwechat.mapper.WeQiRuleScopeMapper;
 import com.linkwechat.service.IWeQiRuleScopeService;
 import org.springframework.stereotype.Service;

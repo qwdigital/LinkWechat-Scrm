@@ -16,6 +16,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeUserBehaviorDataService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,8 @@ public class WeUserBehaviorDataTask {
     private IWeUserBehaviorDataService weUserBehaviorDataService;
 
     @XxlJob("weUserBehaviorDataTask")
-    public void process(String params){
+    public void process(){
+        String params = XxlJobHelper.getJobParam();
         log.info("联系客户统计>>>>>>>>>>>>>>>>>>>启动 params:{}",params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
 

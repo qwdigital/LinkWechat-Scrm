@@ -3,7 +3,7 @@ package com.linkwechat.common.enums;
 import lombok.Getter;
 
 /**
- * @author sxw
+ * @author danmo
  * @description
  * @date 2022/4/14 18:37
  **/
@@ -11,6 +11,7 @@ public enum QwAppMsgBusinessTypeEnum {
 
     COMMON(1, "CommonAppMsgService", "默认通知任务"),
     AGENT(2, "WeAgentMsgService", "应用通知任务"),
+    QI_RULE(3, "WeChatMsgQiRuleService", "质检通知任务"),
     ;
 
 

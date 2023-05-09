@@ -21,5 +21,4 @@ public interface IWeQiRuleScopeService extends IService<WeQiRuleScope> {
     void updateBatchByQiId(Long qiId, List<WeQiUserInfoQuery> qiUserInfos);
 
     List<WeQiRuleScope> getQiRuleScopeByQiIds(List<Long> qiIds);
-
 }

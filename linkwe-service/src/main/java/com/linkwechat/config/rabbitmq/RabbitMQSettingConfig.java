@@ -172,6 +172,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.chat-msg-check:Rk_ChatMsgCheck}")
     private String weChatMsgCheckRk;
 
+    //会话存档规则路由
+    @Value("${wecom.mq.route.chat-msg-qi-rule:Rk_ChatMsgQiRule}")
+    private String weChatMsgQiRuleRk;
+
     //活码变更路由
     @Value("${wecom.mq.route.qr-code-change:Rk_QrCodeChange}")
     private String weQrCodeChangeRk;
@@ -263,6 +267,10 @@ public class RabbitMQSettingConfig {
     //会话存档审计队列
     @Value("${wecom.mq.queue.chat-msg-check:Qu_ChatMsgCheck}")
     private String weChatMsgCheckQu;
+
+    //会话存档规则消费队列
+    @Value("${wecom.mq.queue.chat-msg-qi-rule:Qu_ChatMsgQiRule}")
+    private String weChatMsgQiRule;
 
     //企业微信客户队列
     @Value("${wecom.mq.queue.sync.wecustomer:Qu_WeCustomer}")

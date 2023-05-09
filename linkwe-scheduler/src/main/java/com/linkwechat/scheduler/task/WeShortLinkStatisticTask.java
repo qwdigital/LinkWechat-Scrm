@@ -8,6 +8,7 @@ import com.linkwechat.domain.WeShortLink;
 import com.linkwechat.domain.WeShortLinkStat;
 import com.linkwechat.service.IWeShortLinkService;
 import com.linkwechat.service.IWeShortLinkStatService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class WeShortLinkStatisticTask {
 
     @XxlJob("weShortLinkStatisticTask")
     public void shortLinkStatisticHandle() {
+        String params = XxlJobHelper.getJobParam();
         Map<Long, WeShortLinkStat> map = new HashMap<>();
         log.info("短链统计--------------------------start");
         Collection<String> keys = redisService.keys(WeConstans.WE_SHORT_LINK_KEY + "*");

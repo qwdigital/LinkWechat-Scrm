@@ -8,6 +8,7 @@ import com.linkwechat.domain.WeProductDayStatistics;
 import com.linkwechat.domain.WeProductStatistics;
 import com.linkwechat.service.IWeProductDayStatisticsService;
 import com.linkwechat.service.IWeProductStatisticsService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,11 +41,11 @@ public class WeProductOrderStatisticsDataTask {
     /**
      * 商品订单统计数据: 每天凌晨执行
      *
-     * @param param
      */
     @XxlJob("weProductOrderStatisticsDataTask")
     @Transactional(rollbackFor = Exception.class)
-    public void execute(String param) {
+    public void execute() {
+        String params = XxlJobHelper.getJobParam();
         //今天订单总数
         Integer todayOrderNum = (Integer) redisTemplate.opsForValue().get(ProductOrderConstants.PRODUCT_ANALYZE_ORDER_NUMBER);
         //今天订单总额：分

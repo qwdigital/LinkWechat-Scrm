@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 客群成员
  * @date 2022/4/3 9:57
  **/

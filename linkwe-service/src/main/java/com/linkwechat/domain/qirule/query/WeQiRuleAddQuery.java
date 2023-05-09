@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -28,8 +29,8 @@ public class WeQiRuleAddQuery {
      * 超时时间
      */
     @ApiModelProperty(value = "超时时间")
-    @NotEmpty(message = "超时时间不能为空")
-    private String timeOut;
+    @NotNull(message = "超时时间不能为空")
+    private Integer timeOut;
 
 
     /**

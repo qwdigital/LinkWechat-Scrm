@@ -35,7 +35,7 @@ public class WeQiRuleDetailVo {
      * 超时时间
      */
     @ApiModelProperty(value = "超时时间")
-    private String timeOut;
+    private Integer timeOut;
 
 
     /**

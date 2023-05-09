@@ -48,7 +48,7 @@ public class WeQiRule extends BaseEntity implements Serializable {
      */
     @ApiModelProperty(value = "超时时间")
     @TableField("time_out")
-    private String timeOut;
+    private Integer timeOut;
 
 
     /**

@@ -1,25 +1,36 @@
 package com.linkwechat.scheduler.service.impl.msg;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.domain.WeAgentMsg;
+import com.linkwechat.domain.WeQiRuleMsg;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.wecom.query.msg.WeAppMsgQuery;
+import com.linkwechat.domain.wecom.vo.msg.WeAppMsgVo;
 import com.linkwechat.scheduler.service.AbstractAppMsgService;
+import com.linkwechat.service.IWeQiRuleMsgService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author danmo
- * @description 通用应用消息
- * @date 2022/4/14 23:45
+ * @description 质检通知应用消息
+ * @date 2023/05/06 23:45
  **/
-@Service("CommonAppMsgService")
+@Service("WeChatMsgQiRuleService")
 @Slf4j
-public class CommonAppMsgServiceImpl extends AbstractAppMsgService {
+public class WeChatMsgQiRuleServiceImpl extends AbstractAppMsgService {
 
+    private Long callBackId;
+
+    @Autowired
+    private IWeQiRuleMsgService weQiRuleMsgService;
 
     @Override
     protected WeAppMsgQuery getWeAppMsg(QwAppMsgBody appMsgBody) {
@@ -46,7 +57,19 @@ public class CommonAppMsgServiceImpl extends AbstractAppMsgService {
                     .build();
             query.setTextcard(textCard);
         }
-        //todo 其他类型
         return query;
+    }
+
+    @Override
+    protected void callBackResult(WeAppMsgVo appMsgVo) {
+        log.info(">>>>>>【质检通知任务发送结果】 callBackId:{} ,appMsgVo:{}", callBackId, JSONObject.toJSONString(appMsgVo));
+        WeQiRuleMsg weQiRuleMsg = new WeQiRuleMsg();
+        weQiRuleMsg.setId(callBackId);
+        if (appMsgVo.getErrMsg() != null && !Objects.equals(0,appMsgVo.getErrCode())) {
+            weQiRuleMsg.setStatus(2);
+        } else {
+            weQiRuleMsg.setStatus(1);
+        }
+        weQiRuleMsgService.updateById(weQiRuleMsg);
     }
 }

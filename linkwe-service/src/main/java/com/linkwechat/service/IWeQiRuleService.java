@@ -26,4 +26,6 @@ public interface IWeQiRuleService extends IService<WeQiRule> {
     List<WeQiRuleListVo> getQiRuleList(WeQiRuleListQuery query);
 
     void delQiRule(List<Long> ids);
+
+    List<WeQiRuleListVo> getQiRuleListByUserId(WeQiRuleListQuery query);
 }

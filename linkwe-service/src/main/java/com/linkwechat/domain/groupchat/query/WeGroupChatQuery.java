@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 客群入参
  * @date 2022/4/2 13:47
  **/

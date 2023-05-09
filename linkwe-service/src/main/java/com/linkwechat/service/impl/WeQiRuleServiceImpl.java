@@ -1,6 +1,8 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,6 +13,7 @@ import com.linkwechat.domain.WeQiRule;
 import com.linkwechat.domain.WeQiRuleScope;
 import com.linkwechat.domain.qirule.query.WeQiRuleAddQuery;
 import com.linkwechat.domain.qirule.query.WeQiRuleListQuery;
+import com.linkwechat.domain.qirule.query.WeQiUserInfoQuery;
 import com.linkwechat.domain.qirule.vo.WeQiRuleDetailVo;
 import com.linkwechat.domain.qirule.vo.WeQiRuleListVo;
 import com.linkwechat.domain.qirule.vo.WeQiRuleScopeVo;
@@ -23,6 +26,7 @@ import com.linkwechat.service.IWeQiRuleScopeService;
 import com.linkwechat.service.IWeQiRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -43,8 +47,10 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     @Resource
     private QwSysUserClient qwSysUserClient;
 
+    @Transactional(rollbackFor = {Exception.class, WeComException.class})
     @Override
     public void addQiRule(WeQiRuleAddQuery query) {
+        checkScope(query.getQiUserInfos());
         WeQiRule weQiRule = new WeQiRule();
         weQiRule.setName(query.getName());
         weQiRule.setChatType(query.getChatType());
@@ -56,8 +62,10 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         }
     }
 
+    @Transactional(rollbackFor = {Exception.class, WeComException.class})
     @Override
     public void updateQiRule(WeQiRuleAddQuery query) {
+        checkScope(query.getQiUserInfos());
         WeQiRule weQiRule = getById(query.getQiId());
         if (ObjectUtil.isNull(weQiRule)) {
             throw new WeComException("无效ID");
@@ -68,7 +76,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         if (StringUtils.isNotBlank(query.getManageUser())) {
             weQiRule.setManageUser(query.getManageUser());
         }
-        if (StringUtils.isNotBlank(query.getTimeOut())) {
+        if (Objects.nonNull(query.getTimeOut())) {
             weQiRule.setTimeOut(query.getTimeOut());
         }
         if (ObjectUtil.isNotNull(query.getChatType())) {
@@ -162,7 +170,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     public List<WeQiRuleListVo> getQiRuleList(WeQiRuleListQuery query) {
         List<WeQiRuleListVo> weQiRuleList = this.baseMapper.getQiRuleList(query);
         Set<String> userIds = new HashSet<>();
-        if (CollectionUtil.isNotEmpty(weQiRuleList)) {
+        if (CollectionUtil.isNotEmpty(weQiRuleList) && query.getIsShow()) {
             for (WeQiRuleListVo weQiRuleListVo : weQiRuleList) {
                 if (StringUtils.isNotBlank(weQiRuleListVo.getManageUser())) {
                     CollectionUtil.addAll(userIds, weQiRuleListVo.getManageUser().split(","));
@@ -218,5 +226,54 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         if (update) {
             weQiRuleScopeService.delBatchByQiIds(ids);
         }
+    }
+
+    @Override
+    public List<WeQiRuleListVo> getQiRuleListByUserId(WeQiRuleListQuery query) {
+        return this.baseMapper.getQiRuleListByUserId(query);
+    }
+
+
+    /**
+     * 校验排期是否重复
+     *
+     * @param qiRuleUserInfos 范围参数
+     */
+    private void checkScope(List<WeQiUserInfoQuery> qiRuleUserInfos) {
+        if (CollectionUtil.isNotEmpty(qiRuleUserInfos)) {
+            for (int i = 0; i < qiRuleUserInfos.size() - 1; i++) {
+                for (int j = i + 1; j < qiRuleUserInfos.size(); j++) {
+                    int finalJ = j;
+                    long userSum = qiRuleUserInfos.get(i).getUserIds().stream()
+                            .filter(one -> qiRuleUserInfos.get(finalJ).getUserIds().stream()
+                                    .anyMatch(two -> ObjectUtil.equal(two, one))).count();
+
+                    if (userSum > 0) {
+                        long workCycleSum = qiRuleUserInfos.get(i).getWorkCycle().stream()
+                                .filter(one -> qiRuleUserInfos.get(finalJ).getWorkCycle().stream()
+                                        .anyMatch(two -> ObjectUtil.equal(two, one))).count();
+                        if (workCycleSum > 0) {
+                            String beginTime1 = qiRuleUserInfos.get(i).getBeginTime();
+                            String endTime1 = qiRuleUserInfos.get(i).getEndTime();
+                            String beginTime2 = qiRuleUserInfos.get(finalJ).getBeginTime();
+                            String endTime2 = qiRuleUserInfos.get(finalJ).getEndTime();
+                            if (match(beginTime1, endTime1, beginTime2, endTime2)) {
+                                throw new WeComException("员工时间排期有冲突!");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private boolean match(String startTime1, String endTime1, String startTime2, String endTime2) {
+        DateTime parseStartTime1 = DateUtil.parse(startTime1, "HH:mm");
+        DateTime parseEndTime1 = DateUtil.parse(endTime1, "HH:mm");
+
+        DateTime parseStartTime2 = DateUtil.parse(startTime2, "HH:mm");
+        DateTime parseEndTime2 = DateUtil.parse(endTime2, "HH:mm");
+        return !(parseStartTime2.isAfter(parseEndTime1) || parseStartTime1.isAfter(parseEndTime2));
     }
 }

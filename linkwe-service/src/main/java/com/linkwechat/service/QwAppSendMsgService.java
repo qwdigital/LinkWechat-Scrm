@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微应用通知
  * @date 2022/4/14 15:52
  **/

@@ -15,7 +15,6 @@ import java.util.List;
 @Data
 public class WeQiUserInfoQuery {
 
-
     @ApiModelProperty("员工id列表")
     private List<String> userIds;
 

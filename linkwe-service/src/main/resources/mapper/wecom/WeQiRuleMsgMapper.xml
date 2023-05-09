@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleMsgMapper">
+
+    <resultMap type="com.linkwechat.domain.WeQiRuleMsg" id="WeQiRuleMsgResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="ruleId" column="rule_id" jdbcType="INTEGER"/>
+                <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+                <result property="fromId" column="from_id" jdbcType="VARCHAR"/>
+                <result property="receiveId" column="receive_id" jdbcType="VARCHAR"/>
+                <result property="roomId" column="room_id" jdbcType="VARCHAR"/>
+                <result property="chatType" column="chat_type" jdbcType="INTEGER"/>
+                <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+                <result property="replyTime" column="reply_time" jdbcType="TIMESTAMP"/>
+                <result property="replyMsgId" column="reply_msg_id" jdbcType="VARCHAR"/>
+                <result property="timeOut" column="time_out" jdbcType="INTEGER"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeQiRuleMsgVo">
+        select id, rule_id, msg_id, from_id, receive_id, room_id, chat_type, send_time, reply_time, reply_msg_id, time_out,status, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_qi_rule_msg
+    </sql>
+
+</mapper>
