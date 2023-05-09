@@ -9,8 +9,10 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.RedEnvelopesType;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.envelopes.WeRedEnvelopes;
 import com.linkwechat.domain.envelopes.WeRedEnvelopesLimit;
@@ -264,10 +266,11 @@ public class WeRedEnvelopesController extends BaseController {
      * @return
      */
     @GetMapping("/exportRedEnveForUser")
-    public AjaxResult exportRedEnveForUser(WeRedEnvelopesRecord redEnvelopesRecord){
+    public void exportRedEnveForUser(WeRedEnvelopesRecord redEnvelopesRecord){
         List<WeCutomerRedEnvelopesVo> redEnvelopesVos=iWeRedEnvelopesService.findRedEnveForUser(redEnvelopesRecord);
-        ExcelUtil<WeCutomerRedEnvelopesVo> util = new ExcelUtil<>(WeCutomerRedEnvelopesVo.class);
-        return util.exportExcel(redEnvelopesVos, UUID.randomUUID().toString());
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCutomerRedEnvelopesVo.class,redEnvelopesVos,"客户红包发放记录"
+        );
     }
 
 
@@ -291,10 +294,12 @@ public class WeRedEnvelopesController extends BaseController {
      * @return
      */
     @GetMapping("/exportRedEnveForGroup")
-    public AjaxResult exportRedEnveForGroup(WeRedEnvelopesRecord redEnvelopesRecord){
+    public void exportRedEnveForGroup(WeRedEnvelopesRecord redEnvelopesRecord){
         List<WeGroupRedEnvelopesVo> redEnvelopesVos=iWeRedEnvelopesService.findRedEnveForGroup(redEnvelopesRecord);
-        ExcelUtil<WeGroupRedEnvelopesVo> util = new ExcelUtil<WeGroupRedEnvelopesVo>(WeGroupRedEnvelopesVo.class);
-        return util.exportExcel(redEnvelopesVos, "红包发放客户群");
+
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeGroupRedEnvelopesVo.class,redEnvelopesVos,"红包发放客户群"
+        );
     }
 
 
