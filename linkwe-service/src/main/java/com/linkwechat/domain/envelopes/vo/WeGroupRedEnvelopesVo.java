@@ -26,6 +26,8 @@ public class WeGroupRedEnvelopesVo {
     @ExcelProperty(value = "发放时间",converter = DateConverter.class)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+
+    @ExcelIgnore
     private String chatId;
 
     //群主名称
