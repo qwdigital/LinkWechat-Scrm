@@ -304,6 +304,13 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             d.setOrderNum(dept.getOrder());
             return d;
         }).collect(Collectors.toList());
+        //不存在的移除
+        if(CollectionUtil.isNotEmpty(sysDeptList)){
+            this.remove(
+                    new LambdaQueryWrapper<SysDept>()
+                            .notIn(SysDept::getDeptId,sysDeptList.stream().map(SysDept::getDeptId).collect(Collectors.toList())
+                            ));
+        }
         saveOrUpdateBatch(sysDeptList,200);
         return sysDeptList;
     }
