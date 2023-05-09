@@ -1,4 +1,4 @@
-package com.linkwechat.aspecj;
+package com.linkwechat.aop;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
