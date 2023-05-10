@@ -919,6 +919,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             if (Objects.nonNull(existUser)) {
                 sysUser.setUserId(existUser.getUserId());
                 updateById(sysUser);
+                //重新构建当前员工与部门的关系
+                sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
+                        .eq(SysUserDept::getUserId,sysUser.getUserId()));
+
+                List<SysUserDept> userDeptList = new LinkedList<>();
+                for (int i = 0; i < detailVo.getDepartment().size(); i++) {
+                    SysUserDept sysUserDept = userDeptGenerator(detailVo, i);
+                    sysUserDept.setUserId(existUser.getUserId());
+                    userDeptList.add(sysUserDept);
+                }
+                //保存员工部门关系
+                sysUserDeptService.saveBatch(userDeptList);
+
+
             } else if (save(sysUser)) {
                     Long newUserId = sysUser.getUserId();
 
@@ -933,8 +947,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     }
 
                    //移除旧的关系
-                    sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>());
-                //保存员工部门关系
+                sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>()
+                        .eq(SysUserDept::getUserId,sysUser.getUserId()));
+                   //保存员工部门关系
                     sysUserDeptService.saveBatch(userDeptList);
 
 
