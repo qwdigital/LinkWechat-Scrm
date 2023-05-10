@@ -932,7 +932,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                         userDeptList.add(sysUserDept);
                     }
 
-                    //保存员工部门关系
+                   //移除旧的关系
+                    sysUserDeptService.remove(new LambdaQueryWrapper<SysUserDept>());
+                //保存员工部门关系
                     sysUserDeptService.saveBatch(userDeptList);
 
 
