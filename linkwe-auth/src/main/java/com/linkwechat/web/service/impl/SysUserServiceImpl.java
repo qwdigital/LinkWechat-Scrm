@@ -540,26 +540,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         List<SysDept> deptList = sysDeptService.syncWeDepartment(loginUser.getCorpId());
 
-        for (SysDept dept : deptList) {
-            try {
-                WeUserListQuery query = new WeUserListQuery();
-                query.setDepartment_id(dept.getDeptId());
-                query.setCorpid(loginUser.getCorpId());
-                WeUserListVo userListResult = userClient.getList(query).getData();
+        if(CollectionUtil.isNotEmpty(deptList)){
+            for (SysDept dept : deptList) {
+                if(null != dept){
+                    try {
+                        WeUserListQuery query = new WeUserListQuery();
+                        query.setDepartment_id(dept.getDeptId());
+                        query.setCorpid(loginUser.getCorpId());
+                        WeUserListVo userListResult = userClient.getList(query).getData();
 
-                if (Objects.nonNull(userListResult) && CollectionUtil.isNotEmpty(userListResult.getUserList())) {
-                    userListResult.getUserList().parallelStream().forEach(detailVo -> {
-                        log.info("发送员工信息入队列 userId：{}", detailVo.getUserId());
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("loginUser", loginUser);
-                        jsonObject.put("detailVo", detailVo);
-                        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getSysUserRk(), jsonObject.toJSONString());
-                    });
+                        if (Objects.nonNull(userListResult) && CollectionUtil.isNotEmpty(userListResult.getUserList())) {
+                            userListResult.getUserList().parallelStream().forEach(detailVo -> {
+                                log.info("发送员工信息入队列 userId：{}", detailVo.getUserId());
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("loginUser", loginUser);
+                                jsonObject.put("detailVo", detailVo);
+                                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getSysUserRk(), jsonObject.toJSONString());
+                            });
+                        }
+                    } catch (Exception e) {
+                        log.error("同步部门员工详情失败，query:{}", dept.getDeptId(), e);
+                    }
                 }
-            } catch (Exception e) {
-                log.error("同步部门员工详情失败，query:{}", dept.getDeptId(), e);
             }
         }
+
+
     }
 
     @Async
