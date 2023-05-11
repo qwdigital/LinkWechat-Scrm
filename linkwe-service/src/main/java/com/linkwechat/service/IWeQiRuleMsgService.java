@@ -2,6 +2,8 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeQiRuleMsg;
+import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableListQuery;
+import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsTableVo;
 
 import java.util.List;
 
@@ -13,4 +15,5 @@ import java.util.List;
  */
 public interface IWeQiRuleMsgService extends IService<WeQiRuleMsg> {
 
+    List<WeQiRuleStatisticsTableVo> getRuleTableStatistics(WeQiRuleStatisticsTableListQuery query);
 }

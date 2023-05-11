@@ -117,7 +117,7 @@ public class QwChatMsgQiRuleListener {
                 WeQiRuleMsg ruleMsg = new WeQiRuleMsg();
                 ruleMsg.setRuleId(weQiRuleVo.getId());
                 ruleMsg.setMsgId(msgId);
-                ruleMsg.setTimeOut(timeOut);
+                ruleMsg.setTimeOut(DateUtil.offsetMinute(sendTime,timeOut));
                 ruleMsg.setChatType(1);
                 ruleMsg.setFromId(fromId);
                 ruleMsg.setReceiveId(receiveId);
@@ -183,7 +183,7 @@ public class QwChatMsgQiRuleListener {
                     WeQiRuleMsg ruleMsg = new WeQiRuleMsg();
                     ruleMsg.setRuleId(weQiRuleVo.getId());
                     ruleMsg.setMsgId(msgId);
-                    ruleMsg.setTimeOut(timeOut);
+                    ruleMsg.setTimeOut(DateUtil.offsetMinute(sendTime,timeOut));
                     ruleMsg.setChatType(2);
                     ruleMsg.setFromId(fromId);
                     ruleMsg.setReceiveId(weGroup.getOwner());

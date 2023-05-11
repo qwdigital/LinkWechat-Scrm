@@ -28,6 +28,8 @@ public abstract class AbstractAppMsgService {
     @Autowired
     private IWeCorpAccountService weCorpAccountService;
 
+    protected JSONObject businessData;
+
     /**
      * 消息结果处理
      */
@@ -45,26 +47,43 @@ public abstract class AbstractAppMsgService {
 
 
     public void sendAppMsg(QwAppMsgBody appMsgBody) {
-        WeCorpAccount corpAccountVo = weCorpAccountService.getCorpAccountByCorpId(appMsgBody.getCorpId());
-        WeAppMsgQuery weAppMsg = getWeAppMsg(appMsgBody);
-        weAppMsg.setAgentid(corpAccountVo.getAgentId());
-        WeAppMsgVo data = qwAppMsgClient.sendAppMsg(weAppMsg).getData();
-        callBackResult(data);
+        WeAppMsgVo data = new WeAppMsgVo();
+        try {
+            this.businessData = appMsgBody.getBusinessData();
+            WeCorpAccount corpAccountVo = weCorpAccountService.getCorpAccountByCorpId(appMsgBody.getCorpId());
+            WeAppMsgQuery weAppMsg = getWeAppMsg(appMsgBody);
+            weAppMsg.setAgentid(corpAccountVo.getAgentId());
+            data = qwAppMsgClient.sendAppMsg(weAppMsg).getData();
+        } catch (Exception e) {
+            log.error("sendAppMsg 执行异常: query:{}",JSONObject.toJSONString(appMsgBody),e);
+            data.setErrMsg(e.getMessage());
+            data.setErrCode(-1);
+        }finally {
+            callBackResult(data);
+        }
     }
 
 
     public void sendAgentMsg(QwAppMsgBody appMsgBody) {
+        WeAppMsgVo data = new WeAppMsgVo();
         try {
             WeAppMsgQuery weAppMsg = getWeAppMsg(appMsgBody);
-            WeAppMsgVo data = qwAppMsgClient.sendAppMsg(weAppMsg).getData();
-            callBackResult(data);
+            data = qwAppMsgClient.sendAppMsg(weAppMsg).getData();
         } catch (Exception e) {
             log.error("sendAgentMsg 执行异常: query:{}",JSONObject.toJSONString(appMsgBody),e);
-            WeAppMsgVo errorBody = new WeAppMsgVo();
-            errorBody.setErrMsg(e.getMessage());
-            errorBody.setErrCode(-1);
-            callBackResult(errorBody);
+            data.setErrMsg(e.getMessage());
+            data.setErrCode(-1);
+        }finally {
+            callBackResult(data);
         }
 
+    }
+
+    public JSONObject getBusinessData() {
+        return businessData;
+    }
+
+    public void setBusinessData(JSONObject businessData) {
+        this.businessData = businessData;
     }
 }

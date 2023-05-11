@@ -3,10 +3,15 @@ package com.linkwechat.controller;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.domain.qirule.query.WeQiRuleAddQuery;
 import com.linkwechat.domain.qirule.query.WeQiRuleListQuery;
+import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableListQuery;
+import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableMsgQuery;
 import com.linkwechat.domain.qirule.vo.WeQiRuleDetailVo;
 import com.linkwechat.domain.qirule.vo.WeQiRuleListVo;
+import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsTableVo;
+import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsViewVo;
 import com.linkwechat.service.IWeQiRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,5 +72,28 @@ public class WeQiRuleController extends BaseController {
     public AjaxResult delQiRule(@PathVariable("ids") List<Long> ids) {
         weQiRuleService.delQiRule(ids);
         return AjaxResult.success();
+    }
+
+    @ApiOperation(value = "质检数据统计", httpMethod = "GET")
+    @GetMapping("/statistics/view/{id}")
+    public AjaxResult<WeQiRuleStatisticsViewVo> qiRuleViewStatistics(@PathVariable("id") Long id) {
+        WeQiRuleStatisticsViewVo viewVo = weQiRuleService.qiRuleViewStatistics(id);
+        return AjaxResult.success(viewVo);
+    }
+
+    @ApiOperation(value = "质检数据统计", httpMethod = "GET")
+    @GetMapping("/statistics/table/{id}")
+    public TableDataInfo<List<WeQiRuleStatisticsTableVo>> qiRuleTableStatistics(@PathVariable("id") Long id, WeQiRuleStatisticsTableListQuery query) {
+        startPage();
+        query.setRuleId(id);
+        List<WeQiRuleStatisticsTableVo> list = weQiRuleService.qiRuleTableStatistics(query);
+        return getDataTable(list);
+    }
+
+    @ApiOperation(value = "质检数据统计聊天记录", httpMethod = "GET")
+    @GetMapping("/statistics/table/msg")
+    public AjaxResult<List<WeChatContactMsgVo>> getQiRuleTableStatisticsMsg(WeQiRuleStatisticsTableMsgQuery query) {
+        List<WeChatContactMsgVo> list = weQiRuleService.getQiRuleTableStatisticsMsg(query);
+        return AjaxResult.success(list);
     }
 }

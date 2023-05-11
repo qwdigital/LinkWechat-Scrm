@@ -115,7 +115,8 @@ public class WeQiRuleMsg extends BaseEntity implements Serializable {
      */
     @ApiModelProperty(value = "超时时间")
     @TableField("time_out")
-    private Integer timeOut;
+    private Date timeOut;
+
 
     /**
      * 状态 0-未通知 1-已通知 2-通知失败

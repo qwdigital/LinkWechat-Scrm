@@ -1,35 +1,36 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeQiRule;
-import com.linkwechat.domain.WeQiRuleScope;
-import com.linkwechat.domain.qirule.query.WeQiRuleAddQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleListQuery;
-import com.linkwechat.domain.qirule.query.WeQiUserInfoQuery;
-import com.linkwechat.domain.qirule.vo.WeQiRuleDetailVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleListVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleScopeVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleUserVo;
+import com.linkwechat.domain.*;
+import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
+import com.linkwechat.domain.qirule.query.*;
+import com.linkwechat.domain.qirule.vo.*;
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
+import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeQiRuleMapper;
-import com.linkwechat.service.IWeQiRuleScopeService;
-import com.linkwechat.service.IWeQiRuleService;
+import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +47,18 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
     @Resource
     private QwSysUserClient qwSysUserClient;
+
+    @Autowired
+    private IWeQiRuleMsgService weQiRuleMsgService;
+
+    @Autowired
+    private IWeChatContactMsgService weChatContactMsgService;
+
+    @Autowired
+    private IWeCustomerService weCustomerService;
+
+    @Autowired
+    private IWeGroupMemberService weGroupMemberService;
 
     @Transactional(rollbackFor = {Exception.class, WeComException.class})
     @Override
@@ -231,6 +244,221 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     @Override
     public List<WeQiRuleListVo> getQiRuleListByUserId(WeQiRuleListQuery query) {
         return this.baseMapper.getQiRuleListByUserId(query);
+    }
+
+    @Override
+    public WeQiRuleStatisticsViewVo qiRuleViewStatistics(Long id) {
+        WeQiRuleStatisticsViewVo viewVo = new WeQiRuleStatisticsViewVo();
+        List<WeQiRuleMsg> ruleMsgList = weQiRuleMsgService.list(new LambdaQueryWrapper<WeQiRuleMsg>().eq(WeQiRuleMsg::getRuleId, id).eq(WeQiRuleMsg::getDelFlag, 0));
+        if(CollectionUtil.isNotEmpty(ruleMsgList)){
+
+            List<WeQiRuleMsg> outTimeMsgList = ruleMsgList.stream().filter(ruleMsg -> Objects.isNull(ruleMsg.getReplyTime())
+                            && DateUtil.compare(DateUtil.date(), ruleMsg.getTimeOut()) > 0)
+                    .collect(Collectors.toList());
+            if(CollectionUtil.isNotEmpty(outTimeMsgList)){
+                viewVo.setTimeOutTotalNum(outTimeMsgList.size());
+                BigDecimal timeOutTotalRate = new BigDecimal(outTimeMsgList.size() / ruleMsgList.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                viewVo.setTimeOutTotalRate(timeOutTotalRate.toString());
+
+                List<WeQiRuleMsg> todayOutTimeMsgList = outTimeMsgList.stream()
+                        .filter(outTimeMsg -> ObjectUtil.equal(DateUtil.formatDate(outTimeMsg.getCreateTime()), DateUtil.today()))
+                        .collect(Collectors.toList());
+                Long todayMsgNum = ruleMsgList.stream()
+                        .filter(outTimeMsg -> ObjectUtil.equal(DateUtil.formatDate(outTimeMsg.getCreateTime()), DateUtil.today()))
+                        .count();
+                if(CollectionUtil.isNotEmpty(todayOutTimeMsgList)){
+                    Long todayTimeOutUserNum = todayOutTimeMsgList.stream().map(WeQiRuleMsg::getReceiveId).distinct().count();
+                    viewVo.setTodayTimeOutUserNum(todayTimeOutUserNum.intValue());
+                    viewVo.setTodayTimeOutNum(todayOutTimeMsgList.size());
+                    BigDecimal todayTimeOutTotalRate = new BigDecimal(todayOutTimeMsgList.size() / todayMsgNum).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    viewVo.setTodayTimeOutRate(todayTimeOutTotalRate.toString());
+                }
+            }
+        }
+        return viewVo;
+    }
+
+    @Override
+    public List<WeQiRuleStatisticsTableVo> qiRuleTableStatistics(WeQiRuleStatisticsTableListQuery query) {
+
+        if(CollectionUtil.isNotEmpty(query.getDeptIds())){
+            SysUserQuery sysUserQuery = new SysUserQuery();
+            sysUserQuery.setDeptIds(query.getDeptIds());
+            List<SysUserVo> userVoList = qwSysUserClient.getUserListByWeUserIds(sysUserQuery).getData();
+            if(CollectionUtil.isNotEmpty(userVoList)) {
+                Set<String> sysUserIds = userVoList.stream().map(SysUserVo::getWeUserId).collect(Collectors.toSet());
+                sysUserIds.addAll(query.getUserIds());
+                query.setUserIds(new ArrayList<>(sysUserIds));
+            }
+        }
+        List<WeQiRuleStatisticsTableVo> tableVoList = weQiRuleMsgService.getRuleTableStatistics(query);
+        if(CollectionUtil.isNotEmpty(tableVoList)){
+            Set<String> customerIdSet = tableVoList.stream().filter(tableVo -> ObjectUtil.equal(1, tableVo.getChatType())).map(WeQiRuleStatisticsTableVo::getFromId).collect(Collectors.toSet());
+            Set<String> roomIdSet = tableVoList.stream().filter(tableVo -> ObjectUtil.equal(2, tableVo.getChatType())).map(WeQiRuleStatisticsTableVo::getRoomId).collect(Collectors.toSet());
+            Set<String> userIds = tableVoList.stream().map(WeQiRuleStatisticsTableVo::getUserId).collect(Collectors.toSet());
+            SysUserQuery userQuery = new SysUserQuery();
+            userQuery.setWeUserIds(new ArrayList<>(userIds));
+            List<SysUserVo> userVoList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+            Map<String, SysUserVo> userIdMap = new HashMap<>();
+            if (CollectionUtil.isNotEmpty(userVoList)) {
+                userIdMap = userVoList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, Function.identity(), (key1, key2) -> key2));
+            }
+            for (WeQiRuleStatisticsTableVo tableVo : tableVoList) {
+                if(userIdMap.containsKey(tableVo.getUserId())){
+                    SysUserVo sysUserVo = userIdMap.get(tableVo.getUserId());
+                    tableVo.setUserName(sysUserVo.getUserName());
+                    if(CollectionUtil.isNotEmpty(sysUserVo.getDeptList())){
+                        tableVo.setDeptName(sysUserVo.getDeptList().stream().map(SysDeptVo::getDeptName).collect(Collectors.joining(",")));
+                    }
+                }
+                String outTime = DateUtil.formatBetween(DateUtil.parseDateTime(tableVo.getSendTime()), DateUtil.parseDateTime(tableVo.getReplyTime()));
+                tableVo.setTimeout(outTime);
+            }
+        }
+        return tableVoList;
+    }
+
+    @Override
+    public List<WeChatContactMsgVo> getQiRuleTableStatisticsMsg(WeQiRuleStatisticsTableMsgQuery query) {
+        Map<String, SysUserVo> userIdMap = new HashMap<>();
+        Map<String, WeCustomer> customerIdMap = new HashMap<>();
+        List<WeChatContactMsgVo> resultList = new LinkedList<>();
+        WeChatContactMsg currentMsg = weChatContactMsgService.getOne(new LambdaQueryWrapper<WeChatContactMsg>().eq(WeChatContactMsg::getMsgId, query.getMsgId()));
+        if(Objects.nonNull(currentMsg)){
+            List<WeChatContactMsg> allChatMsgList = CollectionUtil.newLinkedList();
+            //客户
+            if(StringUtils.isEmpty(currentMsg.getRoomId())){
+
+                if(ObjectUtil.equal(0,query.getPageType())){
+                    allChatMsgList.add(currentMsg);
+                    List<WeChatContactMsg> beforeMsgList = getCustomerBeforeMsgList(query, currentMsg);
+                    List<WeChatContactMsg> afterMsgList = getCustomerAfterMsgList(query, currentMsg);
+                    allChatMsgList.addAll(beforeMsgList);
+                    allChatMsgList.addAll(afterMsgList);
+                }else if(ObjectUtil.equal(1,query.getPageType())){
+                    List<WeChatContactMsg> beforeMsgList = getCustomerBeforeMsgList(query, currentMsg);
+                    allChatMsgList.addAll(beforeMsgList);
+                }else if(ObjectUtil.equal(2,query.getPageType())){
+                    List<WeChatContactMsg> afterMsgList = getCustomerAfterMsgList(query, currentMsg);
+                    allChatMsgList.addAll(afterMsgList);
+                }
+                if(CollectionUtil.isNotEmpty(allChatMsgList)){
+                    //获取员工和客户信息
+                    SysUserQuery userQuery = new SysUserQuery();
+                    userQuery.setWeUserId(query.getReceiveId());
+                    List<SysUserVo> userVoList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+                    if (CollectionUtil.isNotEmpty(userVoList)) {
+                        userIdMap.putAll(userVoList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, Function.identity(), (key1, key2) -> key2)));
+                    }
+                    WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
+                            .eq(WeCustomer::getExternalUserid, query.getFromId())
+                            .eq(WeCustomer::getAddUserId, query.getReceiveId())
+                            .eq(WeCustomer::getDelFlag,0)
+                            .last("limit 1"));
+                    if(ObjectUtil.isNotNull(weCustomer)){
+                        customerIdMap.put(weCustomer.getExternalUserid(),weCustomer);
+                    }
+
+                    resultList =  allChatMsgList.stream().map(chatMsg -> {
+                        WeChatContactMsgVo weChatContactMsgVo = new WeChatContactMsgVo();
+                        weChatContactMsgVo.setContact(chatMsg.getContact());
+                        weChatContactMsgVo.setMsgTime(chatMsg.getMsgTime());
+                        weChatContactMsgVo.setAction(chatMsg.getAction());
+                        weChatContactMsgVo.setMsgType(chatMsg.getMsgType());
+                        weChatContactMsgVo.setFromId(chatMsg.getFromId());
+                        weChatContactMsgVo.setReceiver(chatMsg.getToList());
+                        if (customerIdMap.containsKey(chatMsg.getFromId())) {
+                            weChatContactMsgVo.setName(customerIdMap.get(chatMsg.getFromId()).getCustomerName());
+                            weChatContactMsgVo.setAvatar(customerIdMap.get(chatMsg.getFromId()).getAvatar());
+                        }
+                        if (userIdMap.containsKey(chatMsg.getFromId())) {
+                            weChatContactMsgVo.setName(customerIdMap.get(chatMsg.getFromId()).getCustomerName());
+                            weChatContactMsgVo.setAvatar(customerIdMap.get(chatMsg.getFromId()).getAvatar());
+                        }
+                        return weChatContactMsgVo;
+                    }).sorted(Comparator.comparing(WeChatContactMsgVo::getMsgTime)).collect(Collectors.toList());
+                }
+            } else {
+                if(ObjectUtil.equal(0,query.getPageType())){
+                    allChatMsgList.add(currentMsg);
+                    List<WeChatContactMsg> beforeMsgList = getRoomBeforeMsgList(query, currentMsg);
+                    List<WeChatContactMsg> afterMsgList = getRoomAfterMsgList(query, currentMsg);
+                    allChatMsgList.addAll(beforeMsgList);
+                    allChatMsgList.addAll(afterMsgList);
+                }else if(ObjectUtil.equal(1,query.getPageType())){
+                    List<WeChatContactMsg> beforeMsgList = getRoomBeforeMsgList(query, currentMsg);
+                    allChatMsgList.addAll(beforeMsgList);
+                }else if(ObjectUtil.equal(2,query.getPageType())){
+                    List<WeChatContactMsg> afterMsgList = getRoomAfterMsgList(query, currentMsg);
+                    allChatMsgList.addAll(afterMsgList);
+                }
+                if(CollectionUtil.isNotEmpty(allChatMsgList)){
+                    Map<String, Object> groupMembers = weGroupMemberService.getMap(new LambdaQueryWrapper<WeGroupMember>()
+                            .eq(WeGroupMember::getChatId, query.getRoomId())
+                            .eq(WeGroupMember::getDelFlag, 0)
+                            .groupBy(WeGroupMember::getUserId, WeGroupMember::getName));
+
+                    resultList =  allChatMsgList.stream().map(chatMsg -> {
+                        WeChatContactMsgVo weChatContactMsgVo = new WeChatContactMsgVo();
+                        weChatContactMsgVo.setContact(chatMsg.getContact());
+                        weChatContactMsgVo.setMsgTime(chatMsg.getMsgTime());
+                        weChatContactMsgVo.setAction(chatMsg.getAction());
+                        weChatContactMsgVo.setMsgType(chatMsg.getMsgType());
+                        weChatContactMsgVo.setFromId(chatMsg.getFromId());
+                        weChatContactMsgVo.setReceiver(chatMsg.getToList());
+                        if (groupMembers.containsKey(chatMsg.getFromId())) {
+                            weChatContactMsgVo.setName(String.valueOf(groupMembers.get(chatMsg.getFromId())));
+                            //weChatContactMsgVo.setAvatar(customerIdMap.get(chatMsg.getFromId()).getAvatar());
+                        }
+                        return weChatContactMsgVo;
+                    }).sorted(Comparator.comparing(WeChatContactMsgVo::getMsgTime)).collect(Collectors.toList());
+
+                }
+            }
+        }
+        return resultList;
+    }
+
+    private List<WeChatContactMsg> getRoomAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
+        return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
+                .last("limit " + query.getNumber())
+                .orderByAsc(WeChatContactMsg::getSeq)
+        );
+    }
+
+
+    private List<WeChatContactMsg>  getRoomBeforeMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
+        return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
+                .last("limit " + query.getNumber())
+                .orderByDesc(WeChatContactMsg::getSeq)
+        );
+    }
+
+    private List<WeChatContactMsg> getCustomerAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
+        return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
+                .last("limit " + query.getNumber())
+                .orderByAsc(WeChatContactMsg::getSeq)
+        );
+    }
+
+
+    private List<WeChatContactMsg>  getCustomerBeforeMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
+        return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
+                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
+                .last("limit " + query.getNumber())
+                .orderByDesc(WeChatContactMsg::getSeq)
+        );
     }
 
 
