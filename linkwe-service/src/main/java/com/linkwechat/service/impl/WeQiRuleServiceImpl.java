@@ -421,8 +421,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
     private List<WeChatContactMsg> getRoomAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
-                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
-                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .eq(WeChatContactMsg::getRoomId,query.getRoomId())
                 .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByAsc(WeChatContactMsg::getSeq)
@@ -432,8 +431,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
     private List<WeChatContactMsg>  getRoomBeforeMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
-                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
-                .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .eq(WeChatContactMsg::getRoomId,query.getRoomId())
                 .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByDesc(WeChatContactMsg::getSeq)
