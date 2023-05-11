@@ -52,6 +52,9 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     private IWeQiRuleMsgService weQiRuleMsgService;
 
     @Autowired
+    private IWeQiRuleMsgNoticeService weQiRuleMsgNoticeService;
+
+    @Autowired
     private IWeChatContactMsgService weChatContactMsgService;
 
     @Autowired
@@ -417,6 +420,19 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
             }
         }
         return resultList;
+    }
+
+    @Override
+    public List<WeQiRuleNoticeListVo> getNoticeList(WeQiRuleNoticeListQuery query) {
+       return weQiRuleMsgNoticeService.getNoticeList(query);
+    }
+
+    @Override
+    public void updateReplyStatus(Long qiRuleMsgId) {
+        weQiRuleMsgService.update(new LambdaUpdateWrapper<WeQiRuleMsg>()
+                .set(WeQiRuleMsg::getReplyTime,new Date())
+                .set(WeQiRuleMsg::getReplyStatus,2)
+                .eq(WeQiRuleMsg::getId, qiRuleMsgId));
     }
 
     private List<WeChatContactMsg> getRoomAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {

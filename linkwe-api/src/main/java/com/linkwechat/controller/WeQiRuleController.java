@@ -1,17 +1,12 @@
 package com.linkwechat.controller;
 
+import com.dtflys.forest.annotation.Put;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
-import com.linkwechat.domain.qirule.query.WeQiRuleAddQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleListQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableListQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableMsgQuery;
-import com.linkwechat.domain.qirule.vo.WeQiRuleDetailVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleListVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsTableVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsViewVo;
+import com.linkwechat.domain.qirule.query.*;
+import com.linkwechat.domain.qirule.vo.*;
 import com.linkwechat.service.IWeQiRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -74,14 +69,14 @@ public class WeQiRuleController extends BaseController {
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "质检数据统计", httpMethod = "GET")
+    @ApiOperation(value = "质检数据看板统计", httpMethod = "GET")
     @GetMapping("/statistics/view/{id}")
     public AjaxResult<WeQiRuleStatisticsViewVo> qiRuleViewStatistics(@PathVariable("id") Long id) {
         WeQiRuleStatisticsViewVo viewVo = weQiRuleService.qiRuleViewStatistics(id);
         return AjaxResult.success(viewVo);
     }
 
-    @ApiOperation(value = "质检数据统计", httpMethod = "GET")
+    @ApiOperation(value = "质检数据列表统计", httpMethod = "GET")
     @GetMapping("/statistics/table/{id}")
     public TableDataInfo<List<WeQiRuleStatisticsTableVo>> qiRuleTableStatistics(@PathVariable("id") Long id, WeQiRuleStatisticsTableListQuery query) {
         startPage();
@@ -95,5 +90,21 @@ public class WeQiRuleController extends BaseController {
     public AjaxResult<List<WeChatContactMsgVo>> getQiRuleTableStatisticsMsg(WeQiRuleStatisticsTableMsgQuery query) {
         List<WeChatContactMsgVo> list = weQiRuleService.getQiRuleTableStatisticsMsg(query);
         return AjaxResult.success(list);
+    }
+
+    @ApiOperation(value = "质检通知列表",httpMethod = "GET")
+    @GetMapping("/notice/list")
+    public TableDataInfo<List<WeQiRuleNoticeListVo>> getNoticeList(WeQiRuleNoticeListQuery query){
+        startPage();
+        List<WeQiRuleNoticeListVo> list =  weQiRuleService.getNoticeList(query);
+        return getDataTable(list);
+    }
+
+
+    @ApiOperation(value = "质检通知设置回复状态",httpMethod = "Put")
+    @Put("/notice/update/replyStatus/{qiRuleMsgId}")
+    public AjaxResult updateReplyStatus(@PathVariable("qiRuleMsgId") Long qiRuleMsgId){
+        weQiRuleService.updateReplyStatus(qiRuleMsgId);
+        return AjaxResult.success();
     }
 }

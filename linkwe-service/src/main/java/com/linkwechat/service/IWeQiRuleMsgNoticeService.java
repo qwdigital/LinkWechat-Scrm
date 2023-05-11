@@ -2,6 +2,10 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeQiRuleMsgNotice;
+import com.linkwechat.domain.qirule.query.WeQiRuleNoticeListQuery;
+import com.linkwechat.domain.qirule.vo.WeQiRuleNoticeListVo;
+
+import java.util.List;
 
 /**
  * 质检规则通知表(WeQiRuleMsgNotice)
@@ -11,4 +15,5 @@ import com.linkwechat.domain.WeQiRuleMsgNotice;
  */
 public interface IWeQiRuleMsgNoticeService extends IService<WeQiRuleMsgNotice> {
 
-} 
+    List<WeQiRuleNoticeListVo> getNoticeList(WeQiRuleNoticeListQuery query);
+}

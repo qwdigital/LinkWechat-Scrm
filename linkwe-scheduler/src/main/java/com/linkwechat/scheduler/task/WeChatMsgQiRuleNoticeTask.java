@@ -80,7 +80,7 @@ public class WeChatMsgQiRuleNoticeTask {
     @XxlJob("weChatMsgQiRuleNoticeTask")
     public void execute() {
         List<WeQiRuleMsg> weQiRuleMsgList = weQiRuleMsgService.list(new LambdaQueryWrapper<WeQiRuleMsg>()
-                .isNull(WeQiRuleMsg::getReplyTime)
+                .eq(WeQiRuleMsg::getReplyStatus,1)
                 .eq(WeQiRuleMsg::getStatus, 0)
                 .eq(WeQiRuleMsg::getDelFlag, 0));
         if (CollectionUtil.isNotEmpty(weQiRuleMsgList)) {

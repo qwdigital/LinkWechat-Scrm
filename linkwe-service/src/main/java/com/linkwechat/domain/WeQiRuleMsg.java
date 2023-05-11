@@ -109,6 +109,13 @@ public class WeQiRuleMsg extends BaseEntity implements Serializable {
     @TableField("reply_msg_id")
     private String replyMsgId;
 
+    /**
+     * 回复状态 1-未回复 2-已回复
+     */
+    @ApiModelProperty(value = "回复状态 1-未回复 2-已回复")
+    @TableField("reply_status")
+    private Integer replyStatus;
+
 
     /**
      * 超时时间

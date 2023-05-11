@@ -3,14 +3,8 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeQiRule;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
-import com.linkwechat.domain.qirule.query.WeQiRuleAddQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleListQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableListQuery;
-import com.linkwechat.domain.qirule.query.WeQiRuleStatisticsTableMsgQuery;
-import com.linkwechat.domain.qirule.vo.WeQiRuleDetailVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleListVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsTableVo;
-import com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsViewVo;
+import com.linkwechat.domain.qirule.query.*;
+import com.linkwechat.domain.qirule.vo.*;
 
 import java.util.List;
 
@@ -77,4 +71,17 @@ public interface IWeQiRuleService extends IService<WeQiRule> {
      * @return
      */
     List<WeChatContactMsgVo> getQiRuleTableStatisticsMsg(WeQiRuleStatisticsTableMsgQuery query);
+
+    /**
+     * 质检通知列表
+     * @param query
+     */
+    List<WeQiRuleNoticeListVo> getNoticeList(WeQiRuleNoticeListQuery query);
+
+    /**
+     * 质检通知设置回复状态
+     * @param qiRuleMsgId 质检消息ID
+     */
+    void updateReplyStatus(Long qiRuleMsgId);
+
 }

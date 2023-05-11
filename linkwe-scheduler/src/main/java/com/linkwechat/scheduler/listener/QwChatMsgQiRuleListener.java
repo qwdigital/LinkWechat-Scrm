@@ -110,7 +110,7 @@ public class QwChatMsgQiRuleListener {
                         .eq(WeQiRuleMsg::getFromId, fromId)
                         .eq(WeQiRuleMsg::getReceiveId, receiveId)
                         .eq(WeQiRuleMsg::getChatType, 1)
-                        .isNull(WeQiRuleMsg::getReplyTime)
+                        .eq(WeQiRuleMsg::getReplyStatus,1)
                         .last("limit 1")
                         .orderByDesc(BaseEntity::getCreateTime));
 
@@ -141,13 +141,14 @@ public class QwChatMsgQiRuleListener {
                     .eq(WeQiRuleMsg::getFromId, fromId)
                     .eq(WeQiRuleMsg::getReceiveId, receiveId)
                     .eq(WeQiRuleMsg::getChatType, 1)
-                    .isNull(WeQiRuleMsg::getReplyTime)
+                    .eq(WeQiRuleMsg::getReplyStatus,1)
                     .last("limit 1")
                     .orderByDesc(BaseEntity::getCreateTime));
             if (Objects.nonNull(weQiRuleMsg)) {
                 weQiRuleMsgService.update(new LambdaUpdateWrapper<WeQiRuleMsg>()
                         .set(WeQiRuleMsg::getReplyTime, sendTime)
                         .set(WeQiRuleMsg::getReplyMsgId, msgId)
+                        .set(WeQiRuleMsg::getReplyStatus, 2)
                         .eq(WeQiRuleMsg::getId, weQiRuleMsg.getId()));
             }
         }
@@ -176,7 +177,7 @@ public class QwChatMsgQiRuleListener {
                             .eq(WeQiRuleMsg::getFromId, fromId)
                             .eq(WeQiRuleMsg::getReceiveId, weGroup.getOwner())
                             .eq(WeQiRuleMsg::getChatType, 2)
-                            .isNull(WeQiRuleMsg::getReplyTime)
+                            .eq(WeQiRuleMsg::getReplyStatus,1)
                             .last("limit 1")
                             .orderByDesc(BaseEntity::getCreateTime));
 
@@ -207,13 +208,14 @@ public class QwChatMsgQiRuleListener {
                         .eq(WeQiRuleMsg::getFromId, fromId)
                         .eq(WeQiRuleMsg::getReceiveId, weGroup.getOwner())
                         .eq(WeQiRuleMsg::getChatType, 2)
-                        .isNull(WeQiRuleMsg::getReplyTime)
+                        .eq(WeQiRuleMsg::getReplyStatus,1)
                         .last("limit 1")
                         .orderByDesc(BaseEntity::getCreateTime));
                 if (Objects.nonNull(weQiRuleMsg)) {
                     weQiRuleMsgService.update(new LambdaUpdateWrapper<WeQiRuleMsg>()
                             .set(WeQiRuleMsg::getReplyTime, sendTime)
                             .set(WeQiRuleMsg::getReplyMsgId, msgId)
+                            .set(WeQiRuleMsg::getReplyStatus,2)
                             .eq(WeQiRuleMsg::getId, weQiRuleMsg.getId()));
                 }
             }
