@@ -138,8 +138,8 @@ public class QwChatMsgQiRuleListener {
             }
         } else {
             WeQiRuleMsg weQiRuleMsg = weQiRuleMsgService.getOne(new LambdaQueryWrapper<WeQiRuleMsg>()
-                    .eq(WeQiRuleMsg::getFromId, fromId)
-                    .eq(WeQiRuleMsg::getReceiveId, receiveId)
+                    .eq(WeQiRuleMsg::getFromId, receiveId)
+                    .eq(WeQiRuleMsg::getReceiveId, fromId)
                     .eq(WeQiRuleMsg::getChatType, 1)
                     .eq(WeQiRuleMsg::getReplyStatus,1)
                     .last("limit 1")
@@ -205,8 +205,8 @@ public class QwChatMsgQiRuleListener {
 
             } else {
                 WeQiRuleMsg weQiRuleMsg = weQiRuleMsgService.getOne(new LambdaQueryWrapper<WeQiRuleMsg>()
-                        .eq(WeQiRuleMsg::getFromId, fromId)
-                        .eq(WeQiRuleMsg::getReceiveId, weGroup.getOwner())
+                        .eq(WeQiRuleMsg::getFromId, weGroup.getOwner())
+                        .eq(WeQiRuleMsg::getReceiveId, fromId)
                         .eq(WeQiRuleMsg::getChatType, 2)
                         .eq(WeQiRuleMsg::getReplyStatus,1)
                         .last("limit 1")
