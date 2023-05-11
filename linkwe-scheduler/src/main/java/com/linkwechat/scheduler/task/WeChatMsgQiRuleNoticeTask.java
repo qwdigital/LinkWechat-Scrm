@@ -160,7 +160,7 @@ public class WeChatMsgQiRuleNoticeTask {
         template.setBtntxt(manageBtnTxt);
 
         JSONObject businessData = new JSONObject();
-        businessData.put("type",1);
+        businessData.put("type",2);
         qwAppMsgBody.setBusinessData(businessData);
         qwAppMsgBody.setMessageTemplates(template);
         qwAppMsgBody.setCallBackId(weQiRuleMsg.getId());
