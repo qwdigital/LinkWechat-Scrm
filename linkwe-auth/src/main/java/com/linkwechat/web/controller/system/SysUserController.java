@@ -506,6 +506,17 @@ public class SysUserController extends BaseController {
     }
 
     /**
+     * 更新员工开启会话存档状态
+     * @param query
+     * @return
+     */
+    @PutMapping("/system/user/update/chat/status")
+    public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query){
+        userService.updateUserChatStatus(query);
+        return AjaxResult.success();
+    }
+
+    /**
      * 通过企微员工ID获取员工信息
      * @param query
      * @return
