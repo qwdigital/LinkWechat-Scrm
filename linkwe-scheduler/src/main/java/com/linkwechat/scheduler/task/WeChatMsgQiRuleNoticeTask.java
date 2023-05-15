@@ -167,4 +167,13 @@ public class WeChatMsgQiRuleNoticeTask {
         qwAppMsgBody.setBusinessType(QwAppMsgBusinessTypeEnum.QI_RULE.getType());
         qwAppSendMsgService.appMsgSend(qwAppMsgBody);
     }
+
+
+    /**
+     * 计算周报任务
+     */
+    @XxlJob("chatMsgQiRuleWeekCalculateTask")
+    public void chatMsgQiRuleWeekCalculate() {
+
+    }
 }
