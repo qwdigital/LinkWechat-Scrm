@@ -84,6 +84,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserRoleMapper userRoleMapper;
 
     @Resource
+    private ISysUserRoleService sysUserRoleService;
+
+    @Resource
     private SysUserPostMapper userPostMapper;
 
     @Resource
@@ -896,7 +899,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                                 .build();
                         newSysUserRoles.add(sysUserRole);
                     }
-                    userRoleMapper.batchUserRole(newSysUserRoles);
+                sysUserRoleService.saveOrUpdateBatch(newSysUserRoles);
             }
             redisService.unLock(detailVo.getUserId(), "lock");
         }
