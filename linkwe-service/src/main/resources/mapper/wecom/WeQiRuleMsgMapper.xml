@@ -44,8 +44,7 @@
         from we_qi_rule_msg_notice wqrmn
         inner join we_qi_rule_msg wqrm on wqrm.id = wqrmn.qi_rule_msg_id
         left join we_group wg on wqrm.room_id = wg.chat_id and (case when wqrm.chat_type = 2 then 1 else 0 end ) = 1 and wg.del_flag = 0
-        left join we_customer wc on wqrm.from_id = wc.external_userid and wqrm.receive_id = wc.add_user_id and wc.del_flag = 0 and  (case when wqrm.chat_type = 1 then 1 else 0 end ) =
-        left join we
+        left join we_customer wc on wqrm.from_id = wc.external_userid and wqrm.receive_id = wc.add_user_id and wc.del_flag = 0 and  (case when wqrm.chat_type = 1 then 1 else 0 end ) = 1
         where type = 1 and wqrm.rule_id = #{ruleId}
         <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
             and date_format(wqrmn.create_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
