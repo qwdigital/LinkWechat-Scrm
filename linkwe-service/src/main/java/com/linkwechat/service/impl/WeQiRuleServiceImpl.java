@@ -314,7 +314,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                         tableVo.setDeptName(sysUserVo.getDeptList().stream().map(SysDeptVo::getDeptName).collect(Collectors.joining(",")));
                     }
                 }
-                String outTime = DateUtil.formatBetween(DateUtil.parseDateTime(tableVo.getSendTime()), DateUtil.parseDateTime(tableVo.getReplyTime()));
+                String outTime = DateUtil.formatBetween(tableVo.getSendTime(), tableVo.getReplyTime());
                 tableVo.setTimeout(outTime);
             }
         }

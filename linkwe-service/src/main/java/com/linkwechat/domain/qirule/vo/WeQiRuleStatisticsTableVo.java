@@ -1,8 +1,11 @@
 package com.linkwechat.domain.qirule.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @author danmo
@@ -36,14 +39,17 @@ public class WeQiRuleStatisticsTableVo {
     @ApiModelProperty("发送人ID")
     private String fromId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("发送时间")
-    private String sendTime;
+    private Date sendTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("回复时间")
-    private String replyTime;
+    private Date replyTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("触发时间")
-    private String createTime;
+    private Date createTime;
 
     @ApiModelProperty("触发消息ID")
     private String msgId;
