@@ -52,12 +52,12 @@ public class WeMomentsController extends BaseController {
     /**
      * 获取朋友圈详情
      *
-     * @param momentId
+     * @param id
      * @return
      */
-    @GetMapping("/findMomentsDetail/{momentId}")
-    public AjaxResult findMomentsDetail(@PathVariable String momentId) {
-        return AjaxResult.success(iWeMomentsService.findMomentsDetail(momentId));
+    @GetMapping("/findMomentsDetail/{id}")
+    public AjaxResult findMomentsDetail(@PathVariable("id") Long id) {
+        return AjaxResult.success(iWeMomentsService.findMomentsDetail(id));
     }
 
     /**
