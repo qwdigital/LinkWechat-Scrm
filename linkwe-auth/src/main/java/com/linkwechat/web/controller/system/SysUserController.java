@@ -510,7 +510,7 @@ public class SysUserController extends BaseController {
      * @param query
      * @return
      */
-    @PutMapping("/system/user/update/chat/status")
+    @PutMapping("/user/update/chat/status")
     public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query){
         userService.updateUserChatStatus(query);
         return AjaxResult.success();

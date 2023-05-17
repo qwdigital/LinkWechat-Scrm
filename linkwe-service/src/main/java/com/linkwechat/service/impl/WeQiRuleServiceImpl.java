@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
@@ -62,6 +63,12 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
+
+    @Autowired
+    private IWeQiRuleManageStatisticsService weQiRuleManageStatisticsService;
+
+    @Autowired
+    private IWeQiRuleUserStatisticsService weQiRuleUserStatisticsService;
 
     @Transactional(rollbackFor = {Exception.class, WeComException.class})
     @Override
@@ -434,6 +441,35 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                 .set(WeQiRuleMsg::getReplyStatus,2)
                 .eq(WeQiRuleMsg::getId, qiRuleMsgId));
     }
+
+    @Override
+    public List<WeQiRuleWeeklyListVo> getWeeklyList(WeQiRuleWeeklyListQuery query) {
+        if(StringUtils.isNotEmpty(query.getUserName())){
+            SysUserQuery sysUserQuery = new SysUserQuery();
+            sysUserQuery.setUserName(query.getUserName());
+            List<SysUserVo> userVoList = qwSysUserClient.getUserListByWeUserIds(sysUserQuery).getData();
+            if(CollectionUtil.isNotEmpty(userVoList)) {
+                Set<String> sysUserIds = userVoList.stream().map(SysUserVo::getWeUserId).collect(Collectors.toSet());
+                query.setUserIds(new ArrayList<>(sysUserIds));
+            }
+        }
+
+        return weQiRuleManageStatisticsService.getWeeklyList(query);
+    }
+
+    @Override
+    public WeQiRuleWeeklyDetailVo getWeeklyDetail(Long id) {
+        WeQiRuleWeeklyDetailVo detail  = new WeQiRuleWeeklyDetailVo();
+        WeQiRuleManageStatistics manageStatistics = weQiRuleManageStatisticsService.getById(id);
+        BeanUtil.copyProperties(manageStatistics,detail);
+        return detail;
+    }
+
+    @Override
+    public List<WeQiRuleWeeklyDetailListVo> getWeeklyDetailList(WeQiRuleWeeklyDetailListQuery query) {
+        return null;
+    }
+
 
     private List<WeChatContactMsg> getRoomAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()

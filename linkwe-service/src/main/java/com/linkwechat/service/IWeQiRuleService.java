@@ -84,4 +84,19 @@ public interface IWeQiRuleService extends IService<WeQiRule> {
      */
     void updateReplyStatus(Long qiRuleMsgId);
 
+    /**
+     * 质检周报列表
+     * @param query
+     * @return
+     */
+    List<WeQiRuleWeeklyListVo> getWeeklyList(WeQiRuleWeeklyListQuery query);
+
+    /**
+     * 质检周报详情数据
+     * @param id
+     * @return
+     */
+    WeQiRuleWeeklyDetailVo getWeeklyDetail(Long id);
+
+    List<WeQiRuleWeeklyDetailListVo> getWeeklyDetailList(WeQiRuleWeeklyDetailListQuery query);
 }

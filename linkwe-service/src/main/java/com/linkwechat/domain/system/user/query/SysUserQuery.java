@@ -27,6 +27,9 @@ public class SysUserQuery {
     @ApiModelProperty("员工ID")
     private Long userId;
 
+    @ApiModelProperty("员工名称")
+    private String userName;
+
     @ApiModelProperty("企微员工ID")
     private String weUserId;
 

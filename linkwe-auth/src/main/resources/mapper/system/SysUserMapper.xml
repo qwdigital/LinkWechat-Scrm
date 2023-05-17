@@ -595,6 +595,9 @@
             <if test="userId != null">
                 and su.user_id = #{userId}
             </if>
+            <if test="userName != null and userName != ''">
+                and su.user_name like concat('%', #{userName}, '%')
+            </if>
             <if test="weUserId != null and weUserId != ''">
                 and su.we_user_id = #{weUserId}
             </if>
