@@ -74,32 +74,31 @@ public class WeChatMsgQiRuleServiceImpl extends AbstractAppMsgService {
     protected void callBackResult(WeAppMsgVo appMsgVo) {
         log.info(">>>>>>【质检通知任务发送结果】 callBackId:{} ,appMsgVo:{}", callBackId, JSONObject.toJSONString(appMsgVo));
         JSONObject businessData = super.getBusinessData();
-        WeQiRuleMsg weQiRuleMsg = new WeQiRuleMsg();
-        weQiRuleMsg.setId(callBackId);
-        if (appMsgVo.getErrMsg() != null && !Objects.equals(0, appMsgVo.getErrCode())) {
-            weQiRuleMsg.setStatus(2);
-        } else {
-            weQiRuleMsg.setStatus(1);
-        }
-        weQiRuleMsgService.updateById(weQiRuleMsg);
+        if(Objects.nonNull(businessData) && businessData.getBoolean("isBack")){
+            WeQiRuleMsg weQiRuleMsg = new WeQiRuleMsg();
+            weQiRuleMsg.setId(callBackId);
+            if (appMsgVo.getErrMsg() != null && !Objects.equals(0, appMsgVo.getErrCode())) {
+                weQiRuleMsg.setStatus(2);
+            } else {
+                weQiRuleMsg.setStatus(1);
+            }
+            weQiRuleMsgService.updateById(weQiRuleMsg);
 
-        if (CollectionUtil.isNotEmpty(userIds)) {
-            List<WeQiRuleMsgNotice> noticeList = userIds.stream().map(userId -> {
-                WeQiRuleMsgNotice notice = new WeQiRuleMsgNotice();
-                notice.setQiRuleMsgId(callBackId);
-                notice.setUserId(userId);
-                notice.setStatus(weQiRuleMsg.getStatus());
-                notice.setMsgId(appMsgVo.getMsgId());
-                if (Objects.nonNull(businessData)) {
+            if (CollectionUtil.isNotEmpty(userIds)) {
+                List<WeQiRuleMsgNotice> noticeList = userIds.stream().map(userId -> {
+                    WeQiRuleMsgNotice notice = new WeQiRuleMsgNotice();
+                    notice.setQiRuleMsgId(callBackId);
+                    notice.setUserId(userId);
+                    notice.setStatus(weQiRuleMsg.getStatus());
+                    notice.setMsgId(appMsgVo.getMsgId());
                     notice.setType(businessData.getInteger("type"));
-                }
-                notice.setInvalidUser(appMsgVo.getInvalidUser());
-                notice.setResponseCode(appMsgVo.getResponseCode());
-                notice.setUnlicensedUser(appMsgVo.getUnlicenseduser());
-                return notice;
-            }).collect(Collectors.toList());
-            weQiRuleMsgNoticeService.saveBatch(noticeList, 200);
+                    notice.setInvalidUser(appMsgVo.getInvalidUser());
+                    notice.setResponseCode(appMsgVo.getResponseCode());
+                    notice.setUnlicensedUser(appMsgVo.getUnlicenseduser());
+                    return notice;
+                }).collect(Collectors.toList());
+                weQiRuleMsgNoticeService.saveBatch(noticeList, 200);
+            }
         }
-
     }
 }

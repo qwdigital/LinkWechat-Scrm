@@ -11,6 +11,7 @@ import com.linkwechat.domain.WeQiRuleManageStatistics;
 import com.linkwechat.service.IWeQiRuleManageStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,6 @@ public class WeQiRuleManageStatisticsServiceImpl extends ServiceImpl<WeQiRuleMan
                 return weeklyListVo;
             }).collect(Collectors.toList());
         }
-        return null;
+        return new LinkedList<>();
     }
 }

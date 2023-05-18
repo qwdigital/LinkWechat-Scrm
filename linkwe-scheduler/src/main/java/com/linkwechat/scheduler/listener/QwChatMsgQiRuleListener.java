@@ -3,12 +3,15 @@ package com.linkwechat.scheduler.listener;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
@@ -21,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -205,7 +209,7 @@ public class QwChatMsgQiRuleListener {
 
             } else {
                 WeQiRuleMsg weQiRuleMsg = weQiRuleMsgService.getOne(new LambdaQueryWrapper<WeQiRuleMsg>()
-                        .eq(WeQiRuleMsg::getFromId, weGroup.getOwner())
+                        .eq(WeQiRuleMsg::getRoomId, roomId)
                         .eq(WeQiRuleMsg::getReceiveId, fromId)
                         .eq(WeQiRuleMsg::getChatType, 2)
                         .eq(WeQiRuleMsg::getReplyStatus,1)
@@ -242,5 +246,64 @@ public class QwChatMsgQiRuleListener {
             return true;
         }
         return false;
+    }
+
+
+    @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    /**
+     * 开发环境专用
+     * @param msg
+     * @param channel
+     * @param message
+     * @throws IOException
+     */
+    @RabbitHandler
+    @RabbitListener(queues = "Qu_Canal")
+    public void test(String msg, Channel channel, Message message) throws IOException {
+        try {
+            log.info("【开发环境专用】canal消息：msg:{}", msg);
+
+            JSONObject msgObj = JSONObject.parseObject(msg);
+            if(ObjectUtil.equal("we_chat_contact_msg",msgObj.getString("table"))
+                    && ObjectUtil.equal("INSERT",msgObj.getString("type")) ){
+                JSONArray data = msgObj.getJSONArray("data");
+                if(CollectionUtil.isNotEmpty(data)){
+                    data.stream().map(item ->(JSONObject) item).forEach(item ->{
+                        String msgId = item.getString("msg_id");
+                        String fromId = item.getString("from_id");
+                        String toList = item.getString("to_list");
+                        String roomId = item.getString("room_id");
+                        String msgType = item.getString("msgtype");
+                        Long seq = item.getLong("seq");
+                        String contact = item.getString("contact");
+                        String action = item.getString("action");
+                        String corpId = item.getString("corpId");
+                        String msgTime = item.getString("msg_time");
+
+                        JSONObject chatMsgObj = new JSONObject();
+                        chatMsgObj.put("corpId",corpId);
+                        chatMsgObj.put("tolist",toList.split(","));
+                        chatMsgObj.put("msgtime",DateUtil.parseDateTime(msgTime).getTime());
+                        chatMsgObj.put("msgid",msgId);
+                        chatMsgObj.put("action",action);
+                        chatMsgObj.put("from",fromId);
+                        chatMsgObj.put("msgtype",msgType);
+                        chatMsgObj.put("roomid",roomId);
+                        chatMsgObj.put("seq",seq);
+                        chatMsgObj.put(msgType,JSONObject.parseObject(contact));
+                        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), rabbitMQSettingConfig.getWeChatMsgAuditRk(), chatMsgObj.toJSONString());
+                    });
+                }
+            }
+
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            log.error("【开发环境专用】canal消息处理异常 msg:{},error:{}", msg, e);
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), true, true);
+        }
     }
 }

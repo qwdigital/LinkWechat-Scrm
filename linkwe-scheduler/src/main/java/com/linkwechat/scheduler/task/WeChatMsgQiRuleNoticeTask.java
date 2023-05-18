@@ -65,7 +65,7 @@ public class WeChatMsgQiRuleNoticeTask {
     @Value("${task-msg.qi-rule.desc:}")
     private String description;
 
-    @Value("${task-msg.qi-rule.manage.desc:}")
+    @Value("${task-msg.qi-rule.manage-desc:}")
     private String manageDescription;
 
     @Value("${task-msg.qi-rule.url:}")
@@ -74,7 +74,7 @@ public class WeChatMsgQiRuleNoticeTask {
     @Value("${task-msg.qi-rule.btnTxt:去处理}")
     private String userBtnTxt;
 
-    @Value("${task-msg.qi-rule.manage.btnTxt:去查看}")
+    @Value("${task-msg.qi-rule.manage-btnTxt:去查看}")
     private String manageBtnTxt;
 
     @XxlJob("weChatMsgQiRuleNoticeTask")
@@ -125,6 +125,7 @@ public class WeChatMsgQiRuleNoticeTask {
 
         JSONObject businessData = new JSONObject();
         businessData.put("type",1);
+        businessData.put("isBack",true);
         qwAppMsgBody.setBusinessData(businessData);
         qwAppMsgBody.setCallBackId(weQiRuleMsg.getId());
         qwAppMsgBody.setMessageTemplates(template);
@@ -149,8 +150,14 @@ public class WeChatMsgQiRuleNoticeTask {
         userQuery.setWeUserIds(Collections.singletonList(receiveId));
         List<SysUserVo> userVos = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
         if(CollectionUtil.isNotEmpty(userVos)){
-            manageDescription = StringUtils.format(manageDescription, userVos.get(0).getUserName());
+            if (ObjectUtil.equal(1, weQiRuleMsg.getChatType())) {
+                manageDescription = StringUtils.format(manageDescription, userVos.get(0).getUserName(),"客户");
+            }else {
+                manageDescription = StringUtils.format(manageDescription, userVos.get(0).getUserName(), "客群");
+            }
+
         }
+
         //设置消息模板
         WeMessageTemplate template = new WeMessageTemplate();
         template.setMsgType(MessageType.TEXTCARD.getMessageType());
@@ -161,6 +168,7 @@ public class WeChatMsgQiRuleNoticeTask {
 
         JSONObject businessData = new JSONObject();
         businessData.put("type",2);
+        businessData.put("isBack",false);
         qwAppMsgBody.setBusinessData(businessData);
         qwAppMsgBody.setMessageTemplates(template);
         qwAppMsgBody.setCallBackId(weQiRuleMsg.getId());

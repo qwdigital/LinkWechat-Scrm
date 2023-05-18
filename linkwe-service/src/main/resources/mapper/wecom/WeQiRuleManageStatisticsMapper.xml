@@ -54,7 +54,7 @@
                we_user_id,
                start_time,
                finish_time,
-               send_time,
+               send_time
         from we_qi_rule_manage_statistics
         <where>
             <if test="userIds != null and userIds.size() > 0">
