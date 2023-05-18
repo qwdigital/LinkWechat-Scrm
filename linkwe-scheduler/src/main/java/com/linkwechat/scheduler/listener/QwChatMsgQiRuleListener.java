@@ -277,7 +277,7 @@ public class QwChatMsgQiRuleListener {
                         String fromId = item.getString("from_id");
                         String toList = item.getString("to_list");
                         String roomId = item.getString("room_id");
-                        String msgType = item.getString("msgtype");
+                        String msgType = item.getString("msg_type");
                         Long seq = item.getLong("seq");
                         String contact = item.getString("contact");
                         String action = item.getString("action");

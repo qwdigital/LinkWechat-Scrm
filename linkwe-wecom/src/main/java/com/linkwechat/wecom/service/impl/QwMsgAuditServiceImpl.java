@@ -4,6 +4,7 @@ import com.linkwechat.domain.wecom.query.msgaudit.WeMsgAuditQuery;
 import com.linkwechat.domain.wecom.vo.msgaudit.WeMsgAuditVo;
 import com.linkwechat.wecom.client.WeMsgAuditClient;
 import com.linkwechat.wecom.service.IQwMsgAuditService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
  * @author danmo
  * @date 2023年05月12日 10:01
  */
+@Service
 public class QwMsgAuditServiceImpl implements IQwMsgAuditService {
 
     @Resource

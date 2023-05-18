@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linkwechat.common.utils.thread.WeMsgAuditThreadExecutor;
 import com.linkwechat.domain.WeCustomer;
@@ -56,7 +57,7 @@ public class WeMsgAuditTask {
     /**
      * 获取会话内容存档开启成员列表
      */
-    @XxlJob("WePermitUserListTask")
+    @XxlJob("wePermitUserListTask")
     public void getPermitUserListHandle() {
         XxlJobHelper.log("获取会话内容存档开启成员列表-------------->>>>start");
         WeMsgAuditQuery auditQuery = new WeMsgAuditQuery();
@@ -74,13 +75,12 @@ public class WeMsgAuditTask {
     /**
      * 获取会话中外部成员的同意情况
      */
-    @XxlJob("WeCheckSingleAgreeTask")
+    @XxlJob("weCheckSingleAgreeTask")
     public void checkSingleAgreeTaskHandle() {
         XxlJobHelper.log("获取会话中外部成员的同意情况任务-------------->>>>start");
-        int total = weCustomerService.count(new LambdaQueryWrapper<WeCustomer>()
-                .select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId)
-                .eq(WeCustomer::getDelFlag, 0)
-                .groupBy(WeCustomer::getExternalUserid, WeCustomer::getAddUserId));
+        int total = weCustomerService.count(new QueryWrapper<WeCustomer>()
+                .select("distinct external_userid,add_user_id")
+                .eq("del_flag", 0));
 
         XxlJobHelper.log("获取会话中外部成员的同意情况 >>>>>>>>>>>>>>count：{}", total);
         // 手动分页
@@ -125,7 +125,8 @@ public class WeMsgAuditTask {
                                 customerMap.forEach((externalUserIdAndUserId,customerList) ->{
                                     List<WeMsgAuditVo.AgreeInfo> agreeInfos = agreeInfoMap.get(externalUserIdAndUserId);
                                     if(CollectionUtil.isNotEmpty(agreeInfos)){
-                                        WeCustomer weCustomer = customerList.get(0);
+                                        WeCustomer weCustomer = new WeCustomer();
+                                        weCustomer.setId(customerList.get(0).getId());
                                         WeMsgAuditVo.AgreeInfo agreeInfo = agreeInfos.get(0);
                                         weCustomer.setOpenChatTime(new Date(agreeInfo.getStatusChangeTime() * 1000));
                                         weCustomer.setIsOpenChat(ObjectUtil.equal("Agree", agreeInfo.getAgreeStatus()) ? 1 : 0);
@@ -146,7 +147,7 @@ public class WeMsgAuditTask {
     /**
      * 获取会话内容存档外部群外部联系人的同意情况
      */
-    @XxlJob("WeCheckRoomAgreeTask")
+    @XxlJob("weCheckRoomAgreeTask")
     public void checkRoomAgreeHandle() {
         XxlJobHelper.log("外部群-外部联系人的同意情况-------------->>>>start");
 
@@ -169,14 +170,15 @@ public class WeMsgAuditTask {
                                     .in(WeGroupMember::getUserId, memberUserMap.keySet())
                                     .eq(WeGroupMember::getDelFlag, 0));
 
-                            for (WeGroupMember weGroupMember : weGroupMembers) {
-                                List<WeMsgAuditVo.AgreeInfo> agreeInfos = memberUserMap.get(weGroupMember.getUserId());
-                                if(CollectionUtil.isNotEmpty(agreeInfos)){
-                                    weGroupMember.setOpenChatTime(new Date(agreeInfos.get(0).getStatusChangeTime() * 1000));
-                                    weGroupMember.setIsOpenChat(ObjectUtil.equal("Agree", agreeInfos.get(0).getAgreeStatus()) ? 1 : 0);
-                                }
-                            }
-                            weGroupMemberService.updateBatchById(weGroupMembers);
+                            List<WeGroupMember> agree = weGroupMembers.stream().filter(item -> CollectionUtil.isNotEmpty(memberUserMap.get(item.getUserId()))).map(item -> {
+                                List<WeMsgAuditVo.AgreeInfo> agreeInfos = memberUserMap.get(item.getUserId());
+                                WeGroupMember weGroupMember = new WeGroupMember();
+                                weGroupMember.setId(item.getId());
+                                weGroupMember.setOpenChatTime(new Date(agreeInfos.get(0).getStatusChangeTime() * 1000));
+                                weGroupMember.setIsOpenChat(ObjectUtil.equal("Agree", agreeInfos.get(0).getAgreeStatus()) ? 1 : 0);
+                                return weGroupMember;
+                            }).collect(Collectors.toList());
+                            weGroupMemberService.updateBatchById(agree);
                         }
                     }
                 } catch (Exception e) {
