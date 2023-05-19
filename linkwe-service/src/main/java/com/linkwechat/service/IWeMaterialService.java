@@ -42,7 +42,30 @@ public interface IWeMaterialService extends IService<WeMaterial> {
 
     WeMediaVo uploadWebhookMaterial(String key, String url, String type, String name);
 
+
+    /**
+     *  构建海报图片(旧)
+     * @param poster
+     * @return
+     */
     WeMaterial generateSimpleImg(WePoster poster);
+
+
+    /**
+     *  构建海报图片升级（新）
+     * @param poster
+     * @return
+     */
+    WeMaterial builderSimpleImg(WePoster poster);
+
+
+    /**
+     * 构建海报（基于https://gitee.com/dromara/image-combiner#https://gitee.com/dromara/image-combiner/issues/I4FVGB）
+     * @param purePoster
+     * @return
+     */
+    FileEntity builderPoster(PurePoster purePoster) throws Exception;
+
 
     /**
      * 生成海报

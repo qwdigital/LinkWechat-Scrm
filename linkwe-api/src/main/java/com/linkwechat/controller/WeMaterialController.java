@@ -165,7 +165,8 @@ public class WeMaterialController extends BaseController {
         if (digest != null && digest.length() > 100) {
             throw new CustomException("海报描述不可超过100个字符！");
         }
-        WeMaterial material = materialService.generateSimpleImg(poster);
+//        WeMaterial material = materialService.generateSimpleImg(poster);
+        WeMaterial material = materialService.builderSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
         material.setModuleType(poster.getModuleType());
         boolean b = materialService.saveOrUpdate(material);

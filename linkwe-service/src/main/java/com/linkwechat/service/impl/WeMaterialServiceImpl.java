@@ -11,6 +11,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.freewayso.image.combiner.ImageCombiner;
+import com.freewayso.image.combiner.element.TextElement;
+import com.freewayso.image.combiner.enums.Direction;
+import com.freewayso.image.combiner.enums.OutputFormat;
+import com.freewayso.image.combiner.enums.ZoomMode;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -22,10 +27,7 @@ import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.ServletUtils;
-import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.*;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
@@ -66,6 +68,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.*;
@@ -206,6 +209,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public WeMaterial generateSimpleImg(WePoster poster) {
+        //校验海报元素是否为空
         if (CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
             return generateMaterialFromPoster(poster);
         }
@@ -308,6 +312,119 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         }
     }
 
+
+
+    @Override
+    public WeMaterial builderSimpleImg(WePoster poster)  {
+
+
+        try {
+            FileEntity fileEntity = this.builderPoster(PurePoster.builder()
+                            .backgroundImgPath(poster.getBackgroundImgPath())
+                            .width(poster.getWidth())
+                            .height(poster.getHeight())
+                            .posterSubassemblyList(poster.getPosterSubassemblyList())
+
+                    .build());
+
+            if (fileEntity != null) {
+                poster.setSampleImgPath(fileEntity.getUrl());
+            }
+            WeMaterial material = generateMaterialFromPoster(poster);
+            material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
+            return material;
+
+        } catch (Exception e) {
+           log.error("海报素材构建失败:"+e.getMessage());
+            throw new WeComException("海报素材构建失败");
+        }
+
+
+
+
+    }
+
+    @Override
+    public FileEntity builderPoster(PurePoster purePoster) throws Exception {
+        //海报组件数组为空，直接返回图片
+//        if (CollectionUtils.isEmpty(purePoster.getPosterSubassemblyList())) {
+//            FileEntity sysFile = new FileEntity();
+//            sysFile.setName(FileUtils.getName(purePoster.getBackgroundImgPath()));
+//            sysFile.setUrl(purePoster.getBackgroundImgPath());
+//            return sysFile;
+//        }
+
+            //构建海报生成器
+            ImageCombiner combiner = new ImageCombiner(purePoster.getBackgroundImgPath(),
+                    purePoster.getWidth()>=375?375:purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
+
+
+            //海报中元素
+            List<WePosterSubassembly> posterSubassemblyList = purePoster.getPosterSubassemblyList();
+            if(CollectionUtil.isNotEmpty(posterSubassemblyList)){
+
+                //合成素材到海报中
+                posterSubassemblyList.stream().forEach(wePosterSubassembly->{
+
+                    //元素为文字的处理
+                    if (wePosterSubassembly.getType().equals(1)) {
+
+
+                        TextElement textPrice = new TextElement(wePosterSubassembly.getContent(),
+                                wePosterSubassembly.getFontSize(), wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
+                        textPrice.setColor(
+                                ColorUtils.fromStrToARGB(wePosterSubassembly.getFontColor())
+                        );
+
+                        //设置字体对齐方式
+                        Integer fontTextAlign = wePosterSubassembly.getFontTextAlign();
+                        if(new Integer(2).equals(fontTextAlign)){//居中
+                            textPrice.setCenter(true);
+                        }else if(new Integer(1).equals(fontTextAlign)){ //左对齐
+                            textPrice.setDirection(Direction.LeftRight);
+                        }else if(new Integer(3).equals(fontTextAlign)){//右对齐
+                            textPrice.setDirection(Direction.RightLeft);
+                        }
+
+                        combiner.addElement(textPrice);         //加入待绘制集合
+
+
+
+
+                    }else{ //图片处理
+                        String imgPath = wePosterSubassembly.getImgPath();
+                        if(StringUtils.isNotEmpty(imgPath)){
+                            //二维码（强制按指定宽度、高度缩放）
+                            combiner.addImageElement(imgPath,
+                                    wePosterSubassembly.getLeft()
+                                    , wePosterSubassembly.getTop(),
+                                    wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight()
+                                    , wePosterSubassembly.getType().equals(3)?ZoomMode.WidthHeight:ZoomMode.Width);
+                        }
+                    }
+
+
+            });
+
+
+            }
+
+        //执行图片合并
+        try {
+            combiner.combine();
+
+            //获取合成后的海报
+            MultipartFile file
+                    = new MockMultipartFile(String.valueOf(System.currentTimeMillis()),"jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
+            AjaxResult<FileEntity> result = fileClient.upload(file);
+            return result.getData();
+        } catch (Exception e) {
+            log.error("海报构建失败:"+e.getMessage());
+            throw new WeComException("海报构建失败");
+        }
+
+    }
+
     @Override
     public FileEntity createPoster(PurePoster purePoster) {
         //海报组件数组为空，直接返回图片
@@ -318,7 +435,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             return sysFile;
         }
 
-        Set<String> existFontId = new HashSet<>();
+        Set<String> existFontId= new HashSet<>();
         Map<String, Font> fontMap = generateFontMap(purePoster.getPosterSubassemblyList(), existFontId);
         Map<String, NetFileUtils.FileCallable> fileCallableMap = purePoster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(org.apache.commons.lang3.StringUtils::isNotBlank)
                 .distinct().collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
