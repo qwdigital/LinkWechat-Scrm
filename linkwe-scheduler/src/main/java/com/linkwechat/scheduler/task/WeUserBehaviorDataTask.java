@@ -16,12 +16,14 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeUserBehaviorDataService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +37,7 @@ import java.util.List;
 @Component
 public class WeUserBehaviorDataTask {
 
-    @Autowired
+    @Resource
     private QwCustomerClient qwCustomerClient;
 
     @Autowired
@@ -45,7 +47,8 @@ public class WeUserBehaviorDataTask {
     private IWeUserBehaviorDataService weUserBehaviorDataService;
 
     @XxlJob("weUserBehaviorDataTask")
-    public void process(String params){
+    public void process(){
+        String params = XxlJobHelper.getJobParam();
         log.info("联系客户统计>>>>>>>>>>>>>>>>>>>启动 params:{}",params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
 
@@ -84,6 +87,7 @@ public class WeUserBehaviorDataTask {
                         WeUserBehaviorData weUserData = new WeUserBehaviorData();
                         BeanUtils.copyProperties(data, weUserData);
                         weUserData.setUserId(userId);
+                        weUserData.setReplyPercentage(String.valueOf(data.getReplyPercentage()));
                         dataList.add(weUserData);
                     }
                 } catch (Exception e) {
