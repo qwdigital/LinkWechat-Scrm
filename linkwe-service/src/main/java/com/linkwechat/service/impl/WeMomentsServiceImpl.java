@@ -202,8 +202,8 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
      * @return
      */
     @Override
-    public WeMoments findMomentsDetail(String momentId) {
-        return this.baseMapper.findMomentsDetail(momentId);
+    public WeMoments findMomentsDetail(Long id) {
+        return this.baseMapper.findMomentsDetail(id);
     }
 
 
@@ -587,16 +587,20 @@ public class WeMomentsServiceImpl extends ServiceImpl<WeMomentsMapper, WeMoments
             if (momentTask.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
                 List<MomentsResultDto.TaskList> taskList = momentTask.getTask_list();
                 if (CollectionUtil.isNotEmpty(taskList)) {
-                    taskList.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status))
-                            .forEach((k, v) -> {
-                                if (k.equals(0) && ObjectUtil.equal(weMoments.getScopeType(),0)) {//未发表
-                                    weMoments.setNoAddUser(v.stream().map(MomentsResultDto.TaskList::getUserid)
-                                            .collect(Collectors.joining(",")));
-                                } else if (k.equals(1)) {//已发表
-                                    weMoments.setAddUser(v.stream().map(MomentsResultDto.TaskList::getUserid)
-                                            .collect(Collectors.joining(",")));
-                                }
-                            });
+                    Map<Integer, List<MomentsResultDto.TaskList>> listMap = taskList.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status));
+
+                    //已发表
+                    if(listMap.containsKey(1)){
+                        weMoments.setAddUser(listMap.get(1).stream().map(MomentsResultDto.TaskList::getUserid)
+                                .collect(Collectors.joining(",")));
+                    }
+
+                    if(listMap.containsKey(0) && ObjectUtil.equal(weMoments.getScopeType(),0)){
+                        weMoments.setNoAddUser(listMap.get(0).stream().map(MomentsResultDto.TaskList::getUserid)
+                                .collect(Collectors.joining(",")));
+                    }else {
+                        weMoments.setNoAddUser("");
+                    }
                 }
             }
         }
