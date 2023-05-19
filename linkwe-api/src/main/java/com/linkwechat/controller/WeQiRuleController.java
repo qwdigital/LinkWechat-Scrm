@@ -109,8 +109,8 @@ public class WeQiRuleController extends BaseController {
     }
 
 
-    @ApiOperation(value = "质检通知设置回复状态",httpMethod = "PUT")
-    @Put("/notice/update/replyStatus/{qiRuleMsgId}")
+    @ApiOperation(value = "质检通知设置回复状态", httpMethod = "PUT")
+    @PutMapping("/notice/update/replyStatus/{qiRuleMsgId}")
     public AjaxResult updateReplyStatus(@PathVariable("qiRuleMsgId") Long qiRuleMsgId){
         weQiRuleService.updateReplyStatus(qiRuleMsgId);
         return AjaxResult.success();
