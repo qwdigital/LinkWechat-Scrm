@@ -34,4 +34,7 @@ public class WeQiRuleWeeklyListVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "发送时间")
     private Date sendTime;
+
+    @ApiModelProperty("发送状态 0-未发送 1-已发送")
+    private Integer status;
 }

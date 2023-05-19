@@ -134,6 +134,13 @@ public class WeQiRuleManageStatistics extends BaseEntity implements Serializable
     @ApiModelProperty(value = "发送时间")
     @TableField("send_time")
     private Date sendTime;
+
+    /**
+     * 发送状态 0-未发送  1-已发送
+     */
+    @ApiModelProperty(value = "发送状态 0-未发送  1-已发送")
+    @TableField("status")
+    private Integer status;
     /**
      * 删除标识 0 有效 1删除
      */

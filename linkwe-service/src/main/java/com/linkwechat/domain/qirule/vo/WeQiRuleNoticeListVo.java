@@ -67,7 +67,7 @@ public class WeQiRuleNoticeListVo {
     private Date sendTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @ApiModelProperty("消息发送时间")
+    @ApiModelProperty("消息回复发送时间")
     private Date replyTime;
 
     @ApiModelProperty("会话回复消息ID")

@@ -5,11 +5,15 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.thread.WeMsgQiRuleThreadExecutor;
 import com.linkwechat.domain.*;
+import com.linkwechat.domain.qirule.query.WeQiRuleListQuery;
+import com.linkwechat.domain.qirule.vo.WeQiRuleListVo;
+import com.linkwechat.domain.qirule.vo.WeQiRuleUserVo;
 import com.linkwechat.service.*;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -33,6 +37,9 @@ import java.util.stream.Collectors;
 public class WeChatMsgQiRuleWeeklyTask {
 
     @Autowired
+    private IWeQiRuleService weQiRuleService;
+
+    @Autowired
     private IWeQiRuleScopeService weQiRuleScopeService;
 
     @Autowired
@@ -46,6 +53,12 @@ public class WeChatMsgQiRuleWeeklyTask {
 
     @Autowired
     private IWeQiRuleUserStatisticsService weQiRuleUserStatisticsService;
+
+    @Autowired
+    private IWeQiRuleManageStatisticsService weQiRuleManageStatisticsService;
+
+    @Autowired
+    private IWeQiRuleWeeklyUserDataService weQiRuleWeeklyUserDataService;
 
     /**
      * 员工统计执行器
@@ -82,6 +95,167 @@ public class WeChatMsgQiRuleWeeklyTask {
      */
     @XxlJob("weChatMsgQiRuleWeeklyStatisticsTask")
     public void weChatMsgQiRuleWeeklyStatisticsHandler() {
+        String jobParam = XxlJobHelper.getJobParam();
+
+        DateTime startTime = DateUtil.offsetWeek(DateUtil.yesterday(), -1);
+        DateTime endTime = DateUtil.yesterday();
+
+        WeQiRuleListQuery query = new WeQiRuleListQuery();
+        query.setIsShow(false);
+        List<WeQiRuleListVo> ruleList = weQiRuleService.getQiRuleList(query);
+
+        if (CollectionUtil.isNotEmpty(ruleList)) {
+            Map<String, List<String>> manageUserMap = new HashMap<>(64);
+
+            for (WeQiRuleListVo weQiRule : ruleList) {
+                for (String userId : weQiRule.getManageUser().split(",")) {
+                    List<String> ruleIdList = Optional.ofNullable(manageUserMap.get("userId")).orElseGet(ArrayList::new);
+                    List<String> scopeUserIds = Optional.ofNullable(weQiRule.getQiRuleScope()).orElseGet(ArrayList::new).stream().map(WeQiRuleUserVo::getUserId).collect(Collectors.toList());
+                    if (CollectionUtil.isNotEmpty(scopeUserIds)) {
+                        ruleIdList.addAll(scopeUserIds);
+                        manageUserMap.put(userId, ruleIdList);
+                    }
+                }
+            }
+
+            if (CollectionUtil.isNotEmpty(manageUserMap)) {
+
+                Set<String> scopeUserIdList = manageUserMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+
+                List<WeQiRuleUserStatistics> userStatisticsList = weQiRuleUserStatisticsService.list(new LambdaQueryWrapper<WeQiRuleUserStatistics>()
+                        .in(WeQiRuleUserStatistics::getWeUserId, scopeUserIdList)
+                        .apply("date_format(state_time, '%Y-%m-%d' ) >= '" + startTime.toDateStr() + "'")
+                        .apply("date_format(state_time, '%Y-%m-%d' ) <= '" + endTime.toDateStr() + "'")
+                );
+                manageUserMap.forEach((userId, scopeUserIds) -> {
+
+                    WeQiRuleManageStatistics manageStatistics = new WeQiRuleManageStatistics();
+                    manageStatistics.setWeUserId(userId);
+                    manageStatistics.setStaffNum(new HashSet<>(scopeUserIds).size());
+                    manageStatistics.setStartTime(startTime);
+                    manageStatistics.setFinishTime(endTime);
+
+                    List<WeQiRuleUserStatistics> ruleUserStatistics = userStatisticsList.stream().filter(userStatistics -> scopeUserIds.stream().anyMatch(scopeUserId -> ObjectUtil.equal(scopeUserId, userStatistics.getWeUserId()))).collect(Collectors.toList());
+
+                    if (CollectionUtil.isNotEmpty(ruleUserStatistics)) {
+
+                        //客户会话数
+                        BigDecimal chatNum = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getChatNum()))
+                                .map(item -> new BigDecimal(item.getChatNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        manageStatistics.setChatNum(chatNum.toString());
+
+                        //客群会话数
+                        BigDecimal groupChatNum = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getGroupChatNum()))
+                                .map(item -> new BigDecimal(item.getGroupChatNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        manageStatistics.setGroupChatNum(groupChatNum.toString());
+
+                        //成员回复次数
+                        BigDecimal replyNum = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getReplyNum()))
+                                .map(item -> new BigDecimal(item.getReplyNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        manageStatistics.setReplyNum(replyNum.toString());
+
+                        //成员超时次数
+                        BigDecimal timeOutNum = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getTimeOutNum()))
+                                .map(item -> new BigDecimal(item.getTimeOutNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        manageStatistics.setTimeOutNum(timeOutNum.toString());
+
+                        //成员超时率
+                        double timeOutRate = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getTimeOutRate()))
+                                .mapToDouble(item -> Double.parseDouble(item.getTimeOutRate()))
+                                .summaryStatistics().getAverage();
+                        manageStatistics.setTimeOutRate(new BigDecimal(timeOutRate).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+
+                        //客户会话超时率
+                        double chatTimeOutRate = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getChatTimeOutRate()))
+                                .mapToDouble(item -> Double.parseDouble(item.getChatTimeOutRate()))
+                                .summaryStatistics().getAverage();
+                        manageStatistics.setChatTimeOutRate(new BigDecimal(chatTimeOutRate).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+
+
+                        //客群会话超时率
+                        double groupChatTimeOutRate = ruleUserStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getGroupChatTimeOutRate()))
+                                .mapToDouble(item -> Double.parseDouble(item.getGroupChatTimeOutRate()))
+                                .summaryStatistics().getAverage();
+                        manageStatistics.setGroupChatTimeOutRate(new BigDecimal(groupChatTimeOutRate).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+
+
+                    }
+
+                    weQiRuleManageStatisticsService.save(manageStatistics);
+
+                    Map<String, List<WeQiRuleUserStatistics>> ruleUserStatisticsMap = ruleUserStatistics.stream().collect(Collectors.groupingBy(WeQiRuleUserStatistics::getWeUserId));
+
+                    ruleUserStatisticsMap.forEach((scopeUserId, userStatistics) -> {
+                        WeQiRuleWeeklyUserData weQiRuleWeeklyUserData = new WeQiRuleWeeklyUserData();
+                        weQiRuleWeeklyUserData.setWeeklyId(manageStatistics.getId());
+                        weQiRuleWeeklyUserData.setUserId(scopeUserId);
+                        //客户会话数
+                        BigDecimal chatNum = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getChatNum()))
+                                .map(item -> new BigDecimal(item.getChatNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        weQiRuleWeeklyUserData.setChatNum(chatNum.toString());
+
+                        //客群会话数
+                        BigDecimal groupChatNum = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getGroupChatNum()))
+                                .map(item -> new BigDecimal(item.getGroupChatNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        weQiRuleWeeklyUserData.setGroupChatNum(groupChatNum.toString());
+
+                        //成员回复次数
+                        BigDecimal replyNum = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getReplyNum()))
+                                .map(item -> new BigDecimal(item.getReplyNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        weQiRuleWeeklyUserData.setReplyNum(replyNum.toString());
+
+                        //成员超时次数
+                        BigDecimal timeOutNum = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getTimeOutNum()))
+                                .map(item -> new BigDecimal(item.getTimeOutNum()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        weQiRuleWeeklyUserData.setTimeOutNum(timeOutNum.toString());
+
+                        //成员超时率
+                        double timeOutRate = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getTimeOutRate()))
+                                .mapToDouble(item -> Double.parseDouble(item.getTimeOutRate()))
+                                .summaryStatistics().getAverage();
+                        weQiRuleWeeklyUserData.setTimeOutRate(new BigDecimal(timeOutRate).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+
+                        //客户会话超时率
+                        double chatTimeOutRate = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getChatTimeOutRate()))
+                                .mapToDouble(item -> Double.parseDouble(item.getChatTimeOutRate()))
+                                .summaryStatistics().getAverage();
+                        weQiRuleWeeklyUserData.setChatTimeOutRate(new BigDecimal(chatTimeOutRate).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+
+
+                        //客群会话超时率
+                        double groupChatTimeOutRate = userStatistics.stream()
+                                .filter(item -> StringUtils.isNotEmpty(item.getGroupChatTimeOutRate()))
+                                .mapToDouble(item -> Double.parseDouble(item.getGroupChatTimeOutRate()))
+                                .summaryStatistics().getAverage();
+                        weQiRuleWeeklyUserData.setGroupChatTimeOutRate(new BigDecimal(groupChatTimeOutRate).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+
+                        weQiRuleWeeklyUserDataService.save(weQiRuleWeeklyUserData);
+                    });
+
+                });
+            }
+        }
 
     }
 
@@ -179,5 +353,4 @@ public class WeChatMsgQiRuleWeeklyTask {
         private String startTime;
         private String endTime;
     }
-
 }

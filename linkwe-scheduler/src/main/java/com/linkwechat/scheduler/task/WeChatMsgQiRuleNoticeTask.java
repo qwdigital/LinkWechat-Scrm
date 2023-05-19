@@ -6,19 +6,18 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.WeGroupMember;
-import com.linkwechat.domain.WeQiRule;
-import com.linkwechat.domain.WeQiRuleMsg;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +58,9 @@ public class WeChatMsgQiRuleNoticeTask {
     @Resource
     private QwSysUserClient qwSysUserClient;
 
+    @Autowired
+    private IWeQiRuleManageStatisticsService weQiRuleManageStatisticsService;
+
     @Value("${task-msg.qi-rule.title:会话质检}")
     private String title;
 
@@ -76,6 +78,9 @@ public class WeChatMsgQiRuleNoticeTask {
 
     @Value("${task-msg.qi-rule.manage-btnTxt:去查看}")
     private String manageBtnTxt;
+
+    @Value("${task-msg.qi-rule.weeklyUrl:}")
+    private String weeklyUrl;
 
     @XxlJob("weChatMsgQiRuleNoticeTask")
     public void execute() {
@@ -178,10 +183,38 @@ public class WeChatMsgQiRuleNoticeTask {
 
 
     /**
-     * 计算周报任务
+     * 周报通知任务
      */
-    @XxlJob("chatMsgQiRuleWeekCalculateTask")
-    public void chatMsgQiRuleWeekCalculate() {
+    @XxlJob("chatMsgQiRuleWeeklyNoticeTask")
+    public void chatMsgQiRuleWeeklyNotice() {
+        String jobParam = XxlJobHelper.getJobParam();
+        List<WeQiRuleManageStatistics> list = weQiRuleManageStatisticsService.list(new LambdaQueryWrapper<WeQiRuleManageStatistics>()
+                .eq(WeQiRuleManageStatistics::getStatus, 0)
+                .in(StringUtils.isNotEmpty(jobParam),WeQiRuleManageStatistics::getWeUserId, Arrays.stream(jobParam.split(",")).collect(Collectors.toList()))
+                .eq(WeQiRuleManageStatistics::getDelFlag, 0));
+        if(CollectionUtil.isNotEmpty(list)){
+            for (WeQiRuleManageStatistics manageStatistics : list) {
+                QwAppMsgBody qwAppMsgBody = new QwAppMsgBody();
+                //设置消息模板
+                WeMessageTemplate template = new WeMessageTemplate();
+                template.setMsgType(MessageType.TEXTCARD.getMessageType());
+                template.setTitle("周质检报告");
+                String weeklyTime = DateUtil.formatDate(manageStatistics.getStartTime()) + "~" + DateUtil.formatDate(manageStatistics.getFinishTime());
+                template.setDescription("您有一份【"+weeklyTime+"】周质检报告需要查看");
+                template.setLinkUrl(StringUtils.format(weeklyUrl, manageStatistics.getId()));
+                template.setBtntxt("去查看");
 
+                JSONObject businessData = new JSONObject();
+                businessData.put("isBack",false);
+                qwAppMsgBody.setBusinessData(businessData);
+                qwAppMsgBody.setMessageTemplates(template);
+                qwAppMsgBody.setCallBackId(manageStatistics.getId());
+                qwAppMsgBody.setBusinessType(QwAppMsgBusinessTypeEnum.QI_RULE.getType());
+                qwAppSendMsgService.appMsgSend(qwAppMsgBody);
+
+                weQiRuleManageStatisticsService.update(new LambdaUpdateWrapper<WeQiRuleManageStatistics>()
+                        .set(WeQiRuleManageStatistics::getStatus,1).eq(WeQiRuleManageStatistics::getId,manageStatistics.getId()));
+            }
+        }
     }
 }

@@ -36,6 +36,7 @@ public class WeQiRuleManageStatisticsServiceImpl extends ServiceImpl<WeQiRuleMan
                 weeklyListVo.setWeeklyTime(weekly);
                 weeklyListVo.setUserId(weeklyItem.getWeUserId());
                 weeklyListVo.setSendTime(weeklyItem.getSendTime());
+                weeklyListVo.setStatus(weeklyItem.getStatus());
                 return weeklyListVo;
             }).collect(Collectors.toList());
         }

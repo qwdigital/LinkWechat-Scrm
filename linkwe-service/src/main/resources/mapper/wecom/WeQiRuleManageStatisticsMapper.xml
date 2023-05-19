@@ -16,6 +16,7 @@
         <result property="timeOutRate" column="time_out_rate" jdbcType="VARCHAR"/>
         <result property="chatTimeOutRate" column="chat_time_out_rate" jdbcType="VARCHAR"/>
         <result property="groupChatTimeOutRate" column="group_chat_time_out_rate" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
         <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -39,6 +40,7 @@
                time_out_rate,
                chat_time_out_rate,
                group_chat_time_out_rate,
+               status,
                create_by,
                create_by_id,
                create_time,
@@ -54,7 +56,8 @@
                we_user_id,
                start_time,
                finish_time,
-               send_time
+               send_time,
+               status
         from we_qi_rule_manage_statistics
         <where>
             <if test="userIds != null and userIds.size() > 0">
