@@ -75,9 +75,16 @@ public class WeChatMsgQiRuleWeeklyTask {
                 }
             }
         }
+    }
 
+    /**
+     * 周报统计执行器
+     */
+    @XxlJob("weChatMsgQiRuleWeeklyStatisticsTask")
+    public void weChatMsgQiRuleWeeklyStatisticsHandler() {
 
     }
+
 
     /**
      * 计算员工数据

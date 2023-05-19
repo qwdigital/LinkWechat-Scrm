@@ -19,7 +19,7 @@ public class WeQiRuleStatisticsViewVo {
     private String timeOutTotalRate = "0";
 
     @ApiModelProperty("今日超时人数")
-    private Integer todayTimeOutUserNum = 0;
+    private Long todayTimeOutUserNum = 0L;
 
     @ApiModelProperty("今日超时次数")
     private Integer todayTimeOutNum = 0;

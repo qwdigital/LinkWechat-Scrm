@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -261,10 +262,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         WeQiRuleStatisticsViewVo viewVo = new WeQiRuleStatisticsViewVo();
         List<WeQiRuleMsg> ruleMsgList = weQiRuleMsgService.list(new LambdaQueryWrapper<WeQiRuleMsg>().eq(WeQiRuleMsg::getRuleId, id).eq(WeQiRuleMsg::getDelFlag, 0));
         if (CollectionUtil.isNotEmpty(ruleMsgList)) {
-
-            List<WeQiRuleMsg> outTimeMsgList = ruleMsgList.stream().filter(ruleMsg -> Objects.isNull(ruleMsg.getReplyTime())
-                            && DateUtil.compare(DateUtil.date(), ruleMsg.getTimeOut()) > 0)
-                    .collect(Collectors.toList());
+            List<WeQiRuleMsg> outTimeMsgList = ruleMsgList.stream().filter(ruleMsg -> ObjectUtil.notEqual(0,ruleMsg.getStatus())).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(outTimeMsgList)) {
                 viewVo.setTimeOutTotalNum(outTimeMsgList.size());
                 BigDecimal timeOutTotalRate = new BigDecimal(outTimeMsgList.size() / ruleMsgList.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -273,15 +271,20 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                 List<WeQiRuleMsg> todayOutTimeMsgList = outTimeMsgList.stream()
                         .filter(outTimeMsg -> ObjectUtil.equal(DateUtil.formatDate(outTimeMsg.getCreateTime()), DateUtil.today()))
                         .collect(Collectors.toList());
-                Long todayMsgNum = ruleMsgList.stream()
+                long todayMsgNum = ruleMsgList.stream()
                         .filter(outTimeMsg -> ObjectUtil.equal(DateUtil.formatDate(outTimeMsg.getCreateTime()), DateUtil.today()))
                         .count();
                 if (CollectionUtil.isNotEmpty(todayOutTimeMsgList)) {
-                    Long todayTimeOutUserNum = todayOutTimeMsgList.stream().map(WeQiRuleMsg::getReceiveId).distinct().count();
-                    viewVo.setTodayTimeOutUserNum(todayTimeOutUserNum.intValue());
+                    long todayTimeOutUserNum = todayOutTimeMsgList.stream().map(WeQiRuleMsg::getReceiveId).distinct().count();
+                    viewVo.setTodayTimeOutUserNum(todayTimeOutUserNum);
                     viewVo.setTodayTimeOutNum(todayOutTimeMsgList.size());
-                    BigDecimal todayTimeOutTotalRate = new BigDecimal(todayOutTimeMsgList.size() / todayMsgNum).setScale(2, BigDecimal.ROUND_HALF_UP);
-                    viewVo.setTodayTimeOutRate(todayTimeOutTotalRate.toString());
+                    if(todayMsgNum == 0L){
+                        viewVo.setTodayTimeOutRate("100");
+                    }else {
+                        BigDecimal todayTimeOutTotalRate = new BigDecimal(todayOutTimeMsgList.size() / todayMsgNum).setScale(2, BigDecimal.ROUND_HALF_UP);
+                        viewVo.setTodayTimeOutRate(todayTimeOutTotalRate.toString());
+                    }
+
                 }
             }
         }
