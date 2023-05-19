@@ -18,7 +18,7 @@ import java.util.List;
 public class WeQiRuleWeeklyDetailListQuery {
 
     @ApiModelProperty(hidden = true)
-    private Long id;
+    private Long weeklyId;
 
     @ApiModelProperty("员工ID")
     private List<String> userIds;
@@ -33,5 +33,8 @@ public class WeQiRuleWeeklyDetailListQuery {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty("结束时间")
     private Date endTime;
+
+    @ApiModelProperty("员工名称")
+    private String userName;
 
 }

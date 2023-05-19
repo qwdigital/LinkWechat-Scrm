@@ -12,6 +12,7 @@
                 <result property="timeOutRate" column="time_out_rate" jdbcType="VARCHAR"/>
                 <result property="chatTimeOutRate" column="chat_time_out_rate" jdbcType="VARCHAR"/>
                 <result property="groupChatTimeOutRate" column="group_chat_time_out_rate" jdbcType="VARCHAR"/>
+                <result property="stateTime" column="state_time" jdbcType="TIMESTAMP"/>
                 <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
                 <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
                 <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -22,7 +23,7 @@
             </resultMap>
 
     <sql id="selectWeQiRuleUserStatisticsVo">
-        select id, we_user_id, chat_num, group_chat_num, reply_num, time_out_num, time_out_rate, chat_time_out_rate, group_chat_time_out_rate, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_qi_rule_user_statistics
+        select id, we_user_id, chat_num, group_chat_num, reply_num, time_out_num, time_out_rate, chat_time_out_rate, group_chat_time_out_rate, state_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_qi_rule_user_statistics
     </sql>
 
 </mapper>

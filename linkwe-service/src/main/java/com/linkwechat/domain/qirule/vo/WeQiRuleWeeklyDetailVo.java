@@ -22,6 +22,9 @@ public class WeQiRuleWeeklyDetailVo {
     @ApiModelProperty("质检周报ID")
     private Long id;
 
+    @ApiModelProperty("质检周期")
+    private String weeklyTime;
+
     /**
      * 督导成员数
      */

@@ -134,7 +134,7 @@ public class WeQiRuleController extends BaseController {
     @ApiOperation(value = "质检周报明细列表",httpMethod = "GET")
     @GetMapping("/weekly/detail/list/{id}")
     public TableDataInfo<List<WeQiRuleWeeklyDetailListVo>> getWeeklyDetailList(@PathVariable("id") Long id, WeQiRuleWeeklyDetailListQuery query){
-        query.setId(id);
+        query.setWeeklyId(id);
         super.startPage();
         List<WeQiRuleWeeklyDetailListVo> list = weQiRuleService.getWeeklyDetailList(query);
         return getDataTable(list);
@@ -143,7 +143,7 @@ public class WeQiRuleController extends BaseController {
     @ApiOperation(value = "质检周报明细列表导出",httpMethod = "GET")
     @GetMapping("/weekly/detail/list/export/{id}")
     public void weeklyDetailListExport(@PathVariable("id") Long id, WeQiRuleWeeklyDetailListQuery query){
-        query.setId(id);
+        query.setWeeklyId(id);
         List<WeQiRuleWeeklyDetailListVo> list = weQiRuleService.getWeeklyDetailList(query);
         try {
             HttpServletResponse response = ServletUtils.getResponse();

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,16 +18,16 @@ import javax.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 会话质检员工数据统计表(WeQiRuleUserStatistics)
+ * 会话质检周报员工数据表(WeQiRuleWeeklyUserData)
  *
  * @author danmo
- * @since 2023-05-17 13:50:44
+ * @since 2023-05-18 17:36:35
  */
 @ApiModel
 @Data
 @SuppressWarnings("serial")
-@TableName("we_qi_rule_user_statistics")
-public class WeQiRuleUserStatistics extends BaseEntity implements Serializable {
+@TableName("we_qi_rule_weekly_user_data")
+public class WeQiRuleWeeklyUserData extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L; //1
 
@@ -42,11 +41,19 @@ public class WeQiRuleUserStatistics extends BaseEntity implements Serializable {
 
 
     /**
+     * 周报id
+     */
+    @ApiModelProperty(value = "周报id")
+    @TableField("weekly_id")
+    private Long weeklyId;
+
+
+    /**
      * 员工ID
      */
     @ApiModelProperty(value = "员工ID")
-    @TableField("we_user_id")
-    private String weUserId;
+    @TableField("user_id")
+    private String userId;
 
 
     /**
@@ -105,18 +112,9 @@ public class WeQiRuleUserStatistics extends BaseEntity implements Serializable {
     private String groupChatTimeOutRate;
 
     /**
-     * 统计时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @ApiModelProperty(value = "统计时间")
-    @TableField("state_time")
-    private Date stateTime;
-
-    /**
      * 删除标识 0 有效 1删除
      */
     @ApiModelProperty(value = "删除标识 0 有效 1删除")
     @TableField("del_flag")
     private Integer delFlag;
-
 }
