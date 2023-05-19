@@ -741,9 +741,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public void getUserSensitiveInfo(Long userId, String userTicket) {
         SysUser sysUser = getById(userId);
-        if (StringUtils.isNotEmpty(sysUser.getAvatar())) {
-            return;
-        }
+//        if (StringUtils.isNotEmpty(sysUser.getAvatar())) {
+//            return;
+//        }
         WeUserQuery query = new WeUserQuery();
         query.setUser_ticket(userTicket);
         WeUserDetailVo data = userClient.getUserSensitiveInfo(query).getData();
