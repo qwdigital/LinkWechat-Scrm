@@ -372,9 +372,16 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
                         TextElement textPrice = new TextElement(wePosterSubassembly.getContent(),
                                 wePosterSubassembly.getFontSize(), wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
-                        textPrice.setColor(
-                                ColorUtils.fromStrToARGB(wePosterSubassembly.getFontColor())
-                        );
+
+
+                        if(StringUtils.isNotEmpty(wePosterSubassembly.getFontColor())){
+                            textPrice.setColor(
+                                   new Color(
+                                           Integer.parseInt(wePosterSubassembly.getFontColor().substring(1), 16)
+                                   )
+                            );
+                        }
+
 
                         //设置字体对齐方式
                         Integer fontTextAlign = wePosterSubassembly.getFontTextAlign();
@@ -1035,5 +1042,14 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         }
 
         return material;
+    }
+
+
+    public static void main(String[] args) {
+        String ss=new String("#FF6200");
+        int i = Integer.parseInt(ss.substring(1), 16);
+
+        Color color = new Color(i);
+        System.out.println("======");
     }
 }
