@@ -156,7 +156,7 @@ public class WeMaterialController extends BaseController {
     @PostMapping(value = "/poster/insert")
     @ApiOperation("创建海报")
     @Transactional(rollbackFor = RuntimeException.class)
-    public AjaxResult insert(@RequestBody WePoster poster) {
+    public AjaxResult insert(@RequestBody WePoster poster) throws Exception {
         String materialName = poster.getMaterialName();
         if (materialName != null && materialName.length() > 60) {
             throw new CustomException("海报标题不可超过60个字符！");
@@ -165,7 +165,8 @@ public class WeMaterialController extends BaseController {
         if (digest != null && digest.length() > 100) {
             throw new CustomException("海报描述不可超过100个字符！");
         }
-        WeMaterial material = materialService.generateSimpleImg(poster);
+//        WeMaterial material = materialService.generateSimpleImg(poster);
+        WeMaterial material = materialService.builderSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
         material.setModuleType(poster.getModuleType());
         boolean b = materialService.saveOrUpdate(material);
@@ -182,8 +183,8 @@ public class WeMaterialController extends BaseController {
      */
     @PostMapping(value = "/pure/poster/insert")
     @ApiOperation("纯创建海报")
-    private AjaxResult<FileEntity> createPoster(@RequestBody PurePoster purePoster) {
-        FileEntity poster = materialService.createPoster(purePoster);
+    private AjaxResult<FileEntity> createPoster(@RequestBody PurePoster purePoster) throws Exception {
+        FileEntity poster = materialService.builderPoster(purePoster);
         return AjaxResult.success(poster);
     }
 
@@ -191,7 +192,7 @@ public class WeMaterialController extends BaseController {
     @PutMapping(value = "/poster/update")
     @ApiOperation("修改海报")
     @Transactional(rollbackFor = RuntimeException.class)
-    public AjaxResult update(@RequestBody WePoster poster) {
+    public AjaxResult update(@RequestBody WePoster poster) throws Exception {
         if (poster.getId() == null) {
             return AjaxResult.error("id为空");
         }
@@ -204,7 +205,7 @@ public class WeMaterialController extends BaseController {
             throw new CustomException("海报描述不可超过100个字符！");
         }
         poster.setMediaType(null);
-        WeMaterial material = materialService.generateSimpleImg(poster);
+        WeMaterial material = materialService.builderSimpleImg(poster);
         materialService.saveOrUpdate(material);
         return AjaxResult.success(material);
     }

@@ -67,6 +67,7 @@
         <oss-spring-boot-starter.version>1.3</oss-spring-boot-starter.version>
         <qiniu.version>7.2.7</qiniu.version>
         <wechatpay-httpclient.version>0.4.9</wechatpay-httpclient.version>
+        <combiner.version>2.6.3</combiner.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -494,6 +495,13 @@
                 <groupId>com.github.wechatpay-apiv3</groupId>
                 <artifactId>wechatpay-apache-httpclient</artifactId>
                 <version>${wechatpay-httpclient.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.freewayso</groupId>
+                <artifactId>image-combiner</artifactId>
+                <version>${combiner.version}</version>
             </dependency>
 
         </dependencies>

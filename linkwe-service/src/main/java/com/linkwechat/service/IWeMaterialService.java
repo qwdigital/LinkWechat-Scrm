@@ -42,16 +42,39 @@ public interface IWeMaterialService extends IService<WeMaterial> {
 
     WeMediaVo uploadWebhookMaterial(String key, String url, String type, String name);
 
-    WeMaterial generateSimpleImg(WePoster poster);
+
+//    /**
+//     *  构建海报图片(旧)
+//     * @param poster
+//     * @return
+//     */
+//    WeMaterial generateSimpleImg(WePoster poster);
+
 
     /**
-     * 生成海报
-     *
-     * @author WangYX
-     * @date 2022/11/04 16:58
-     * @version 1.0.0
+     *  构建海报图片升级（新）
+     * @param poster
+     * @return
      */
-    FileEntity createPoster(PurePoster purePoster);
+    WeMaterial builderSimpleImg(WePoster poster) throws Exception;
+
+
+    /**
+     * 构建海报（基于https://gitee.com/dromara/image-combiner#https://gitee.com/dromara/image-combiner/issues/I4FVGB）
+     * @param purePoster
+     * @return
+     */
+    FileEntity builderPoster(PurePoster purePoster) throws Exception;
+
+
+//    /**
+//     * 生成海报
+//     *
+//     * @author WangYX
+//     * @date 2022/11/04 16:58
+//     * @version 1.0.0
+//     */
+//    FileEntity createPoster(PurePoster purePoster);
 
     List<WePosterFontAO> getFontList(BaseEntity query);
 
@@ -183,7 +206,7 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      * @param posterId
      * @return
      */
-    WeMaterial builderPosterWeMaterial(String actualCodeUrl,Long posterId);
+    WeMaterial builderPosterWeMaterial(String actualCodeUrl,Long posterId) throws Exception;
 
 
 
