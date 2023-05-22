@@ -80,7 +80,7 @@ public class WeQiRuleNoticeListVo {
     private String replyStatus;
 
     @ApiModelProperty("超时时间")
-    private String  timeMinutes;
+    private String timeMinutes;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("质检通知创建时间")

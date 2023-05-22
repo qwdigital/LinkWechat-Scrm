@@ -437,15 +437,25 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     public List<WeQiRuleNoticeListVo> getNoticeList(WeQiRuleNoticeListQuery query) {
         List<WeQiRuleNoticeListVo> noticeList = weQiRuleMsgNoticeService.getNoticeList(query);
         if(CollectionUtil.isNotEmpty(noticeList)){
+            Map<String, WeCustomer> customerMap = new HashMap<>();
+            Map<String, String> groupMemberMap = new HashMap<>();
             Set<String> customerIds = noticeList.stream().filter(notice -> ObjectUtil.equal(1, notice.getChatType())).map(WeQiRuleNoticeListVo::getFromId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            List<WeCustomer> customerList = weCustomerService.list(new QueryWrapper<WeCustomer>()
-                    .select("distinct external_userid,customer_name,avatar,gender")
-                    .in("external_userid", customerIds).eq("del_flag", 0));
-            Map<String, WeCustomer> customerMap = Optional.ofNullable(customerList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeCustomer::getExternalUserid, Function.identity(), (key1, key2) -> key1));
+            if(CollectionUtil.isNotEmpty(customerIds)){
+
+
+                List<WeCustomer> customerList = weCustomerService.list(new QueryWrapper<WeCustomer>()
+                        .select("distinct external_userid,customer_name,avatar,gender")
+                        .in("external_userid", customerIds).eq("del_flag", 0));
+                customerMap = Optional.ofNullable(customerList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeCustomer::getExternalUserid, Function.identity(), (key1, key2) -> key1));
+            }
+
 
             Set<String> groupUserIds = noticeList.stream().filter(notice -> ObjectUtil.equal(2, notice.getChatType())).map(WeQiRuleNoticeListVo::getFromId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().select(WeGroupMember::getUserId, WeGroupMember::getName).in(WeGroupMember::getUserId, groupUserIds).eq(WeGroupMember::getDelFlag,0).groupBy(WeGroupMember::getUserId, WeGroupMember::getName));
-            Map<String, String> groupMemberMap = Optional.ofNullable(groupMemberList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeGroupMember::getUserId,WeGroupMember::getName,(key1, key2) -> key1));
+            if(CollectionUtil.isNotEmpty(groupUserIds)){
+                List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().select(WeGroupMember::getUserId, WeGroupMember::getName).in(WeGroupMember::getUserId, groupUserIds).eq(WeGroupMember::getDelFlag,0).groupBy(WeGroupMember::getUserId, WeGroupMember::getName));
+                groupMemberMap = Optional.ofNullable(groupMemberList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeGroupMember::getUserId,WeGroupMember::getName,(key1, key2) -> key1));
+            }
+
 
             for (WeQiRuleNoticeListVo noticeVo : noticeList) {
                 if(CollectionUtil.isNotEmpty(customerMap) && ObjectUtil.equal(1, noticeVo.getChatType()) && customerMap.containsKey(noticeVo.getFromId())){
