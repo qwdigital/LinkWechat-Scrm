@@ -342,7 +342,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public FileEntity builderPoster(PurePoster purePoster) throws Exception {
 
-        if(StringUtils.isNotEmpty(purePoster.getBackgroundImgPath())){
+        if(StringUtils.isEmpty(purePoster.getBackgroundImgPath())){
             throw new WeComException("海报背景不可为空");
         }
         //海报组件数组为空，直接返回图片
