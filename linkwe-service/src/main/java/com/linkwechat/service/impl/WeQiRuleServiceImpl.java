@@ -7,6 +7,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
@@ -434,7 +435,32 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
     @Override
     public List<WeQiRuleNoticeListVo> getNoticeList(WeQiRuleNoticeListQuery query) {
-        return weQiRuleMsgNoticeService.getNoticeList(query);
+        List<WeQiRuleNoticeListVo> noticeList = weQiRuleMsgNoticeService.getNoticeList(query);
+        if(CollectionUtil.isNotEmpty(noticeList)){
+            Set<String> customerIds = noticeList.stream().filter(notice -> ObjectUtil.equal(1, notice.getChatType())).map(WeQiRuleNoticeListVo::getFromId).collect(Collectors.toSet());
+            List<WeCustomer> customerList = weCustomerService.list(new QueryWrapper<WeCustomer>()
+                    .select("distinct external_userid,customer_name,avatar,gender")
+                    .in("external_userid", customerIds).eq("del_flag", 0));
+            Map<String, WeCustomer> customerMap = Optional.ofNullable(customerList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeCustomer::getExternalUserid, Function.identity(), (key1, key2) -> key1));
+
+            Set<String> groupUserIds = noticeList.stream().filter(notice -> ObjectUtil.equal(2, notice.getChatType())).map(WeQiRuleNoticeListVo::getFromId).collect(Collectors.toSet());
+            List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().select(WeGroupMember::getUserId, WeGroupMember::getName).in(WeGroupMember::getUserId, groupUserIds).eq(WeGroupMember::getDelFlag,0).groupBy(WeGroupMember::getUserId, WeGroupMember::getName));
+            Map<String, String> groupMemberMap = Optional.ofNullable(groupMemberList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeGroupMember::getUserId,WeGroupMember::getName,(key1, key2) -> key1));
+
+            for (WeQiRuleNoticeListVo noticeVo : noticeList) {
+                if(CollectionUtil.isNotEmpty(customerMap) && ObjectUtil.equal(1, noticeVo.getChatType()) && customerMap.containsKey(noticeVo.getFromId())){
+                    WeCustomer weCustomer = customerMap.get(noticeVo.getFromId());
+                    noticeVo.setFromAvatar(weCustomer.getAvatar());
+                    noticeVo.setFromName(weCustomer.getCustomerName());
+                    noticeVo.setFromGender(weCustomer.getGender());
+                }
+                if(CollectionUtil.isNotEmpty(groupMemberMap) && ObjectUtil.equal(2, noticeVo.getChatType()) && groupMemberMap.containsKey(noticeVo.getFromId())){
+                    String name = groupMemberMap.get(noticeVo.getFromId());
+                    noticeVo.setFromName(name);
+                }
+            }
+        }
+        return noticeList;
     }
 
     @Override

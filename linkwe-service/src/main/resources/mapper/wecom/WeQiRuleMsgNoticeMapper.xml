@@ -38,6 +38,7 @@
                wqrm.from_id,
                wqrm.receive_id,
                wqrm.room_id,
+               wg.group_name as room_name,
                wqrm.chat_type,
                wqrm.send_time,
                wqrm.reply_time,
@@ -53,12 +54,16 @@
                  inner join we_qi_rule_msg wqrm on wqrmn.qi_rule_msg_id = wqrm.id
                  left join we_qi_rule wqr on wqrm.rule_id = wqr.id
                  left join we_chat_contact_msg wccm on wqrm.msg_id = wccm.msg_id
+                 left join we_group wg on wqrm.room_id = wg.chat_id and wqrm.chat_type = 2
         <where>
             <if test="type != null">
                 and wqrmn.type = #{type}
             </if>
             <if test="name != null and name != ''">
                 and wqr.name like concat('%', #{name}, '%')
+            </if>
+            <if test="ruleId != null">
+                and wqr.id = #{ruleId}
             </if>
             <if test="userIds != null and userIds != ''">
                 and  wqrmn.user_id in
@@ -75,5 +80,6 @@
         </where>
         order by time_minutes desc
     </select>
+
 
 </mapper>

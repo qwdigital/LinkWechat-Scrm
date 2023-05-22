@@ -50,6 +50,9 @@ public class WeQiRuleNoticeListVo {
     @ApiModelProperty("发送人头像")
     private String fromAvatar;
 
+    @ApiModelProperty("性别")
+    private Integer fromGender;
+
     @ApiModelProperty("接收人ID")
     private String receiveId;
 

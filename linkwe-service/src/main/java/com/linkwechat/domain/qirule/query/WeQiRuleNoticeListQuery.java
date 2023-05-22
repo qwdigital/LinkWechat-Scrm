@@ -23,6 +23,9 @@ public class WeQiRuleNoticeListQuery {
     @ApiModelProperty("通知类型 1-普通 2-督导")
     private Integer type;
 
+    @ApiModelProperty("规则ID")
+    private Long ruleId;
+
     @ApiModelProperty("员工ID")
     private List<String> userIds;
 
