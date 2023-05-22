@@ -685,15 +685,15 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 //    }
 
 
-//    @Override
-//    public WeMediaVo getMediaToResponse(String mediaId) {
-//        WeMediaVo weMediaVo = mediaClient.getMedia(new WeGetMediaQuery(mediaId)).getData();
-//        MockMultipartFile multipartFile = new MockMultipartFile(FileUtil.getPrefix(weMediaVo.getFileName()),
-//                weMediaVo.getFileName(), "text/plain", weMediaVo.getBytes());
-//        FileEntity data = fileClient.upload(multipartFile).getData();
-//        weMediaVo.setUrl(data.getUrl());
-//        return weMediaVo;
-//    }
+    @Override
+    public WeMediaVo getMediaToResponse(String mediaId) {
+        WeMediaVo weMediaVo = mediaClient.getMedia(new WeGetMediaQuery(mediaId)).getData();
+        MockMultipartFile multipartFile = new MockMultipartFile(FileUtil.getPrefix(weMediaVo.getFileName()),
+                weMediaVo.getFileName(), "text/plain", weMediaVo.getBytes());
+        FileEntity data = fileClient.upload(multipartFile).getData();
+        weMediaVo.setUrl(data.getUrl());
+        return weMediaVo;
+    }
 
     /**
      * 查询素材列表

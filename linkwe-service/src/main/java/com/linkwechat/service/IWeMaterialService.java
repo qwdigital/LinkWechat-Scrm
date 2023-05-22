@@ -116,13 +116,13 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      */
     String mediaGet(String media_id, String fileType, String extentType);
 
-//    /**
-//     * 获取素材
-//     *
-//     * @param mediaId 素材id
-//     * @return
-//     */
-//    WeMediaVo getMediaToResponse(String mediaId);
+    /**
+     * 获取素材
+     *
+     * @param mediaId 素材id
+     * @return
+     */
+    WeMediaVo getMediaToResponse(String mediaId);
 
     /**
      * 查询素材列表
