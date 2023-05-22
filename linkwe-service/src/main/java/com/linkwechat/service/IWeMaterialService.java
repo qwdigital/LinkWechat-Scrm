@@ -43,12 +43,12 @@ public interface IWeMaterialService extends IService<WeMaterial> {
     WeMediaVo uploadWebhookMaterial(String key, String url, String type, String name);
 
 
-    /**
-     *  构建海报图片(旧)
-     * @param poster
-     * @return
-     */
-    WeMaterial generateSimpleImg(WePoster poster);
+//    /**
+//     *  构建海报图片(旧)
+//     * @param poster
+//     * @return
+//     */
+//    WeMaterial generateSimpleImg(WePoster poster);
 
 
     /**
@@ -56,7 +56,7 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      * @param poster
      * @return
      */
-    WeMaterial builderSimpleImg(WePoster poster);
+    WeMaterial builderSimpleImg(WePoster poster) throws Exception;
 
 
     /**
@@ -67,14 +67,14 @@ public interface IWeMaterialService extends IService<WeMaterial> {
     FileEntity builderPoster(PurePoster purePoster) throws Exception;
 
 
-    /**
-     * 生成海报
-     *
-     * @author WangYX
-     * @date 2022/11/04 16:58
-     * @version 1.0.0
-     */
-    FileEntity createPoster(PurePoster purePoster);
+//    /**
+//     * 生成海报
+//     *
+//     * @author WangYX
+//     * @date 2022/11/04 16:58
+//     * @version 1.0.0
+//     */
+//    FileEntity createPoster(PurePoster purePoster);
 
     List<WePosterFontAO> getFontList(BaseEntity query);
 
@@ -116,13 +116,13 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      */
     String mediaGet(String media_id, String fileType, String extentType);
 
-    /**
-     * 获取素材
-     *
-     * @param mediaId 素材id
-     * @return
-     */
-    WeMediaVo getMediaToResponse(String mediaId);
+//    /**
+//     * 获取素材
+//     *
+//     * @param mediaId 素材id
+//     * @return
+//     */
+//    WeMediaVo getMediaToResponse(String mediaId);
 
     /**
      * 查询素材列表
@@ -206,7 +206,7 @@ public interface IWeMaterialService extends IService<WeMaterial> {
      * @param posterId
      * @return
      */
-    WeMaterial builderPosterWeMaterial(String actualCodeUrl,Long posterId);
+    WeMaterial builderPosterWeMaterial(String actualCodeUrl,Long posterId) throws Exception;
 
 
 
