@@ -2,25 +2,28 @@ package com.linkwechat.scheduler.task;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.linkwechat.common.core.redis.RedisService;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.thread.WeMsgAuditThreadExecutor;
-import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.WeGroup;
-import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.*;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.query.msgaudit.WeMsgAuditQuery;
 import com.linkwechat.domain.wecom.vo.msgaudit.WeMsgAuditVo;
 import com.linkwechat.fegin.QwMsgAuditClient;
 import com.linkwechat.fegin.QwSysUserClient;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeGroupMemberService;
-import com.linkwechat.service.IWeGroupService;
+import com.linkwechat.service.*;
+import com.tencent.wework.FinanceService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +55,57 @@ public class WeMsgAuditTask {
 
     @Autowired
     private IWeGroupMemberService weGroupMemberService;
+
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private IWeChatContactMsgService weChatContactMsgService;
+
+    @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+    /**
+     * 会话拉取定时任务
+     */
+    @XxlJob("weChatMsgPullTask")
+    public void eChatMsgPullHandle(String message) {
+        String corpId = XxlJobHelper.getJobParam();
+        XxlJobHelper.log("会话拉取定时任务--------------{}",corpId);
+        Long seqLong = 0L;
+
+        if(StringUtils.isNotEmpty(message)){
+            WeBackBaseVo weBackBaseVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackBaseVo.class);
+            corpId = weBackBaseVo.getToUserName();
+        }
+
+        WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(corpId);
+        if (corpAccount == null) {
+            log.info("无有效企业----------------->");
+            return;
+        }
+
+        if(redisService.keyIsExists("we:chat:seq:" + corpAccount.getCorpId())){
+            seqLong = (Long) redisService.getCacheObject("we:chat:seq:" + corpAccount.getCorpId());
+        }else {
+            LambdaQueryWrapper<WeChatContactMsg> wrapper = new LambdaQueryWrapper<WeChatContactMsg>().orderByDesc(WeChatContactMsg::getSeq).last("limit 1");
+            WeChatContactMsg weChatContactMsg = weChatContactMsgService.getOne(wrapper);
+            if (weChatContactMsg != null) {
+                seqLong = weChatContactMsg.getSeq();
+            }
+        }
+        FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
+        financeService.setRedisService(redisService);
+        financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), rabbitMQSettingConfig.getWeChatMsgAuditRk(), data.toJSONString()));
+        log.info("会话存档定时任务执行完成----------------->");
+    }
 
 
     /**
