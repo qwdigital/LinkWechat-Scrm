@@ -19,7 +19,7 @@ public interface IWeKnowCustomerCodeService extends IService<WeKnowCustomerCode>
    * @param weKnowCustomerCode
    * @param isUpdate true更新 false新增
    */
-  void  addOrUpdateKnowCustomer(WeKnowCustomerCode weKnowCustomerCode,boolean isUpdate) throws IOException;
+  void  addOrUpdateKnowCustomer(WeKnowCustomerCode weKnowCustomerCode,boolean isUpdate) throws Exception;
 
 
   /**

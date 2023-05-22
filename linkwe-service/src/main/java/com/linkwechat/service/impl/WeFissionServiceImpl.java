@@ -268,7 +268,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     }
 
     @Override
-    public WeFissionInviterPoster findFissionPoster(String unionid, String fissionId) {
+    public WeFissionInviterPoster findFissionPoster(String unionid, String fissionId) throws Exception {
 
         WeFissionInviterPoster weFissionInviterPoster = iWeFissionInviterPosterService.getOne(new LambdaQueryWrapper<WeFissionInviterPoster>()
                 .eq(WeFissionInviterPoster::getInviterId, unionid)

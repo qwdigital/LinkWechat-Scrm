@@ -40,7 +40,7 @@
         wm.id,
         wm.content,
         wm.content_type,
-        wm.wm.real_type,
+        wm.real_type,
         wm.material_id,
         wm.status,
         IFNULL((SELECT GROUP_CONCAT(DISTINCT wu.user_name) as userName FROM sys_user wu WHERE wu.we_user_id=wm.creator),creator) as creator,

@@ -43,7 +43,7 @@ public class WeKnowCustomerController extends BaseController {
      * @return
      */
     @PostMapping("/addOrUpdateKnowCustomer")
-    public AjaxResult addOrUpdateKnowCustomer(@RequestBody WeKnowCustomerCode weKnowCustomerCode) throws IOException {
+    public AjaxResult addOrUpdateKnowCustomer(@RequestBody WeKnowCustomerCode weKnowCustomerCode) throws Exception {
 
         iWeKnowCustomerCodeService.addOrUpdateKnowCustomer(weKnowCustomerCode,weKnowCustomerCode.getId()==null?false:true);
 

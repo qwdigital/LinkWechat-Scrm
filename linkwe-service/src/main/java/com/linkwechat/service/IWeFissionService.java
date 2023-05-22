@@ -93,7 +93,7 @@ public interface IWeFissionService extends IService<WeFission> {
      * @param fissionId
      * @return
      */
-    WeFissionInviterPoster findFissionPoster(String unionid, String fissionId);
+    WeFissionInviterPoster findFissionPoster(String unionid, String fissionId) throws Exception;
 
 
     /**

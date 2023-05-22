@@ -74,7 +74,7 @@ public class WeKnowCustomerCodeServiceImpl extends ServiceImpl<WeKnowCustomerCod
 
     @Override
     @Transactional
-    public void addOrUpdateKnowCustomer(WeKnowCustomerCode weKnowCustomerCode,boolean isUpdate) throws IOException {
+    public void addOrUpdateKnowCustomer(WeKnowCustomerCode weKnowCustomerCode,boolean isUpdate) throws Exception {
 
         if(weKnowCustomerCode.getId()==null){
             weKnowCustomerCode.setId(SnowFlakeUtil.nextId());
@@ -176,7 +176,7 @@ public class WeKnowCustomerCodeServiceImpl extends ServiceImpl<WeKnowCustomerCod
                 wePoster.setSampleImgPath(material.getMaterialUrl());
                 wePoster.setBackgroundImgPath(material.getBackgroundImgUrl());
                 wePoster.setPosterSubassemblyList(wePosterSubassemblies);
-                WeMaterial weMaterial = materialService.generateSimpleImg(wePoster);
+                WeMaterial weMaterial = materialService.builderSimpleImg(wePoster);
                 weKnowCustomerCode.setPosterUrl(weMaterial.getMaterialUrl());
             } else {
                 throw new WeComException("生成海报错误，无二维码位置");
