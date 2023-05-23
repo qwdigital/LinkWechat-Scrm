@@ -419,7 +419,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
             //获取合成后的海报
             MultipartFile file
-                    = new MockMultipartFile(String.valueOf(System.currentTimeMillis()),"jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
+                    = new MockMultipartFile(String.valueOf(System.currentTimeMillis()),".jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
             AjaxResult<FileEntity> result = fileClient.upload(file);
             return result.getData();
         } catch (Exception e) {
