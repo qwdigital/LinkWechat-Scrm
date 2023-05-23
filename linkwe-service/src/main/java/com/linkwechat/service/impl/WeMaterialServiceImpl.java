@@ -100,31 +100,31 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     private WeTlpMaterialMapper weTlpMaterialMapper;
 
 
-//    private static Font DEFAULT_FONT;
+    private static Font DEFAULT_FONT;
 //
 //    private final static int TOP_MAX_SIZE = 5;
 //    private final static String FIELD_NAME_SEND = "sendTotalNum";
 //    private final static String FIELD_NAME_VIEW = "viewTotalNum";
 //    private final static String FIELD_NAME_VIEW_BY = "viewByTotalNum";
 
-//    static {
-//        try {
-//            DEFAULT_FONT = Font.createFont(Font.TRUETYPE_FONT,
-//                    WeMaterialServiceImpl.class.getResourceAsStream("/font/default.ttf"));
-//            log.info("字体文件读取成功");
-//        } catch (FontFormatException e) {
-//            e.printStackTrace();
-//            log.info("字体加载失败");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            log.info("字体文件读取失败");
-//        }
-//    }
-
-    /**
-     * 字体数据缓存
-     */
-    private final Map<Long, Font> FONT_MAP = new ConcurrentHashMap<>();
+    static {
+        try {
+            DEFAULT_FONT = Font.createFont(Font.TRUETYPE_FONT,
+                    WeMaterialServiceImpl.class.getResourceAsStream("/font/default.ttf"));
+            log.info("字体文件读取成功");
+        } catch (FontFormatException e) {
+            e.printStackTrace();
+            log.info("字体加载失败");
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("字体文件读取失败");
+        }
+    }
+//
+//    /**
+//     * 字体数据缓存
+//     */
+//    private final Map<Long, Font> FONT_MAP = new ConcurrentHashMap<>();
 
 
     @Override
@@ -367,8 +367,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                     if (wePosterSubassembly.getType().equals(1)) {
 
 
-                        TextElement textPrice = new TextElement(wePosterSubassembly.getContent(),
-                                wePosterSubassembly.getFontSize(), wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
+                        DEFAULT_FONT.deriveFont(0, (float) wePosterSubassembly.getFontSize());
+                        TextElement textPrice = new TextElement(wePosterSubassembly.getContent(),DEFAULT_FONT, wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
 
 
                         if(StringUtils.isNotEmpty(wePosterSubassembly.getFontColor())){
