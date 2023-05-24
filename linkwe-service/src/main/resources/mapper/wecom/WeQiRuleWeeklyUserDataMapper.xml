@@ -53,7 +53,7 @@
                time_out_num,
                time_out_rate,
                chat_time_out_rate,
-               group_chat_time_out_rate,
+               group_chat_time_out_rate
         from we_qi_rule_weekly_user_data
         <where>
             and weekly_id = #{weeklyId}
