@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,11 +73,15 @@ public class WeChatMsgQiRuleWeeklyTask {
             weeklyTaskParams = JSONObject.parseObject(jobParam, WeChatMsgQiRuleWeeklyTaskParams.class);
         }
 
-        List<WeQiRuleScope> weQiRuleScopes = weQiRuleScopeService.list(new LambdaQueryWrapper<WeQiRuleScope>()
+        LambdaQueryWrapper<WeQiRuleScope> wrapper = new LambdaQueryWrapper<WeQiRuleScope>()
                 .select(WeQiRuleScope::getUserId)
-                .in(StringUtils.isNotEmpty(weeklyTaskParams.getUserIds()), WeQiRuleScope::getUserId, Arrays.stream(weeklyTaskParams.getUserIds().split(",")).collect(Collectors.toList()))
                 .eq(WeQiRuleScope::getDelFlag, 0)
-                .groupBy(WeQiRuleScope::getUserId));
+                .groupBy(WeQiRuleScope::getUserId);
+        if(StringUtils.isNotEmpty(weeklyTaskParams.getUserIds())){
+            wrapper.in(WeQiRuleScope::getUserId, Arrays.stream(weeklyTaskParams.getUserIds().split(",")).collect(Collectors.toList()));
+        }
+
+        List<WeQiRuleScope> weQiRuleScopes = weQiRuleScopeService.list(wrapper);
 
         DateTime startTime = StringUtils.isNotEmpty(weeklyTaskParams.getStartTime()) ? DateUtil.parseDate(weeklyTaskParams.getStartTime()) : DateUtil.yesterday();
         DateTime endTime = StringUtils.isNotEmpty(weeklyTaskParams.getEndTime()) ? DateUtil.parseDate(weeklyTaskParams.getEndTime()) : DateUtil.yesterday();
@@ -271,11 +277,13 @@ public class WeChatMsgQiRuleWeeklyTask {
         String userId = weQiRuleScope.getUserId();
 
         WeQiRuleUserStatistics statistics = new WeQiRuleUserStatistics();
+        statistics.setWeUserId(userId);
         statistics.setStateTime(dateTime);
         //客户会话数
         int chatNum = weChatContactMsgService.count(new LambdaQueryWrapper<WeChatContactMsg>()
                 .and(wrapper -> wrapper.eq(WeChatContactMsg::getFromId, userId)
                         .or().eq(WeChatContactMsg::getToList, userId))
+                .isNull(WeChatContactMsg::getRoomId)
                 .apply("date_format(msg_time, '%Y-%m-%d' ) = '" + dateTime.toDateStr() + "'")
                 .eq(WeChatContactMsg::getDelFlg, 0));
         statistics.setChatNum(String.valueOf(chatNum));
@@ -283,11 +291,15 @@ public class WeChatMsgQiRuleWeeklyTask {
         //客群会话数
         List<WeGroup> groupList = Optional.ofNullable(weGroupService.list(new LambdaQueryWrapper<WeGroup>().select(WeGroup::getChatId).eq(WeGroup::getOwner, userId).eq(WeGroup::getDelFlag, 0))).orElseGet(ArrayList::new);
 
-        int groupChatNum = weChatContactMsgService.count(new LambdaQueryWrapper<WeChatContactMsg>()
-                .in(WeChatContactMsg::getRoomId, groupList.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
-                .apply("date_format(msg_time, '%Y-%m-%d' ) = '" + dateTime.toDateStr() + "'")
-                .eq(WeChatContactMsg::getDelFlg, 0));
-        statistics.setGroupChatNum(String.valueOf(groupChatNum));
+        if(CollectionUtil.isNotEmpty(groupList)){
+            int groupChatNum = weChatContactMsgService.count(new LambdaQueryWrapper<WeChatContactMsg>()
+                    .in(WeChatContactMsg::getRoomId, groupList.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
+                    .apply("date_format(msg_time, '%Y-%m-%d' ) = '" + dateTime.toDateStr() + "'")
+                    .eq(WeChatContactMsg::getDelFlg, 0));
+            statistics.setGroupChatNum(String.valueOf(groupChatNum));
+        }else {
+            statistics.setGroupChatNum("0");
+        }
 
 
         List<WeQiRuleMsg> replyNumList = Optional.ofNullable(weQiRuleMsgService.list(new LambdaQueryWrapper<WeQiRuleMsg>()

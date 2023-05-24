@@ -206,6 +206,7 @@ public class WeChatMsgQiRuleNoticeTask {
 
                 JSONObject businessData = new JSONObject();
                 businessData.put("isBack",false);
+                qwAppMsgBody.setCorpUserIds(Collections.singletonList(manageStatistics.getWeUserId()));
                 qwAppMsgBody.setBusinessData(businessData);
                 qwAppMsgBody.setMessageTemplates(template);
                 qwAppMsgBody.setCallBackId(manageStatistics.getId());

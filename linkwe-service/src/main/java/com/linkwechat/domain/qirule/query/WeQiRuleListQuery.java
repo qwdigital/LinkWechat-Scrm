@@ -30,6 +30,9 @@ public class WeQiRuleListQuery {
     @ApiModelProperty("员工ID")
     private String userIds;
 
+    @ApiModelProperty("督导ID")
+    private String manageUserId;
+
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty("开始时间")
     private Date beginTime;
