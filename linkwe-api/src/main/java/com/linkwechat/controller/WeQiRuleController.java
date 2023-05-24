@@ -93,9 +93,9 @@ public class WeQiRuleController extends BaseController {
         return getDataTable(list);
     }
 
-    @ApiOperation(value = "质检数据统计聊天记录", httpMethod = "GET")
-    @GetMapping("/statistics/table/msg")
-    public AjaxResult<List<WeChatContactMsgVo>> getQiRuleTableStatisticsMsg(WeQiRuleStatisticsTableMsgQuery query) {
+    @ApiOperation(value = "质检数据统计聊天记录", httpMethod = "POST")
+    @PostMapping("/statistics/table/msg")
+    public AjaxResult<List<WeChatContactMsgVo>> getQiRuleTableStatisticsMsg(@RequestBody WeQiRuleStatisticsTableMsgQuery query) {
         List<WeChatContactMsgVo> list = weQiRuleService.getQiRuleTableStatisticsMsg(query);
         return AjaxResult.success(list);
     }

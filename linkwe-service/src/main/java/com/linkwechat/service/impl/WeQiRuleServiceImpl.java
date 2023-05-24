@@ -337,14 +337,17 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         Map<String, SysUserVo> userIdMap = new HashMap<>();
         Map<String, WeCustomer> customerIdMap = new HashMap<>();
         List<WeChatContactMsgVo> resultList = new LinkedList<>();
-        WeChatContactMsg currentMsg = weChatContactMsgService.getOne(new LambdaQueryWrapper<WeChatContactMsg>().eq(WeChatContactMsg::getMsgId, query.getMsgId()));
+        WeChatContactMsg currentMsg = weChatContactMsgService.getOne(new LambdaQueryWrapper<WeChatContactMsg>()
+                .eq(WeChatContactMsg::getMsgId, query.getMsgId()));
         if (Objects.nonNull(currentMsg)) {
             List<WeChatContactMsg> allChatMsgList = CollectionUtil.newLinkedList();
             //客户
             if (StringUtils.isEmpty(currentMsg.getRoomId())) {
 
                 if (ObjectUtil.equal(0, query.getPageType())) {
-                    allChatMsgList.add(currentMsg);
+                    if(StringUtils.isEmpty(query.getMsgType()) || query.getMsgType().contains(currentMsg.getMsgType())){
+                        allChatMsgList.add(currentMsg);
+                    }
                     List<WeChatContactMsg> beforeMsgList = getCustomerBeforeMsgList(query, currentMsg);
                     List<WeChatContactMsg> afterMsgList = getCustomerAfterMsgList(query, currentMsg);
                     allChatMsgList.addAll(beforeMsgList);
@@ -381,6 +384,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                         weChatContactMsgVo.setMsgType(chatMsg.getMsgType());
                         weChatContactMsgVo.setFromId(chatMsg.getFromId());
                         weChatContactMsgVo.setReceiver(chatMsg.getToList());
+                        weChatContactMsgVo.setMsgId(chatMsg.getMsgId());
                         if (customerIdMap.containsKey(chatMsg.getFromId())) {
                             weChatContactMsgVo.setName(customerIdMap.get(chatMsg.getFromId()).getCustomerName());
                             weChatContactMsgVo.setAvatar(customerIdMap.get(chatMsg.getFromId()).getAvatar());
@@ -394,7 +398,9 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                 }
             } else {
                 if (ObjectUtil.equal(0, query.getPageType())) {
-                    allChatMsgList.add(currentMsg);
+                    if(StringUtils.isEmpty(query.getMsgType()) || query.getMsgType().contains(currentMsg.getMsgType())){
+                        allChatMsgList.add(currentMsg);
+                    }
                     List<WeChatContactMsg> beforeMsgList = getRoomBeforeMsgList(query, currentMsg);
                     List<WeChatContactMsg> afterMsgList = getRoomAfterMsgList(query, currentMsg);
                     allChatMsgList.addAll(beforeMsgList);
@@ -420,6 +426,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                         weChatContactMsgVo.setMsgType(chatMsg.getMsgType());
                         weChatContactMsgVo.setFromId(chatMsg.getFromId());
                         weChatContactMsgVo.setReceiver(chatMsg.getToList());
+                        weChatContactMsgVo.setMsgId(chatMsg.getMsgId());
                         if (groupMembers.containsKey(chatMsg.getFromId())) {
                             weChatContactMsgVo.setName(String.valueOf(groupMembers.get(chatMsg.getFromId())));
                             //weChatContactMsgVo.setAvatar(customerIdMap.get(chatMsg.getFromId()).getAvatar());
@@ -522,6 +529,8 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
             if (CollectionUtil.isNotEmpty(userVoList)) {
                 Set<String> sysUserIds = userVoList.stream().map(SysUserVo::getWeUserId).collect(Collectors.toSet());
                 query.setUserIds(new ArrayList<>(sysUserIds));
+            }else {
+                return new LinkedList<>();
             }
         }
         List<WeQiRuleWeeklyDetailListVo> weeklyDetailList = weQiRuleWeeklyUserDataService.getWeeklyDetailList(query);
@@ -573,6 +582,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByAsc(WeChatContactMsg::getSeq)
@@ -584,6 +594,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
+                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByDesc(WeChatContactMsg::getSeq)

@@ -34,4 +34,7 @@ public class WeQiRuleStatisticsTableMsgQuery {
 
     @ApiModelProperty("群聊ID")
     private String roomId;
+
+    @ApiModelProperty("会话类型")
+    private String msgType;
 }
