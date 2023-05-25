@@ -1,16 +1,21 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.annotation.Put;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.domain.kf.vo.WeKfQualityChatVo;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.domain.qirule.query.*;
 import com.linkwechat.domain.qirule.vo.*;
 import com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveListVo;
+import com.linkwechat.handler.WeQiRuleWeeklyUserDetailWriteHandler;
+import com.linkwechat.handler.WeQualityWriteHandler;
 import com.linkwechat.service.IWeQiRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -151,7 +156,10 @@ public class WeQiRuleController extends BaseController {
             response.setCharacterEncoding("utf-8");
             String fileName = URLEncoder.encode("质检周报明细", "UTF-8").replaceAll("\\+", "%20");
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-            EasyExcel.write(response.getOutputStream(), WeLxQrCodeReceiveListVo.class).sheet("质检周报明细").doWrite(list);
+            ExcelWriterBuilder write = EasyExcel.write(response.getOutputStream(), WeKfQualityChatVo.class);
+            write.relativeHeadRowIndex(1);
+            write.registerWriteHandler(new WeQiRuleWeeklyUserDetailWriteHandler(query));
+            write.sheet("质检周报明细").doWrite(list);
         } catch (IOException e) {
             log.error("质检周报明细列表导出异常：query:{}", JSONObject.toJSONString(query),e);
         }

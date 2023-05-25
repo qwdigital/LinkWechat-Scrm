@@ -1,12 +1,10 @@
 package com.linkwechat.domain.qirule.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * 会话质检周报详情列表出参
@@ -20,60 +18,41 @@ import java.util.Date;
 public class WeQiRuleWeeklyDetailListVo {
 
     @ApiModelProperty("成员ID")
+    @ExcelIgnore
     private String userId;
 
-
     @ApiModelProperty("成员名称")
+    @ExcelProperty("成员名称")
     private String userName;
 
     @ApiModelProperty("所属部门")
+    @ExcelProperty("所属部门")
     private String deptName;
 
-    /**
-     * 客户会话数
-     */
     @ApiModelProperty(value = "客户会话数")
+    @ExcelIgnore
     private String chatNum;
 
-
-    /**
-     * 客群会话数
-     */
     @ApiModelProperty(value = "客群会话数")
+    @ExcelIgnore
     private String groupChatNum;
 
-
-    /**
-     * 成员回复次数
-     */
     @ApiModelProperty(value = "成员回复次数")
     private String replyNum;
 
-
-    /**
-     * 成员超时次数
-     */
     @ApiModelProperty(value = "成员超时次数")
+    @ExcelProperty("超时次数")
     private String timeOutNum;
 
-
-    /**
-     * 成员超时率
-     */
     @ApiModelProperty(value = "成员超时率")
+    @ExcelProperty("超时率")
     private String timeOutRate;
 
-
-    /**
-     * 客户会话超时率
-     */
     @ApiModelProperty(value = "客户会话超时率")
+    @ExcelProperty("客户会话超时率")
     private String chatTimeOutRate;
 
-
-    /**
-     * 客群会话超时率
-     */
     @ApiModelProperty(value = "客群会话超时率")
+    @ExcelProperty("客群会话超时率")
     private String groupChatTimeOutRate;
 }

@@ -499,8 +499,23 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                 query.setUserIds(new ArrayList<>(sysUserIds));
             }
         }
-
-        return weQiRuleManageStatisticsService.getWeeklyList(query);
+        List<WeQiRuleWeeklyListVo> weeklyList = weQiRuleManageStatisticsService.getWeeklyList(query);
+        if(CollectionUtil.isNotEmpty(weeklyList)){
+            List<String> weUserIds = weeklyList.stream().map(WeQiRuleWeeklyListVo::getUserId).collect(Collectors.toList());
+            SysUserQuery userQuery = new SysUserQuery();
+            userQuery.setWeUserIds(weUserIds);
+            List<SysUserVo> userVoList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+            Map<String, String> userIdMap = new HashMap<>();
+            if (CollectionUtil.isNotEmpty(userVoList)) {
+                userIdMap = userVoList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
+            }
+            for (WeQiRuleWeeklyListVo weekly : weeklyList) {
+                if (userIdMap.containsKey(weekly.getUserId())) {
+                    weekly.setUserName(userIdMap.get(weekly.getUserId()));
+                }
+            }
+        }
+        return weeklyList;
     }
 
     @Override
@@ -562,6 +577,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     private List<WeChatContactMsg> getRoomAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .eq(WeChatContactMsg::getRoomId, query.getRoomId())
+                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByAsc(WeChatContactMsg::getSeq)
@@ -572,6 +588,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     private List<WeChatContactMsg> getRoomBeforeMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .eq(WeChatContactMsg::getRoomId, query.getRoomId())
+                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByDesc(WeChatContactMsg::getSeq)

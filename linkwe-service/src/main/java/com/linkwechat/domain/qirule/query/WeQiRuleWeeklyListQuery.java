@@ -17,6 +17,9 @@ import java.util.List;
 @Data
 public class WeQiRuleWeeklyListQuery {
 
+    @ApiModelProperty(hidden = true)
+    private Long weeklyId;
+
     @ApiModelProperty("员工名称")
     private String userName;
 

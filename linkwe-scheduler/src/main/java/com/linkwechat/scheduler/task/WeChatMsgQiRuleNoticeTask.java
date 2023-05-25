@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -214,7 +215,9 @@ public class WeChatMsgQiRuleNoticeTask {
                 qwAppSendMsgService.appMsgSend(qwAppMsgBody);
 
                 weQiRuleManageStatisticsService.update(new LambdaUpdateWrapper<WeQiRuleManageStatistics>()
-                        .set(WeQiRuleManageStatistics::getStatus,1).eq(WeQiRuleManageStatistics::getId,manageStatistics.getId()));
+                        .set(WeQiRuleManageStatistics::getStatus,1)
+                        .set(WeQiRuleManageStatistics::getSendTime,new Date())
+                        .eq(WeQiRuleManageStatistics::getId,manageStatistics.getId()));
             }
         }
     }

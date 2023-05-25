@@ -70,6 +70,9 @@
                 and date_format(start_time,'%y-%m-%d') &lt;= date_format(#{dateTime},'%y-%m-%d')
                 and date_format(finish_time,'%y-%m-%d') &gt;= date_format(#{dateTime},'%y-%m-%d')
             </if>
+            <if test="weeklyId != null">
+                and id = #{weeklyId}
+            </if>
         </where>
         order by send_time desc
     </select>
