@@ -244,8 +244,10 @@ public class WeStrategicCrowdServiceImpl extends ServiceImpl<WeStrategicCrowdMap
 
         Long addNum = 0L;
         Long reduceNum = 0L;
-        String beginTime = DateUtils.initSqlBeginTime(DateUtil.yesterday().toDateStr());
-        String endTime = DateUtils.initSqlEndTime(DateUtil.today());
+//        String beginTime = DateUtils.initSqlBeginTime(DateUtil.yesterday().toDateStr());
+//        String endTime = DateUtils.initSqlEndTime(DateUtil.today());
+        String beginTime =  DateUtils.dateTime(DateUtil.yesterday());
+        String endTime = DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD);
         List<WeStrategicCrowdCustomerRel> crowdCustomerRelList = weStrategicCrowdCustomerRelService.getListByCrowdIdAndTime(query.getId(), beginTime, endTime);
         if(CollectionUtil.isNotEmpty(crowdCustomerRelList)){
             List<WeStrategicCrowdCustomerRel> list = crowdCustomerRelList.stream().filter(bean -> Objects.equals(0, bean.getDelFlag())).collect(Collectors.toList());
