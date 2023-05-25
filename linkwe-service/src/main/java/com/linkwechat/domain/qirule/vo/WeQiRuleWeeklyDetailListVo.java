@@ -38,6 +38,7 @@ public class WeQiRuleWeeklyDetailListVo {
     private String groupChatNum;
 
     @ApiModelProperty(value = "成员回复次数")
+    @ExcelIgnore
     private String replyNum;
 
     @ApiModelProperty(value = "成员超时次数")

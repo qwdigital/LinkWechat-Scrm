@@ -156,7 +156,7 @@ public class WeQiRuleController extends BaseController {
             response.setCharacterEncoding("utf-8");
             String fileName = URLEncoder.encode("质检周报明细", "UTF-8").replaceAll("\\+", "%20");
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-            ExcelWriterBuilder write = EasyExcel.write(response.getOutputStream(), WeKfQualityChatVo.class);
+            ExcelWriterBuilder write = EasyExcel.write(response.getOutputStream(), WeQiRuleWeeklyDetailListVo.class);
             write.relativeHeadRowIndex(1);
             write.registerWriteHandler(new WeQiRuleWeeklyUserDetailWriteHandler(query));
             write.sheet("质检周报明细").doWrite(list);
