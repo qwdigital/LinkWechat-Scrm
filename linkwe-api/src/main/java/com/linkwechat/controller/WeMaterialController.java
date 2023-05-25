@@ -16,6 +16,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.domain.WeCustomer;

@@ -720,12 +720,12 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public List<ContentDataDetailVo> getWeMaterialDataCount(ContentDetailQuery contentDetailQuery) {
         Integer detailsType = contentDetailQuery.getDetailsType();
-        if (StringUtils.isNotBlank(contentDetailQuery.getBeginTime())) {
-            contentDetailQuery.setBeginTime(DateUtils.initSqlBeginTime(contentDetailQuery.getBeginTime()));
-        }
-        if (StringUtils.isNotBlank(contentDetailQuery.getEndTime())) {
-            contentDetailQuery.setEndTime(DateUtils.initSqlEndTime(contentDetailQuery.getEndTime()));
-        }
+//        if (StringUtils.isNotBlank(contentDetailQuery.getBeginTime())) {
+//            contentDetailQuery.setBeginTime(DateUtils.initSqlBeginTime(contentDetailQuery.getBeginTime()));
+//        }
+//        if (StringUtils.isNotBlank(contentDetailQuery.getEndTime())) {
+//            contentDetailQuery.setEndTime(DateUtils.initSqlEndTime(contentDetailQuery.getEndTime()));
+//        }
         List<ContentDataDetailVo> result = new ArrayList<>();
         switch (detailsType) {
             case 1:

@@ -110,7 +110,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 
     @Override
     public List<ContentDataDetailVo> getViewDetail(ContentDetailQuery contentDetailQuery) {
-        Long contentId = contentDetailQuery.getContentId();
+//        Long contentId = contentDetailQuery.getContentId();
 
 //        String beginTime = contentDetailQuery.getBeginTime();
 //        String endTime = contentDetailQuery.getEndTime();
