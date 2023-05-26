@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.FileEntity;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
@@ -70,7 +71,11 @@ public class FinanceService{
     /**
      * 一次拉取的消息条数，最大值1000条，超过1000条会返回错误
      */
-    private final long LIMIT = 1_000L;
+    private final long LIMIT = 1000L;
+
+
+
+    private RedisService redisService;
 
     public FinanceService(String corpId, String secret, String privateKey){
         this(corpId,secret,privateKey,"","");
@@ -118,6 +123,7 @@ public class FinanceService{
         log.info("开始执行数据解析:------------");
         AtomicLong LocalSEQ = new AtomicLong();
         if (CollectionUtil.isNotEmpty(chatDataArr)) {
+            redisService.setCacheObject("we:chat:seq:" + corpId,chatDataArr.getJSONObject(chatDataArr.size() -1).getLong("seq"));
             chatDataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
                 LocalSEQ.set(data.getLong("seq"));
                 JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"), data.getString("encrypt_chat_msg"));
@@ -320,5 +326,9 @@ public class FinanceService{
                 Finance.FreeMediaData(mediaData);
             }
         }
+    }
+
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
     }
 }
