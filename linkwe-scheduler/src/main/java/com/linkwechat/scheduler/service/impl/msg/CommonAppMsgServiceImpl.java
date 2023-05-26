@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.stream.Collectors;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 通用应用消息
  * @date 2022/4/14 23:45
  **/
@@ -36,6 +36,15 @@ public class CommonAppMsgServiceImpl extends AbstractAppMsgService {
         if(MessageType.TEXT.getMessageType().equals(messageTemplates.getMsgType())){
             query.setMsgtype(MessageType.TEXT.getMessageType());
             query.setText(WeAppMsgQuery.Text.builder().content(messageTemplates.getContent()).build());
+        }else if(MessageType.TEXTCARD.getMessageType().equals(messageTemplates.getMsgType())){
+            query.setMsgtype(MessageType.TEXTCARD.getMessageType());
+            WeAppMsgQuery.TextCard textCard = WeAppMsgQuery.TextCard.builder()
+                    .title(messageTemplates.getTitle())
+                    .description(messageTemplates.getDescription())
+                    .url(messageTemplates.getLinkUrl())
+                    .btntxt(messageTemplates.getBtntxt())
+                    .build();
+            query.setTextcard(textCard);
         }
         //todo 其他类型
         return query;

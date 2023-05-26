@@ -2,6 +2,7 @@ package com.linkwechat.scheduler.task;
 
 import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,9 @@ public class WeFormSurveyCatalogueTask {
     private IWeFormSurveyCatalogueService weFormSurveyCatalogueService;
 
     @XxlJob("weFormSurveyCatalogueTask")
-    public void process(String params) {
-        log.info("智能表单定时收集任务>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+    public void process() {
+        String jobParam = XxlJobHelper.getJobParam();
+        log.info("智能表单定时收集任务>>>>>>>>>>>>>>>>>>启动 params:{}", jobParam);
         List<WeFormSurveyCatalogue> list = weFormSurveyCatalogueService.getListIgnoreTenantId();
         if (list != null && list.size() > 0) {
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : list) {

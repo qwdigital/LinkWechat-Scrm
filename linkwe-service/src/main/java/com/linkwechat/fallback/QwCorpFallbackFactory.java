@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微企业接口回调
  * @date 2022/3/29 22:52
  **/

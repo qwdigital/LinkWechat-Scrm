@@ -1,5 +1,6 @@
 package com.linkwechat.domain.msg;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import lombok.Data;
 
@@ -53,4 +54,9 @@ public class QwAppMsgBody {
      * 消息模板
      */
     private WeMessageTemplate messageTemplates;
+
+    /**
+     * 业务数据
+     */
+    private JSONObject businessData;
 }

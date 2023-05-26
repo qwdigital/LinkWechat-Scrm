@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleScopeMapper">
+
+    <resultMap type="com.linkwechat.domain.WeQiRuleScope" id="WeQiRuleScopeResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="qiId" column="qi_id" jdbcType="INTEGER"/>
+        <result property="scopeId" column="scope_id" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="workCycle" column="work_cycle" jdbcType="VARCHAR"/>
+        <result property="beginTime" column="begin_time" jdbcType="VARCHAR"/>
+        <result property="endTime" column="end_time" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectWeQiRuleScopeVo">
+        select id,
+               qi_id,
+               scope_id,
+               user_id,
+               work_cycle,
+               begin_time,
+               end_time,
+               create_by,
+               create_by_id,
+               create_time,
+               update_by,
+               update_by_id,
+               update_time,
+               del_flag
+        from we_qi_rule_scope
+    </sql>
+
+</mapper>

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 
 /**
- * @author sxw
+ * @author danmo
  * @description 群发消息发送发送业务员
  * @date 2022/4/14 19:03
  **/

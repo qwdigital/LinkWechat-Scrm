@@ -2,6 +2,7 @@ package com.linkwechat.scheduler.task;
 
 import com.linkwechat.service.IWeQrCodeService;
 import com.rabbitmq.client.Channel;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -23,7 +24,8 @@ public class WeQrCodeUpdateTask {
     private IWeQrCodeService weQrCodeService;
 
     @XxlJob("weQrCodeUpdateTask")
-    public void process(String params) {
+    public void process() {
+        String params = XxlJobHelper.getJobParam();
         log.info("员工活码变更任务>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
         weQrCodeService.qrCodeUpdateTask(null);
     }

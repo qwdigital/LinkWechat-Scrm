@@ -3,7 +3,7 @@ package com.linkwechat.common.enums;
 import java.util.Objects;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 数据权限枚举
  * @date 2022/5/10 18:18
  **/
