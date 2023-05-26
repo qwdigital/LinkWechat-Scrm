@@ -154,11 +154,7 @@ public class WeSensitiveServiceImpl extends ServiceImpl<WeSensitiveMapper, WeSen
     @Override
     public List<String> getScopeUsers(List<WeSensitiveAuditScope> scopeList) {
         List<String> users = Lists.newArrayList();
-        if(CollectionUtil.isEmpty(scopeList)){
-            List<SysUser> userList = qwSysUserClient.listAll().getData();
-            List<String> userIdList = userList.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
-            users.addAll(userIdList);
-        }else {
+        if(CollectionUtil.isNotEmpty(scopeList)){
             scopeList.forEach(scope -> {
                 if (scope.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
                     users.add(scope.getAuditScopeId());
