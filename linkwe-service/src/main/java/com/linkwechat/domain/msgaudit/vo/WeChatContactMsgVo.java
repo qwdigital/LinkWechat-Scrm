@@ -52,4 +52,7 @@ public class WeChatContactMsgVo {
     @ExcelProperty("消息内容")
     @ApiModelProperty("消息内容")
     private String contact;
+
+    @ApiModelProperty("消息ID")
+    private String msgId;
 }

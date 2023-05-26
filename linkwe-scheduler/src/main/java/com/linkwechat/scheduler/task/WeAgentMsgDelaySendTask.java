@@ -9,6 +9,7 @@ import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.service.IWeAgentMsgService;
 import com.linkwechat.service.QwAppSendMsgService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,9 @@ public class WeAgentMsgDelaySendTask {
     private QwAppSendMsgService qwAppSendMsgService;
 
     @XxlJob("weAgentMsgDelaySendTask")
-    public void execute(String param) {
-        log.info("应用消息定时发送任务 param：{}", param);
+    public void execute() {
+        String jobParam = XxlJobHelper.getJobParam();
+        log.info("应用消息定时发送任务 param：{}", jobParam);
         List<WeAgentMsg> waitingList = weAgentMsgService.getWaitingList();
         if (CollectionUtil.isNotEmpty(waitingList)) {
             for (WeAgentMsg msg : waitingList) {

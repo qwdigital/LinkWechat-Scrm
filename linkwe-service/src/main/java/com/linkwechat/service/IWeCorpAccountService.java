@@ -20,4 +20,6 @@ public interface IWeCorpAccountService extends IService<WeCorpAccount> {
     void startCustomerChurnNoticeSwitch(String status);
 
     String getCustomerChurnNoticeSwitch();
+
+    void addOrUpdate(WeCorpAccount weCorpAccount);
 }

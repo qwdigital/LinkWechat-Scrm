@@ -349,6 +349,7 @@
             wc.id as customerId,
             wc.customer_name as name,
             wc.other_descr as remark,
+            wc.other_descr as otherDescr,
             wc.phone as remarkMobiles,
             wc.birthday,
             wc.email,

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 群发消息发送业务回调
  * @date 2022/4/14 19:03
  **/

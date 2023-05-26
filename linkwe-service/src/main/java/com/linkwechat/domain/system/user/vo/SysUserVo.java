@@ -1,8 +1,11 @@
 package com.linkwechat.domain.system.user.vo;
 
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author danmo
@@ -91,4 +94,7 @@ public class SysUserVo {
      */
     @ApiModelProperty(value = "接待状态。1:接待中,2:停止接待")
     private Integer kfStatus;
+
+    @ApiModelProperty(value = "所属部门")
+    private List<SysDeptVo> deptList;
 }

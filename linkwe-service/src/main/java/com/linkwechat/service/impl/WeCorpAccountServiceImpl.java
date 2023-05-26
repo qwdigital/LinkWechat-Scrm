@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCorpAccount;
@@ -19,8 +20,10 @@ import com.linkwechat.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 企业id相关配置(WeCorpAccount)
@@ -31,6 +34,12 @@ import java.util.Optional;
 @Service
 public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, WeCorpAccount> implements IWeCorpAccountService {
 
+    @Autowired
+    private RedisService redisService;
+
+    @Resource
+    private QwCorpClient qwCorpClient;
+
     @Override
     public List<WeCorpAccount> getAllCorpAccountInfo() {
         return list(new LambdaQueryWrapper<WeCorpAccount>().eq(WeCorpAccount::getDelFlag,0));
@@ -38,9 +47,14 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
 
     @Override
     public WeCorpAccount getCorpAccountByCorpId(String corpId) {
-        return getOne(new LambdaQueryWrapper<WeCorpAccount>()
-                .eq(StringUtils.isNotEmpty(corpId),WeCorpAccount::getCorpId,corpId)
-                .eq(WeCorpAccount::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
+        WeCorpAccount account = (WeCorpAccount)redisService.getCacheObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, corpId));
+        if(ObjectUtil.isNull(account)){
+            account = getOne(new LambdaQueryWrapper<WeCorpAccount>()
+                    .eq(StringUtils.isNotEmpty(corpId),WeCorpAccount::getCorpId,corpId)
+                    .eq(WeCorpAccount::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
+            redisService.setCacheObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, corpId),account,1, TimeUnit.HOURS);
+        }
+        return account;
     }
 
     @Override
@@ -56,6 +70,15 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
         String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
                 .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
         return noticeSwitch;
+    }
+
+    @Override
+    public void addOrUpdate(WeCorpAccount weCorpAccount) {
+        redisService.deleteObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, weCorpAccount.getCorpId()));
+        if(saveOrUpdate(weCorpAccount)){
+            redisService.deleteObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, weCorpAccount.getCorpId()));
+            qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
+        }
     }
 
 }

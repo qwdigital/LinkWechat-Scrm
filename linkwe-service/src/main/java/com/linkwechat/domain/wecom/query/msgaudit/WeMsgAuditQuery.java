@@ -45,7 +45,7 @@ public class WeMsgAuditQuery extends WeBaseQuery {
         /**
          * 外部成员的exteranalopenid
          */
-        private String usexteranalopeniderid;
+        private String exteranalopenid;
     }
 
 }

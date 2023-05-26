@@ -3,7 +3,7 @@ package com.linkwechat.common.annotation;
 import java.lang.annotation.*;
 
 /**
- * @author sxw
+ * @author danmo
  * @description
  * @date 2022/5/10 17:47
  **/

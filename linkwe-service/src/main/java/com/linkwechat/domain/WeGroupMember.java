@@ -128,15 +128,23 @@ public class WeGroupMember extends BaseEntity implements Serializable {
     @TableField("invitor_user_id")
     private String invitorUserId;
 
-
-    
-    
-    
-
     /**
      * 渠道id
      */
     private String state;
+
+    /**
+     * 是否开启会话存档 0：关闭 1：开启
+     */
+    @ApiModelProperty(value = "是否开启会话存档 0：关闭 1：开启")
+    private Integer isOpenChat;
+
+    /**
+     * 开通会话存档时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "开通会话存档时间")
+    private Date openChatTime;
 
     /**
      * 删除标识 0 正常 1 删除

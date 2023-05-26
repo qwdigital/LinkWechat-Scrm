@@ -243,7 +243,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                 }));
 
         BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
-        poster.setWidth(backgroundImg.getWidth());
+        poster.setWidth(backgroundImg.getWidth()>375?375:backgroundImg.getWidth());
         poster.setHeight(backgroundImg.getHeight());
 
         poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微应用消息监听
  * @date 2022/4/3 15:39
  **/
@@ -37,6 +37,9 @@ public class QwAppMsgListener {
                 switch (qwAppMsgBusinessTypeEnum){
                     case AGENT:
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAgentMsg(appMsgBody);
+                        break;
+                    case QI_RULE:
+                        SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);
                         break;
                     default: //默认通用发送
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);

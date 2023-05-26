@@ -357,12 +357,11 @@ public class WeStoreCodeController extends BaseController {
      * @return
      */
     @GetMapping("/exportCountShopGuideReport")
-    public AjaxResult exportCountShopGuideReport(WeStoreCode weStoreCode){
-        List<WeStoreShopGuideReportVo> weStoreShopGuideReportVos
-                = iWeStoreCodeService.countShopGuideReport(weStoreCode);
-        ExcelUtil<WeStoreShopGuideReportVo> util = new ExcelUtil<WeStoreShopGuideReportVo>(WeStoreShopGuideReportVo.class);
-        return util.exportExcel(weStoreShopGuideReportVos, DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD)+"_门店导购统计");
+    public void exportCountShopGuideReport(WeStoreCode weStoreCode){
 
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeStoreShopGuideReportVo.class, iWeStoreCodeService.countShopGuideReport(weStoreCode),DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD) + "_门店导购统计"
+        );
     }
 
 
@@ -386,11 +385,10 @@ public class WeStoreCodeController extends BaseController {
      * @return
      */
     @GetMapping("/exportCountStoreGroupReport")
-    public AjaxResult exportCountStoreGroupReport(WeStoreCode weStoreCode){
-        List<WeStoreGroupReportVo> weStoreGroupReportVos
-                = iWeStoreCodeService.countStoreGroupReport(weStoreCode);
-        ExcelUtil<WeStoreGroupReportVo> util = new ExcelUtil<WeStoreGroupReportVo>(WeStoreGroupReportVo.class);
-        return util.exportExcel(weStoreGroupReportVos, DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD)+"_门店群码统计");
+    public void exportCountStoreGroupReport(WeStoreCode weStoreCode){
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeStoreGroupReportVo.class,  iWeStoreCodeService.countStoreGroupReport(weStoreCode),DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD) + "_门店群码统计"
+        );
 
     }
 

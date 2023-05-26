@@ -22,7 +22,7 @@ class WeUserBehaviorDataTaskTest {
     @Test
     public void process() throws InterruptedException {
         //weUserBehaviorDataTask.process("{\"beginTime\":-30,\"endTime\":-1}");
-        weGroupChatStatisticTask.process("{\"beginTime\":-30,\"endTime\":-1}");
-        Thread.sleep(10000000);
+        //weGroupChatStatisticTask.process("{\"beginTime\":-30,\"endTime\":-1}");
+        //Thread.sleep(10000000);
     }
 }
