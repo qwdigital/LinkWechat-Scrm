@@ -184,7 +184,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
-    @Async
     public void synchWeCustomerHandler(String msg) {
 
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
