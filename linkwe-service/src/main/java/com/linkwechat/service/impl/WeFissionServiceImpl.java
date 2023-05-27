@@ -484,7 +484,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             //构建发送素材
                             messageQuery.setAttachmentsList(
                                     ListUtil.toList(WeMessageTemplate.builder()
-                                            .title(weMaterial.getMaterialName())
+//                                            .title(weMaterial.getMaterialName())
+                                                    .title(weFission.getFassionName())
                                             .msgType(MediaType.LINK.getMediaType())
                                             .linkUrl(weFission.getFissionUrl())
                                             .build())
