@@ -557,7 +557,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                             weFission.setIsTip(1);
                             //通知员工群发
-                            iWeMessagePushService.officialPushMessage(messageQuery);
+//                            iWeMessagePushService.officialPushMessage(messageQuery);
                         }
 
 
@@ -571,7 +571,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 });
 
 
-//            this.updateBatchById(weFissions);
 
 
             }
@@ -591,13 +590,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         }
 
 
-
-        //处理消息群发状态
-//        List<WeFissionNotice> weFissionNotices = iWeFissionNoticeService.list(new LambdaQueryWrapper<WeFissionNotice>()
-//                .eq(WeFissionNotice::getStatus, 0));
-//        if(CollectionUtil.isNotEmpty(weFissionNotices)){
-//
-//        }
 
 
 
