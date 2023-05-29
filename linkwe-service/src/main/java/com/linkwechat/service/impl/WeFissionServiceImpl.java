@@ -557,7 +557,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                             weFission.setIsTip(1);
                             //通知员工群发
-//                            iWeMessagePushService.officialPushMessage(messageQuery);
+                            iWeMessagePushService.officialPushMessage(messageQuery);
                         }
 
 
