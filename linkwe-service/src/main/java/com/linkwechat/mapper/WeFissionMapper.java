@@ -77,6 +77,13 @@ public interface WeFissionMapper extends BaseMapper<WeFission> {
      */
     List<WeFissionDetailSubVo> findWeFissionDetailSub(@Param("fissionInviterRecordId") Long fissionInviterRecordId);
 
+
+    /**
+     * 更新任务信息发送状态
+     * @param weFissions
+     */
+    void updateBatchFissionIsTip(@Param("weFissions") List<WeFission> weFissions);
+
 }
 
 

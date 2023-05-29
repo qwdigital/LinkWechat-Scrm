@@ -449,48 +449,53 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     @Override
     public void handleFission() {
 
+
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
                 .eq(WeFission::getIsTip,2)
                 .ne(WeFission::getFassionState, 3));
 
-        if(CollectionUtil.isNotEmpty(weFissions)){
-            weFissions.stream().forEach(weFission -> {
 
-                //如果当前时间在裂变结束时间之前,则裂变结束
-               if(new Date().after(weFission.getFassionEndTime())){
-                   weFission.setFassionState(3);
-               }
-
-               //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
-                if(new Date().after(weFission.getFassionStartTime())&&
-                        new Date().before(weFission.getFassionEndTime())
-                ){
-
-                    //发送通知逻辑
-                  if(weFission.getIsTip().equals(new Integer(2))){
-
-                        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-                        messageQuery.setIsAll(false);
-                        messageQuery.setMsgSource(5);
-                        messageQuery.setIsTask(0);
-                        messageQuery.setLoginUser(SecurityUtils.getLoginUser());
-                        messageQuery.setContent(weFission.getContent());
-                        messageQuery.setBusinessIds(weFission.getId().toString());
+        try {
 
 
-                        WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
-                        if(null != weMaterial){
-                            //构建发送素材
-                            messageQuery.setAttachmentsList(
-                                    ListUtil.toList(WeMessageTemplate.builder()
+            if(CollectionUtil.isNotEmpty(weFissions)){
+                weFissions.stream().forEach(weFission -> {
+
+                    //如果当前时间在裂变结束时间之前,则裂变结束
+                    if(new Date().after(weFission.getFassionEndTime())){
+                        weFission.setFassionState(3);
+                    }
+
+                    //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
+                    if(new Date().after(weFission.getFassionStartTime())&&
+                            new Date().before(weFission.getFassionEndTime())
+                    ){
+
+                        //发送通知逻辑
+                        if(weFission.getIsTip().equals(new Integer(2))){
+
+                            WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+                            messageQuery.setIsAll(false);
+                            messageQuery.setMsgSource(5);
+                            messageQuery.setIsTask(0);
+                            messageQuery.setLoginUser(SecurityUtils.getLoginUser());
+                            messageQuery.setContent(weFission.getContent());
+                            messageQuery.setBusinessIds(weFission.getId().toString());
+
+
+                            WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
+                            if(null != weMaterial){
+                                //构建发送素材
+                                messageQuery.setAttachmentsList(
+                                        ListUtil.toList(WeMessageTemplate.builder()
 //                                            .title(weMaterial.getMaterialName())
-                                                    .title(weFission.getFassionName())
-                                            .msgType(MediaType.LINK.getMediaType())
-                                            .linkUrl(weFission.getFissionUrl())
-                                            .build())
-                            );
-                        }
+                                                .title(weFission.getFassionName())
+                                                .msgType(MediaType.LINK.getMediaType())
+                                                .linkUrl(weFission.getFissionUrl())
+                                                .build())
+                                );
+                            }
 
 
 //                        if(weFission.getFassionStartTime()//定时发送,活动时间
@@ -501,74 +506,91 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 //                            messageQuery.setIsTask(0);
 //                        }
 
-                        //构建群发时间
-                        List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
+                            //构建群发时间
+                            List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
 
-                        //任务宝
-                        if(TaskFissionType.USER_FISSION.getCode()
-                                .equals(weFission.getFassionType())){
-                            messageQuery.setChatType(1);
-                            List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
-                                    weFission.getExecuteUserOrGroup()
-                            );
-
-                            if(CollectionUtil.isNotEmpty(weCustomersVos)){
-                                weCustomersVos.stream()
-                                        .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
-                                        .forEach((k,v)->{
-                                            senderInfos.add(
-                                                    WeAddGroupMessageQuery
-                                                            .SenderInfo
-                                                            .builder()
-                                                            .userId(k)
-                                                            .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
-                                                            .build()
-                                            );
-
-                                        });
-                            }
-                            //群裂变
-                        }else if(TaskFissionType.GROUP_FISSION.getCode()
-                                .equals(weFission.getFassionType())){
-                            messageQuery.setChatType(2);
-                            WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
-                            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
-                                    .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
-                                            ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
-                            if(CollectionUtil.isNotEmpty(weGroups)){
-
-                                senderInfos.add(
-                                        WeAddGroupMessageQuery
-                                                .SenderInfo
-                                                .builder()
-                                                .userId(executeUserOrGroup.getWeUserIds())
-                                                .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
-                                                .build()
+                            //任务宝
+                            if(TaskFissionType.USER_FISSION.getCode()
+                                    .equals(weFission.getFassionType())){
+                                messageQuery.setChatType(1);
+                                List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
+                                        weFission.getExecuteUserOrGroup()
                                 );
+
+                                if(CollectionUtil.isNotEmpty(weCustomersVos)){
+                                    weCustomersVos.stream()
+                                            .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
+                                            .forEach((k,v)->{
+                                                senderInfos.add(
+                                                        WeAddGroupMessageQuery
+                                                                .SenderInfo
+                                                                .builder()
+                                                                .userId(k)
+                                                                .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
+                                                                .build()
+                                                );
+
+                                            });
+                                }
+                                //群裂变
+                            }else if(TaskFissionType.GROUP_FISSION.getCode()
+                                    .equals(weFission.getFassionType())){
+                                messageQuery.setChatType(2);
+                                WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
+                                List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                                        .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
+                                                ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
+                                if(CollectionUtil.isNotEmpty(weGroups)){
+
+                                    senderInfos.add(
+                                            WeAddGroupMessageQuery
+                                                    .SenderInfo
+                                                    .builder()
+                                                    .userId(executeUserOrGroup.getWeUserIds())
+                                                    .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
+                                                    .build()
+                                    );
+                                }
                             }
+
+                            messageQuery.setSenderList(senderInfos);
+
+                            weFission.setIsTip(1);
+                            //通知员工群发
+                            iWeMessagePushService.officialPushMessage(messageQuery);
                         }
 
-                        messageQuery.setSenderList(senderInfos);
 
-                         weFission.setIsTip(1);
-                        //通知员工群发
-                        iWeMessagePushService.officialPushMessage(messageQuery);
+                        weFission.setFassionState(2);
                     }
 
 
-                    weFission.setFassionState(2);
-                }
 
 
 
+                });
 
 
-            });
+//            this.updateBatchById(weFissions);
 
 
-            this.updateBatchById(weFissions);
+            }
+
+        }catch (Exception e){
+
+            if(CollectionUtil.isNotEmpty(weFissions)){
+                weFissions.stream().forEach(weFission ->{
+                    weFission.setIsTip(3);
+                });
+            }
+
+
+        }finally {
+            this.baseMapper.updateBatchFissionIsTip(weFissions);
 
         }
+
+
 
         //处理消息群发状态
 //        List<WeFissionNotice> weFissionNotices = iWeFissionNoticeService.list(new LambdaQueryWrapper<WeFissionNotice>()

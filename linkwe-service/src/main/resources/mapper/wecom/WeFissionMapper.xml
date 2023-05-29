@@ -213,4 +213,18 @@
             we_fission_inviter_record_sub wfds WHERE wfds.fission_inviter_record_id=#{fissionInviterRecordId}
     </select>
 
+    <update id="updateBatchFissionIsTip">
+        <foreach collection="weFissions" item="item" separator=";">
+            UPDATE we_fission
+            SET
+            is_tip = 2,
+            update_time = NOW()
+            WHERE
+            id = #{item.id}
+        </foreach>
+    </update>
+
+
+
+
 </mapper>
