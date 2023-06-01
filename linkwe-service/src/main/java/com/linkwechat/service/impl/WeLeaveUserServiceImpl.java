@@ -387,7 +387,9 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                      //构建离职员工数据
                      this.baseMapper.batchAddOrUpdate(
                              ListUtil.toList(
-                                     SysLeaveUser.builder().userName(sysUser.getUserName())
+                                     SysLeaveUser.builder()
+                                             .id(SnowFlakeUtil.nextId())
+                                             .userName(sysUser.getUserName())
                                              .deptNames(sysUser.getDeptName())
                                              .weUserId(sysUser.getWeUserId())
                                              .allocateCustomerNum(v.size())
