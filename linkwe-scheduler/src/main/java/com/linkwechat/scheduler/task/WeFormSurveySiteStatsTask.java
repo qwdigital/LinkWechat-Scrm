@@ -15,6 +15,7 @@ import com.linkwechat.service.IWeFormSurveyAnswerService;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
 import com.linkwechat.service.IWeFormSurveySiteStasService;
 import com.linkwechat.service.IWeFormSurveyStatisticsService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,8 +51,9 @@ public class WeFormSurveySiteStatsTask {
 
 
     @XxlJob("weFormSurveySiteStasTask")
-    public void process(String params) {
-        log.info("智能表单站点统计定时任务>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+    public void process() {
+        String jobParam = XxlJobHelper.getJobParam();
+        log.info("智能表单站点统计定时任务>>>>>>>>>>>>>>>>>>启动 params:{}", jobParam);
         List<WeFormSurveyCatalogue> weFormSurveyCatalogueList = weFormSurveyCatalogueService.getListIgnoreTenantId();
         if (weFormSurveyCatalogueList != null && weFormSurveyCatalogueList.size() > 0) {
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogueList) {

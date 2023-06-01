@@ -385,13 +385,15 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                      sysUser.setIsUserLeave(1);
 
                      //构建离职员工数据
-                     this.save(
-                             SysLeaveUser.builder().userName(sysUser.getUserName())
-                                     .deptNames(sysUser.getDeptName())
-                                     .weUserId(sysUser.getWeUserId())
-                                     .allocateCustomerNum(v.size())
-                                     .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
-                                     .allocateGroupNum(weGroups.size()).build()
+                     this.baseMapper.batchAddOrUpdate(
+                             ListUtil.toList(
+                                     SysLeaveUser.builder().userName(sysUser.getUserName())
+                                             .deptNames(sysUser.getDeptName())
+                                             .weUserId(sysUser.getWeUserId())
+                                             .allocateCustomerNum(v.size())
+                                             .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
+                                             .allocateGroupNum(weGroups.size()).build()
+                             )
                      );
 
 

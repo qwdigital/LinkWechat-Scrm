@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleUserStatisticsMapper">
+
+    <resultMap type="com.linkwechat.domain.WeQiRuleUserStatistics" id="WeQiRuleUserStatisticsResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="weUserId" column="we_user_id" jdbcType="VARCHAR"/>
+                <result property="chatNum" column="chat_num" jdbcType="VARCHAR"/>
+                <result property="groupChatNum" column="group_chat_num" jdbcType="VARCHAR"/>
+                <result property="replyNum" column="reply_num" jdbcType="VARCHAR"/>
+                <result property="timeOutNum" column="time_out_num" jdbcType="VARCHAR"/>
+                <result property="timeOutRate" column="time_out_rate" jdbcType="VARCHAR"/>
+                <result property="chatTimeOutRate" column="chat_time_out_rate" jdbcType="VARCHAR"/>
+                <result property="groupChatTimeOutRate" column="group_chat_time_out_rate" jdbcType="VARCHAR"/>
+                <result property="stateTime" column="state_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeQiRuleUserStatisticsVo">
+        select id, we_user_id, chat_num, group_chat_num, reply_num, time_out_num, time_out_rate, chat_time_out_rate, group_chat_time_out_rate, state_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_qi_rule_user_statistics
+    </sql>
+
+</mapper>

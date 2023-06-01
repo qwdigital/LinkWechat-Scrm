@@ -21,8 +21,6 @@ public class WeCorpAccountController extends BaseController {
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
 
-    @Autowired
-    private QwCorpClient qwCorpClient;
 
     /**
      * 获取当前租户信息
@@ -46,11 +44,9 @@ public class WeCorpAccountController extends BaseController {
     public AjaxResult addOrUpdate(@RequestBody WeCorpAccount weCorpAccount) {
         if(linkWeChatConfig.isDemoEnviron()){
             return AjaxResult.error("当前为演示环境,无法修改配置");
-
         }
-        if(iWeCorpAccountService.saveOrUpdate(weCorpAccount)){
-            qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
-        };
+
+        iWeCorpAccountService.addOrUpdate(weCorpAccount);
         return AjaxResult.success();
     }
 

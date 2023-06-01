@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleManageStatisticsMapper">
+
+    <resultMap type="com.linkwechat.domain.WeQiRuleManageStatistics" id="WeQiRuleManageStatisticsResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="weUserId" column="we_user_id" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="finishTime" column="finish_time" jdbcType="TIMESTAMP"/>
+        <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+        <result property="staffNum" column="staff_num" jdbcType="INTEGER"/>
+        <result property="chatNum" column="chat_num" jdbcType="VARCHAR"/>
+        <result property="groupChatNum" column="group_chat_num" jdbcType="VARCHAR"/>
+        <result property="replyNum" column="reply_num" jdbcType="VARCHAR"/>
+        <result property="timeOutNum" column="time_out_num" jdbcType="VARCHAR"/>
+        <result property="timeOutRate" column="time_out_rate" jdbcType="VARCHAR"/>
+        <result property="chatTimeOutRate" column="chat_time_out_rate" jdbcType="VARCHAR"/>
+        <result property="groupChatTimeOutRate" column="group_chat_time_out_rate" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectWeQiRuleManageStatisticsVo">
+        select id,
+               we_user_id,
+               start_time,
+               finish_time,
+               send_time,
+               staff_num,
+               chat_num,
+               group_chat_num,
+               reply_num,
+               time_out_num,
+               time_out_rate,
+               chat_time_out_rate,
+               group_chat_time_out_rate,
+               status,
+               create_by,
+               create_by_id,
+               create_time,
+               update_by,
+               update_by_id,
+               update_time,
+               del_flag
+        from we_qi_rule_manage_statistics
+    </sql>
+
+    <select id="getWeeklyList" resultType="com.linkwechat.domain.WeQiRuleManageStatistics">
+        select id,
+               we_user_id,
+               start_time,
+               finish_time,
+               send_time,
+               status
+        from we_qi_rule_manage_statistics
+        <where>
+            <if test="userIds != null and userIds.size() > 0">
+                and we_user_id in
+                <foreach item="item" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dateTime != null">
+                and date_format(start_time,'%y-%m-%d') &lt;= date_format(#{dateTime},'%y-%m-%d')
+                and date_format(finish_time,'%y-%m-%d') &gt;= date_format(#{dateTime},'%y-%m-%d')
+            </if>
+            <if test="weeklyId != null">
+                and id = #{weeklyId}
+            </if>
+        </where>
+        order by send_time desc
+    </select>
+
+</mapper>

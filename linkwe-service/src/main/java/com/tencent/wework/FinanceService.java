@@ -6,9 +6,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.FileEntity;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.common.utils.thread.WeMsgAuditThreadExecutor;
 import com.linkwechat.common.utils.uuid.IdUtils;
 import com.linkwechat.common.utils.wecom.RSAUtil;
 import com.linkwechat.fegin.QwFileClient;
@@ -40,8 +42,8 @@ public class FinanceService{
      */
     private final long timeout = 5 * 60;
 
-    
 
+    private RedisService redisService;
     /**
      * 企业id
      */
@@ -70,7 +72,7 @@ public class FinanceService{
     /**
      * 一次拉取的消息条数，最大值1000条，超过1000条会返回错误
      */
-    private final long LIMIT = 1_000L;
+    private final long LIMIT = 1000L;
 
     public FinanceService(String corpId, String secret, String privateKey){
         this(corpId,secret,privateKey,"","");
@@ -97,7 +99,12 @@ public class FinanceService{
     private void initSDK() {
         if (0 == sdk) {
             sdk = Finance.NewSdk();
-            Finance.Init(sdk, corpId, secret);
+            int ret = Finance.Init(sdk, corpId, secret);
+            if(ret != 0){
+                Finance.DestroySdk(sdk);
+                System.out.println("init sdk err ret " + ret);
+                return;
+            }
         }
     }
 
@@ -116,13 +123,12 @@ public class FinanceService{
         String content = Finance.GetContentFromSlice(slice);
         JSONArray chatDataArr = JSONObject.parseObject(content).getJSONArray("chatdata");
         log.info("开始执行数据解析:------------");
-        AtomicLong LocalSEQ = new AtomicLong();
         if (CollectionUtil.isNotEmpty(chatDataArr)) {
+            redisService.setCacheObject("we:chat:seq:" + corpId,chatDataArr.getJSONObject(chatDataArr.size() -1).getLong("seq"));
             chatDataArr.stream().map(data -> (JSONObject) data).forEach(data -> {
-                LocalSEQ.set(data.getLong("seq"));
-                JSONObject jsonObject = decryptChatRecord(sdk, data.getString("encrypt_random_key"), data.getString("encrypt_chat_msg"));
+                JSONObject jsonObject = decryptChatRecord(data.getString("encrypt_random_key"), data.getString("encrypt_chat_msg"));
                 if (jsonObject != null) {
-                    jsonObject.put("seq", LocalSEQ.get());
+                    jsonObject.put("seq", data.getLong("seq"));
                     jsonObject.put("corpId",this.corpId);
                     consumer.accept(jsonObject);
                 }
@@ -133,13 +139,13 @@ public class FinanceService{
     }
 
     /**
-     * @param sdk               初始化时候获取到的值
      * @param encryptRandomKey 企业微信返回的随机密钥
      * @param encryptChatMsg  企业微信返回的单条记录的密文消息
      * @return JSONObject 返回不同格式的聊天数据,格式有二十来种
      * 详情请看官网 https://open.work.weixin.qq.com/api/doc/90000/90135/91774#%E6%B6%88%E6%81%AF%E6%A0%BC%E5%BC%8F
      */
-    private JSONObject decryptChatRecord(Long sdk, String encryptRandomKey, String encryptChatMsg) {
+    private JSONObject decryptChatRecord(String encryptRandomKey, String encryptChatMsg) {
+        JSONObject realJsonData = new JSONObject();
         Long msg = null;
         try {
             //获取私钥
@@ -147,153 +153,28 @@ public class FinanceService{
             String str = RSAUtil.decryptRSA(encryptRandomKey, privateKeyObj);
             //初始化参数slice
             msg = Finance.NewSlice();
-
             //解密
             Finance.DecryptData(sdk, str, encryptChatMsg, msg);
             String jsonDataStr = Finance.GetContentFromSlice(msg);
-            JSONObject realJsonData = JSONObject.parseObject(jsonDataStr);
-            String msgType = realJsonData.getString("msgtype");
-            if (StringUtils.isNotEmpty(msgType)) {
-                getSwitchType(realJsonData, msgType);
-            }
-            log.info("数据解析:------------" + realJsonData.toJSONString());
-            return realJsonData;
+            log.info("数据解析:------------{}",jsonDataStr);
+            realJsonData = JSONObject.parseObject(jsonDataStr);
         } catch (Exception e) {
-            log.error("解析密文失败");
-            return null;
+            log.error("解析密文失败",e);
         } finally {
             if (msg != null) {
                 //释放参数slice
                 Finance.FreeSlice(msg);
             }
         }
-    }
-
-    private void getSwitchType(JSONObject realJsonData, String msgType) {
-        switch (msgType) {
-            case "image":
-                setMediaImageData(realJsonData, msgType);
-                break;
-            case "voice":
-                setMediaVoiceData(realJsonData, msgType);
-                break;
-            case "video":
-                setMediaVideoData(realJsonData, msgType);
-                break;
-            case "emotion":
-                setMediaEmotionData(realJsonData, msgType);
-                break;
-            case "file":
-                setMediaFileData(realJsonData, msgType);
-                break;
-            case "mixed":
-                setMediaMixedData(realJsonData, msgType);
-                break;
-            case "meeting_voice_call":
-                setMediaMeetingVoiceCallData(realJsonData, msgType);
-                break;
-            case "voip_doc_share":
-                setVoipDocShareData(realJsonData, msgType);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void setVoipDocShareData(JSONObject realJsonData, String msgType) {
-        JSONObject voipDocShare = realJsonData.getJSONObject(msgType);
-        String fileName = voipDocShare.getString("filename");
-        getPath(realJsonData, msgType, fileName);
-    }
-
-    private void setMediaMeetingVoiceCallData(JSONObject realJsonData, String msgType) {
-        JSONObject meetingVoiceCall = realJsonData.getJSONObject(msgType);
-        String fileName = realJsonData.getString("voiceid") + ".amr";
-        getPath(realJsonData, msgType, fileName);
-    }
-
-    private void setMediaMixedData(JSONObject realJsonData, String msgType) {
-        JSONObject mixedData = realJsonData.getJSONObject(msgType);
-        JSONArray items = mixedData.getJSONArray("item");
-        items.stream().map(item -> (JSONObject) item).forEach(item -> {
-            getSwitchType(item, item.getString("type"));
-        });
-    }
-
-    private void setMediaFileData(JSONObject realJsonData, String msgType) {
-        JSONObject emotionData = Optional.ofNullable(realJsonData.getJSONObject(msgType))
-                .orElse(realJsonData.getJSONObject("content"));
-        String filename = emotionData.getString("filename");
-        //String fileext = emotionData.getString("fileext");
-        //String fileName = filename+"."+fileext;
-        getPath(realJsonData, msgType, filename);
+        return realJsonData;
     }
 
 
-    private void setMediaImageData(JSONObject realJsonData, String msgType) {
-        String fileName = IdUtils.simpleUUID() + ".jpg";
-        getPath(realJsonData, msgType, fileName);
-    }
-
-    private void setMediaVoiceData(JSONObject realJsonData, String msgType) {
-        String fileName = IdUtils.simpleUUID() + ".amr";
-        getPath(realJsonData, msgType, fileName);
-    }
-
-    private void setMediaVideoData(JSONObject realJsonData, String msgType) {
-        String fileName = IdUtils.simpleUUID() + ".mp4";
-        getPath(realJsonData, msgType, fileName);
-    }
-
-    private void setMediaEmotionData(JSONObject realJsonData, String msgType) {
-        String fileName = "";
-        JSONObject emotionData = Optional.ofNullable(realJsonData.getJSONObject(msgType))
-                .orElse(realJsonData.getJSONObject("content"));
-        Integer type = emotionData.getInteger("type");
-        switch (type) {
-            case 1:
-                fileName = IdUtils.simpleUUID() + ".gif";
-                break;
-            case 2:
-                fileName = IdUtils.simpleUUID() + ".png";
-                break;
-            default:
-                break;
-        }
-        getPath(realJsonData, msgType, fileName);
-    }
-
-    private void getPath(JSONObject realJsonData, String msgType, String fileName) {
-        String filePath = getFilePath(msgType);
-        JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
-                .orElse(realJsonData.getJSONObject("content"));
-        String sdkfileid = data.getString("sdkfileid");
-        try {
-            getMediaData(sdkfileid,filePath, fileName);
-            File file = new File(filePath, fileName);
-            MockMultipartFile multipartFile = new MockMultipartFile(FileUtil.getPrefix(fileName), fileName,null, new FileInputStream(file));
-            FileEntity fileEntity = SpringUtils.getBean(QwFileClient.class).upload(multipartFile).getData();
-            data.put("attachment", fileEntity.getUrl());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (realJsonData.containsKey("content")) {
-            realJsonData.put("content", data);
-        } else {
-            realJsonData.put(msgType, data);
-        }
-
-    }
-
-    private String getFilePath(String msgType) {
-        return LinkWeChatConfig.getProfile() + "/" + msgType + "/" + DateUtils.getDate();
-    }
-
-    private void getMediaData(String sdkFileId, String filePath, String fileName) {
+    public void getMediaData(String sdkFileId, String filePath, String fileName) {
         String indexbuf = "";
         while (true) {
             long mediaData = Finance.NewMediaData();
-            int ret = Finance.GetMediaData(sdk, indexbuf, sdkFileId, proxy, passwd, timeout, mediaData);
+            int ret = Finance.GetMediaData(sdk, indexbuf, sdkFileId, proxy, passwd, 5 * 60, mediaData);
             if (ret != 0) {
                 return;
             }
@@ -320,5 +201,9 @@ public class FinanceService{
                 Finance.FreeMediaData(mediaData);
             }
         }
+    }
+
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
     }
 }

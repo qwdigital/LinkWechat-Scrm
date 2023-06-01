@@ -83,10 +83,10 @@ public class WeMsgAuditVo extends WeResultVo {
         /**
          * 群内外部联系人的externalopenid
          */
-        private String exteranaLopenId;
+        private String exteranalOpenId;
 
         /**
-         * 同意:”Agree”，不同意:”Disagree”，默认同意:”Default_Agree”
+         * 同意:”Agree”，不同意:”Disagree”
          */
         private String agreeStatus;
     }

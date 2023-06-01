@@ -53,6 +53,9 @@ public class WeMessageTemplate {
     @ApiModelProperty("小程序appid（可以在微信公众平台上查询），必须是关联到企业的小程序应用")
     private String appId;
 
+    @ApiModelProperty("按钮文字")
+    private String btntxt;
+
 
     /**
      * 来源 1:手动添加的 2:设置sop结束条件时附加的素材

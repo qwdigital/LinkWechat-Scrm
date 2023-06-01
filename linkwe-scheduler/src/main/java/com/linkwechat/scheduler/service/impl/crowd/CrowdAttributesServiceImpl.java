@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 /**
  * 客户属性人群计算
  *
- * @author sxw
+ * @author danmo
  */
 
 @Service

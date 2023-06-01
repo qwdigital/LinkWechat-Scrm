@@ -11,6 +11,7 @@ import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeProductDayStatisticsService;
 import com.linkwechat.service.IWeProductOrderService;
 import com.linkwechat.service.IWeProductStatisticsService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,10 +48,10 @@ public class WeProductOrderSyncTask {
     /**
      * 同步订单的定时器，一小时执行一次
      *
-     * @param param
      */
     @XxlJob("weProductOrderSyncTask")
-    public void execute(String param) {
+    public void execute() {
+        String params = XxlJobHelper.getJobParam();
         //同步订单
         LambdaQueryWrapper<WeCorpAccount> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WeCorpAccount::getDelFlag, 0);
