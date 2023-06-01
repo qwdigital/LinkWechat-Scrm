@@ -31,6 +31,9 @@ public class WeCorpAccountController extends BaseController {
     @Resource
     private ShopSystemConfigClient shopSystemConfigClient;
 
+    @Autowired
+    private  QwCorpClient qwCorpClient;
+
     /**
      * 获取当前租户信息
      *

@@ -122,6 +122,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Autowired
     private ISysUserManageScopService iSysUserManageScopService;
 
+    @Autowired
+    private RedisService redisService;
+
 
     /**
      * 根据条件分页查询用户列表
