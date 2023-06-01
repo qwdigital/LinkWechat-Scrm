@@ -483,17 +483,20 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             messageQuery.setContent(weFission.getContent());
                             messageQuery.setBusinessIds(weFission.getId().toString());
 
-
                             WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
                             if(null != weMaterial){
                                 //构建发送素材
                                 messageQuery.setAttachmentsList(
                                         ListUtil.toList(WeMessageTemplate.builder()
-//                                            .title(weMaterial.getMaterialName())
                                                 .title(weFission.getFassionName())
                                                 .msgType(MediaType.LINK.getMediaType())
                                                 .linkUrl(weFission.getFissionUrl())
-                                                .build())
+                                                .build(),
+                                                WeMessageTemplate.builder()
+                                                        .msgType(MediaType.TEXT.getMediaType())
+                                                        .content(weFission.getContent())
+                                                        .build()
+                                                )
                                 );
                             }
 
