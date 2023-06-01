@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 创建商品图册入参
  *
- * @author sxw
+ * @author danmo
  */
 @Data
 public class QwAddProductQuery extends WeBaseQuery {

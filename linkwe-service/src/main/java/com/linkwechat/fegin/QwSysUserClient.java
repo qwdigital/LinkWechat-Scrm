@@ -91,6 +91,14 @@ public interface QwSysUserClient {
     AjaxResult updateUserKfStatus(@RequestBody SysUser sysUser);
 
     /**
+     * 更新员工开启会话存档状态
+     * @param query
+     * @return
+     */
+    @PutMapping("/system/user/update/chat/status")
+    AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query);
+
+    /**
      * 通过企微员工ID获取员工信息
      * @param query
      * @return

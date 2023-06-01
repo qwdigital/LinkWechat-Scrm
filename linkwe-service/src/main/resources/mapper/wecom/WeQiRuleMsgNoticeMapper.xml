@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleMsgNoticeMapper">
+
+    <resultMap type="com.linkwechat.domain.WeQiRuleMsgNotice" id="WeQiRuleMsgNoticeResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="qiRuleMsgId" column="qi_rule_msg_id" jdbcType="INTEGER"/>
+                <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+                <result property="type" column="type" jdbcType="INTEGER"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+                <result property="invalidUser" column="invalid_user" jdbcType="VARCHAR"/>
+                <result property="unlicensedUser" column="unlicensed_user" jdbcType="VARCHAR"/>
+                <result property="responseCode" column="response_code" jdbcType="VARCHAR"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeQiRuleMsgNoticeVo">
+        select id, qi_rule_msg_id, user_id, type, status, msg_id, invalid_user, unlicensed_user, response_code, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_qi_rule_msg_notice
+    </sql>
+
+    <select id="getNoticeList" resultType="com.linkwechat.domain.qirule.vo.WeQiRuleNoticeListVo">
+        select wqrmn.id,
+               wqrmn.qi_rule_msg_id,
+               wqrmn.user_id,
+               wqrmn.type,
+               wqrmn.status,
+               wqrmn.msg_id,
+               wqrmn.create_time,
+               wqrm.rule_id,
+               wqrm.msg_id as chat_msg_id,
+               wqrm.from_id,
+               wqrm.receive_id,
+               wqrm.room_id,
+               wg.group_name as room_name,
+               wqrm.chat_type,
+               wqrm.send_time,
+               wqrm.reply_time,
+               wqrm.reply_msg_id,
+               wqrm.reply_status,
+               TIMESTAMPDIFF(MINUTE,  wqrm.send_time, ifnull(wqrm.reply_time,now())) as time_minutes,
+               wqr.name  as rule_name,
+               wccm.action,
+               wccm.msg_type,
+               wccm.seq,
+               wccm.contact
+        from we_qi_rule_msg_notice wqrmn
+                 inner join we_qi_rule_msg wqrm on wqrmn.qi_rule_msg_id = wqrm.id
+                 left join we_qi_rule wqr on wqrm.rule_id = wqr.id
+                 left join we_chat_contact_msg wccm on wqrm.msg_id = wccm.msg_id
+                 left join we_group wg on wqrm.room_id = wg.chat_id and wqrm.chat_type = 2
+        <where>
+            <if test="type != null">
+                and wqrmn.type = #{type}
+            </if>
+            <if test="name != null and name != ''">
+                and wqr.name like concat('%', #{name}, '%')
+            </if>
+            <if test="ruleId != null">
+                and wqr.id = #{ruleId}
+            </if>
+            <if test="userIds != null and userIds != ''">
+                and  wqrmn.user_id in
+                <foreach item="item" index="index" collection="userIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                and date_format(wqrmn.create_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
+            </if>
+            <if test="endTime != null "><!-- 结束时间检索 -->
+                and date_format(wqrmn.create_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+            </if>
+        </where>
+        order by time_minutes desc
+    </select>
+
+
+</mapper>

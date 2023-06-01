@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 人群计算抽象模板类
  * @date 2022/7/14 19:03
  **/

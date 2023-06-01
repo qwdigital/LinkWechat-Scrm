@@ -1,7 +1,7 @@
 package com.linkwechat.common.enums;
 
 /**
- * @author sxw
+ * @author danmo
  * @date 2023年01月17日 11:11
  */
 

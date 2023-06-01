@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 客户群聊列表出参
  * @date 2022/4/2 14:43
  **/

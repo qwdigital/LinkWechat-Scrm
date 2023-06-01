@@ -75,6 +75,11 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
     }
 
     @Override
+    public AjaxResult updateUserChatStatus(SysUserQuery query) {
+        return null;
+    }
+
+    @Override
     public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(SysUserQuery query) {
         return null;
     }

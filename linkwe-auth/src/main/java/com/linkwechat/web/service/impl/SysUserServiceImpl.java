@@ -7,6 +7,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.SynchRecord;
@@ -116,9 +117,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Autowired
     private ISysRoleService sysRoleService;
-
-    @Autowired
-    public RedisService redisService;
 
 
     @Autowired
@@ -854,19 +852,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public List<SysUserVo> getUserListByWeUserIds(SysUserQuery query) {
-        List<SysUser> sysUserList = list(new LambdaQueryWrapper<SysUser>()
-                .in(CollectionUtil.isNotEmpty(query.getWeUserIds()), SysUser::getWeUserId, query.getWeUserIds())
-                .in(CollectionUtil.isNotEmpty(query.getDeptIds()), SysUser::getDeptId, query.getDeptIds())
-                .eq(SysUser::getDelFlag, 0));
-        if (CollectionUtil.isNotEmpty(sysUserList)) {
-            List<SysUserVo> list = sysUserList.stream().map(item -> {
-                SysUserVo sysUserVo = new SysUserVo();
-                BeanUtil.copyProperties(item, sysUserVo);
-                return sysUserVo;
-            }).collect(Collectors.toList());
-            return list;
-        }
-        return new ArrayList<>();
+
+        return this.baseMapper.getUserListByQuery(query);
     }
 
     @Override
@@ -968,6 +955,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
             redisService.unLock(detailVo.getUserId(), "lock");
         }
+    }
+
+    @Override
+    public void updateUserChatStatus(SysUserQuery query) {
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(SysUser::getIsOpenChat, 0);
+        updateWrapper.lambda().notIn(SysUser::getWeUserId, query.getWeUserIds());
+        update(updateWrapper);
+
+        UpdateWrapper<SysUser> wrapper = new UpdateWrapper<>();
+        wrapper.lambda().set(SysUser::getIsOpenChat, 1);
+        wrapper.lambda().in(SysUser::getWeUserId, query.getWeUserIds());
+        update(wrapper);
+
+
     }
 
 

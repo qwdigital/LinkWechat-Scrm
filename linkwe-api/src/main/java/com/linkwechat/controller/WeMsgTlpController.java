@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 欢迎语管理
  * @date 2022/3/26 10:29
  **/

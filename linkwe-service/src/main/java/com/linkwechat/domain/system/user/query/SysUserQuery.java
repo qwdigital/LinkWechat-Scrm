@@ -33,6 +33,11 @@ public class SysUserQuery {
     @ApiModelProperty("员工ID")
     private List<Long> userIds;
 
+
+    @ApiModelProperty("员工名称")
+    private String userName;
+
+
     @ApiModelProperty("企微员工ID")
     private List<String> weUserIds;
 

@@ -27,8 +27,6 @@ public class WeCorpAccountController extends BaseController {
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
 
-    @Autowired
-    private QwCorpClient qwCorpClient;
 
     @Resource
     private ShopSystemConfigClient shopSystemConfigClient;
@@ -62,6 +60,8 @@ public class WeCorpAccountController extends BaseController {
             //商城配置
             saveOrUpdateShopConfig(weCorpAccount);
         }
+
+        iWeCorpAccountService.addOrUpdate(weCorpAccount);
         return AjaxResult.success();
     }
 

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 /**
  * 标签组人群计算
- * @author sxw
+ * @author danmo
  */
 
 @Service

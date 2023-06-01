@@ -284,9 +284,9 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void builderLeaveSysUser(List<SysUser> sysUsers);
 
-
-
-
-
-
+    /**
+     * 更新员工开启会话存档状态
+     * @param query
+     */
+    void updateUserChatStatus(SysUserQuery query);
 }

@@ -540,4 +540,106 @@
         </if>
 
     </select>
+
+
+    <resultMap id="userListByQueryResult" type="com.linkwechat.domain.system.user.vo.SysUserVo">
+        <result property="userId" column="user_id"/>
+        <result property="weUserId" column="we_user_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userName" column="user_name" />
+        <result property="position" column="position"/>
+        <result property="userType" column="user_type"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="thumbAvatar" column="thumb_avatar"/>
+        <result property="weUserStatus" column="we_user_status"/>
+        <result property="openUserid" column="open_userid"/>
+        <result property="kfStatus" column="kf_status"/>
+        <collection property="deptList" ofType="com.linkwechat.domain.system.dept.vo.SysDeptVo">
+            <result property="deptId" column="sdept_id"/>
+            <result property="parentId" column="parent_id"/>
+            <result property="deptName" column="dept_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserListByQuery" resultMap="userListByQueryResult">
+        select
+        su.user_id,
+        su.dept_id,
+        su.user_name,
+        su.user_type,
+        su.nick_name,
+        su.sex,
+        su.avatar,
+        su.status,
+        su.we_user_id,
+        su.position,
+        su.thumb_avatar,
+        su.we_user_status,
+        su.address,
+        su.open_userid,
+        su.is_allocate,
+        su.dimission_time,
+        su.is_open_chat,
+        su.kf_status,
+        sd.dept_id as sdept_id,
+        sd.parent_id,
+        sd.dept_name
+        from sys_user su
+        inner join sys_user_dept sud on sud.user_id = su.user_id and sud.del_flag = 0
+        inner join sys_dept sd on sd.dept_id = sud.dept_id and sd.del_flag = 0
+        inner join sys_user_role sr on sr.user_id = su.user_id
+        <where>
+            and su.del_flag = 0
+            <if test="userId != null">
+                and su.user_id = #{userId}
+            </if>
+            <if test="userName != null and userName != ''">
+                and su.user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="weUserId != null and weUserId != ''">
+                and su.we_user_id = #{weUserId}
+            </if>
+            <if test="weUserIds != null and weUserIds.size() > 0">
+                and  su.we_user_id in
+                <foreach item="weUserId" collection="weUserIds" index="index" open="(" separator="," close=")">
+                    #{weUserId}
+                </foreach>
+            </if>
+            <if test="deptIds != null and deptIds.size() > 0">
+                and  sud.dept_id in
+                <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="roleIds != null and roleIds.size() > 0">
+                and  sr.role_id in
+                <foreach item="roleId" collection="roleIds" index="index" open="(" separator="," close=")">
+                    #{roleId}
+                </foreach>
+            </if>
+            <if test="positions != null and positions.size() > 0">
+                and  su.position in
+                <foreach item="position" collection="positions" index="index" open="(" separator="," close=")">
+                    #{position}
+                </foreach>
+            </if>
+            <if test="weUserStatus != null">
+                and  su.we_user_status = #{weUserStatus}
+            </if>
+            <if test="isAllocate != null">
+                and  su.isAllocate = #{isAllocate}
+            </if>
+            <if test="isOpenChat != null">
+                and  su.is_open_chat = #{isOpenChat}
+            </if>
+            <if test="kfStatus != null">
+                and  su.kf_status = #{kfStatus}
+            </if>
+            <if test="sex != null">
+                and  su.sex = #{sex}
+            </if>
+        </where>
+    </select>
 </mapper> 

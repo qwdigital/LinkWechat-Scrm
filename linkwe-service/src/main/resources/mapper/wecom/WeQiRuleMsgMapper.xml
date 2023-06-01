@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeQiRuleMsgMapper">
+
+    <resultMap type="com.linkwechat.domain.WeQiRuleMsg" id="WeQiRuleMsgResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="ruleId" column="rule_id" jdbcType="INTEGER"/>
+                <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+                <result property="fromId" column="from_id" jdbcType="VARCHAR"/>
+                <result property="receiveId" column="receive_id" jdbcType="VARCHAR"/>
+                <result property="roomId" column="room_id" jdbcType="VARCHAR"/>
+                <result property="chatType" column="chat_type" jdbcType="INTEGER"/>
+                <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+                <result property="replyTime" column="reply_time" jdbcType="TIMESTAMP"/>
+                <result property="replyMsgId" column="reply_msg_id" jdbcType="VARCHAR"/>
+                <result property="replyStatus" column="reply_status" jdbcType="TIMESTAMP"/>
+                <result property="timeOut" column="time_out" jdbcType="TIMESTAMP"/>
+                <result property="status" column="status" jdbcType="INTEGER"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeQiRuleMsgVo">
+        select id, rule_id, msg_id, from_id, receive_id, room_id, chat_type, send_time, reply_time, reply_msg_id,reply_status, time_out,status, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_qi_rule_msg
+    </sql>
+
+    <select id="getRuleTableStatistics" resultType="com.linkwechat.domain.qirule.vo.WeQiRuleStatisticsTableVo">
+        select
+            wqrmn.user_id,
+            wqrm.chat_type,
+            wqrm.room_id,
+            wqrm.from_id,
+            wqrm.send_time,
+            wqrm.reply_status,
+            ifnull(wqrm.reply_time,now()) as reply_time,
+            if(wqrm.chat_type = 1,wc.customer_name,wg.group_name) as chat_name,
+            wqrmn.create_time,
+            wqrm.msg_id
+        from we_qi_rule_msg_notice wqrmn
+        inner join we_qi_rule_msg wqrm on wqrm.id = wqrmn.qi_rule_msg_id
+        left join we_group wg on wqrm.room_id = wg.chat_id and (case when wqrm.chat_type = 2 then 1 else 0 end ) = 1 and wg.del_flag = 0
+        left join we_customer wc on wqrm.from_id = wc.external_userid and wqrm.receive_id = wc.add_user_id and wc.del_flag = 0 and  (case when wqrm.chat_type = 1 then 1 else 0 end ) = 1
+        where wqrmn.type = 1 and wqrm.rule_id = #{ruleId}
+        <if test="beginTime != null"><!-- 开始时间检索 -->
+            and date_format(wqrmn.create_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
+        </if>
+        <if test="endTime != null"><!-- 结束时间检索 -->
+            and date_format(wqrmn.create_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and  wqrmn.user_id in
+            <foreach item="item" index="index" collection="userIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by wqrmn.create_time desc
+    </select>
+
+</mapper>

@@ -411,6 +411,11 @@ public class RabbitMQConfig {
         return new Queue(rabbitMQSettingConfig.getWeChatMsgCheckQu());
     }
 
+    @Bean
+    public Queue quChatMsgQiRule() {
+        return new Queue(rabbitMQSettingConfig.getWeChatMsgQiRule());
+    }
+
 
     /**
      * 活码变更队列
@@ -561,6 +566,16 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingExchangeChatMsgCheck() {
         return BindingBuilder.bind(quChatMsgCheck()).to(chatMsgAuditEx()).with(rabbitMQSettingConfig.getWeChatMsgCheckRk()).noargs();
+    }
+
+    /**
+     * 会话存档质检规则队列绑定交换机
+     *
+     * @return
+     */
+   @Bean
+    public Binding bindingExchangeChatMsgQiRule() {
+        return BindingBuilder.bind(quChatMsgQiRule()).to(chatMsgAuditEx()).with(rabbitMQSettingConfig.getWeChatMsgQiRuleRk()).noargs();
     }
 
     /**

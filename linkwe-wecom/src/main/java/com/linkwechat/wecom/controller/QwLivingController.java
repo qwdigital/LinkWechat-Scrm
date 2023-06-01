@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 企微企业接口
  * @date 2022/3/13 21:01
  **/

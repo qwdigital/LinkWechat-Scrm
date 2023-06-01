@@ -4,7 +4,7 @@ import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import lombok.*;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 获取应用的管理员列表
  * @date 2022/3/4 10:56
  **/
