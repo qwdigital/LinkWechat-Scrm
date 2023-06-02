@@ -11,6 +11,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.freewayso.image.combiner.ImageCombiner;
+import com.freewayso.image.combiner.element.TextElement;
+import com.freewayso.image.combiner.enums.Direction;
+import com.freewayso.image.combiner.enums.OutputFormat;
+import com.freewayso.image.combiner.enums.ZoomMode;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -22,10 +27,7 @@ import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.ServletUtils;
-import com.linkwechat.common.utils.SnowFlakeUtil;
-import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.*;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
@@ -59,12 +61,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -102,31 +100,31 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     private WeTlpMaterialMapper weTlpMaterialMapper;
 
 
-    private static Font DEFAULT_FONT;
+//    private static Font DEFAULT_FONT;
+//
+//    private final static int TOP_MAX_SIZE = 5;
+//    private final static String FIELD_NAME_SEND = "sendTotalNum";
+//    private final static String FIELD_NAME_VIEW = "viewTotalNum";
+//    private final static String FIELD_NAME_VIEW_BY = "viewByTotalNum";
 
-    private final static int TOP_MAX_SIZE = 5;
-    private final static String FIELD_NAME_SEND = "sendTotalNum";
-    private final static String FIELD_NAME_VIEW = "viewTotalNum";
-    private final static String FIELD_NAME_VIEW_BY = "viewByTotalNum";
-
-    static {
-        try {
-            DEFAULT_FONT = Font.createFont(Font.TRUETYPE_FONT,
-                    WeMaterialServiceImpl.class.getResourceAsStream("/font/default.ttf"));
-            log.info("字体文件读取成功");
-        } catch (FontFormatException e) {
-            e.printStackTrace();
-            log.info("字体加载失败");
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("字体文件读取失败");
-        }
-    }
-
-    /**
-     * 字体数据缓存
-     */
-    private final Map<Long, Font> FONT_MAP = new ConcurrentHashMap<>();
+//    static {
+//        try {
+//            DEFAULT_FONT = Font.createFont(Font.TRUETYPE_FONT,
+//                    WeMaterialServiceImpl.class.getResourceAsStream("/font/default.ttf"));
+//            log.info("字体文件读取成功");
+//        } catch (FontFormatException e) {
+//            e.printStackTrace();
+//            log.info("字体加载失败");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            log.info("字体文件读取失败");
+//        }
+//    }
+////
+//    /**
+//     * 字体数据缓存
+//     */
+//    private final Map<Long, Font> FONT_MAP = new ConcurrentHashMap<>();
 
 
     @Override
@@ -198,202 +196,325 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     }
 
 
-    /**
-     * 生成海报图片地址(合成图片+文字)
-     *
-     * @param poster
-     * @return
-     */
+//    /**
+//     * 生成海报图片地址(合成图片+文字)
+//     *
+//     * @param poster
+//     * @return
+//     */
+//    @Override
+//    public WeMaterial generateSimpleImg(WePoster poster) {
+//        //校验海报元素是否为空
+//        if (CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
+//            return generateMaterialFromPoster(poster);
+//        }
+//
+//        Set<String> existFontId = new HashSet<>();
+//        Map<String, Font> fontMap = generateFontMap(poster.getPosterSubassemblyList(), existFontId);
+//
+//        Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList()
+//                .stream()
+//                .map(WePosterSubassembly::getImgPath)
+//                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+//                .distinct()
+//                .collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
+//
+//        if (org.springframework.util.CollectionUtils.isEmpty(fileCallableMap)) {
+//            fileCallableMap = new HashMap<>();
+//        }
+//
+//        fileCallableMap.put(poster.getBackgroundImgPath(), NetFileUtils.getNetFile(poster.getBackgroundImgPath()));
+//
+//        Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream()
+//                .collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
+//                    try {
+//                        ByteArrayOutputStream byteArrayOutputStream = NetFileUtils.getByteArrayOutputStream(
+//                                stringFileCallableEntry.getValue(), false);
+//                        BufferedImage read = ImageIO.read(
+//                                new ByteArrayInputStream(Objects.requireNonNull(byteArrayOutputStream).toByteArray()));
+//
+//                        return ImageUtils.copyBufferedImage(read,
+//                                BufferedImage.TYPE_INT_ARGB);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        throw new RuntimeException("图片读取错误");
+//                    }
+//                }));
+//
+//        BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
+//        poster.setWidth(backgroundImg.getWidth()>375?375:backgroundImg.getWidth());
+//        poster.setHeight(backgroundImg.getHeight());
+//
+//        poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
+//            if (wePosterSubassembly.getType().equals(1)) {
+//                Font font = fontMap.get(
+//                        wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
+//                FontMetrics fontMetrics = ImageUtils.getFontMetrics(font);
+//                Color color;
+//                if (org.apache.commons.lang3.StringUtils.isNotBlank(wePosterSubassembly.getFontColor())) {
+//                    color = ImageUtils.getColor(wePosterSubassembly.getFontColor(), wePosterSubassembly.getAlpha());
+//                } else {
+//                    color = Color.BLACK;
+//                }
+//                List<ImageUtils.LineText> lineTextList = ImageUtils.splitContext(wePosterSubassembly.getContent(),
+//                        fontMetrics, wePosterSubassembly.getLeft(), wePosterSubassembly.getTop(),
+//                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight(),
+//                        wePosterSubassembly.getWordSpace(), wePosterSubassembly.getLineSpace(),
+//                        wePosterSubassembly.getFontTextAlign(), wePosterSubassembly.getVerticalType());
+//                lineTextList.forEach(lineText -> {
+//                    lineText.getCharTextList().forEach(charText -> {
+//                        ImageUtils.writeFontBufferedImage(backgroundImg, charText.getValue().toString(),
+//                                charText.getPointX(), charText.getPointY(), font, color);
+//                    });
+//                });
+//            } else {
+//                BufferedImage bufferedImage = bufferedImageMap.get(wePosterSubassembly.getImgPath());
+//                if (wePosterSubassembly.getAlpha() != null && wePosterSubassembly.getAlpha() >= 0) {
+//                    bufferedImage = ImageUtils.setBufferedImageAlpha(bufferedImage, wePosterSubassembly.getAlpha(),
+//                            BufferedImage.TYPE_INT_ARGB);
+//                }
+//                bufferedImage = ImageUtils.fixedDimensionBufferedImage(bufferedImage, BufferedImage.TYPE_INT_ARGB,
+//                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight());
+//                if (wePosterSubassembly.getRotate() == null) {
+//                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, wePosterSubassembly.getLeft(),
+//                            wePosterSubassembly.getTop());
+//                } else {
+//                    int x = wePosterSubassembly.getLeft() + bufferedImage.getWidth() / 2;
+//                    int y = wePosterSubassembly.getTop() + bufferedImage.getHeight() / 2;
+//                    bufferedImage = ImageUtils.rotateImage(bufferedImage, wePosterSubassembly.getRotate());
+//                    x = x - bufferedImage.getWidth() / 2;
+//                    y = y - bufferedImage.getHeight() / 2;
+//                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, x, y);
+//                }
+//            }
+//        });
+//
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        try {
+//            ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
+//            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
+//            byteArrayOutputStream.close();
+//            AjaxResult<FileEntity> result = fileClient.upload(streamMultipartFile);
+//            if (result != null) {
+//                poster.setSampleImgPath(result.getData().getUrl());
+//            }
+//            WeMaterial material = generateMaterialFromPoster(poster);
+//            material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
+//            return material;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new WeComException("图片生成错误");
+//        }
+//    }
+//
+
+
     @Override
-    public WeMaterial generateSimpleImg(WePoster poster) {
-        if (CollectionUtils.isEmpty(poster.getPosterSubassemblyList())) {
-            return generateMaterialFromPoster(poster);
-        }
+    public WeMaterial builderSimpleImg(WePoster poster) throws Exception {
 
-        Set<String> existFontId = new HashSet<>();
-        Map<String, Font> fontMap = generateFontMap(poster.getPosterSubassemblyList(), existFontId);
 
-        Map<String, NetFileUtils.FileCallable> fileCallableMap = poster.getPosterSubassemblyList()
-                .stream()
-                .map(WePosterSubassembly::getImgPath)
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
-                .distinct()
-                .collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
-
-        if (org.springframework.util.CollectionUtils.isEmpty(fileCallableMap)) {
-            fileCallableMap = new HashMap<>();
-        }
-
-        fileCallableMap.put(poster.getBackgroundImgPath(), NetFileUtils.getNetFile(poster.getBackgroundImgPath()));
-
-        Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
-                    try {
-                        ByteArrayOutputStream byteArrayOutputStream = NetFileUtils.getByteArrayOutputStream(
-                                stringFileCallableEntry.getValue(), false);
-                        BufferedImage read = ImageIO.read(
-                                new ByteArrayInputStream(Objects.requireNonNull(byteArrayOutputStream).toByteArray()));
-
-                        return ImageUtils.copyBufferedImage(read,
-                                BufferedImage.TYPE_INT_ARGB);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("图片读取错误");
-                    }
-                }));
-
-        BufferedImage backgroundImg = bufferedImageMap.get(poster.getBackgroundImgPath());
-        poster.setWidth(backgroundImg.getWidth()>375?375:backgroundImg.getWidth());
-        poster.setHeight(backgroundImg.getHeight());
-
-        poster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-            if (wePosterSubassembly.getType().equals(1)) {
-                Font font = fontMap.get(
-                        wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
-                FontMetrics fontMetrics = ImageUtils.getFontMetrics(font);
-                Color color;
-                if (org.apache.commons.lang3.StringUtils.isNotBlank(wePosterSubassembly.getFontColor())) {
-                    color = ImageUtils.getColor(wePosterSubassembly.getFontColor(), wePosterSubassembly.getAlpha());
-                } else {
-                    color = Color.BLACK;
-                }
-                List<ImageUtils.LineText> lineTextList = ImageUtils.splitContext(wePosterSubassembly.getContent(),
-                        fontMetrics, wePosterSubassembly.getLeft(), wePosterSubassembly.getTop(),
-                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight(),
-                        wePosterSubassembly.getWordSpace(), wePosterSubassembly.getLineSpace(),
-                        wePosterSubassembly.getFontTextAlign(), wePosterSubassembly.getVerticalType());
-                lineTextList.forEach(lineText -> {
-                    lineText.getCharTextList().forEach(charText -> {
-                        ImageUtils.writeFontBufferedImage(backgroundImg, charText.getValue().toString(),
-                                charText.getPointX(), charText.getPointY(), font, color);
-                    });
-                });
-            } else {
-                BufferedImage bufferedImage = bufferedImageMap.get(wePosterSubassembly.getImgPath());
-                if (wePosterSubassembly.getAlpha() != null && wePosterSubassembly.getAlpha() >= 0) {
-                    bufferedImage = ImageUtils.setBufferedImageAlpha(bufferedImage, wePosterSubassembly.getAlpha(),
-                            BufferedImage.TYPE_INT_ARGB);
-                }
-                bufferedImage = ImageUtils.fixedDimensionBufferedImage(bufferedImage, BufferedImage.TYPE_INT_ARGB,
-                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight());
-                if (wePosterSubassembly.getRotate() == null) {
-                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, wePosterSubassembly.getLeft(),
-                            wePosterSubassembly.getTop());
-                } else {
-                    int x = wePosterSubassembly.getLeft() + bufferedImage.getWidth() / 2;
-                    int y = wePosterSubassembly.getTop() + bufferedImage.getHeight() / 2;
-                    bufferedImage = ImageUtils.rotateImage(bufferedImage, wePosterSubassembly.getRotate());
-                    x = x - bufferedImage.getWidth() / 2;
-                    y = y - bufferedImage.getHeight() / 2;
-                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, x, y);
-                }
-            }
-        });
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
-            ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
-            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
-            byteArrayOutputStream.close();
-            AjaxResult<FileEntity> result = fileClient.upload(streamMultipartFile);
-            if (result != null) {
-                poster.setSampleImgPath(result.getData().getUrl());
+            FileEntity fileEntity = this.builderPoster(PurePoster.builder()
+                            .backgroundImgPath(poster.getBackgroundImgPath())
+                            .width(poster.getWidth())
+                            .height(poster.getHeight())
+                            .posterSubassemblyList(poster.getPosterSubassemblyList())
+
+                    .build());
+
+            if (fileEntity != null) {
+                poster.setSampleImgPath(fileEntity.getUrl());
             }
             WeMaterial material = generateMaterialFromPoster(poster);
             material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
             return material;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new WeComException("图片生成错误");
+
+        } catch (Exception e) {
+           log.error("海报素材构建失败:"+e.getMessage());
+           throw e;
         }
+
+
+
+
     }
 
     @Override
-    public FileEntity createPoster(PurePoster purePoster) {
+    public FileEntity builderPoster(PurePoster purePoster) throws Exception {
+
+        if(StringUtils.isEmpty(purePoster.getBackgroundImgPath())){
+            throw new WeComException("海报背景不可为空");
+        }
         //海报组件数组为空，直接返回图片
         if (CollectionUtils.isEmpty(purePoster.getPosterSubassemblyList())) {
-            FileEntity sysFile = new FileEntity();
-            sysFile.setName(FileUtils.getName(purePoster.getBackgroundImgPath()));
-            sysFile.setUrl(purePoster.getBackgroundImgPath());
-            return sysFile;
+
+            throw new WeComException("海报中元素不可为空");
         }
 
-        Set<String> existFontId = new HashSet<>();
-        Map<String, Font> fontMap = generateFontMap(purePoster.getPosterSubassemblyList(), existFontId);
-        Map<String, NetFileUtils.FileCallable> fileCallableMap = purePoster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(org.apache.commons.lang3.StringUtils::isNotBlank)
-                .distinct().collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
-        if (org.springframework.util.CollectionUtils.isEmpty(fileCallableMap)) {
-            fileCallableMap = new HashMap<>();
-        }
-        Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
-                    try {
-                        ByteArrayOutputStream byteArrayOutputStream = NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false);
-                        BufferedImage read = ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(byteArrayOutputStream).toByteArray()));
-                        return ImageUtils.copyBufferedImage(read, BufferedImage.TYPE_INT_ARGB);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("图片读取错误");
+            //构建海报生成器
+            ImageCombiner combiner = new ImageCombiner(purePoster.getBackgroundImgPath(),
+                    purePoster.getWidth()>=375?375:purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
+
+
+            //海报中元素
+            List<WePosterSubassembly> posterSubassemblyList = purePoster.getPosterSubassemblyList();
+            if(CollectionUtil.isNotEmpty(posterSubassemblyList)){
+
+                //合成素材到海报中
+                posterSubassemblyList.stream().forEach(wePosterSubassembly->{
+
+                    //元素为文字的处理
+                    if (wePosterSubassembly.getType().equals(1)) {
+
+                        TextElement textPrice = new TextElement(wePosterSubassembly.getContent(),"/font/default.ttf",
+                                wePosterSubassembly.getFontSize(),
+                                wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
+
+
+                        if(StringUtils.isNotEmpty(wePosterSubassembly.getFontColor())){
+                            textPrice.setColor(
+                                   new Color(
+                                           Integer.parseInt(wePosterSubassembly.getFontColor().substring(1), 16)
+                                   )
+                            );
+                        }
+
+
+                        //设置字体对齐方式
+                        Integer fontTextAlign = wePosterSubassembly.getFontTextAlign();
+                        if(new Integer(2).equals(fontTextAlign)){//居中
+                            textPrice.setCenter(true);
+                        }else if(new Integer(1).equals(fontTextAlign)){ //左对齐
+                            textPrice.setDirection(Direction.LeftRight);
+                        }else if(new Integer(3).equals(fontTextAlign)){//右对齐
+                            textPrice.setDirection(Direction.RightLeft);
+                        }
+
+                        combiner.addElement(textPrice);         //加入待绘制集合
+
+
+
+
+                    }else{ //图片处理
+                        String imgPath = wePosterSubassembly.getImgPath();
+                        if(StringUtils.isNotEmpty(imgPath)){
+                            //二维码（强制按指定宽度、高度缩放）
+                            combiner.addImageElement(imgPath,
+                                    wePosterSubassembly.getLeft()
+                                    , wePosterSubassembly.getTop(),
+                                    wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight()
+                                    , wePosterSubassembly.getType().equals(3)?ZoomMode.WidthHeight:ZoomMode.Width);
+                        }
                     }
-                }));
-        BufferedImage backgroundImg = bufferedImageMap.get(purePoster.getBackgroundImgPath());
-        purePoster.setWidth(backgroundImg.getWidth());
-        purePoster.setHeight(backgroundImg.getHeight());
-        purePoster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
-            if (wePosterSubassembly.getType().equals(1)) {
-                Font font = fontMap.get(
-                        wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
-                FontMetrics fontMetrics = ImageUtils.getFontMetrics(font);
-                Color color;
-                if (org.apache.commons.lang3.StringUtils.isNotBlank(wePosterSubassembly.getFontColor())) {
-                    color = ImageUtils.getColor(wePosterSubassembly.getFontColor(), wePosterSubassembly.getAlpha());
-                } else {
-                    color = Color.BLACK;
-                }
-                List<ImageUtils.LineText> lineTextList = ImageUtils.splitContext(wePosterSubassembly.getContent(),
-                        fontMetrics, wePosterSubassembly.getLeft(), wePosterSubassembly.getTop(),
-                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight(),
-                        wePosterSubassembly.getWordSpace(), wePosterSubassembly.getLineSpace(),
-                        wePosterSubassembly.getFontTextAlign(), wePosterSubassembly.getVerticalType());
-                lineTextList.forEach(lineText -> {
-                    lineText.getCharTextList().forEach(charText -> {
-                        ImageUtils.writeFontBufferedImage(backgroundImg, charText.getValue().toString(),
-                                charText.getPointX(), charText.getPointY(), font, color);
-                    });
-                });
-            } else {
-                BufferedImage bufferedImage = bufferedImageMap.get(wePosterSubassembly.getImgPath());
-                if (wePosterSubassembly.getAlpha() != null && wePosterSubassembly.getAlpha() >= 0) {
-                    bufferedImage = ImageUtils.setBufferedImageAlpha(bufferedImage, wePosterSubassembly.getAlpha(),
-                            BufferedImage.TYPE_INT_ARGB);
-                }
-                bufferedImage = ImageUtils.fixedDimensionBufferedImage(bufferedImage, BufferedImage.TYPE_INT_ARGB,
-                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight());
-                if (wePosterSubassembly.getRotate() == null) {
-                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, wePosterSubassembly.getLeft(),
-                            wePosterSubassembly.getTop());
-                } else {
-                    int x = wePosterSubassembly.getLeft() + bufferedImage.getWidth() / 2;
-                    int y = wePosterSubassembly.getTop() + bufferedImage.getHeight() / 2;
-                    bufferedImage = ImageUtils.rotateImage(bufferedImage, wePosterSubassembly.getRotate());
-                    x = x - bufferedImage.getWidth() / 2;
-                    y = y - bufferedImage.getHeight() / 2;
-                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, x, y);
-                }
+
+
+            });
+
+
             }
-        });
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        //执行图片合并
         try {
-            ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
-            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
-            byteArrayOutputStream.close();
-            AjaxResult<FileEntity> result = fileClient.upload(streamMultipartFile);
+            combiner.combine();
+
+            //获取合成后的海报
+            MultipartFile file
+                    = new MockMultipartFile(String.valueOf(System.currentTimeMillis()),".jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
+            AjaxResult<FileEntity> result = fileClient.upload(file);
             return result.getData();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new WeComException("图片生成错误");
+        } catch (Exception e) {
+            log.error("海报构建失败:"+e.getMessage());
+            throw new WeComException("海报构建失败");
         }
+
     }
+
+//    @Override
+//    public FileEntity createPoster(PurePoster purePoster) {
+//        //海报组件数组为空，直接返回图片
+//        if (CollectionUtils.isEmpty(purePoster.getPosterSubassemblyList())) {
+//            FileEntity sysFile = new FileEntity();
+//            sysFile.setName(FileUtils.getName(purePoster.getBackgroundImgPath()));
+//            sysFile.setUrl(purePoster.getBackgroundImgPath());
+//            return sysFile;
+//        }
+//
+//        Set<String> existFontId= new HashSet<>();
+//        Map<String, Font> fontMap = generateFontMap(purePoster.getPosterSubassemblyList(), existFontId);
+//        Map<String, NetFileUtils.FileCallable> fileCallableMap = purePoster.getPosterSubassemblyList().stream().map(WePosterSubassembly::getImgPath).filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+//                .distinct().collect(Collectors.toMap(s -> s, NetFileUtils::getNetFile));
+//        if (org.springframework.util.CollectionUtils.isEmpty(fileCallableMap)) {
+//            fileCallableMap = new HashMap<>();
+//        }
+//        Map<String, BufferedImage> bufferedImageMap = fileCallableMap.entrySet().stream()
+//                .collect(Collectors.toMap(Map.Entry::getKey, stringFileCallableEntry -> {
+//                    try {
+//                        ByteArrayOutputStream byteArrayOutputStream = NetFileUtils.getByteArrayOutputStream(stringFileCallableEntry.getValue(), false);
+//                        BufferedImage read = ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(byteArrayOutputStream).toByteArray()));
+//                        return ImageUtils.copyBufferedImage(read, BufferedImage.TYPE_INT_ARGB);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        throw new RuntimeException("图片读取错误");
+//                    }
+//                }));
+//        BufferedImage backgroundImg = bufferedImageMap.get(purePoster.getBackgroundImgPath());
+//        purePoster.setWidth(backgroundImg.getWidth());
+//        purePoster.setHeight(backgroundImg.getHeight());
+//        purePoster.getPosterSubassemblyList().forEach(wePosterSubassembly -> {
+//            if (wePosterSubassembly.getType().equals(1)) {
+//                Font font = fontMap.get(
+//                        wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
+//                FontMetrics fontMetrics = ImageUtils.getFontMetrics(font);
+//                Color color;
+//                if (org.apache.commons.lang3.StringUtils.isNotBlank(wePosterSubassembly.getFontColor())) {
+//                    color = ImageUtils.getColor(wePosterSubassembly.getFontColor(), wePosterSubassembly.getAlpha());
+//                } else {
+//                    color = Color.BLACK;
+//                }
+//                List<ImageUtils.LineText> lineTextList = ImageUtils.splitContext(wePosterSubassembly.getContent(),
+//                        fontMetrics, wePosterSubassembly.getLeft(), wePosterSubassembly.getTop(),
+//                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight(),
+//                        wePosterSubassembly.getWordSpace(), wePosterSubassembly.getLineSpace(),
+//                        wePosterSubassembly.getFontTextAlign(), wePosterSubassembly.getVerticalType());
+//                lineTextList.forEach(lineText -> {
+//                    lineText.getCharTextList().forEach(charText -> {
+//                        ImageUtils.writeFontBufferedImage(backgroundImg, charText.getValue().toString(),
+//                                charText.getPointX(), charText.getPointY(), font, color);
+//                    });
+//                });
+//            } else {
+//                BufferedImage bufferedImage = bufferedImageMap.get(wePosterSubassembly.getImgPath());
+//                if (wePosterSubassembly.getAlpha() != null && wePosterSubassembly.getAlpha() >= 0) {
+//                    bufferedImage = ImageUtils.setBufferedImageAlpha(bufferedImage, wePosterSubassembly.getAlpha(),
+//                            BufferedImage.TYPE_INT_ARGB);
+//                }
+//                bufferedImage = ImageUtils.fixedDimensionBufferedImage(bufferedImage, BufferedImage.TYPE_INT_ARGB,
+//                        wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight());
+//                if (wePosterSubassembly.getRotate() == null) {
+//                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, wePosterSubassembly.getLeft(),
+//                            wePosterSubassembly.getTop());
+//                } else {
+//                    int x = wePosterSubassembly.getLeft() + bufferedImage.getWidth() / 2;
+//                    int y = wePosterSubassembly.getTop() + bufferedImage.getHeight() / 2;
+//                    bufferedImage = ImageUtils.rotateImage(bufferedImage, wePosterSubassembly.getRotate());
+//                    x = x - bufferedImage.getWidth() / 2;
+//                    y = y - bufferedImage.getHeight() / 2;
+//                    ImageUtils.mergeBufferedImage(backgroundImg, bufferedImage, x, y);
+//                }
+//            }
+//        });
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        try {
+//            ImageIO.write(backgroundImg, "png", byteArrayOutputStream);
+//            NetFileUtils.StreamMultipartFile streamMultipartFile = new NetFileUtils.StreamMultipartFile(System.currentTimeMillis() + ".jpg", byteArrayOutputStream.toByteArray());
+//            byteArrayOutputStream.close();
+//            AjaxResult<FileEntity> result = fileClient.upload(streamMultipartFile);
+//            return result.getData();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new WeComException("图片生成错误");
+//        }
+//    }
 
     @Override
     @DataScope(type = "2", value = @DataColumn(alias = "we_material", name = "create_by_id", userid = "user_id"))
@@ -492,76 +613,76 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         return m;
     }
 
-    private Map<String, Font> generateFontMap(List<WePosterSubassembly> list, Set<String> existFontId) {
-        Map<String, Font> fontMap = list.stream()
-                .filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1)).peek(wePosterSubassembly -> {
-                    if (wePosterSubassembly.getFontId() == null) {
-                        wePosterSubassembly.setFontId(0L);
-                    }
-                }).filter(wePosterSubassembly -> {
-                    if (existFontId.contains(
-                            wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle())) {
-                        return false;
-                    } else {
-                        existFontId.add(
-                                wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
-                        return true;
-                    }
-                }).collect(Collectors.toMap(
-                        wePosterSubassembly -> wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle(),
-                        wePosterSubassembly -> getFont(wePosterSubassembly.getFontId(),
-                                wePosterSubassembly.getFontSize(), wePosterSubassembly.getFontStyle())));
-        return fontMap;
-    }
+//    private Map<String, Font> generateFontMap(List<WePosterSubassembly> list, Set<String> existFontId) {
+//        Map<String, Font> fontMap = list.stream()
+//                .filter(wePosterSubassembly -> wePosterSubassembly.getType().equals(1)).peek(wePosterSubassembly -> {
+//                    if (wePosterSubassembly.getFontId() == null) {
+//                        wePosterSubassembly.setFontId(0L);
+//                    }
+//                }).filter(wePosterSubassembly -> {
+//                    if (existFontId.contains(
+//                            wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle())) {
+//                        return false;
+//                    } else {
+//                        existFontId.add(
+//                                wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle());
+//                        return true;
+//                    }
+//                }).collect(Collectors.toMap(
+//                        wePosterSubassembly -> wePosterSubassembly.getFontId() + "_" + wePosterSubassembly.getFontSize() + "_" + wePosterSubassembly.getFontStyle(),
+//                        wePosterSubassembly -> getFont(wePosterSubassembly.getFontId(),
+//                                wePosterSubassembly.getFontSize(), wePosterSubassembly.getFontStyle())));
+//        return fontMap;
+//    }
 
     private List<WeMaterial> findWeMaterialByIds(Collection<Long> ids) {
         return new LambdaQueryChainWrapper<>(this.baseMapper).in(WeMaterial::getId, ids).eq(WeMaterial::getDelFlag, 0)
                 .list();
     }
 
-    private Font getFont(Long id, Integer fontSize, Integer fontStyle) {
-        List<WeMaterial> materials = lambdaQuery().eq(WeMaterial::getMediaType, MediaType.POSTER_FONT.getType())
-                .orderByDesc(WeMaterial::getFrontOrder).orderByDesc(WeMaterial::getCreateTime).eq(WeMaterial::getId, id)
-                .list();
-        WeMaterial fontMaterial = null;
-        if (CollectionUtils.isNotEmpty(materials)) {
-            fontMaterial = materials.get(0);
-        }
-        return getFont(fontMaterial, fontStyle, fontSize);
-    }
+//    private Font getFont(Long id, Integer fontSize, Integer fontStyle) {
+//        List<WeMaterial> materials = lambdaQuery().eq(WeMaterial::getMediaType, MediaType.POSTER_FONT.getType())
+//                .orderByDesc(WeMaterial::getFrontOrder).orderByDesc(WeMaterial::getCreateTime).eq(WeMaterial::getId, id)
+//                .list();
+//        WeMaterial fontMaterial = null;
+//        if (CollectionUtils.isNotEmpty(materials)) {
+//            fontMaterial = materials.get(0);
+//        }
+//        return getFont(fontMaterial, fontStyle, fontSize);
+//    }
 
-    private Font getFont(WeMaterial fontMaterial, Integer fontStyle, Integer fontSize) {
-        int fontType = Font.PLAIN;
-        if (fontStyle.equals(1)) {
-            fontType = Font.BOLD;
-        } else if (fontStyle.equals(2)) {
-            fontType = Font.ITALIC;
-        } else if (fontStyle.equals(3)) {
-            fontType = Font.BOLD + Font.ITALIC;
-        }
-        if (fontMaterial == null) {
-            return DEFAULT_FONT.deriveFont(fontType, (float) fontSize);
-        }
-        Font font;
-        if ((font = FONT_MAP.get(fontMaterial.getId())) != null) {
-            return font.deriveFont((float) fontSize);
-        }
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-                NetFileUtils.getByteArrayOutputStream(NetFileUtils.getNetFile(fontMaterial.getMaterialUrl()), false)
-                        .toByteArray());
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT, byteArrayInputStream);
-            FONT_MAP.put(fontMaterial.getId(), font);
-            font = font.deriveFont(fontType, (float) fontSize);
-            return font;
-        } catch (FontFormatException e) {
-            e.printStackTrace();
-            throw new RuntimeException("字体格式错误");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    private Font getFont(WeMaterial fontMaterial, Integer fontStyle, Integer fontSize) {
+//        int fontType = Font.PLAIN;
+//        if (fontStyle.equals(1)) {
+//            fontType = Font.BOLD;
+//        } else if (fontStyle.equals(2)) {
+//            fontType = Font.ITALIC;
+//        } else if (fontStyle.equals(3)) {
+//            fontType = Font.BOLD + Font.ITALIC;
+//        }
+//        if (fontMaterial == null) {
+//            return DEFAULT_FONT.deriveFont(fontType, (float) fontSize);
+//        }
+//        Font font;
+//        if ((font = FONT_MAP.get(fontMaterial.getId())) != null) {
+//            return font.deriveFont((float) fontSize);
+//        }
+//        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+//                NetFileUtils.getByteArrayOutputStream(NetFileUtils.getNetFile(fontMaterial.getMaterialUrl()), false)
+//                        .toByteArray());
+//        try {
+//            font = Font.createFont(Font.TRUETYPE_FONT, byteArrayInputStream);
+//            FONT_MAP.put(fontMaterial.getId(), font);
+//            font = font.deriveFont(fontType, (float) fontSize);
+//            return font;
+//        } catch (FontFormatException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException("字体格式错误");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 
     @Override
@@ -599,12 +720,12 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public List<ContentDataDetailVo> getWeMaterialDataCount(ContentDetailQuery contentDetailQuery) {
         Integer detailsType = contentDetailQuery.getDetailsType();
-        if (StringUtils.isNotBlank(contentDetailQuery.getBeginTime())) {
-            contentDetailQuery.setBeginTime(DateUtils.initSqlBeginTime(contentDetailQuery.getBeginTime()));
-        }
-        if (StringUtils.isNotBlank(contentDetailQuery.getEndTime())) {
-            contentDetailQuery.setEndTime(DateUtils.initSqlEndTime(contentDetailQuery.getEndTime()));
-        }
+//        if (StringUtils.isNotBlank(contentDetailQuery.getBeginTime())) {
+//            contentDetailQuery.setBeginTime(DateUtils.initSqlBeginTime(contentDetailQuery.getBeginTime()));
+//        }
+//        if (StringUtils.isNotBlank(contentDetailQuery.getEndTime())) {
+//            contentDetailQuery.setEndTime(DateUtils.initSqlEndTime(contentDetailQuery.getEndTime()));
+//        }
         List<ContentDataDetailVo> result = new ArrayList<>();
         switch (detailsType) {
             case 1:
@@ -899,7 +1020,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      * @return
      */
     @Override
-    public WeMaterial builderPosterWeMaterial(String actualCodeUrl, Long posterId) {
+    public WeMaterial builderPosterWeMaterial(String actualCodeUrl, Long posterId) throws Exception {
         WeMaterial material = this.getById(posterId);
         if (StringUtils.isNotEmpty(material.getPosterSubassembly())) {
             List<WePosterSubassembly> wePosterSubassemblies = JSONArray.parseArray(material.getPosterSubassembly(), WePosterSubassembly.class);
@@ -912,11 +1033,14 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             wePoster.setSampleImgPath(material.getMaterialUrl());
             wePoster.setBackgroundImgPath(material.getBackgroundImgUrl());
             wePoster.setPosterSubassemblyList(wePosterSubassemblies);
-            material = this.generateSimpleImg(wePoster);
+            material = this.builderSimpleImg(wePoster);
         } else {
             throw new WeComException("生成海报错误，无二维码位置");
         }
 
         return material;
     }
+
+
+
 }

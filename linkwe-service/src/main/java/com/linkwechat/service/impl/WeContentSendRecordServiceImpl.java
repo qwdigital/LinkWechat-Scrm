@@ -89,8 +89,10 @@ public class WeContentSendRecordServiceImpl extends ServiceImpl<WeContentSendRec
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getTalkId()), WeContentSendRecord::getTalkId, contentDetailQuery.getTalkId());
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentId), WeContentSendRecord::getContentId, contentId);
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getResourceType()), WeContentSendRecord::getResourceType, contentDetailQuery.getResourceType());
-        queryWrapper.lambda().ge(StringUtils.isNotBlank(beginTime), WeContentSendRecord::getSendTime, beginTime);
-        queryWrapper.lambda().le(StringUtils.isNotBlank(endTime), WeContentSendRecord::getSendTime, endTime);
+
+        if(StringUtils.isNotEmpty(beginTime) && StringUtils.isNotEmpty(endTime)){
+            queryWrapper.lambda().between(WeContentSendRecord::getSendTime,beginTime,endTime);
+        }
         queryWrapper.lambda().groupBy(WeContentSendRecord::getSendById);
 
         //取出所有的数据

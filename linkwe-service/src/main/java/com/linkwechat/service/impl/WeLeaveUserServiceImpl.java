@@ -384,14 +384,33 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                      SysUser sysUser = ajaxResult.getData().stream().findFirst().get();
                      sysUser.setIsUserLeave(1);
 
+
+                     SysLeaveUser leaveUser = SysLeaveUser.builder()
+                             .id(SnowFlakeUtil.nextId())
+                             .userName(sysUser.getUserName())
+                             .deptNames(sysUser.getDeptName())
+                             .weUserId(sysUser.getWeUserId())
+                             .allocateCustomerNum(v.size())
+                             .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
+                             .allocateGroupNum(weGroups.size())
+                             .isAllocate(0)
+                             .delFlag(Constants.COMMON_STATE)
+                             .build();
+
+
+                     leaveUser.setCreateBy(SecurityUtils.getUserName());
+                     leaveUser.setCreateTime(new Date());
+                     leaveUser.setCreateById(SecurityUtils.getUserId());
+                     leaveUser.setUpdateBy(SecurityUtils.getUserName());
+                     leaveUser.setUpdateTime(new Date());
+                     leaveUser.setUpdateById(SecurityUtils.getUserId());
+
+
                      //构建离职员工数据
-                     this.save(
-                             SysLeaveUser.builder().userName(sysUser.getUserName())
-                                     .deptNames(sysUser.getDeptName())
-                                     .weUserId(sysUser.getWeUserId())
-                                     .allocateCustomerNum(v.size())
-                                     .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
-                                     .allocateGroupNum(weGroups.size()).build()
+                     this.baseMapper.batchAddOrUpdate(
+                             ListUtil.toList(
+                                     leaveUser
+                             )
                      );
 
 

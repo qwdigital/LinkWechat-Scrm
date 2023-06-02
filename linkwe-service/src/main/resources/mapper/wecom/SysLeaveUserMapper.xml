@@ -3,5 +3,41 @@
 <mapper namespace="com.linkwechat.mapper.SysLeaveUserMapper">
 
 
+    <insert id="batchAddOrUpdate">
+        INSERT INTO sys_leave_user(
+            id,
+            user_name,
+            dept_names,
+            we_user_id,
+            allocate_customer_num,
+            allocate_group_num,
+            dimission_time,
+            is_allocate,
+            create_by,
+            create_by_id,
+            create_time,
+            update_by,
+            update_by_id,
+            update_time,
+            del_flag
+        )  values
+        <foreach collection="leaveUsers" item="item" index="index" separator=",">
+            (#{item.id},#{item.userName},#{item.deptNames},#{item.weUserId},#{item.allocateCustomerNum},#{item.allocateGroupNum},#{item.dimissionTime},#{item.isAllocate},#{item.createBy},#{item.createById}
+            ,#{item.createTime},#{item.updateBy},#{item.updateById},#{item.updateTime},#{item.delFlag})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        user_name=IFNULL(VALUES(user_name),sys_leave_user.user_name),
+        dept_names=IFNULL(VALUES(dept_names),sys_leave_user.dept_names),
+        we_user_id=IFNULL(VALUES(we_user_id),sys_leave_user.we_user_id),
+        allocate_customer_num=IFNULL(VALUES(allocate_customer_num),sys_leave_user.allocate_customer_num),
+        allocate_group_num=IFNULL(VALUES(allocate_group_num),sys_leave_user.allocate_group_num),
+        dimission_time=IFNULL(VALUES(dimission_time),sys_leave_user.dimission_time),
+        is_allocate=IFNULL(VALUES(is_allocate),sys_leave_user.is_allocate),
+        update_by=IFNULL(VALUES(update_by),sys_leave_user.update_by),
+        update_by_id=IFNULL(VALUES(update_by_id),sys_leave_user.update_by_id),
+        update_time=IFNULL(VALUES(update_time),sys_leave_user.update_time);
+    </insert>
+
+
 
 </mapper>
