@@ -7,7 +7,7 @@
 
 [![star](https://gitee.com/LinkWeChat/link-wechat/badge/star.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/stargazers)
 [![fork](https://gitee.com/LinkWeChat/link-wechat/badge/fork.svg?theme=gvp)](https://gitee.com/LinkWeChat/link-wechat/members)
-[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V4.6-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
+[![LinkWeChat](https://img.shields.io/badge/LinkWeChat-V4.8-brightgreen)](https://www.yuque.com/linkwechat/help/ci1n9p)
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
@@ -25,7 +25,7 @@
 
 ---
 
-**<p align="center">【📣最近更新】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
+**<p align="center">【📣最近通知】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
 
 **<p align="center">LinkWeChat V4.0 正式发布啦，新版“生态绿”视觉，更多能力逐步升级，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
 
