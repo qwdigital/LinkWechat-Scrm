@@ -56,6 +56,12 @@ public class WeQrAddQuery {
     @ApiModelProperty("排班类型  1-全天 2-自动")
     private Integer qrRuleType;
 
+    @ApiModelProperty("排班方式  1-轮询 2-顺序 3-随机")
+    private Integer qrRuleMode;
+
+    @ApiModelProperty("开启备用员工 1-是 0-否 默认是 0")
+    private Integer openSpareUser = 0;
+
     @ApiModelProperty("活码员工列表")
     private List<WeQrUserInfoQuery> qrUserInfos;
 

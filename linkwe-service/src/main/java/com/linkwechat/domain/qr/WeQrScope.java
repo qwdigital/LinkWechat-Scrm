@@ -80,6 +80,19 @@ public class WeQrScope implements Serializable {
     @TableField("user_id")
     private String userId;
 
+    /**
+     * 排班次数
+     */
+    @ApiModelProperty(value = "排班次数")
+    @TableField("scheduling_num")
+    private Integer schedulingNum;
+
+    /**
+     * 是否备用员工 0：否 1：是
+     */
+    @ApiModelProperty(value = "是否备用员工 0：否 1：是")
+    @TableField("is_spare_user")
+    private Integer isSpareUser;
 
     /**
      * 周期时间

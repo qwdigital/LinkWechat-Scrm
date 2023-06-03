@@ -1,18 +1,24 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableSupport;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -23,6 +29,7 @@ import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
 import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.WeQrCode;
 import com.linkwechat.domain.qr.query.WeQrAddQuery;
@@ -40,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +89,9 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 新增员工活码
@@ -341,6 +352,225 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
     @Override
     public void updateQrbyWeUserIds(List<String> weUserIds, String configId) {
         qwCustomerClient.updateContactWay(WeAddWayQuery.builder().config_id(configId).user(weUserIds).build());
+    }
+
+    @Async
+    @Override
+    public void updateQrMultiplePeople(String state) {
+        String stateKey = Constants.USER_CODE_KEY + state;
+        try {
+            //尝试加锁
+            Boolean lock = redisService.tryLock(stateKey, "lock", 30L);
+            if(Boolean.FALSE.equals(lock)){
+                log.info("操作过于频繁，请稍后再试:{}", state);
+                return;
+            }
+            WeQrCodeDetailVo weQrCodeDetail = this.baseMapper.getQrDetailByState(state);
+            if (Objects.isNull(weQrCodeDetail)) {
+                log.info("无效二维码配置ID:{}", state);
+                return;
+            }
+            if (StringUtils.isEmpty(weQrCodeDetail.getConfigId())) {
+                log.info("二维码配置ID为空:{}", state);
+                return;
+            }
+            WeQrAddQuery weQrAddQuery = BeanUtil.copyProperties(weQrCodeDetail, WeQrAddQuery.class);
+            weQrAddQuery.setQrId(weQrCodeDetail.getId());
+            weQrAddQuery.setQrType(weQrCodeDetail.getType());
+            List<WeQrScopeVo> weQrScopeList = scopeService.getWeQrScopeByQrIds(Collections.singletonList(weQrCodeDetail.getId()));
+            // 查询企业客户
+            List<WeCustomer> weCustomersList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCodeDetail.getState()));
+            Map<String, List<WeCustomer>> customersListMap = weCustomersList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
+
+            List<WeQrUserInfoQuery> weQrUserInfoQueryList = Lists.newArrayList();
+            for (WeQrScopeVo weQrScopeVo : weQrScopeList) {
+                WeQrUserInfoQuery weQrUserInfoQuery = BeanUtil.copyProperties(weQrScopeVo, WeQrUserInfoQuery.class);
+
+                List<String> userIds = Lists.newArrayList();
+                List<WeQrScopeUserVo> weQrUserList = weQrScopeVo.getWeQrUserList();
+                // 备用员工不参与
+                List<WeQrScopeUserVo> filterWeQrUserList = weQrUserList.stream()
+                        .filter(item -> Objects.equals(item.getIsSpareUser(), 0) && item.getSchedulingNum() > 0).collect(Collectors.toList());
+                // 随机法打乱列表中元素的顺序
+                if (Objects.equals(weQrCodeDetail.getRuleMode(), 3)) {
+                    Collections.shuffle(filterWeQrUserList);
+                }
+
+                for (int i = 0; i < filterWeQrUserList.size(); i++) {
+                    WeQrScopeUserVo weQrScopeUser = filterWeQrUserList.get(i);
+                    List<WeCustomer> customersList = customersListMap.get(weQrScopeUser.getUserId());
+                    int customersNum = CollUtil.isEmpty(customersList) ? 0 : customersList.size();
+                    // 判断是否继续往下执行
+                    String configIdKey = Constants.USER_CODE_KEY + state + ":" + weQrScopeUser.getUserNo();
+                    Integer cacheConfigId = redisService.getCacheObject(configIdKey);
+                    if (null != cacheConfigId && cacheConfigId == customersNum) {
+                        continue;
+                    }
+                    if (customersNum == 0) {
+                        continue;
+                    }
+                    log.info("判断是否继续往下执行:{},{},{}", configIdKey, cacheConfigId, customersNum);
+                    redisService.setCacheObject(configIdKey, customersNum);
+                    // 缓存redis员工活码
+                    String qrIdKey = Constants.USER_CODE_KEY + weQrCodeDetail.getConfigId();
+                    Map<String, Integer> getCacheUserMap = redisService.getCacheMap(qrIdKey);
+
+                    // 检验是否轮询过
+                    Map<String, Integer> finalGetCacheUserMap = getCacheUserMap;
+                    filterWeQrUserList.forEach(item -> {
+                        if (!finalGetCacheUserMap.containsKey(item.getUserId())) {
+                            Map<String, Integer> saveCacheUserMap = new HashMap<>(16);
+                            saveCacheUserMap.put(item.getUserId(), item.getSchedulingNum());
+                            redisService.setCacheMap(qrIdKey, saveCacheUserMap);
+                        }
+                    });
+                    String configIdListKey = Constants.USER_CODE_KEY + weQrCodeDetail.getConfigId() + ":" + weQrScopeUser.getUserId();
+                    Integer getConfigIdList = redisService.getCacheObject(configIdListKey) == null ? 0 : redisService.getCacheObject(configIdListKey);
+
+                    // 轮询法
+                    if (Objects.equals(weQrCodeDetail.getRuleMode(), 1)) {
+                        getCacheUserMap = redisService.getCacheMap(qrIdKey);
+                        Integer cacheSchedulingNum = getCacheUserMap.get(weQrScopeUser.getUserId());
+                        // 检验是否有大于0的
+                        int schedulingCount = Math.toIntExact(getCacheUserMap.entrySet().stream().filter(item -> item.getValue() >= 1).count());
+                        if (cacheSchedulingNum <= 1 && schedulingCount == 1 && Objects.equals(weQrAddQuery.getOpenSpareUser(), 0)) {
+                            // 检验是否轮询完一轮删除从新轮询，满足未启动备用员工
+                            redisService.deleteObject(qrIdKey);
+                            redisService.deleteObject(configIdListKey);
+                            userIds.add(filterWeQrUserList.get(0).getUserId());
+                            log.info("推送四:{},{}", state, filterWeQrUserList.get(0).getUserId());
+                            break;
+                        }
+                        // 检验大于0的进行更新
+                        if (cacheSchedulingNum >= 1 && schedulingCount > 0) {
+                            Map<String, Integer> updateCacheUserMap = new HashMap<>(16);
+                            updateCacheUserMap.put(weQrScopeUser.getUserId(), cacheSchedulingNum - 1);
+                            redisService.setCacheMap(qrIdKey, updateCacheUserMap);
+                            // 列表值大于循环次数取第一个
+                            if (i > getConfigIdList && schedulingCount == 1) {
+                                userIds.add(weQrScopeUser.getUserId());
+                                log.info("推送一:{},{}", state, weQrScopeUser.getUserId());
+                            } else if (i > getConfigIdList) {
+                                userIds.add(filterWeQrUserList.get(0).getUserId());
+                                log.info("推送二:{},{}", state, filterWeQrUserList.get(0).getUserId());
+                            } else {
+                                redisService.setCacheObject(configIdListKey, i + 1);
+                                WeQrScopeUserVo weQrScopeUserVo = filterWeQrUserList.get(i + 1);
+                                userIds.add(weQrScopeUserVo.getUserId());
+                                log.info("推送三:{},{}", state, weQrScopeUserVo.getUserId());
+                            }
+                            break;
+                        }
+                    }
+
+                    // 顺序法
+                    if (Objects.equals(weQrCodeDetail.getRuleMode(), 2)) {
+                        getCacheUserMap = redisService.getCacheMap(qrIdKey);
+                        Integer cacheSchedulingNum = getCacheUserMap.get(weQrScopeUser.getUserId());
+                        // 检验是否有大于0的
+                        int schedulingCount = Math.toIntExact(getCacheUserMap.entrySet().stream().filter(item -> item.getValue() >= 1).count());
+                        if (cacheSchedulingNum <= 1 && schedulingCount == 1 && Objects.equals(weQrAddQuery.getOpenSpareUser(), 0)) {
+                            // 检验是否轮询完一轮删除从新轮询，满足未启动备用员工
+                            redisService.deleteObject(qrIdKey);
+                            redisService.deleteObject(configIdListKey);
+                            userIds.add(filterWeQrUserList.get(0).getUserId());
+                            log.info("推送四:{},{}", state, filterWeQrUserList.get(0).getUserId());
+                            break;
+                        }
+                        // 检验大于0的进行更新
+                        if (cacheSchedulingNum >= 1 && schedulingCount > 0) {
+                            Map<String, Integer> updateCacheUserMap = new HashMap<>(16);
+                            updateCacheUserMap.put(weQrScopeUser.getUserId(), cacheSchedulingNum - 1);
+                            redisService.setCacheMap(qrIdKey, updateCacheUserMap);
+                            // 列表值大于循环次数取第一个
+                            if (cacheSchedulingNum > 1) {
+                                redisService.setCacheObject(configIdListKey, i + 1);
+                                userIds.add(weQrScopeUser.getUserId());
+                                log.info("推送一:{},{}", state, weQrScopeUser.getUserId());
+                            } else if (i > getConfigIdList) {
+                                userIds.add(filterWeQrUserList.get(0).getUserId());
+                                log.info("推送二:{},{}", state, filterWeQrUserList.get(0).getUserId());
+                            } else {
+                                redisService.setCacheObject(configIdListKey, i + 1);
+                                WeQrScopeUserVo weQrScopeUserVo = filterWeQrUserList.get(i + 1);
+                                userIds.add(weQrScopeUserVo.getUserId());
+                                log.info("推送三:{},{}", state, weQrScopeUserVo.getUserId());
+                            }
+                            break;
+                        }
+                    }
+
+                    // 随机法
+                    if (Objects.equals(weQrCodeDetail.getRuleMode(), 3)) {
+                        getCacheUserMap = redisService.getCacheMap(qrIdKey);
+                        Integer cacheSchedulingNum = getCacheUserMap.get(weQrScopeUser.getUserId());
+                        // 检验是否有大于0的
+                        int schedulingCount = Math.toIntExact(getCacheUserMap.entrySet().stream().filter(item -> item.getValue() >= 1).count());
+                        if (cacheSchedulingNum <= 1 && schedulingCount == 1 && Objects.equals(weQrAddQuery.getOpenSpareUser(), 0)) {
+                            // 检验是否轮询完一轮删除从新轮询，满足未启动备用员工
+                            redisService.deleteObject(qrIdKey);
+                            redisService.deleteObject(configIdListKey);
+                            userIds.add(filterWeQrUserList.get(0).getUserId());
+                            log.info("推送四:{},{}", state, filterWeQrUserList.get(0).getUserId());
+                            break;
+                        }
+                        // 检验大于0的进行更新
+                        if (cacheSchedulingNum >= 1 && schedulingCount > 0) {
+                            Map<String, Integer> updateCacheUserMap = new HashMap<>(16);
+                            updateCacheUserMap.put(weQrScopeUser.getUserId(), cacheSchedulingNum - 1);
+                            redisService.setCacheMap(qrIdKey, updateCacheUserMap);
+                            // 列表值大于循环次数取第一个
+                            if (i > getConfigIdList && schedulingCount == 1) {
+                                userIds.add(weQrScopeUser.getUserId());
+                                log.info("推送一:{},{}", state, weQrScopeUser.getUserId());
+                            } else if (i > getConfigIdList) {
+                                userIds.add(filterWeQrUserList.get(0).getUserId());
+                                log.info("推送二:{},{}", state, filterWeQrUserList.get(0).getUserId());
+                            } else {
+                                redisService.setCacheObject(configIdListKey, i + 1);
+                                WeQrScopeUserVo weQrScopeUserVo = filterWeQrUserList.get(i + 1);
+                                userIds.add(weQrScopeUserVo.getUserId());
+                                log.info("推送三:{},{}", state, weQrScopeUserVo.getUserId());
+                            }
+                            break;
+                        }
+                    }
+                }
+                // 是否开启备用员工 并且为 备用员工
+                if (Objects.equals(weQrAddQuery.getOpenSpareUser(), 1) && CollUtil.isEmpty(userIds)) {
+                    List<WeQrScopeUserVo> spareUserList = weQrUserList.stream()
+                            .filter(item -> Objects.equals(item.getIsSpareUser(), 1)).collect(Collectors.toList());
+                    if (CollUtil.isNotEmpty(spareUserList)) {
+                        List<String> spareUserIds = spareUserList.stream().map(WeQrScopeUserVo::getUserId).collect(Collectors.toList());
+                        userIds.addAll(spareUserIds);
+                        log.info("推送总:{},{}", state, spareUserIds);
+                    }
+                }
+                if (CollUtil.isNotEmpty(userIds)) {
+                    weQrUserInfoQuery.setUserIds(userIds);
+                    weQrUserInfoQueryList.add(weQrUserInfoQuery);
+                }
+            }
+
+            // 更新联系方式
+            if (CollUtil.isNotEmpty(weQrUserInfoQueryList)) {
+                weQrAddQuery.setQrUserInfos(weQrUserInfoQueryList);
+                WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
+                weContactWay.setState(weQrCodeDetail.getState());
+                WeResultVo weResultVo = qwCustomerClient.updateContactWay(weContactWay).getData();
+                if (Objects.isNull(weResultVo)) {
+                    throw new WeComException("活码生成失败！");
+                }
+                log.info("更新多人员工活码返回:{},{}", JSON.toJSONString(weContactWay), JSON.toJSONString(weResultVo));
+                rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(), mqSettingConfig.getWeQrCodeChangeRk(), String.valueOf(weQrCodeDetail.getId()));
+            }
+        }catch (Exception e){
+            log.error("updateQrMultiplePeople方法异常信息msg:{}",e.getMessage(),e);
+        }
+        finally {
+            //释放锁
+            redisService.unLock(stateKey, "lock");
+        }
     }
 
     @Override

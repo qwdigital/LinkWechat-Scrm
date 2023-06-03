@@ -76,6 +76,13 @@ public class WeQrCode extends BaseEntity implements Serializable {
 
 
     /**
+     * 排班方式 1：轮询 2：顺序 3：随机
+     */
+    @ApiModelProperty("排班方式 1：轮询 2：顺序 3：随机")
+    @TableField("rule_mode")
+    private Integer ruleMode;
+
+    /**
      * 添加渠道
      */
     @ApiModelProperty(value = "添加渠道")

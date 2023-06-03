@@ -180,4 +180,10 @@
         and wqs.del_flag = 0
     </select>
 
+    <select id="getQrDetailByState" resultMap="WeQrCodeDetailResult">
+        <include refid="selectWeQrCodeDetailVo"/>
+        <if test="state != null and state != ''">
+            and wqc.state = #{state} limit 1
+        </if>
+    </select>
 </mapper>
