@@ -82,12 +82,14 @@
         wqs.user_id,
         wqs.party
         from we_qr_scope wqs
+        inner join we_qr_code wqc on wqc.id = wqs.qr_id and wqc.del_flag = 0
         where  find_in_set(dayofweek(curdate())-1,wqs.work_cycle)
         and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.begin_time), '%H:%i:%s') &lt;= date_format(#{formatTime},'%H:%i:%s')
         and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.end_time), '%H:%i:%s') &gt;= date_format(#{formatTime},'%H:%i:%s')
         <if test="qrId != null and qrId != ''">
             and wqs.qr_id = #{qrId}
         </if>
+        and wqc.rule_type = 2
         and wqs.del_flag = 0
     </select>
 </mapper>

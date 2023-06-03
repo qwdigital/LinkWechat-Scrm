@@ -562,7 +562,6 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                     throw new WeComException("活码生成失败！");
                 }
                 log.info("更新多人员工活码返回:{},{}", JSON.toJSONString(weContactWay), JSON.toJSONString(weResultVo));
-                rabbitTemplate.convertAndSend(mqSettingConfig.getWeQrCodeChangeEx(), mqSettingConfig.getWeQrCodeChangeRk(), String.valueOf(weQrCodeDetail.getId()));
             }
         }catch (Exception e){
             log.error("updateQrMultiplePeople方法异常信息msg:{}",e.getMessage(),e);
