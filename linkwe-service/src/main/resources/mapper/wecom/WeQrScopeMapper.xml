@@ -53,6 +53,8 @@
         wqs.work_cycle,
         wqs.user_id,
         if(wqs.user_id is null,null,wu.user_name) as user_name,
+        wqs.scheduling_num,
+        wqs.is_spare_user,
         wqs.party,
         if(wqs.party is null,null,wd.dept_name) as party_name
         from we_qr_scope wqs
