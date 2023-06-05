@@ -401,7 +401,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                     List<WeCustomer> customersList = customersListMap.get(weQrScopeUser.getUserId());
                     int customersNum = CollUtil.isEmpty(customersList) ? 0 : customersList.size();
                     // 判断是否继续往下执行
-                    String configIdKey = Constants.USER_CODE_KEY + state + ":" + weQrScopeUser.getUserNo();
+                    String configIdKey = Constants.USER_CODE_KEY + state + ":" + weQrScopeUser.getUserId();
                     Integer cacheConfigId = redisService.getCacheObject(configIdKey);
                     if (null != cacheConfigId && cacheConfigId == customersNum) {
                         continue;

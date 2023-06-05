@@ -64,7 +64,7 @@ public class WeQrAddQuery {
     private Integer openSpareUser = 0;
 
     @ApiModelProperty("是否开启同一外部企业客户只能添加同一个员工，开启后，同一个企业的客户会优先添加到同一个跟进人  0-不开启 1-开启")
-    private Integer isExclusive;
+    private Integer isExclusive = 0;
 
 
     @ApiModelProperty("活码员工列表")

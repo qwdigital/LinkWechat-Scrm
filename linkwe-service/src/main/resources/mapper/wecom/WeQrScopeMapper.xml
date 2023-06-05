@@ -27,6 +27,8 @@
         <collection property="weQrUserList" ofType="com.linkwechat.domain.qr.vo.WeQrScopeUserVo">
             <result property="userId" column="user_id" jdbcType="VARCHAR"/>
             <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+            <result property="schedulingNum" column="scheduling_num" jdbcType="INTEGER"/>
+            <result property="isSpareUser" column="is_spare_user" jdbcType="INTEGER"/>
         </collection>
         <collection property="weQrPartyList" ofType="com.linkwechat.domain.qr.vo.WeQrScopePartyVo">
             <result property="party" column="party" jdbcType="VARCHAR"/>
