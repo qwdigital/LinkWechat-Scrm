@@ -14,13 +14,10 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.*;
 import com.linkwechat.mapper.WeCustomerTrajectoryMapper;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeCustomerTrackRecordService;
-import com.linkwechat.service.IWeGroupService;
+import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import com.linkwechat.service.IWeCustomerTrajectoryService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -42,6 +39,9 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
     @Autowired
     @Lazy
     private IWeGroupService iWeGroupService;
+
+    @Autowired
+    private IWeStrackStageService iWeStrackStageService;
 
 
 
@@ -155,6 +155,21 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                 .eq(WeCustomer::getAddUserId, weUserId)
                 .eq(WeCustomer::getExternalUserid, externalUserid));
 
+
+        String trackStateName=null;
+
+        TrackState statetate = TrackState.of(trackState);
+
+        if(null == statetate){
+            List<WeStrackStage> weStrackStages = iWeStrackStageService.list(new LambdaQueryWrapper<WeStrackStage>()
+                    .eq(WeStrackStage::getStageVal, trackState));
+            if(CollectionUtil.isNotEmpty(weStrackStages)){
+                trackStateName=weStrackStages.stream().findFirst().get().getStageKey();
+            }
+        }else{
+            trackStateName=TrackState.of(trackState).getName();
+        }
+
        if(this.save(
                WeCustomerTrajectory.builder()
                        .trajectorySceneType(TrajectorySceneType.TRAJECTORY_TITLE_TJGJ.getType())
@@ -172,7 +187,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                        .content(
                                String.format(TrajectorySceneType.TRAJECTORY_TITLE_TJGJ.getMsgTpl()
                                        ,StringUtils.isNotEmpty(userName)?userName:"@员工",weCustomer!=null?weCustomer.getCustomerName():"@客户",
-                                       TrackState.of(trackState).getName())
+                                       trackStateName)
                        )
                        .build()
        )){

@@ -75,7 +75,7 @@ public class WeCustomerPortraitVo {
     private Integer customerType;
 
     //跟进动态
-    private String content;
+    private String trackContent;
 
     //省id
     private Integer provinceId;
