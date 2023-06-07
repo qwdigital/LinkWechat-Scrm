@@ -4,7 +4,7 @@
     <parent>
         <artifactId>linkwechat-cloud</artifactId>
         <groupId>com.linkwechat</groupId>
-        <version>3.1.0</version>
+        <version>2023-release</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -35,7 +35,6 @@
         <dependency>
             <groupId>com.linkwechat</groupId>
             <artifactId>linkwe-service</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <dependency>
