@@ -46,6 +46,7 @@
         where
         wtg.del_flag=0
         <if test="groupTagType != null">and wtg.group_tag_type=#{groupTagType}</if>
+        <if test="groupName != null and groupName !=''">and wtg.group_name like concat('%',#{groupName,jdbcType=VARCHAR},'%')</if>
         ORDER BY wtg.create_time DESC
     </select>
 
