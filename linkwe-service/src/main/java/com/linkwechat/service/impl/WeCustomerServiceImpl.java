@@ -725,10 +725,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
 
         //客户当前客户拓展字段
-        weCustomerDetail.setWeCustomerInfoExpands(
-                iWeCustomerInfoExpandService.list(new LambdaQueryWrapper<WeCustomerInfoExpand>()
-                        .eq(WeCustomerInfoExpand::getCustomerId, weCustomer.getId()))
-        );
+        if(weCustomer != null){
+            weCustomerDetail.setWeCustomerInfoExpands(
+                    iWeCustomerInfoExpandService.list(new LambdaQueryWrapper<WeCustomerInfoExpand>()
+                            .eq(WeCustomerInfoExpand::getCustomerId, weCustomer.getId()))
+            );
+        }
 
 
         return weCustomerDetail;
