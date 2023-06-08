@@ -593,7 +593,10 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
         }finally {
-            this.baseMapper.updateBatchFissionIsTip(weFissions);
+            if(CollectionUtil.isNotEmpty(weFissions)){
+                this.baseMapper.updateBatchFissionIsTip(weFissions);
+            }
+
 
         }
 
