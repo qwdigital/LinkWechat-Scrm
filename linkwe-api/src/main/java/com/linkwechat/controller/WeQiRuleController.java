@@ -1,19 +1,15 @@
 package com.linkwechat.controller;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.fastjson.JSONObject;
-import com.dtflys.forest.annotation.Put;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
-import com.linkwechat.domain.kf.vo.WeKfQualityChatVo;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.domain.qirule.query.*;
 import com.linkwechat.domain.qirule.vo.*;
-import com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveListVo;
 import com.linkwechat.handler.WeQiRuleWeeklyUserDetailWriteHandler;
 import com.linkwechat.service.IWeQiRuleService;
 import io.swagger.annotations.Api;
@@ -104,49 +100,49 @@ public class WeQiRuleController extends BaseController {
         return AjaxResult.success(list);
     }
 
-    @ApiOperation(value = "质检通知列表",httpMethod = "GET")
+    @ApiOperation(value = "质检通知列表", httpMethod = "GET")
     @GetMapping("/notice/list")
-    public TableDataInfo<List<WeQiRuleNoticeListVo>> getNoticeList(WeQiRuleNoticeListQuery query){
+    public TableDataInfo<List<WeQiRuleNoticeListVo>> getNoticeList(WeQiRuleNoticeListQuery query) {
         startPage();
-        List<WeQiRuleNoticeListVo> list =  weQiRuleService.getNoticeList(query);
+        List<WeQiRuleNoticeListVo> list = weQiRuleService.getNoticeList(query);
         return getDataTable(list);
     }
 
 
     @ApiOperation(value = "质检通知设置回复状态", httpMethod = "PUT")
     @PutMapping("/notice/update/replyStatus/{qiRuleMsgId}")
-    public AjaxResult updateReplyStatus(@PathVariable("qiRuleMsgId") Long qiRuleMsgId){
+    public AjaxResult updateReplyStatus(@PathVariable("qiRuleMsgId") Long qiRuleMsgId) {
         weQiRuleService.updateReplyStatus(qiRuleMsgId);
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "质检周报列表",httpMethod = "GET")
+    @ApiOperation(value = "质检周报列表", httpMethod = "GET")
     @GetMapping("/weekly/list")
-    public TableDataInfo<List<WeQiRuleWeeklyListVo>> getWeeklyList(WeQiRuleWeeklyListQuery query){
+    public TableDataInfo<List<WeQiRuleWeeklyListVo>> getWeeklyList(WeQiRuleWeeklyListQuery query) {
         super.startPage();
         List<WeQiRuleWeeklyListVo> list = weQiRuleService.getWeeklyList(query);
         return getDataTable(list);
     }
 
-    @ApiOperation(value = "质检周报详情",httpMethod = "GET")
+    @ApiOperation(value = "质检周报详情", httpMethod = "GET")
     @GetMapping("/weekly/getDetail/{id}")
-    public AjaxResult<WeQiRuleWeeklyDetailVo> getWeeklyDetail(@PathVariable("id") Long id){
+    public AjaxResult<WeQiRuleWeeklyDetailVo> getWeeklyDetail(@PathVariable("id") Long id) {
         WeQiRuleWeeklyDetailVo detail = weQiRuleService.getWeeklyDetail(id);
         return AjaxResult.success(detail);
     }
 
-    @ApiOperation(value = "质检周报明细列表",httpMethod = "GET")
+    @ApiOperation(value = "质检周报明细列表", httpMethod = "GET")
     @GetMapping("/weekly/detail/list/{id}")
-    public TableDataInfo<List<WeQiRuleWeeklyDetailListVo>> getWeeklyDetailList(@PathVariable("id") Long id, WeQiRuleWeeklyDetailListQuery query){
+    public TableDataInfo<List<WeQiRuleWeeklyDetailListVo>> getWeeklyDetailList(@PathVariable("id") Long id, WeQiRuleWeeklyDetailListQuery query) {
         query.setWeeklyId(id);
         super.startPage();
         List<WeQiRuleWeeklyDetailListVo> list = weQiRuleService.getWeeklyDetailList(query);
         return getDataTable(list);
     }
 
-    @ApiOperation(value = "质检周报明细列表导出",httpMethod = "GET")
+    @ApiOperation(value = "质检周报明细列表导出", httpMethod = "GET")
     @GetMapping("/weekly/detail/list/export/{id}")
-    public void weeklyDetailListExport(@PathVariable("id") Long id, WeQiRuleWeeklyDetailListQuery query){
+    public void weeklyDetailListExport(@PathVariable("id") Long id, WeQiRuleWeeklyDetailListQuery query) {
         query.setWeeklyId(id);
         List<WeQiRuleWeeklyDetailListVo> list = weQiRuleService.getWeeklyDetailList(query);
         try {
@@ -160,7 +156,7 @@ public class WeQiRuleController extends BaseController {
             write.registerWriteHandler(new WeQiRuleWeeklyUserDetailWriteHandler(query));
             write.sheet("质检周报明细").doWrite(list);
         } catch (IOException e) {
-            log.error("质检周报明细列表导出异常：query:{}", JSONObject.toJSONString(query),e);
+            log.error("质检周报明细列表导出异常：query:{}", JSONObject.toJSONString(query), e);
         }
     }
 }
