@@ -27,6 +27,8 @@
         <collection property="weQrUserList" ofType="com.linkwechat.domain.qr.vo.WeQrScopeUserVo">
             <result property="userId" column="user_id" jdbcType="VARCHAR"/>
             <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+            <result property="schedulingNum" column="scheduling_num" jdbcType="INTEGER"/>
+            <result property="isSpareUser" column="is_spare_user" jdbcType="INTEGER"/>
         </collection>
         <collection property="weQrPartyList" ofType="com.linkwechat.domain.qr.vo.WeQrScopePartyVo">
             <result property="party" column="party" jdbcType="VARCHAR"/>
@@ -53,6 +55,8 @@
         wqs.work_cycle,
         wqs.user_id,
         if(wqs.user_id is null,null,wu.user_name) as user_name,
+        wqs.scheduling_num,
+        wqs.is_spare_user,
         wqs.party,
         if(wqs.party is null,null,wd.dept_name) as party_name
         from we_qr_scope wqs
@@ -82,12 +86,14 @@
         wqs.user_id,
         wqs.party
         from we_qr_scope wqs
+        inner join we_qr_code wqc on wqc.id = wqs.qr_id and wqc.del_flag = 0
         where  find_in_set(dayofweek(curdate())-1,wqs.work_cycle)
         and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.begin_time), '%H:%i:%s') &lt;= date_format(#{formatTime},'%H:%i:%s')
         and date_format(concat(date_format(curdate(),'%Y-%m-%d '),wqs.end_time), '%H:%i:%s') &gt;= date_format(#{formatTime},'%H:%i:%s')
         <if test="qrId != null and qrId != ''">
             and wqs.qr_id = #{qrId}
         </if>
+        and wqc.rule_type = 2
         and wqs.del_flag = 0
     </select>
 </mapper>

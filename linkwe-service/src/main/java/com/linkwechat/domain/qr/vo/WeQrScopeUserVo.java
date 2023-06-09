@@ -17,4 +17,10 @@ public class WeQrScopeUserVo {
 
     @ApiModelProperty(value = "员工姓名")
     private String userName;
+
+    @ApiModelProperty(value = "排班次数")
+    private Integer schedulingNum;
+
+    @ApiModelProperty(value = "是否备用员工 0：否 1：是")
+    private Integer isSpareUser;
 }
