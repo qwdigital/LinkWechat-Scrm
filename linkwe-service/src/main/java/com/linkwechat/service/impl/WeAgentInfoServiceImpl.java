@@ -46,6 +46,9 @@ public class WeAgentInfoServiceImpl extends ServiceImpl<WeAgentInfoMapper, WeAge
 
     @Override
     public Integer addAgent(WeAgentAddQuery query) {
+
+
+
         WeAgentInfo weAgentInfo = new WeAgentInfo();
         weAgentInfo.setAgentId(query.getAgentId());
         weAgentInfo.setSecret(query.getSecret());

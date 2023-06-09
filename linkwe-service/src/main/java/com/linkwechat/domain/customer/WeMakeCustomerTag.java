@@ -21,6 +21,8 @@ public class WeMakeCustomerTag {
     private String externalUserid;
     private String userId;
     private List<WeTag> addTag;
+
+    private List<WeTag> removeTag;
     //是否是企业标签true是;false:不是
     private Boolean isCompanyTag=true;
 
