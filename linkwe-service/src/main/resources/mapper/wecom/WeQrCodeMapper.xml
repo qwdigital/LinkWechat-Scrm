@@ -28,6 +28,9 @@
         <result property="autoAdd" column="auto_add" jdbcType="INTEGER"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
         <result property="ruleType" column="rule_type" jdbcType="INTEGER"/>
+        <result property="ruleMode" column="rule_mode" jdbcType="INTEGER"/>
+        <result property="openSpareUser" column="open_spare_user" jdbcType="INTEGER"/>
+        <result property="isExclusive" column="is_exclusive" jdbcType="INTEGER"/>
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="configId" column="config_id" jdbcType="VARCHAR"/>
         <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
@@ -52,7 +55,7 @@
     </resultMap>
 
     <sql id="selectWeQrCodeVo">
-        select id, name, group_id, auto_add, type, rule_type, state, scan_num, config_id, qr_code, create_by, create_time, update_by, update_time, del_flag from we_qr_code
+        select id, name, group_id, auto_add, type, rule_type, state, scan_num, config_id, qr_code, rule_mode,open_spare_user,is_exclusive, create_by, create_time, update_by, update_time, del_flag from we_qr_code
     </sql>
 
     <sql id="selectWeQrCodeDetailVo">
@@ -64,10 +67,16 @@
             wqc.auto_add,
             wqc.type,
             wqc.rule_type,
+            wqc.rule_mode,
+            wqc.open_spare_user,
+            wqc.is_exclusive,
             wqc.state,
             wqc.scan_num,
             wqc.config_id,
             wqc.qr_code,
+            wqc.rule_mode,
+            wqc.open_spare_user,
+            wqc.is_exclusive,
             wqc.update_time,
             wqtr.tag_id,
             wt.name as tag_name,
@@ -180,4 +189,10 @@
         and wqs.del_flag = 0
     </select>
 
+    <select id="getQrDetailByState" resultMap="WeQrCodeDetailResult">
+        <include refid="selectWeQrCodeDetailVo"/>
+        <if test="state != null and state != ''">
+            and wqc.state = #{state} limit 1
+        </if>
+    </select>
 </mapper>

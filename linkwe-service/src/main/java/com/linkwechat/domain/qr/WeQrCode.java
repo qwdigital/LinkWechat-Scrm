@@ -76,6 +76,27 @@ public class WeQrCode extends BaseEntity implements Serializable {
 
 
     /**
+     * 排班方式 1：轮询 2：顺序 3：随机
+     */
+    @ApiModelProperty("排班方式 1：轮询 2：顺序 3：随机")
+    @TableField("rule_mode")
+    private Integer ruleMode;
+
+    /**
+     * 开启备用员工 0：否 1：是
+     */
+    @ApiModelProperty("开启备用员工 0：否 1：是")
+    @TableField("open_spare_user")
+    private Integer openSpareUser = 0;
+
+    /**
+     * 是否开启同一外部企业客户只能添加同一个员工，开启后，同一个企业的客户会优先添加到同一个跟进人  0-不开启 1-开启
+     */
+    @ApiModelProperty("是否开启同一外部企业客户只能添加同一个员工，开启后，同一个企业的客户会优先添加到同一个跟进人  0-不开启 1-开启")
+    @TableField("is_exclusive")
+    private Integer isExclusive = 0;
+
+    /**
      * 添加渠道
      */
     @ApiModelProperty(value = "添加渠道")
