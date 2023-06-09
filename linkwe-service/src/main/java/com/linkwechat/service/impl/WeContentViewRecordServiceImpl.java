@@ -256,8 +256,8 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         SysUser data = result.getData().stream().findFirst().get();
 
         //获取员工对应的企业信息
-        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
+//        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
+//        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
 
 //        //1.根据openId和unionId获取客户的ExternalUserId
 //        WeUnionidExternalUseridRelation weUnionidExternalUseridRelation = weUnionidExternalUseridRelationService.get(weContentViewRecordQuery.getOpenid(), weContentViewRecordQuery.getUnionid());
