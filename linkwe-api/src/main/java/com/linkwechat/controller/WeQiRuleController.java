@@ -15,7 +15,6 @@ import com.linkwechat.domain.qirule.query.*;
 import com.linkwechat.domain.qirule.vo.*;
 import com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveListVo;
 import com.linkwechat.handler.WeQiRuleWeeklyUserDetailWriteHandler;
-import com.linkwechat.handler.WeQualityWriteHandler;
 import com.linkwechat.service.IWeQiRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
