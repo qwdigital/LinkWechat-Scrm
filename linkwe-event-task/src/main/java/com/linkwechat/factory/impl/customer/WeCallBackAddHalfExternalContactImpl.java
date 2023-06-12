@@ -9,6 +9,7 @@ import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.factory.WeEventStrategy;
 import com.linkwechat.service.IWeCustomerService;
+import com.linkwechat.service.IWeQrCodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private IWeQrCodeService weQrCodeService;
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
@@ -45,6 +49,9 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
             if(StringUtils.isNotEmpty(customerInfo.getWelcomeCode())){
                 //发送欢迎语
                 rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeWelcomeMsgEx(),rabbitMQSettingConfig.getWeCustomerWelcomeMsgRk(), JSONObject.toJSONString(customerInfo));
+            }
+            if(StringUtils.isNotEmpty(customerInfo.getState())){
+                weQrCodeService.updateQrMultiplePeople(customerInfo.getState());
             }
         } catch (Exception e) {
             e.printStackTrace();
