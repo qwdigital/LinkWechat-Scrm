@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.dtflys.forest.annotation.Post;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -103,6 +104,8 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWeStrackStageService iWeStrackStageService;
+
+
 
     /**
      * 获取用户列表
