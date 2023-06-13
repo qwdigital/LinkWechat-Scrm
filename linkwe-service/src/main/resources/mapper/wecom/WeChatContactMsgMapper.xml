@@ -119,10 +119,14 @@
                         <if test="toList != null and toList != ''">
                                 and (wccm.to_list = #{toList} or wccm.from_id = #{toList})
                         </if>
-
-                        <if test="roomId != null and roomId != ''">
-                                and wccm.room_id = #{roomId}
-                        </if>
+                        <choose>
+                            <when test="roomId != null and roomId != ''">
+                                 and wccm.room_id = #{roomId}
+                            </when>
+                            <otherwise>
+                                and wccm.room_id is null
+                            </otherwise>
+                        </choose>
 
                         <if test="msgType != null and msgType != ''">
                             and find_in_set(wccm.msg_type,#{msgType})
