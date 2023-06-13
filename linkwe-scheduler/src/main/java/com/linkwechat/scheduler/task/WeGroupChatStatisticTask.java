@@ -18,6 +18,7 @@ import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWeGroupStatisticService;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,8 @@ public class WeGroupChatStatisticTask {
     private IWeCorpAccountService weCorpAccountService;
 
     @XxlJob("weGroupChatStatisticTask")
-    public void process(String params){
+    public void process(){
+        String params = XxlJobHelper.getJobParam();
         log.info("群聊数据统计>>>>>>>>>>>>>>>>>>>启动 params:{}",params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
 

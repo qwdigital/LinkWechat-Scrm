@@ -16,7 +16,7 @@ import java.util.Collection;
 /**
  * feign 请求拦截器
  *
- * @author sxw
+ * @author danmo
  */
 @Slf4j
 @Component

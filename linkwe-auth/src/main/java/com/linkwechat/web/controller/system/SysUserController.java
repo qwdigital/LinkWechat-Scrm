@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.dtflys.forest.annotation.Post;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -102,6 +103,8 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWeStrackStageService iWeStrackStageService;
+
+
 
     /**
      * 获取用户列表
@@ -502,6 +505,17 @@ public class SysUserController extends BaseController {
         updateWrapper.lambda().set(SysUser::getKfStatus, sysUser.getKfStatus());
         updateWrapper.lambda().eq(SysUser::getWeUserId, sysUser.getWeUserId());
         userService.update(updateWrapper);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 更新员工开启会话存档状态
+     * @param query
+     * @return
+     */
+    @PutMapping("/update/chat/status")
+    public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query){
+        userService.updateUserChatStatus(query);
         return AjaxResult.success();
     }
 

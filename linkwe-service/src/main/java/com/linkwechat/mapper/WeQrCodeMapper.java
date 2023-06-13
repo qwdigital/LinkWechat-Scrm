@@ -50,5 +50,7 @@ public interface WeQrCodeMapper extends BaseMapper<WeQrCode> {
 
     
     List<WeQrScopeVo> getWeQrScopeByTime(@Param("formatTime") String formatTime,@Param("qrId") Long qrId);
+
+    WeQrCodeDetailVo getQrDetailByState(String state);
 }
 

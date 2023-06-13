@@ -1,5 +1,6 @@
 package com.linkwechat.web.controller.system;
 
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -34,6 +35,10 @@ import java.util.List;
 public class SysRoleController extends BaseController {
     @Autowired
     private ISysRoleService roleService;
+
+
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
 
 
@@ -92,6 +97,11 @@ public class SysRoleController extends BaseController {
     @PutMapping
     @ApiOperation(value = "修改角色")
     public AjaxResult edit(@Validated @RequestBody SysRole role) {
+        if(linkWeChatConfig.isDemoEnviron()){
+
+            return AjaxResult.error("当前演示环境角色不可修改");
+
+        }
         roleService.checkRoleAllowed(role);
         if (UserConstants.NOT_UNIQUE.equals(roleService.checkRoleNameUnique(role))) {
             return AjaxResult.error("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");

@@ -184,7 +184,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
-    @Async
     public void synchWeCustomerHandler(String msg) {
 
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
@@ -382,13 +381,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     @Transactional
     public void makeLabel(WeMakeCustomerTag weMakeCustomerTag) {
+
+        //移除相关标签
+        List<WeTag> removeTag = weMakeCustomerTag.getRemoveTag();
+
+        if(CollectionUtil.isNotEmpty(removeTag)){
+            iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                    .in(WeFlowerCustomerTagRel::getTagId,removeTag.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+        }
+
+
+        //新增的标签
         List<WeTag> addTag = weMakeCustomerTag.getAddTag();
 
-        //逻辑删除当前客户所有标签关系
-        iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
-                .eq(WeFlowerCustomerTagRel::getIsCompanyTag, weMakeCustomerTag.getIsCompanyTag())
-                .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId()));
+//        //逻辑删除当前客户所有标签关系
+//        iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+//                .eq(WeFlowerCustomerTagRel::getExternalUserid, weMakeCustomerTag.getExternalUserid())
+//                .eq(WeFlowerCustomerTagRel::getIsCompanyTag, weMakeCustomerTag.getIsCompanyTag())
+//                .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId()));
 
         if (CollectionUtil.isNotEmpty(addTag)) {
             List<WeFlowerCustomerTagRel> tagRels = new ArrayList<>();
@@ -413,30 +423,43 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             WeMarkTagQuery cutomerTagEdit = WeMarkTagQuery.builder()
                     .external_userid(weMakeCustomerTag.getExternalUserid())
                     .userid(weMakeCustomerTag.getUserId())
-                    .add_tag(addTag.stream().map(WeTag::getTagId).collect(Collectors.toList()))
                     .build();
 
-            //根据创建时间查询，如果创建时间是今天,需要同步企业微信,新增标签
-            List<WeFlowerCustomerTagRel> nowAddWeFlowerCustomerTagRel = iWeFlowerCustomerTagRelService
-                    .findNowAddWeFlowerCustomerTagRel(weMakeCustomerTag.getExternalUserid(), weMakeCustomerTag.getUserId());
-
-            if (CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)) {
+            if(CollectionUtil.isNotEmpty(addTag)){
                 cutomerTagEdit.setAdd_tag(
-                        nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+                        addTag.stream().map(WeTag::getTagId).collect(Collectors.toList())
                 );
-
-
             }
-            //根据删除的标记+更新时间，同步企业微信,移除标签
-            List<WeFlowerCustomerTagRel> removeWeFlowerCustomerTagRel = iWeFlowerCustomerTagRelService
-                    .findRemoveWeFlowerCustomerTagRel(weMakeCustomerTag.getExternalUserid(), weMakeCustomerTag.getUserId());
 
-            if (CollectionUtil.isNotEmpty(removeWeFlowerCustomerTagRel)) {
+            if(CollectionUtil.isNotEmpty(removeTag)){
                 cutomerTagEdit.setRemove_tag(
-                        removeWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+                        removeTag.stream().map(WeTag::getTagId).collect(Collectors.toList())
                 );
             }
 
+            //根据创建时间查询，如果创建时间是今天,需要同步企业微信,新增标签
+//            List<WeFlowerCustomerTagRel> nowAddWeFlowerCustomerTagRel = iWeFlowerCustomerTagRelService
+//                    .findNowAddWeFlowerCustomerTagRel(weMakeCustomerTag.getExternalUserid(), weMakeCustomerTag.getUserId());
+//
+//            if (CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)) {
+//                cutomerTagEdit.setAdd_tag(
+//                        nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+//                );
+//
+//
+//            }
+            //根据删除的标记+更新时间，同步企业微信,移除标签
+//            List<WeFlowerCustomerTagRel> removeWeFlowerCustomerTagRel = iWeFlowerCustomerTagRelService
+//                    .findRemoveWeFlowerCustomerTagRel(weMakeCustomerTag.getExternalUserid(), weMakeCustomerTag.getUserId());
+//
+//            if (CollectionUtil.isNotEmpty(removeWeFlowerCustomerTagRel)) {
+//                cutomerTagEdit.setRemove_tag(
+//                        removeWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+//                );
+//            }
+
+
+            //发送消息客户标签同步企业微信端
 
             AjaxResult weResultVoAjaxResult = qwCustomerClient.makeCustomerLabel(
                     cutomerTagEdit
@@ -448,20 +471,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 throw new WeComException("打标签失败，稍后请重实");
             } else {
 
-                if (CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)) {
-                    List<WeTag> weTags = iWeTagService.listByIds(
-                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
-                    );
-                    if (CollectionUtil.isNotEmpty(weTags)) {
+//                if (CollectionUtil.isNotEmpty(nowAddWeFlowerCustomerTagRel)) {
+//                    List<WeTag> weTags = iWeTagService.listByIds(
+//                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+//                    );
+                    if (CollectionUtil.isNotEmpty(addTag)) {
                         iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
                                 weMakeCustomerTag.getUserId(),
                                 weMakeCustomerTag.getIsCompanyTag() ?
                                         TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType() :
                                         TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
-                                String.join(",", weTags.stream().map(WeTag::getName).collect(Collectors.toList()))
+                                String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
                         );
                     }
-                }
+//                }
 
 
             }
@@ -473,6 +496,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     }
+
 
 
     //更新客户表的标签id,冗余字段
@@ -701,10 +725,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
 
         //客户当前客户拓展字段
-        weCustomerDetail.setWeCustomerInfoExpands(
-                iWeCustomerInfoExpandService.list(new LambdaQueryWrapper<WeCustomerInfoExpand>()
-                        .eq(WeCustomerInfoExpand::getCustomerId, weCustomer.getId()))
-        );
+        if(weCustomer != null){
+            weCustomerDetail.setWeCustomerInfoExpands(
+                    iWeCustomerInfoExpandService.list(new LambdaQueryWrapper<WeCustomerInfoExpand>()
+                            .eq(WeCustomerInfoExpand::getCustomerId, weCustomer.getId()))
+            );
+        }
 
 
         return weCustomerDetail;

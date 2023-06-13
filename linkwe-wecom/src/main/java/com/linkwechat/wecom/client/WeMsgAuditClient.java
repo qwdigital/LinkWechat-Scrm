@@ -11,7 +11,7 @@ import com.linkwechat.wecom.retry.WeCommonRetryWhen;
  * @description 会话存档接口
  * @date 2020/12/2 16:45
  **/
-@BaseRequest(baseURL = "${weComServerUrl}${weComePrefix}", interceptor = WeChatAccessTokenInterceptor.class)
+@BaseRequest(baseURL = "${weComServerUrl}", interceptor = WeChatAccessTokenInterceptor.class)
 @Retry(maxRetryCount = "3", maxRetryInterval = "1000", condition = WeCommonRetryWhen.class)
 public interface WeMsgAuditClient {
 

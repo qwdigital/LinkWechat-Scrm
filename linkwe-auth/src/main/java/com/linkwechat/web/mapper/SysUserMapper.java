@@ -5,6 +5,8 @@ import com.linkwechat.common.annotation.DataScope;
 //import com.linkwechat.common.annotation.PhoneEncryptMethod;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.web.domain.vo.UserRoleVo;
 import com.linkwechat.web.domain.vo.UserVo;
 import org.apache.ibatis.annotations.Param;
@@ -154,4 +156,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return
      */
     List<SysUser> findAllSysUser(@Param("weUserIds") String weUserIds,@Param("positions") String positions,@Param("deptIds") String deptIds);
+
+
+    List<SysUserVo> getUserListByQuery(SysUserQuery query);
 }

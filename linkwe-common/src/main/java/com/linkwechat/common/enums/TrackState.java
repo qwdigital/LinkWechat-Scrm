@@ -1,5 +1,9 @@
 package com.linkwechat.common.enums;
 
+import cn.hutool.core.collection.CollectionUtil;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum TrackState {
@@ -71,6 +75,14 @@ public enum TrackState {
     }
 
     public static  TrackState of(Integer type){
-        return Stream.of(values()).filter(s->s.getType().equals(type)).findFirst().orElseGet(null);
+        List<TrackState> trackStates = Stream.of(values()).filter(s -> s.getType()
+                .equals(type)).collect(Collectors.toList());
+
+        if(CollectionUtil.isEmpty(trackStates)){
+            return null;
+        }
+
+
+        return trackStates.stream().findFirst().orElseGet(null);
     }
 }

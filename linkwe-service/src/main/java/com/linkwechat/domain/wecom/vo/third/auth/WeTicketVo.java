@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 获取jsapi_ticket
  * @date 2022/3/4 11:34
  **/

@@ -38,7 +38,7 @@ public class WxTaskFissionController extends BaseController {
      * @return
      */
     @GetMapping("/findFissionPoster")
-    public AjaxResult<WeFissionInviterPoster> findFissionPoster(String unionid, String fissionId){
+    public AjaxResult<WeFissionInviterPoster> findFissionPoster(String unionid, String fissionId) throws Exception {
 
 
         return AjaxResult.success(

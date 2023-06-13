@@ -2,6 +2,7 @@ package com.linkwechat.domain.qr.query;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.linkwechat.common.constant.WeConstans;
@@ -56,6 +57,16 @@ public class WeQrAddQuery {
     @ApiModelProperty("排班类型  1-全天 2-自动")
     private Integer qrRuleType;
 
+    @ApiModelProperty("排班方式  1-轮询 2-顺序 3-随机")
+    private Integer qrRuleMode;
+
+    @ApiModelProperty("开启备用员工 1-是 0-否 默认是 0")
+    private Integer openSpareUser = 0;
+
+    @ApiModelProperty("是否开启同一外部企业客户只能添加同一个员工，开启后，同一个企业的客户会优先添加到同一个跟进人  0-不开启 1-开启")
+    private Integer isExclusive = 0;
+
+
     @ApiModelProperty("活码员工列表")
     private List<WeQrUserInfoQuery> qrUserInfos;
 
@@ -81,6 +92,7 @@ public class WeQrAddQuery {
             this.state = WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + snowflake.nextIdStr();
             weContactWay.setState(state);
         }
+        weContactWay.setIs_exclusive(BooleanUtils.toBoolean(this.isExclusive));
         weContactWay.setConfig_id(this.configId);
         weContactWay.setType(this.qrType);
         weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
@@ -117,6 +129,9 @@ public class WeQrAddQuery {
         weQrCode.setGroupId(this.getQrGroupId());
         weQrCode.setType(this.qrType);
         weQrCode.setRuleType(this.qrRuleType);
+        weQrCode.setRuleMode(this.qrRuleMode);
+        weQrCode.setOpenSpareUser(this.openSpareUser);
+        weQrCode.setIsExclusive(this.isExclusive);
         if(this.qrId == null){
             weQrCode.setState(state);
         }

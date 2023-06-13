@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * @author sxw
+ * @author danmo
  * @description 授权信息
  * @date 2022/3/4 11:34
  **/

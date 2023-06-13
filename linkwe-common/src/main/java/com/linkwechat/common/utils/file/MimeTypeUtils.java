@@ -30,7 +30,7 @@ public class MimeTypeUtils
             // word excel powerpoint
             "doc", "docx", "xls", "xlsx", "ppt", "pptx", "html", "htm", "txt",
             // 压缩文件
-            "rar", "zip", "gz", "bz2",
+            "rar", "zip", "gz", "bz2","arm",
             // pdf
             "pdf" ,"wav","amr","mp4","mp3","p12","md"};
 

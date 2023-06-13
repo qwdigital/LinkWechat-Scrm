@@ -108,7 +108,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 
     @Override
     public List<ContentDataDetailVo> getViewDetail(ContentDetailQuery contentDetailQuery) {
-        Long contentId = contentDetailQuery.getContentId();
+//        Long contentId = contentDetailQuery.getContentId();
 
 //        String beginTime = contentDetailQuery.getBeginTime();
 //        String endTime = contentDetailQuery.getEndTime();
@@ -256,26 +256,45 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         SysUser data = result.getData().stream().findFirst().get();
 
         //获取员工对应的企业信息
-        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
+//        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
+//        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
 
-        //1.根据openId和unionId获取客户的ExternalUserId
-        WeUnionidExternalUseridRelation weUnionidExternalUseridRelation = weUnionidExternalUseridRelationService.get(weContentViewRecordQuery.getOpenid(), weContentViewRecordQuery.getUnionid());
-        //2.根据ExternalUserId获取客户信息
+//        //1.根据openId和unionId获取客户的ExternalUserId
+//        WeUnionidExternalUseridRelation weUnionidExternalUseridRelation = weUnionidExternalUseridRelationService.get(weContentViewRecordQuery.getOpenid(), weContentViewRecordQuery.getUnionid());
+//        //2.根据ExternalUserId获取客户信息
+//        WeCustomer weCustomer = null;
+//        if (ObjectUtil.isNotEmpty(weUnionidExternalUseridRelation)) {
+//            String externalUserid = weUnionidExternalUseridRelation.getExternalUserid();
+//            if (StringUtils.isNotBlank(externalUserid)) {
+//                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+//                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
+//                queryWrapper.eq(WeCustomer::getExternalUserid, externalUserid);
+//                queryWrapper.last("limit 1");
+//                List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
+//                if (weCustomers != null && weCustomers.size() > 0) {
+//                    weCustomer = weCustomers.get(0);
+//                }
+//            }
+//        }
+//
+
+        //根据unionId获取客户
         WeCustomer weCustomer = null;
-        if (ObjectUtil.isNotEmpty(weUnionidExternalUseridRelation)) {
-            String externalUserid = weUnionidExternalUseridRelation.getExternalUserid();
-            if (StringUtils.isNotBlank(externalUserid)) {
-                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
-                queryWrapper.eq(WeCustomer::getExternalUserid, externalUserid);
-                queryWrapper.last("limit 1");
-                List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
-                if (weCustomers != null && weCustomers.size() > 0) {
-                    weCustomer = weCustomers.get(0);
-                }
+        if(StringUtils
+                .isNotEmpty(weContentViewRecordQuery.getUnionid())){
+
+
+            List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getUnionid, weContentViewRecordQuery.getUnionid()));
+
+            if(CollectionUtil.isNotEmpty(weCustomers)){
+                weCustomer=weCustomers.stream().findFirst().get();
             }
         }
+
+
+
+
         //3.添加查看数据
         WeContentViewRecord weContentViewRecord = new WeContentViewRecord();
         if (weContentViewRecordQuery.getTalkId() != null) {

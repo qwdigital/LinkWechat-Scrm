@@ -151,4 +151,12 @@ public class WeQrCodeController extends BaseController {
         weQrCodeService.deleteQrGroup(groupId);
         return AjaxResult.success();
     }
+
+    @ApiOperation(value = "更新多人员工活码", httpMethod = "GET")
+    @Log(title = "更新多人员工活码", businessType = BusinessType.SELECT)
+    @GetMapping("/update/multiplePeople")
+    public AjaxResult updateQrMultiplePeople(@RequestParam("state") String state) {
+        weQrCodeService.updateQrMultiplePeople(state);
+        return AjaxResult.success();
+    }
 }
