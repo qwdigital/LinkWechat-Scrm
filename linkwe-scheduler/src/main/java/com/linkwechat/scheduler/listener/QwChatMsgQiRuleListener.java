@@ -87,7 +87,7 @@ public class QwChatMsgQiRuleListener {
         }
         //判断是否为群聊
         if (StringUtils.isEmpty(roomId)) {
-            String receiveId = jsonObject.getString("tolist");
+            String receiveId = jsonObject.getJSONArray("tolist").getString(0);
             externalCustomerMsgHandler(msgId, fromId, receiveId, sendTime);
         } else {
             externalGroupChatMsgHandler(msgId, fromId, roomId, sendTime);
