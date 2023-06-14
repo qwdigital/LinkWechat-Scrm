@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import com.alibaba.fastjson.JSONObject;
@@ -41,9 +42,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.awt.image.BufferedImage;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -210,40 +208,40 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
     }
 
     @Override
-    public JSONObject getShort2LongUrl(String shortUrl) {
+    public JSONObject getShort2LongUrl(String shortUrl, String promotionKey) {
         long id = Base62NumUtil.decode(shortUrl);
         JSONObject resObj = new JSONObject();
         WeShortLink weShortLink = getById(id);
         if (Objects.isNull(weShortLink)) {
-            resObj.put("errorMsg","无效链接");
+            resObj.put("errorMsg", "无效链接");
             return resObj;
             //throw new WeComException("无效链接");
         }
-        resObj.put("type",weShortLink.getType());
+        resObj.put("type", weShortLink.getType());
 
         Integer status = weShortLink.getStatus();
         if (Objects.equals(2, status)) {
-            resObj.put("errorMsg","链接已关闭");
+            resObj.put("errorMsg", "链接已关闭");
             return resObj;
             //throw new WeComException("链接已关闭");
         }
 
-        if(Objects.equals(0,weShortLink.getType())){
-            resObj.put("linkPath",weShortLink.getLongLink());
+        if (Objects.equals(0, weShortLink.getType())) {
+            resObj.put("linkPath", weShortLink.getLongLink());
         }
 
-        if(StringUtils.isNotEmpty(weShortLink.getQrCode())){
-            resObj.put("qrCode",weShortLink.getQrCode());
+        if (StringUtils.isNotEmpty(weShortLink.getQrCode())) {
+            resObj.put("qrCode", weShortLink.getQrCode());
         }
 
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
         if (Objects.isNull(corpAccount)) {
-            resObj.put("errorMsg","请未配置企业信息");
+            resObj.put("errorMsg", "请未配置企业信息");
             return resObj;
             //throw new WeComException("请未配置企业信息");
         }
         if (StringUtils.isEmpty(corpAccount.getWxAppletOriginalId())) {
-            resObj.put("errorMsg","请未配置小程序原始ID");
+            resObj.put("errorMsg", "请未配置小程序原始ID");
             return resObj;
             //throw new WeComException("请未配置小程序原始ID");
         }
@@ -251,19 +249,30 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
         WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
         wxa.setPath(linkWeChatConfig.getShortAppletUrl());
-        wxa.setQuery("id=" + shortUrl);
+        if (StrUtil.isNotBlank(promotionKey)) {
+            long promotionId = Base62NumUtil.decode(promotionKey);
+            wxa.setQuery("id=" + shortUrl + "&promotionId=" + promotionId);
+        } else {
+            wxa.setQuery("id=" + shortUrl);
+        }
         wxa.setEnv_version(shortEnvVersion);
         wxaQuery.setJump_wxa(wxa);
         WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
         if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
             resObj.put("url_scheme", wxJumpWxa.getOpenLink());
         } else {
-            resObj.put("errorMsg","生成小程序跳转链接失败");
+            resObj.put("errorMsg", "生成小程序跳转链接失败");
             //throw new WeComException("生成小程序跳转链接失败");
         }
         resObj.put("user_name", corpAccount.getWxAppletOriginalId());
         resObj.put("path", linkWeChatConfig.getShortAppletUrl());
-        resObj.put("query", "id=" + shortUrl);
+
+        if (StrUtil.isNotBlank(promotionKey)) {
+            long promotionId = Base62NumUtil.decode(promotionKey);
+            resObj.put("query", "id=" + shortUrl + "&promotionId=" + promotionId);
+        } else {
+            resObj.put("query", "id=" + shortUrl);
+        }
         return resObj;
     }
 

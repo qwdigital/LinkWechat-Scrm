@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeShortLinkPromotionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.WeShortLinkPromotion">
+        <id column="id" property="id"/>
+        <result column="task_name" property="taskName"/>
+        <result column="short_link_id" property="shortLinkId"/>
+        <result column="type" property="type"/>
+        <result column="style" property="style"/>
+        <result column="material_id" property="materialId"/>
+        <result column="url" property="url"/>
+        <result column="task_status" property="taskStatus"/>
+        <result column="task_start_time" property="taskStartTime"/>
+        <result column="task_end_time" property="taskEndTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        ,task_name, short_link_id, `type`, `style`, material_id, url, task_status, task_start_time, task_end_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag
+    </sql>
+
+
+    <select id="selectList" resultType="com.linkwechat.domain.shortlink.vo.WeShortLinkPromotionVo">
+        SELECT p.id,
+        p.task_name,
+        p.short_link_id,
+        sl.short_link_name,
+        p.type,
+        p.style,
+        p.material_id,
+        p.url,
+        p.task_status,
+        p.task_start_time,
+        p.task_end_time,
+        p.create_by,
+        p.update_time,
+        (select sum(pv_num) from we_short_link_promotion_day_stat d1 where d1.promotion_id = p.id and d1.del_flag = 0)
+        as pv_num,
+        (select sum(uv_num) from we_short_link_promotion_day_stat d2 where d2.promotion_id = p.id and d2.del_flag = 0)
+        as uv_num,
+        (select sum(open_num) from we_short_link_promotion_day_stat d3 where d3.promotion_id = p.id and d3.del_flag = 0)
+        as open_num
+        FROM we_short_link_promotion p
+        LEFT JOIN we_short_link sl on p.short_link_id = sl.id
+        <where>
+            p.del_flag = 0
+            <if test="type!=null">
+                and p.type = #{type}
+            </if>
+            <if test="style!=null">
+                and p.style = #{style}
+            </if>
+            <if test="taskStatus!=null">
+                and p.task_status = #{taskStatus}
+            </if>
+            <if test="taskName!=null and taskName!=''">
+                and p.task_name like concat("%",#{taskName},"%")
+            </if>
+            <if test="shortLinkName!=null and shortLinkName!=''">
+                and sl.short_link_name like concat("%",#{shortLinkName},"%")
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+
+</mapper>
