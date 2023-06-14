@@ -29,7 +29,7 @@
 
             <choose>
                 <when test="isExpiringSoon">
-                    AND  timestampdiff(MINUTE,NOW(),wseta.push_end_time)&lt;=10 AND wseta.is_tip !=2
+                    AND   0&lt;=timestampdiff(MINUTE,NOW(),wseta.push_end_time)&lt;=10 AND wseta.is_tip !=2
                 </when>
                 <otherwise>
                     AND to_days(wseta.push_start_time) = to_days(now()) AND wseta.is_tip=0

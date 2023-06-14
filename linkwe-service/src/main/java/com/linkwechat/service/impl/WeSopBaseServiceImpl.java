@@ -1006,7 +1006,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                     if(currentWeek-1<=new Integer(weSopPushTimeDto.getPushTimePre())){//生成符合条件当前日期下到周日的具体时间
                                         //执行日期
                                         String executeData
-                                                = WeekDateUtils.GetCurrentWeekAllDate().get(new Integer(currentWeek));
+                                                = WeekDateUtils.GetCurrentWeekAllDate().get(Integer.parseInt(weSopPushTimeDto.getPushTimePre()));
 
                                         if(StringUtils.isNotEmpty(executeData)){
                                             attachments.setPushStartTime(

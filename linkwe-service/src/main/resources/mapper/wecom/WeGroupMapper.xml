@@ -127,10 +127,10 @@
             </if>
 
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(wg.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+                AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
             </if>
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(wg.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+                AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
             </if>
             <if test="userIds != null and userIds !=''">
                 <if test="userIds.indexOf(',') != -1">
