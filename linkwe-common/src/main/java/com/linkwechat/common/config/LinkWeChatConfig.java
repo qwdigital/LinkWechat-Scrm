@@ -41,7 +41,7 @@ public class LinkWeChatConfig {
     /**
      * 是否是演示环境 true:是 false:不是
      */
-    private boolean demoEnviron=false;
+    private boolean demoEnviron = false;
     /**
      * 上传路径
      */
@@ -50,14 +50,13 @@ public class LinkWeChatConfig {
     /**
      * 客户访问地址
      */
-    private  String groupCodeUrl;
+    private String groupCodeUrl;
 
 
     /**
      * 客户公海访问地址
      */
     private String seasRedirectUrl;
-
 
 
     /**
@@ -84,8 +83,6 @@ public class LinkWeChatConfig {
     private String liveUrl;
 
 
-
-
     /**
      * 流失客户地址
      */
@@ -97,11 +94,10 @@ public class LinkWeChatConfig {
     private String h5Domain;
 
 
-
     /**
      * JS SDK 身份校验url
      */
-    private String authorizeUrl="https://open.weixin.qq.com/connect/oauth2/authorize";
+    private String authorizeUrl = "https://open.weixin.qq.com/connect/oauth2/authorize";
 
     /**
      * 获取地址开关
@@ -156,13 +152,13 @@ public class LinkWeChatConfig {
     /**
      * 第三方应用的环境 true 正式授权， false 测试授权
      */
-    private boolean installEnv=false;
+    private boolean installEnv = false;
 
 
     /**
      * 数据同步使劲啊间隔
      */
-    private int dataSynchInterval=3;
+    private int dataSynchInterval = 3;
 
 
     /**
@@ -177,7 +173,7 @@ public class LinkWeChatConfig {
 
 
     /**
-     *  导购码
+     * 导购码
      */
     private String guideCodeUrl;
 
@@ -190,7 +186,6 @@ public class LinkWeChatConfig {
      * 导购群码
      */
     private String guideGroupUrl;
-
 
 
     /**
@@ -212,6 +207,21 @@ public class LinkWeChatConfig {
      * 拉新活码H5地址
      */
     private String lxQrCodeUrl;
+
+    /**
+     * 短链推广-应用消息详情
+     */
+    private String appMsgUrl;
+
+    /**
+     * 素材中心素材详情
+     */
+    private String materialDetailUrl;
+
+    /**
+     * 朋友圈移动端列表页
+     */
+    private String momentsUrl;
 
 
     public String getName() {
@@ -241,7 +251,7 @@ public class LinkWeChatConfig {
     public static String getProfile() {
         if (OsUtils.isWindows()) {
             return "D:/linkWeChat/uploadPath";
-        }else if(OsUtils.isMac()){
+        } else if (OsUtils.isMac()) {
             return "/Users/robin/work/sr_project/lw/saas/file";
         }
         return "/usr/local/app/file";
@@ -416,9 +426,6 @@ public class LinkWeChatConfig {
     public void setDataSynchInterval(int dataSynchInterval) {
         this.dataSynchInterval = dataSynchInterval;
     }
-
-
-
 
 
 }

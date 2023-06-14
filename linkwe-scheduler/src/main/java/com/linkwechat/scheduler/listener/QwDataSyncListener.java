@@ -31,9 +31,6 @@ public class QwDataSyncListener {
     @Autowired
     private IWeTagGroupService weTagGroupService;
 
-    @Autowired
-    private IWeMomentsService weMomentsService;
-
     @Resource
     private QwSysUserClient qwSysUserClient;
 
@@ -43,10 +40,8 @@ public class QwDataSyncListener {
     @Resource
     private IWeProductOrderService weProductOrderService;
 
-
     @Autowired
     private IWeLiveService iWeLiveService;
-
 
     @Autowired
     private IWeLeaveUserService iWeLeaveUserService;
@@ -77,7 +72,6 @@ public class QwDataSyncListener {
         }
     }
 
-
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.grouptag:Qu_GroupTag}")
     public void groupTagSubscribe(String msg, Channel channel, Message message) {
@@ -90,22 +84,6 @@ public class QwDataSyncListener {
             log.error("企微标签同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
-
-
-
-    @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.sync.we-moments:Qu_Moments}")
-    public void weMomentsSubscribe(String msg, Channel channel, Message message) {
-        try {
-            log.info("企微朋友圈同步消息监听：msg:{}", msg);
-            weMomentsService.synchWeMomentsHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("企微朋友圈同步-消息处理失败 msg:{},error:{}", msg, e);
-        }
-    }
-
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.user-depart:Qu_UserDepart}")
@@ -120,19 +98,6 @@ public class QwDataSyncListener {
         }
     }
 
-
-    @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.sync.we-hd-moments:Qu_Hd_Moments}")
-    public void weHdMomentsSubscribe(String msg, Channel channel, Message message) {
-        try {
-            log.info("企微朋友圈互动同步消息监听：msg:{}", msg);
-            weMomentsService.synchMomentsInteracteHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("企微朋友圈互动同步-消息处理失败 msg:{},error:{}", msg, e);
-        }
-    }
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.product:Qu_Product}")
@@ -163,27 +128,27 @@ public class QwDataSyncListener {
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.live-qu:Qu_Live}")
-    public void weLiveSubscribe(String msg, Channel channel, Message message){
+    public void weLiveSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微直播同步消息监听：msg:{}",msg);
+            log.info("企微直播同步消息监听：msg:{}", msg);
             iWeLiveService.synchLiveHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微直播同步-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微直播同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.leaveUser:Qu_LeaveUser}")
-    public void weLeaveUserSubscribe(String msg, Channel channel, Message message){
+    public void weLeaveUserSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微离职员工同步消息监听：msg:{}",msg);
+            log.info("企微离职员工同步消息监听：msg:{}", msg);
             iWeLeaveUserService.synchLeaveSysUserHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("企微离职员工同步消息监听-消息处理失败 msg:{},error:{}",msg,e);
+            log.error("企微离职员工同步消息监听-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 

@@ -580,21 +580,15 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public String mediaGet(String media_id, String fileType, String extentType) {
-
         byte[] data = mediaClient.mediaGet(new WeMediaQuery(media_id)).getData();
-
-
         String fileName = String.valueOf(SnowFlakeUtil.nextId());
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain",
-                data);
-
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain", data);
         try {
             WeMaterialFileVo weMaterialFileVO = this.uploadWeMaterialFile(mockMultipartFile, fileType);
             return weMaterialFileVO.getMaterialUrl();
         } catch (Exception e) {
             log.error("朋友圈资源获取失败:" + e.getMessage());
         }
-
         return null;
     }
 

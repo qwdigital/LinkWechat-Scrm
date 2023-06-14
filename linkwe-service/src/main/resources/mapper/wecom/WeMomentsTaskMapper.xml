@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeMomentsTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.moments.entity.WeMomentsTask">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="send_type" property="sendType"/>
+        <result column="is_lw_push" property="isLwPush"/>
+        <result column="scope_type" property="scopeType"/>
+        <result column="customer_num" property="customerNum"/>
+        <result column="dept_ids" property="deptIds"/>
+        <result column="post_ids" property="postIds"/>
+        <result column="user_ids" property="userIds"/>
+        <result column="customer_tag" property="customerTag"/>
+        <result column="content" property="content"/>
+        <result column="execute_time" property="executeTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="like_tag_ids" property="likeTagIds"/>
+        <result column="comment_tag_ids" property="commentTagIds"/>
+        <result column="status" property="status"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        `name`,
+        `type`,
+        send_type,
+        is_lw_push,
+        scope_type,
+        customer_num,
+        dept_ids,
+        post_ids,
+        user_ids,
+        customer_tag,
+        content,
+        execute_time,
+        execute_end_time,
+        like_tag_ids,
+        comment_tag_ids,
+        status,
+        create_by,
+        create_by_id,
+        create_time,
+        update_by,
+        update_by_id,
+        update_time,
+        del_flag
+    </sql>
+
+
+    <select id="list" resultType="com.linkwechat.domain.moments.vo.WeMomentsTaskVO">
+        SELECT
+        t1.id,
+        t1.name,
+        t1.type,
+        t1.send_type,
+        t1.is_lw_push,
+        t1.scope_type,
+        t1.customer_num,
+        t1.dept_ids,
+        t1.post_ids,
+        t1.user_ids,
+        t1.customer_tag,
+        t1.content,
+        t1.execute_time,
+        t1.execute_end_time,
+        t1.like_tag_ids,
+        t1.comment_tag_ids,
+        t1.status,
+        t1.create_by,
+        t1.create_by_id,
+        t1.create_time,
+        t1.update_by,
+        t1.update_by_id,
+        t1.update_time,
+        t1.del_flag,
+        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_id = t1.id AND t2.execute_status = 1 ) AS executed,
+        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_id = t1.id ) AS total
+        FROM
+        we_moments_task t1
+        WHERE t1.del_flag = 0
+        <if test="sendType!=null">
+            AND t1.send_type = #{sendType}
+        </if>
+        <if test="status!=null">
+            AND t1.status = #{status}
+        </if>
+        <if test="executeStartTime!=null and executeEndTime!=null">
+            AND t1.execute_time BETWEEN #{executeStartTime} AND #{executeEndTime}
+        </if>
+        <if test="name!=null and name!=''">
+            AND t1.name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="createBy!=null and createBy!=''">
+            AND t1.create_by like CONCAT('%',#{createBy},'%')
+        </if>
+        ORDER BY t1.update_time DESC
+    </select>
+
+</mapper>

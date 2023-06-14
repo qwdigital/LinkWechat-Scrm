@@ -104,7 +104,6 @@ public class RabbitMQConfig {
         return ExchangeBuilder.directExchange(rabbitMQSettingConfig.getWeQrCodeChangeEx()).durable(true).build();
     }
 
-
     /**
      * 声明回调队列
      *
@@ -154,8 +153,6 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quSyncGroupChat()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupChatRk()).noargs();
     }
 
-
-
     /**
      * 客户同步队列
      *
@@ -175,7 +172,6 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncWeCustomer() {
         return BindingBuilder.bind(quWeCustomer()).to(syncEx()).with(rabbitMQSettingConfig.getWeCustomerRk()).noargs();
     }
-
 
     /**
      * 员工部门队列
@@ -197,7 +193,6 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quUserDepart()).to(syncEx()).with(rabbitMQSettingConfig.getUserDepartRk()).noargs();
     }
 
-
     /**
      * 客户标签同步队列
      *
@@ -218,6 +213,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(weGroupTag()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupTagRk()).noargs();
     }
 
+
     /**
      * 朋友圈同步队列
      *
@@ -234,10 +230,9 @@ public class RabbitMQConfig {
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncWemoments() {
+    public Binding bindingExchangeSyncWeMoments() {
         return BindingBuilder.bind(weMoments()).to(syncEx()).with(rabbitMQSettingConfig.getWeMomentsRk()).noargs();
     }
-
 
     /**
      * 朋友圈互动同步队列
@@ -255,8 +250,72 @@ public class RabbitMQConfig {
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncHdWemoments() {
+    public Binding bindingExchangeSyncHdWeMoments() {
         return BindingBuilder.bind(weHdMoments()).to(syncEx()).with(rabbitMQSettingConfig.getWeHdMomentsRk()).noargs();
+    }
+
+    /**
+     * 朋友圈定时执行队列
+     *
+     * @return 定时执行队列
+     */
+    @Bean
+    public Queue weMomentsDelayExecute() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayExecuteQu());
+    }
+
+    /**
+     * 朋友圈定时执行队列绑定延迟交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeDelayMomentDelayExecute() {
+        return BindingBuilder.bind(weMomentsDelayExecute()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayExecuteRk()).noargs();
+    }
+
+    /**
+     * 朋友圈定时取消队列
+     *
+     * @return 定时取消队列
+     */
+    @Bean
+    public Queue weMomentsDelayCancel() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayCancelQu());
+    }
+
+    /**
+     * 朋友圈定时执行队列绑定延迟交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeDelayMomentDelayCancel() {
+        return BindingBuilder.bind(weMomentsDelayCancel()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayCancelRk()).noargs();
+    }
+
+    /**
+     * 朋友圈jobId换取momentsId队列
+     *
+     * @author WangYX
+     * @date 2023/06/13 10:30
+     * @version 1.0.0
+     */
+    @Bean
+    public Queue weMomentsJobIdToMomentsId() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdQu());
+    }
+
+    /**
+     * 朋友圈jobId换取momentsId绑定交换机
+     *
+     * @author WangYX
+     * @date 2023/06/13 10:30
+     * @version 1.0.0
+     */
+    @Bean
+    public Binding bindingExchangeDelayJobIdToMomentsId() {
+        return BindingBuilder.bind(weMomentsJobIdToMomentsId()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK()).noargs();
     }
 
 
@@ -553,7 +612,7 @@ public class RabbitMQConfig {
      *
      * @return
      */
-   @Bean
+    @Bean
     public Binding bindingExchangeChatMsgQiRule() {
         return BindingBuilder.bind(quChatMsgQiRule()).to(chatMsgAuditEx()).with(rabbitMQSettingConfig.getWeChatMsgQiRuleRk()).noargs();
     }
@@ -591,63 +650,66 @@ public class RabbitMQConfig {
 
     /**
      * sop队列绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingSopExchange(){
+    public Binding bindingSopExchange() {
         return BindingBuilder.bind(sopQu()).to(sopEx()).with(rabbitMQSettingConfig.getSopRk()).noargs();
     }
 
 
     /**
      * sop队列
+     *
      * @return
      */
     @Bean
-    public Queue sopQu(){
+    public Queue sopQu() {
         return new Queue(rabbitMQSettingConfig.getSopQu());
     }
 
     /**
      * sop交换机
+     *
      * @return
      */
     @Bean
-    public Exchange sopEx(){
+    public Exchange sopEx() {
         // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
 
-
     /**
      * 直播交换机
+     *
      * @return
      */
     @Bean
-    public Exchange liveEx(){
+    public Exchange liveEx() {
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeLiveRk()).durable(true).build();
     }
 
     /**
      * 直播队列绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncWeLive(){
+    public Binding bindingExchangeSyncWeLive() {
         return BindingBuilder.bind(quWeLive()).to(syncEx()).with(rabbitMQSettingConfig.getWeLiveRk()).noargs();
     }
 
     /**
      * 直播同步队列
+     *
      * @return
      */
     @Bean
-    public Queue quWeLive(){
+    public Queue quWeLive() {
         return new Queue(rabbitMQSettingConfig.getLiveQu());
     }
-
-
 
 
     /**
@@ -663,24 +725,23 @@ public class RabbitMQConfig {
 
     /**
      * 同步离职成员队列
+     *
      * @return
      */
     @Bean
-    public Queue quLeaveUser(){
+    public Queue quLeaveUser() {
         return new Queue(rabbitMQSettingConfig.getLeaveAllocateUserQu());
-
     }
 
 
     /**
      * 离职成员同步绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingQuLeaveUser(){
-
+    public Binding bindingQuLeaveUser() {
         return BindingBuilder.bind(quLeaveUser()).to(syncEx()).with(rabbitMQSettingConfig.getWeLeaveAllocateUserRk()).noargs();
-
     }
 }
 

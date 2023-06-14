@@ -47,6 +47,8 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
 
     @Override
     public WeCorpAccount getCorpAccountByCorpId(String corpId) {
+        //TODO corpId 空值
+        Object cacheObject = redisService.getCacheObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, corpId));
         WeCorpAccount account = (WeCorpAccount)redisService.getCacheObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, corpId));
         if(ObjectUtil.isNull(account)){
             account = getOne(new LambdaQueryWrapper<WeCorpAccount>()

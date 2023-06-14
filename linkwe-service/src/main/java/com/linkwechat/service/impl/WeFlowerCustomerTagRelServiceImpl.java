@@ -32,4 +32,9 @@ public class WeFlowerCustomerTagRelServiceImpl extends ServiceImpl<WeFlowerCusto
     public List<WeFlowerCustomerTagRel> findRemoveWeFlowerCustomerTagRel(String externalUserId, String userId) {
         return this.baseMapper.findRemoveWeFlowerCustomerTagRel(externalUserId, userId);
     }
+
+    @Override
+    public List<String> getCountByTagIdAndUserId(List<String> tagIds, List<String> userIds) {
+        return this.baseMapper.getCountByTagIdAndUserId(tagIds,userIds);
+    }
 }
