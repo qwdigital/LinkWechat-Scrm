@@ -81,14 +81,14 @@ public interface WeSopBaseMapper extends BaseMapper<WeSopBase> {
      * @param weUserId
      * @return
      */
-    List<WeCustomerSopToBeSentVo> findTdSendSopCustomers(@Param("weUserId") String weUserId);
+    List<WeCustomerSopToBeSentVo> findTdSendSopCustomers(@Param("weUserId") String weUserId,@Param("isExpiringSoon") boolean isExpiringSoon);
 
     /**
      * 根据员工id获取今日需要发送sop的群
      * @param weUserId
      * @return
      */
-    List<WeGroupSopToBeSentVo> findTdSendSopGroups(@Param("weUserId") String weUserId);
+    List<WeGroupSopToBeSentVo> findTdSendSopGroups(@Param("weUserId") String weUserId,@Param("isExpiringSoon") boolean isExpiringSoon);
 
 
     /**

@@ -607,7 +607,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
     @Override
-    public List<WeCustomerSopToBeSentVo> findWeCustomerSopToBeSent() {
+    public List<WeCustomerSopToBeSentVo> findWeCustomerSopToBeSent(boolean isExpiringSoon) {
         List<WeCustomerSopToBeSentVo> sopToBeSentVoList=new ArrayList<>();
         LoginUser loginUser = SecurityUtils.getLoginUser();
 
@@ -617,7 +617,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             List<WeCustomerSopToBeSentVo> tdSendSopCustomers
-                    = this.baseMapper.findTdSendSopCustomers(loginUser.getSysUser().getWeUserId());
+                    = this.baseMapper.findTdSendSopCustomers(loginUser.getSysUser().getWeUserId(),isExpiringSoon);
 
             if(CollectionUtil.isNotEmpty(tdSendSopCustomers)){
 
@@ -644,7 +644,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public List<WeGroupSopToBeSentVo> findWeGroupSopToBeSent() {
+    public List<WeGroupSopToBeSentVo> findWeGroupSopToBeSent(boolean isExpiringSoon) {
         List<WeGroupSopToBeSentVo> weGroupSopToBeSentVos=new ArrayList<>();
         LoginUser loginUser = SecurityUtils.getLoginUser();
         if(null != loginUser && null != loginUser.getSysUser()){
@@ -652,7 +652,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             List<WeGroupSopToBeSentVo> tdSendSopGroups
-                    = this.baseMapper.findTdSendSopGroups(loginUser.getSysUser().getWeUserId());
+                    = this.baseMapper.findTdSendSopGroups(loginUser.getSysUser().getWeUserId(),isExpiringSoon);
 
             if(CollectionUtil.isNotEmpty(tdSendSopGroups)){
                 tdSendSopGroups.stream()

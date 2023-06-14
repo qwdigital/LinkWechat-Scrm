@@ -7,6 +7,8 @@ import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.domain.sop.vo.*;
 import com.linkwechat.domain.sop.vo.content.*;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,13 +134,13 @@ public interface IWeSopBaseService extends IService<WeSopBase> {
      * 获取今日客户发送的sop相关消息
      * @return
      */
-    List<WeCustomerSopToBeSentVo> findWeCustomerSopToBeSent();
+    List<WeCustomerSopToBeSentVo> findWeCustomerSopToBeSent(boolean isExpiringSoon);
 
     /**
      * 获取今日客群发送的sop相关消息
      * @return
      */
-    List<WeGroupSopToBeSentVo> findWeGroupSopToBeSent();
+    List<WeGroupSopToBeSentVo> findWeGroupSopToBeSent(boolean isExpiringSoon);
 
 
     /**

@@ -116,26 +116,28 @@ public class WeSopController extends BaseController {
 
     /**
      *  获取今日客户相关sop信息
+     *  isExpiringSoon true 即将过期的sop false 当日sop
      * @return
      */
     @GetMapping("/findWeCustomerSop")
-    public AjaxResult findTodayWeCustomerSop(){
+    public AjaxResult findTodayWeCustomerSop(@RequestParam(defaultValue = "false") Boolean isExpiringSoon){
 
 
         return AjaxResult.success(
-                iWeSopBaseService.findWeCustomerSopToBeSent()
+                iWeSopBaseService.findWeCustomerSopToBeSent(isExpiringSoon)
         );
     }
 
     /**
      * 获取今日客群相关sop
+     *  isExpiringSoon true 即将过期的sop false 当日sop
      * @return
      */
     @GetMapping("/findTodayGroupSop")
-    public AjaxResult findTodayGroupSop(){
+    public AjaxResult findTodayGroupSop(@RequestParam(defaultValue = "false") Boolean isExpiringSoon){
 
         return AjaxResult.success(
-                iWeSopBaseService.findWeGroupSopToBeSent()
+                iWeSopBaseService.findWeGroupSopToBeSent(isExpiringSoon)
         );
     }
 
