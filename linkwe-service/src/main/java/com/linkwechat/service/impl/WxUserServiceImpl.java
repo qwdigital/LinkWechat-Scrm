@@ -1,7 +1,10 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WxUser;
 import com.linkwechat.domain.wecom.vo.weixin.WxAuthUserInfoVo;
 import com.linkwechat.fegin.QwCustomerClient;
@@ -12,6 +15,8 @@ import com.linkwechat.service.IWxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 微信用户表(WxUser)
@@ -52,9 +57,14 @@ public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> impleme
 
     @Override
     public WxUser getCustomerInfo(String openId, String unionId) {
-       return getOne(new LambdaQueryWrapper<WxUser>()
+        List<WxUser> wxUserList = list(new LambdaQueryWrapper<WxUser>()
                 .eq(WxUser::getOpenId,openId)
-                .eq(WxUser::getUnionId,unionId)
-                .eq(WxUser::getDelFlag,0));
+                .eq(StringUtils.isNotEmpty(unionId),WxUser::getUnionId,unionId)
+                .eq(WxUser::getDelFlag, Constants.COMMON_STATE));
+
+        if(CollectionUtil.isNotEmpty(wxUserList)){
+            return wxUserList.stream().findFirst().get();
+        }
+        return new WxUser();
     }
 }
