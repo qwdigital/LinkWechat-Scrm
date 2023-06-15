@@ -27,14 +27,6 @@ import java.util.List;
 @Service
 public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> implements IWxUserService {
 
-    @Autowired
-    private IWeCustomerService weCustomerService;
-
-    @Autowired
-    private IWeCorpAccountService weCorpAccountService;
-
-    @Autowired
-    private QwCustomerClient qwCustomerClient;
 
     @Async
     @Override
