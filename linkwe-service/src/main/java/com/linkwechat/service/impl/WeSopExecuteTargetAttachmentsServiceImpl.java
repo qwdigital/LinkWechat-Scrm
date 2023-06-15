@@ -260,12 +260,21 @@ implements IWeSopExecuteTargetAttachmentsService {
 
                         if(isExpiringSoon){
                             textContent.append(" 请注意及时推送。");
+                            iWeMessagePushService.pushMessageSelfH5(
+                                    ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP_DQTX.getType():MessageNoticeType.CUSTOMER_SOP_DQTX.getType(),true
+                            );
+
+                        }else{
+                            iWeMessagePushService.pushMessageSelfH5(
+                                    ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
+                            );
+
+
+
                         }
 
 
-                        iWeMessagePushService.pushMessageSelfH5(
-                                ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
-                        );
+
 
 
                     }
@@ -303,11 +312,17 @@ implements IWeSopExecuteTargetAttachmentsService {
 
                         if(isExpiringSoon){
                             textContent.append(" 请注意及时推送。");
+                            iWeMessagePushService.pushMessageSelfH5(
+                                    ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP_DQTX.getType():MessageNoticeType.CUSTOMER_SOP_DQTX.getType(),true
+                            );
+                        }else{
+                            iWeMessagePushService.pushMessageSelfH5(
+                                    ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
+                            );
+
                         }
 
-                        iWeMessagePushService.pushMessageSelfH5(
-                                ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
-                        );
+
 
                     }
 
