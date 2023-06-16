@@ -141,7 +141,7 @@ public class WeLive extends BaseEntity {
     /**
      * 直播开始时间
      */
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm" , timezone = "GMT+8")
     @ExcelIgnore
     private Date liveStartTime;
 
@@ -158,7 +158,7 @@ public class WeLive extends BaseEntity {
     /**
      * 直播结束时间
      */
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm", timezone = "GMT+8")
     @ExcelIgnore
     private Date liveEndTime;
 

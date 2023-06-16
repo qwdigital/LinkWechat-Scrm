@@ -182,4 +182,9 @@ public class Constants
      * 企业信息管理 cache key
      */
     public static final String CORP_ACCOUNT_KEY = "corp_account:{}";
+
+    /**
+     * 员工活码 redis key
+     */
+    public static final String USER_CODE_KEY = "user_code:";
 }
