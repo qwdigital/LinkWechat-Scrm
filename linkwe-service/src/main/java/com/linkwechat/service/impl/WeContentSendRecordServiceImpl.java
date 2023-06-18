@@ -90,9 +90,9 @@ public class WeContentSendRecordServiceImpl extends ServiceImpl<WeContentSendRec
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentId), WeContentSendRecord::getContentId, contentId);
         queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getResourceType()), WeContentSendRecord::getResourceType, contentDetailQuery.getResourceType());
 
-        if(StringUtils.isNotEmpty(beginTime) && StringUtils.isNotEmpty(endTime)){
-            queryWrapper.lambda().between(WeContentSendRecord::getSendTime,beginTime,endTime);
-        }
+        queryWrapper.lambda().apply(StringUtils.isNotEmpty(beginTime) ,"date_format(send_time, '%Y-%m-%d' ) >= '" + beginTime + "'");
+        queryWrapper.lambda().apply(StringUtils.isNotEmpty(endTime),"date_format(send_time, '%Y-%m-%d' ) <= '" + endTime + "'");
+
         queryWrapper.lambda().groupBy(WeContentSendRecord::getSendById);
 
         //取出所有的数据

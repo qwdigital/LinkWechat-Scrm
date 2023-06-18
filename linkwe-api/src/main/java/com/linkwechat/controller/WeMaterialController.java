@@ -54,10 +54,6 @@ public class WeMaterialController extends BaseController {
     @Resource
     private IWeMaterialService materialService;
 
-    @Resource
-    private IWeCustomerService weCustomerService;
-
-
     @GetMapping("/material/list")
     @ApiOperation("查询素材列表")
     public TableDataInfo list(LinkMediaQuery query) {
@@ -341,36 +337,6 @@ public class WeMaterialController extends BaseController {
     public TableDataInfo getWeMaterialDataCount(ContentDetailQuery contentDetailQuery) {
         startPage();
         List<ContentDataDetailVo> weMaterialDataCount = materialService.getWeMaterialDataCount(contentDetailQuery);
-        TableDataInfo dataTable = getDataTable(weMaterialDataCount);
-        Integer detailsType = contentDetailQuery.getDetailsType();
-        if (detailsType.equals(2)) {
-            List<ContentDataDetailVo> rows = (List<ContentDataDetailVo>) dataTable.getRows();
-            if (rows != null && rows.size() > 0) {
-                Set<String> collect = rows.stream().map(o -> o.getViewByUnionid()).collect(Collectors.toSet());
-                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-                queryWrapper.in(WeCustomer::getUnionid, collect);
-                List<WeCustomer> list = weCustomerService.list(queryWrapper);
-                if (list != null && list.size() > 0) {
-                    Map<String, WeCustomer> weCustomersMap = list.stream().collect(Collectors.toMap(WeCustomer::getUnionid, Function.identity(), (key1, key2) -> key2));
-                    for (ContentDataDetailVo row : rows) {
-                        WeCustomer weCustomer = weCustomersMap.get(row.getViewByUnionid());
-                        if (ObjectUtil.isNotNull(weCustomer)) {
-                            row.setIsCustomer(1);
-                            String viewBy = row.getViewBy();
-                            if (StrUtil.isBlank(viewBy)) {
-                                row.setViewBy(weCustomer.getCustomerName());
-                            }
-                            String viewAvatar = row.getViewAvatar();
-                            if (StrUtil.isBlank(viewAvatar)) {
-                                if (StrUtil.isNotBlank(weCustomer.getAvatar())) {
-                                    row.setViewAvatar(weCustomer.getAvatar());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
         return getDataTable(weMaterialDataCount);
     }
 
