@@ -124,7 +124,7 @@
                                  and wccm.room_id = #{roomId}
                             </when>
                             <otherwise>
-                                and wccm.room_id is null
+                                and wccm.room_id = ''
                             </otherwise>
                         </choose>
 
