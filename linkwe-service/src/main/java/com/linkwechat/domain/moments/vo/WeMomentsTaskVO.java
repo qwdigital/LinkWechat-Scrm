@@ -74,7 +74,7 @@ public class WeMomentsTaskVO {
      * 岗位id集合
      */
     @ApiModelProperty(value = "岗位id集合")
-    private List<String> postIds;
+    private List<String> posts;
 
     /**
      * 员工id集合
@@ -86,7 +86,7 @@ public class WeMomentsTaskVO {
      * 客户标签
      */
     @ApiModelProperty(value = "客户标签")
-    private String customerTag;
+    private List<String> customerTag;
 
     /**
      * 朋友圈文本内容

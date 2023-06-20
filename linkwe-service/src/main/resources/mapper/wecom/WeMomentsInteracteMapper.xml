@@ -6,6 +6,7 @@
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="momentsTaskId" column="moments_task_id" jdbcType="INTEGER"/>
         <result property="interacteUserId" column="interacte_user_id" jdbcType="VARCHAR"/>
+        <result property="weUserId" column="we_user_id" jdbcType="VARCHAR"/>
         <result property="interacteType" column="interacte_type" jdbcType="INTEGER"/>
         <result property="momentId" column="moment_id" jdbcType="VARCHAR"/>
         <result property="interacteUserType" column="interacte_user_type" jdbcType="INTEGER"/>
@@ -20,23 +21,22 @@
     </resultMap>
 
     <sql id="selectWeMomentsInteracteVo">
-        select
-        id,
-        moments_task_id,
-        interacte_user_id,
-        interacte_type,
-        moment_id,
-        interacte_user_type,
-        interacte_time,
-        create_time,
-        create_by,
-        create_by_id,
-        update_time,
-        update_by,
-        update_by_id,
-        del_flag
-        from
-        we_moments_interacte
+        select id,
+               moments_task_id,
+               we_user_id,
+               interacte_user_id,
+               interacte_type,
+               moment_id,
+               interacte_user_type,
+               interacte_time,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_moments_interacte
     </sql>
 
 </mapper>

@@ -16,6 +16,7 @@ import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.vo.WeMaterialVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.moments.dto.CancelMomentTaskDto;
+import com.linkwechat.domain.moments.dto.MomentsCancelDTO;
 import com.linkwechat.domain.moments.dto.MomentsCreateResultDto;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionQuery;
@@ -465,9 +466,9 @@ public class WeShortLinkPromotionServiceImpl extends ServiceImpl<WeShortLinkProm
                     MomentsCreateResultDto data = m.getData();
                     MomentsCreateResultDto.Result result = data.getResult();
                     //停止发送朋友圈
-                    CancelMomentTaskDto cancelMomentTaskDto = new CancelMomentTaskDto();
-                    cancelMomentTaskDto.setMoment_id(result.getMoment_id());
-                    qwMomentsClient.cancel_moment_task(cancelMomentTaskDto);
+                    MomentsCancelDTO momentsCancelDTO = new MomentsCancelDTO();
+                    momentsCancelDTO.setMoment_id(result.getMomentId());
+                    qwMomentsClient.cancel_moment_task(momentsCancelDTO);
                 });
             });
         });

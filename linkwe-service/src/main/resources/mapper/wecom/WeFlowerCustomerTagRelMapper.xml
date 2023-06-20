@@ -61,7 +61,7 @@
         t3.track_state !=5
         WHERE t1.del_flag = 0
         <if test="tagIds!=null and tagIds.size()>0">
-            AMD t1.tag_id IN
+            AND t1.tag_id IN
             <foreach collection="tagIds" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>

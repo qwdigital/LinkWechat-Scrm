@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -82,7 +83,6 @@ public class WeMomentsTaskAddRequest {
      * 朋友圈文本内容
      */
     @Size(max = 2000)
-    @NotBlank(message = "朋友圈内容必填")
     @ApiModelProperty(value = "朋友圈文本内容")
     private String content;
 
@@ -90,7 +90,8 @@ public class WeMomentsTaskAddRequest {
      * 执行时间
      */
     @ApiModelProperty(value = "执行时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime executeTime;
 
     /**
@@ -98,7 +99,8 @@ public class WeMomentsTaskAddRequest {
      */
     @NotNull(message = "结束时间必填")
     @ApiModelProperty(value = "结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private LocalDateTime executeEndTime;
 
     /**

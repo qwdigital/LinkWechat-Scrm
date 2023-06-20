@@ -181,5 +181,5 @@ public class Constants
     /**
      * 企业信息管理 cache key
      */
-    public static final String CORP_ACCOUNT_KEY = "corp_account:{}";
+    public static final String CORP_ACCOUNT_KEY = "corp_account_key";
 }

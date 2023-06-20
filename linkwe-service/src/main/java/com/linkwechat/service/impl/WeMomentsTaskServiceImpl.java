@@ -112,6 +112,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long add(WeMomentsTaskAddRequest request) {
+        //校验朋友圈内容和附件是否同时为空
+        if (StrUtil.isBlank(request.getContent()) && CollectionUtil.isEmpty(request.getMaterialIds())) {
+            throw new ServiceException("朋友圈内容和附件两者不能同时为空！", HttpStatus.BAD_REQUEST);
+        }
         //校验任务名称是否重复
         LambdaQueryWrapper<WeMomentsTask> queryWrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
         queryWrapper.eq(WeMomentsTask::getName, request.getName());
@@ -141,6 +145,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
         //发送范围为按条件筛选
         if (request.getScopeType().equals(1)) {
+            //TODO 需进一步完善
             //按条件筛选
             if (CollectionUtil.isNotEmpty(request.getDeptIds())) {
                 task.setDeptIds(JSONObject.toJSONString(request.getDeptIds()));
@@ -153,7 +158,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             }
             //客户标签
             if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
-                task.setCommentTagIds(JSONObject.toJSONString(request.getCustomerTag()));
+                task.setCustomerTag(JSONObject.toJSONString(request.getCustomerTag()));
             }
         }
 
@@ -238,6 +243,25 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             return null;
         }
         WeMomentsTaskVO weMomentsTaskVO = BeanUtil.copyProperties(weMomentsTask, WeMomentsTaskVO.class);
+        //TODO 需完善
+        if (BeanUtil.isNotEmpty(weMomentsTaskVO.getCustomerTag())) {
+            weMomentsTaskVO.setCustomerTag(JSONObject.parseArray(weMomentsTask.getCustomerTag(), String.class));
+        }
+        if (BeanUtil.isNotEmpty(weMomentsTaskVO.getDeptIds())) {
+            weMomentsTaskVO.setDeptIds(JSONObject.parseArray(weMomentsTask.getDeptIds(), Long.class));
+        }
+        if (BeanUtil.isNotEmpty(weMomentsTask.getPostIds())) {
+            weMomentsTaskVO.setPosts(JSONObject.parseArray(weMomentsTask.getPostIds(), String.class));
+        }
+        if (BeanUtil.isNotEmpty(weMomentsTaskVO.getUserIds())) {
+            weMomentsTaskVO.setUserIds(JSONObject.parseArray(weMomentsTask.getUserIds(), String.class));
+        }
+        if (BeanUtil.isNotEmpty(weMomentsTaskVO.getLikeTagIds())) {
+            weMomentsTaskVO.setLikeTagIds(JSONObject.parseArray(weMomentsTask.getLikeTagIds(), String.class));
+        }
+        if (BeanUtil.isNotEmpty(weMomentsTaskVO.getCommentTagIds())) {
+            weMomentsTaskVO.setCommentTagIds(JSONObject.parseArray(weMomentsTask.getCommentTagIds(), String.class));
+        }
 
         LambdaQueryWrapper<WeMomentsAttachments> wrapper = Wrappers.lambdaQuery(WeMomentsAttachments.class);
         wrapper.eq(WeMomentsAttachments::getMomentsTaskId, weMomentsTaskId);

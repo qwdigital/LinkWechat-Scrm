@@ -1,7 +1,7 @@
 package com.linkwechat.domain.shortlink.dto;
 
 import com.linkwechat.common.core.domain.model.LoginUser;
-import com.linkwechat.domain.moments.entity.WeMoments;
+import com.linkwechat.domain.moments.entity.WeMomentsTask;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -13,7 +13,7 @@ import lombok.Data;
  * @date 2023/03/14 9:48
  */
 @Data
-public class WeShortLinkPromotionMomentsDto extends WeMoments {
+public class WeShortLinkPromotionMomentsDto extends WeMomentsTask {
 
     /**
      * 短链推广Id

@@ -13,7 +13,7 @@ import com.linkwechat.domain.WeShortLinkPromotionTemplateMoments;
 import com.linkwechat.domain.WeShortLinkUserPromotionTask;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.moments.entity.WeMoments;
+//import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsAddQuery;
@@ -55,6 +55,7 @@ public class MomentsPromotion extends PromotionType {
     @Resource
     private RabbitMQSettingConfig rabbitMQSettingConfig;
 
+    //TODO 代码需重新调整
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
@@ -243,83 +244,83 @@ public class MomentsPromotion extends PromotionType {
 
     @Override
     protected void directSend(Long id, Long businessId, String content, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects) {
-        WeShortLinkPromotionMomentsDto weMoments = new WeShortLinkPromotionMomentsDto();
-
-        weMoments.setShortLinkPromotionId(id);
-        weMoments.setBusinessId(businessId);
-        weMoments.setLoginUser(SecurityUtils.getLoginUser());
-
-        weMoments.setContent(content);
-        //可见类型:0:部分可见;1:公开;
-        if (senderList.size() > 0) {
-            weMoments.setScopeType(0);
-            //发送者
-            String collect = senderList.stream().map(i -> i.getUserId()).collect(Collectors.joining(","));
-            weMoments.setNoAddUser(collect);
-        } else {
-            weMoments.setScopeType(1);
-        }
-
-        //客户标签
-        Object object = objects[0];
-        if (BeanUtil.isNotEmpty(object)) {
-            weMoments.setCustomerTag(String.valueOf(object));
-        }
-        //附件
-        List<WeMoments.OtherContent> otherContents = new ArrayList<>();
-        attachments.stream().findFirst().ifPresent(i -> {
-            WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
-            otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
-            otherContent.setAnnexUrl(i.getPicUrl());
-            otherContents.add(otherContent);
-        });
-        weMoments.setOtherContent(otherContents);
-        weMoments.setContentType(MediaType.IMAGE.getMediaType());
-
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentMsgRk(), JSONObject.toJSONString(weMoments));
+//        WeShortLinkPromotionMomentsDto weMoments = new WeShortLinkPromotionMomentsDto();
+//
+//        weMoments.setShortLinkPromotionId(id);
+//        weMoments.setBusinessId(businessId);
+//        weMoments.setLoginUser(SecurityUtils.getLoginUser());
+//
+//        weMoments.setContent(content);
+//        //可见类型:0:部分可见;1:公开;
+//        if (senderList.size() > 0) {
+//            weMoments.setScopeType(0);
+//            //发送者
+//            String collect = senderList.stream().map(i -> i.getUserId()).collect(Collectors.joining(","));
+//            weMoments.setNoAddUser(collect);
+//        } else {
+//            weMoments.setScopeType(1);
+//        }
+//
+//        //客户标签
+//        Object object = objects[0];
+//        if (BeanUtil.isNotEmpty(object)) {
+//            weMoments.setCustomerTag(String.valueOf(object));
+//        }
+//        //附件
+//        List<WeMoments.OtherContent> otherContents = new ArrayList<>();
+//        attachments.stream().findFirst().ifPresent(i -> {
+//            WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
+//            otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
+//            otherContent.setAnnexUrl(i.getPicUrl());
+//            otherContents.add(otherContent);
+//        });
+//        weMoments.setOtherContent(otherContents);
+//        weMoments.setContentType(MediaType.IMAGE.getMediaType());
+//
+//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentMsgRk(), JSONObject.toJSONString(weMoments));
 
     }
 
     @Override
     protected void timingSend(Long id, Long businessId, String content, Date sendTime, List<WeMessageTemplate> attachments, List<WeAddGroupMessageQuery.SenderInfo> senderList, Object... objects) {
-        WeShortLinkPromotionMomentsDto weMoments = new WeShortLinkPromotionMomentsDto();
-
-        weMoments.setShortLinkPromotionId(id);
-        weMoments.setBusinessId(businessId);
-        weMoments.setLoginUser(SecurityUtils.getLoginUser());
-
-        weMoments.setContent(content);
-        //可见类型:0:部分可见;1:公开;
-        if (senderList.size() > 0) {
-            weMoments.setScopeType(0);
-            //发送者
-            String collect = senderList.stream().map(i -> i.getUserId()).collect(Collectors.joining(","));
-            weMoments.setNoAddUser(collect);
-        } else {
-            weMoments.setScopeType(1);
-        }
-
-        //客户标签
-        Object object = objects[0];
-        if (BeanUtil.isNotEmpty(object)) {
-            weMoments.setCustomerTag(String.valueOf(object));
-        }
-
-        //附件
-        List<WeMoments.OtherContent> otherContents = new ArrayList<>();
-        attachments.stream().findFirst().ifPresent(i -> {
-            WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
-            otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
-            otherContent.setAnnexUrl(i.getPicUrl());
-        });
-        weMoments.setOtherContent(otherContents);
-
-        long diffTime = DateUtils.diffTime(sendTime, new Date());
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayMomentMsgRk(), JSONObject.toJSONString(weMoments), message -> {
-            //注意这里时间可使用long类型,毫秒单位，设置header
-            message.getMessageProperties().setHeader("x-delay", diffTime);
-            return message;
-        });
+//        WeShortLinkPromotionMomentsDto weMoments = new WeShortLinkPromotionMomentsDto();
+//
+//        weMoments.setShortLinkPromotionId(id);
+//        weMoments.setBusinessId(businessId);
+//        weMoments.setLoginUser(SecurityUtils.getLoginUser());
+//
+//        weMoments.setContent(content);
+//        //可见类型:0:部分可见;1:公开;
+//        if (senderList.size() > 0) {
+//            weMoments.setScopeType(0);
+//            //发送者
+//            String collect = senderList.stream().map(i -> i.getUserId()).collect(Collectors.joining(","));
+//            weMoments.setNoAddUser(collect);
+//        } else {
+//            weMoments.setScopeType(1);
+//        }
+//
+//        //客户标签
+//        Object object = objects[0];
+//        if (BeanUtil.isNotEmpty(object)) {
+//            weMoments.setCustomerTag(String.valueOf(object));
+//        }
+//
+//        //附件
+//        List<WeMoments.OtherContent> otherContents = new ArrayList<>();
+//        attachments.stream().findFirst().ifPresent(i -> {
+//            WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
+//            otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
+//            otherContent.setAnnexUrl(i.getPicUrl());
+//        });
+//        weMoments.setOtherContent(otherContents);
+//
+//        long diffTime = DateUtils.diffTime(sendTime, new Date());
+//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayMomentMsgRk(), JSONObject.toJSONString(weMoments), message -> {
+//            //注意这里时间可使用long类型,毫秒单位，设置header
+//            message.getMessageProperties().setHeader("x-delay", diffTime);
+//            return message;
+//        });
     }
 
 //    @Override

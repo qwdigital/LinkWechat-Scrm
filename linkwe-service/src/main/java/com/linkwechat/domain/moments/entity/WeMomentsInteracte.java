@@ -44,6 +44,13 @@ public class WeMomentsInteracte extends BaseEntity {
     private Long momentsTaskId;
 
     /**
+     * 企业发表成员userid
+     */
+    @ApiModelProperty(value = "企业发表成员userid")
+    @TableField("we_user_id")
+    private String weUserId;
+
+    /**
      * 互动人员名称id
      */
     @ApiModelProperty(value = "互动人员名称id")
