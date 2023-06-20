@@ -199,7 +199,7 @@ public class WeSopController extends BaseController {
      */
     @PutMapping("/updateWeSop")
     public AjaxResult updateWeSop(@RequestBody WeSopBase weSopBase){
-        iWeSopBaseService.updateWeSop(weSopBase);
+        iWeSopBaseService.updateSopState(String.valueOf(weSopBase.getId()),weSopBase.getSopState());
         return AjaxResult.success();
     }
 

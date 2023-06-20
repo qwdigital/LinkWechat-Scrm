@@ -195,5 +195,14 @@ public interface IWeSopBaseService extends IService<WeSopBase> {
      */
     void synchSopExecuteResultForWeChatPushType(String sopBaseId);
 
+
+
+    /**
+     * 更新sop状态
+     * @param sopId
+     * @param sopState
+     */
+    void  updateSopState(String sopId,Integer sopState);
+
 }
 

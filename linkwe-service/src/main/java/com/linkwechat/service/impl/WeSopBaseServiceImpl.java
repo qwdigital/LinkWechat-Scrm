@@ -1148,9 +1148,13 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
         }
 
+    }
 
 
 
+    @Override
+    public void updateSopState(String sopId, Integer sopState) {
+        this.baseMapper.updateSopState(sopId,sopState);
     }
 
 

@@ -100,5 +100,13 @@ public interface WeSopBaseMapper extends BaseMapper<WeSopBase> {
     List<WeSopToBeSentContentInfoVo> findSopToBeSentContentInfo(@Param("weUserId") String weUserId,@Param("targetId") String targetId);
 
 
+    /**
+     * 更新sop状态
+     * @param sopId
+     * @param sopState
+     */
+    void  updateSopState(@Param("sopId") String sopId,@Param("sopState") Integer sopState);
+
+
 }
 
