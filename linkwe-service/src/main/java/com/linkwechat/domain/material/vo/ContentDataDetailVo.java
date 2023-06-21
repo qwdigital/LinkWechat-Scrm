@@ -21,6 +21,8 @@ public class ContentDataDetailVo {
      */
     private String viewBy;
     private Integer sendTotalNum;
+
+    private String externalUserid;
     /**
      * 是否企业用户 0否 1是
      */

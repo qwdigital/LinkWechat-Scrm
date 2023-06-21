@@ -51,8 +51,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
     private WeCustomerMapper weCustomerMapper;
     @Resource
     private WeContentViewRecordMapper weContentViewRecordMapper;
-    @Resource
-    private IWeUnionidExternalUseridRelationService weUnionidExternalUseridRelationService;
+
     @Resource
     private QwAppSendMsgService qwAppSendMsgService;
     @Resource
@@ -60,8 +59,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
     @Resource
     private WeMaterialMapper weMaterialMapper;
 
-    @Resource
-    private IWeCorpAccountService iWeCorpAccountService;
+
     @Resource
     private IWeContentTalkService weContentTalkService;
     /**
@@ -123,25 +121,25 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 //        }
 
         //查询数据
-        List<WeContentViewRecord> weContentViewRecordList = weContentViewRecordMapper.getList(contentDetailQuery);
-        Map<String, List<WeContentViewRecord>> collect = weContentViewRecordList.stream().collect(Collectors.groupingBy(WeContentViewRecord::getViewOpenid));
-
-        List<ContentDataDetailVo> result = new ArrayList<>();
-        collect.forEach((k, v) -> {
-            WeContentViewRecord item = v.get(0);
-            ContentDataDetailVo contentDataDetailVo = new ContentDataDetailVo();
-            contentDataDetailVo.setViewTime(item.getViewTime());
-            contentDataDetailVo.setViewTotalNum(v.size());
-            Long sum = v.stream().mapToLong(o -> o.getViewWatchTime()).sum();
-            contentDataDetailVo.setViewDuration(sum.intValue());
-            contentDataDetailVo.setViewByOpenid(item.getViewOpenid());
-            contentDataDetailVo.setViewByUnionid(item.getViewUnionid());
-            contentDataDetailVo.setViewBy(item.getExternalUserName());
-            contentDataDetailVo.setViewAvatar(item.getExternalAvatar());
-            result.add(contentDataDetailVo);
-        });
-        result.sort(Comparator.comparing(ContentDataDetailVo::getViewTime).reversed());
-        return result;
+//        List<WeContentViewRecord> weContentViewRecordList = weContentViewRecordMapper.getList(contentDetailQuery);
+//        Map<String, List<WeContentViewRecord>> collect = weContentViewRecordList.stream().collect(Collectors.groupingBy(WeContentViewRecord::getViewOpenid));
+//
+//        List<ContentDataDetailVo> result = new ArrayList<>();
+//        collect.forEach((k, v) -> {
+//            WeContentViewRecord item = v.get(0);
+//            ContentDataDetailVo contentDataDetailVo = new ContentDataDetailVo();
+//            contentDataDetailVo.setViewTime(item.getViewTime());
+//            contentDataDetailVo.setViewTotalNum(v.size());
+//            Long sum = v.stream().mapToLong(o -> o.getViewWatchTime()).sum();
+//            contentDataDetailVo.setViewDuration(sum.intValue());
+//            contentDataDetailVo.setViewByOpenid(item.getViewOpenid());
+//            contentDataDetailVo.setViewByUnionid(item.getViewUnionid());
+//            contentDataDetailVo.setViewBy(item.getExternalUserName());
+//            contentDataDetailVo.setViewAvatar(item.getExternalAvatar());
+//            result.add(contentDataDetailVo);
+//        });
+//        result.sort(Comparator.comparing(ContentDataDetailVo::getViewTime).reversed());
+        return this.baseMapper.findContentDataDetailVos(String.valueOf(contentDetailQuery.getContentId()),contentDetailQuery.getBeginTime(),contentDetailQuery.getEndTime());
     }
 
     @Override
