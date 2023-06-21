@@ -43,9 +43,10 @@
             COUNT(wcvr.id) as viewTotalNum,
             wcvr.external_avatar as viewAvatar,
             wcvr.external_user_name as viewBy,
-            wcvr.is_customer  as isCustomer,
+            IF((SELECT count(wc.id) from we_customer wc WHERE wc.unionid=wcvr.view_unionid)>0,1,0)	 as isCustomer,
             wcvr.external_user_id as externalUserid,
-            ROUND(sum(wcvr.view_watch_time)/ 1000,0) as viewDuration
+            ROUND(sum(wcvr.view_watch_time)/ 1000,0) as viewDuration,
+            ROUND(sum(wcvr.view_watch_time)/ 1000,0) as viewDurationCpt
         FROM
             we_content_view_record wcvr
         WHERE date_format(wcvr.create_time,'%Y-%m-%d') BETWEEN #{startTime} AND #{endTime}
