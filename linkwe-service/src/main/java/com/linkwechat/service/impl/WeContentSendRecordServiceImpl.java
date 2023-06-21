@@ -74,40 +74,40 @@ public class WeContentSendRecordServiceImpl extends ServiceImpl<WeContentSendRec
 
     @Override
     public List<ContentDataDetailVo> getSendDetail(ContentDetailQuery contentDetailQuery) {
-        Long contentId = contentDetailQuery.getContentId();
-
-        String beginTime = contentDetailQuery.getBeginTime();
-        String endTime = contentDetailQuery.getEndTime();
-//        if (StringUtils.isNotBlank(beginTime)) {
-//            beginTime = DateUtils.initSqlBeginTime(beginTime);
-//        }
-//        if (StringUtils.isNotBlank(endTime)) {
-//            endTime = DateUtils.initSqlEndTime(endTime);
-//        }
-        QueryWrapper<WeContentSendRecord> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id,talk_id, content_id, send_by, send_by_id, send_time, resource_type,count(id) as sendCount");
-        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getTalkId()), WeContentSendRecord::getTalkId, contentDetailQuery.getTalkId());
-        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentId), WeContentSendRecord::getContentId, contentId);
-        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getResourceType()), WeContentSendRecord::getResourceType, contentDetailQuery.getResourceType());
-
-        queryWrapper.lambda().apply(StringUtils.isNotEmpty(beginTime) ,"date_format(send_time, '%Y-%m-%d' ) >= '" + beginTime + "'");
-        queryWrapper.lambda().apply(StringUtils.isNotEmpty(endTime),"date_format(send_time, '%Y-%m-%d' ) <= '" + endTime + "'");
-
-        queryWrapper.lambda().groupBy(WeContentSendRecord::getSendById);
-
-        //取出所有的数据
-        List<WeContentSendRecord> weContentSendRecordList = list(queryWrapper);
-
-        List<ContentDataDetailVo> result = new ArrayList<>();
-        weContentSendRecordList.forEach(o -> {
-            ContentDataDetailVo contentDataDetailVo = new ContentDataDetailVo();
-            contentDataDetailVo.setSendTotalNum(o.getSendCount());
-            contentDataDetailVo.setSendBy(o.getSendBy());
-            result.add(contentDataDetailVo);
-        });
-
-        result.sort(Comparator.comparing(ContentDataDetailVo::getSendTotalNum).reversed());
-        return result;
+//        Long contentId = contentDetailQuery.getContentId();
+//
+//        String beginTime = contentDetailQuery.getBeginTime();
+//        String endTime = contentDetailQuery.getEndTime();
+////        if (StringUtils.isNotBlank(beginTime)) {
+////            beginTime = DateUtils.initSqlBeginTime(beginTime);
+////        }
+////        if (StringUtils.isNotBlank(endTime)) {
+////            endTime = DateUtils.initSqlEndTime(endTime);
+////        }
+//        QueryWrapper<WeContentSendRecord> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.select("id,talk_id, content_id, send_by, send_by_id, send_time, resource_type,count(id) as sendCount");
+//        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getTalkId()), WeContentSendRecord::getTalkId, contentDetailQuery.getTalkId());
+//        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentId), WeContentSendRecord::getContentId, contentId);
+//        queryWrapper.lambda().eq(ObjectUtil.isNotEmpty(contentDetailQuery.getResourceType()), WeContentSendRecord::getResourceType, contentDetailQuery.getResourceType());
+//
+//        queryWrapper.lambda().apply(StringUtils.isNotEmpty(beginTime) ,"date_format(send_time, '%Y-%m-%d' ) >= '" + beginTime + "'");
+//        queryWrapper.lambda().apply(StringUtils.isNotEmpty(endTime),"date_format(send_time, '%Y-%m-%d' ) <= '" + endTime + "'");
+//
+//        queryWrapper.lambda().groupBy(WeContentSendRecord::getSendById);
+//
+//        //取出所有的数据
+//        List<WeContentSendRecord> weContentSendRecordList = list(queryWrapper);
+//
+//        List<ContentDataDetailVo> result = new ArrayList<>();
+//        weContentSendRecordList.forEach(o -> {
+//            ContentDataDetailVo contentDataDetailVo = new ContentDataDetailVo();
+//            contentDataDetailVo.setSendTotalNum(o.getSendCount());
+//            contentDataDetailVo.setSendBy(o.getSendBy());
+//            result.add(contentDataDetailVo);
+//        });
+//
+//        result.sort(Comparator.comparing(ContentDataDetailVo::getSendTotalNum).reversed());
+        return this.baseMapper.findContentDataDetailVo(String.valueOf( contentDetailQuery.getContentId()), contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
     }
 
     @Override
