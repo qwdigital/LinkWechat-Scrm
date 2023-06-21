@@ -86,6 +86,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Autowired
+    @Lazy
     private IWeGroupService iWeGroupService;
 
     @Autowired
