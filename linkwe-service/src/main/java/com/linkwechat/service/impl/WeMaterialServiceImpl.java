@@ -31,6 +31,7 @@ import com.linkwechat.common.utils.*;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.material.ao.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.entity.WeTalkMaterial;
@@ -51,6 +52,7 @@ import com.linkwechat.mapper.WeTalkMaterialMapper;
 import com.linkwechat.mapper.WeTlpMaterialMapper;
 import com.linkwechat.service.IWeContentSendRecordService;
 import com.linkwechat.service.IWeContentViewRecordService;
+import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeMaterialService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -98,6 +100,9 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
     @Resource
     private WeTlpMaterialMapper weTlpMaterialMapper;
+
+    @Resource
+    private IWeCustomerService weCustomerService;
 
 
 //    private static Font DEFAULT_FONT;
@@ -735,27 +740,57 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             case 2:
                 //查看明细
                 result = weContentViewRecordService.getViewDetail(contentDetailQuery);
-                result.forEach(contentDataDetailVo -> {
-                    //秒数
-                    Integer viewDuration = contentDataDetailVo.getViewDuration() / 1000;
 
-                    //小时
-                    Integer hour = viewDuration / 3600;
-                    //剩余秒数
-                    viewDuration = viewDuration % 3600;
+                if (CollectionUtil.isNotEmpty(result)) {
+                    Set<String> unionIds = result.stream().map(ContentDataDetailVo::getViewByUnionid).collect(Collectors.toSet());
+                    LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
+                    queryWrapper.in(WeCustomer::getUnionid, unionIds);
+                    List<WeCustomer> customerList = weCustomerService.list(queryWrapper);
 
-                    //分钟
-                    Integer minutes = viewDuration / 60;
-                    //剩余秒数
-                    viewDuration = viewDuration % 60;
+                    Map<String, WeCustomer> weCustomersMap = new HashMap<>();
+                    if (CollectionUtil.isNotEmpty(customerList)) {
+                        weCustomersMap = customerList.stream().collect(Collectors.toMap(WeCustomer::getUnionid, Function.identity(), (key1, key2) -> key2));
+                    }
+
+                    for (ContentDataDetailVo contentDataDetailVo : result) {
+                        //秒数
+                        Integer viewDuration = contentDataDetailVo.getViewDuration() / 1000;
+
+                        //小时
+                        Integer hour = viewDuration / 3600;
+                        //剩余秒数
+                        viewDuration = viewDuration % 3600;
+
+                        //分钟
+                        Integer minutes = viewDuration / 60;
+                        //剩余秒数
+                        viewDuration = viewDuration % 60;
 
 
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(hour != 0L ? hour + "时" : "");
-                    sb.append(minutes != 0L ? minutes + "分" : "");
-                    sb.append(viewDuration != 0L ? viewDuration + "秒" : "");
-                    contentDataDetailVo.setViewDurationCpt(sb.toString());
-                });
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(hour != 0L ? hour + "时" : "");
+                        sb.append(minutes != 0L ? minutes + "分" : "");
+                        sb.append(viewDuration != 0L ? viewDuration + "秒" : "");
+                        contentDataDetailVo.setViewDurationCpt(sb.toString());
+
+                        WeCustomer weCustomer = weCustomersMap.get(contentDataDetailVo.getViewByUnionid());
+                        if (ObjectUtil.isNotNull(weCustomer)) {
+                            contentDataDetailVo.setIsCustomer(1);
+                            String viewBy = contentDataDetailVo.getViewBy();
+                            if (StrUtil.isBlank(viewBy)) {
+                                contentDataDetailVo.setViewBy(weCustomer.getCustomerName());
+                            }
+                            String viewAvatar = contentDataDetailVo.getViewAvatar();
+                            if (StrUtil.isBlank(viewAvatar)) {
+                                if (StrUtil.isNotBlank(weCustomer.getAvatar())) {
+                                    contentDataDetailVo.setViewAvatar(weCustomer.getAvatar());
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            default:
                 break;
         }
         return result;
