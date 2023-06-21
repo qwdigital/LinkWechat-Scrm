@@ -449,8 +449,9 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 //设置应用id
                 template.setAppId(weCorpAccount.getAgentId());
 
+                String url = String.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
                 String content = "【朋友圈营销】<br/> 管理员下发一条【" + weMomentsTask.getName() + "】的朋友圈营销任务，请及时执行 <br/><br/>" +
-                        "<a href='" + linkWeChatConfig.getMomentsUrl() + "'>去处理</a>";
+                        "<a href='" + url + "'>去处理</a>";
 
                 template.setContent(content);
                 body.setMessageTemplates(template);
@@ -963,14 +964,17 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 template.setMsgType("text");
                 //设置应用id
                 template.setAppId(weCorpAccount.getAgentId());
+
+                String url = String.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
+
                 //应用消息内容
                 String content = null;
                 if (StrUtil.isNotBlank(weMomentsTask.getName())) {
                     content = "【朋友圈营销】<br/> 你有一条【" + weMomentsTask.getName() + "】的朋友圈营销任务还未执行，请尽快执行 <br/><br/>" +
-                            "<a href='" + linkWeChatConfig.getMomentsUrl() + "'>去处理</a>";
+                            "<a href='" + url + "'>去处理</a>";
                 } else {
                     content = "【朋友圈营销】<br/> 你有一条朋友圈营销任务还未执行，请尽快执行 <br/><br/>" +
-                            "<a href='" + linkWeChatConfig.getMomentsUrl() + "'>去处理</a>";
+                            "<a href='" + url + "'>去处理</a>";
                 }
                 template.setContent(content);
                 body.setMessageTemplates(template);

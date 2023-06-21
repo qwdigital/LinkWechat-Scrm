@@ -5,15 +5,16 @@ import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.moments.entity.WeMomentsTask;
-import com.linkwechat.domain.moments.query.WeMomentsSyncGroupSendRequest;
-import com.linkwechat.domain.moments.query.WeMomentsTaskAddRequest;
-import com.linkwechat.domain.moments.query.WeMomentsTaskEstimateCustomerNumRequest;
-import com.linkwechat.domain.moments.query.WeMomentsTaskListRequest;
+import com.linkwechat.domain.moments.query.*;
+import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 import com.linkwechat.service.IWeMomentsCustomerService;
 import com.linkwechat.service.IWeMomentsTaskService;
+import com.linkwechat.service.IWeMomentsUserService;
 import com.linkwechat.service.IWeSynchRecordService;
 import io.swagger.annotations.Api;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +41,8 @@ public class WeMomentsTaskController extends BaseController {
     private IWeSynchRecordService iWeSynchRecordService;
     @Resource
     private IWeMomentsCustomerService weMomentsCustomerService;
+    @Resource
+    private IWeMomentsUserService weMomentsUserService;
 
 
     /**
@@ -159,6 +162,37 @@ public class WeMomentsTaskController extends BaseController {
     public AjaxResult groupSendFinish(@RequestBody WeMomentsSyncGroupSendRequest request) {
         weMomentsTaskService.groupSendFinish(request);
         return AjaxResult.success();
+    }
+
+    /**
+     * 移动端列表
+     *
+     * @param request
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/06/20 18:07
+     */
+    @GetMapping("/mobile/list")
+    public TableDataInfo mobileList(@Validated WeMomentsTaskMobileRequest request) {
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        request.setWeUserId(sysUser.getWeUserId());
+        startPage();
+        List<WeMomentsTaskMobileVO> vos = weMomentsUserService.mobileList(request);
+        return getDataTable(vos);
+    }
+
+    /**
+     * 移动端详情
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/06/21 9:58
+     */
+    @GetMapping("/mobile/get/{weMomentsTaskId}")
+    public AjaxResult mobileGet(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
+        WeMomentsTaskMobileVO vo = weMomentsUserService.mobileGet(weMomentsTaskId);
+        return AjaxResult.success(vo);
     }
 
 

@@ -3,8 +3,11 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,18 +15,26 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto.TaskList;
+import com.linkwechat.domain.moments.entity.WeMomentsAttachments;
+import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
 import com.linkwechat.domain.moments.entity.WeMomentsUser;
+import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
+import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeMomentsUserMapper;
-import com.linkwechat.service.IWeMomentsUserService;
+import com.linkwechat.service.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,6 +56,18 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     private QwSysUserClient qwSysUserClient;
     @Resource
     private QwMomentsClient qwMomentsClient;
+    @Resource
+    private IWeMomentsAttachmentsService weMomentsAttachmentsService;
+    @Resource
+    private IWeMaterialService weMaterialService;
+    @Resource
+    private IWeTagService weTagService;
+    @Resource
+    private IWeMomentsCustomerService weMomentsCustomerService;
+    @Resource
+    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+    @Resource
+    private IWeCustomerService weCustomerService;
 
     @Override
     public void addMomentsUser(Long momentsTaskId, List<SysUser> users) {
@@ -136,6 +159,131 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         }
     }
 
+    @Override
+    public List<WeMomentsTaskMobileVO> mobileList(WeMomentsTaskMobileRequest request) {
+        List<WeMomentsTaskMobileVO> vos = this.baseMapper.mobileList(request);
+        //客户数
+        for (WeMomentsTaskMobileVO vo : vos) {
+            if (vo.getStatus().equals(1)) {
+                List<String> tagIds = JSONArray.parseArray(vo.getCustomerTag(), String.class);
+                if (CollectionUtil.isNotEmpty(tagIds)) {
+                    List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(tagIds, ListUtil.toList(request.getWeUserId()));
+                    vo.setCustomerNum(weUserIds.size());
+                } else {
+                    LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+                    queryWrapper.eq(WeCustomer::getAddUserId, request.getWeUserId());
+                    queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+                    queryWrapper.ne(WeCustomer::getTrackState, 5);
+                    int count = weCustomerService.count(queryWrapper);
+                    vo.setCustomerNum(count);
+                }
+            } else {
+                LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
+                queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, vo.getWeMomentsTaskId());
+                queryWrapper.eq(WeMomentsCustomer::getWeUserId, request.getWeUserId());
+                queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
+                int count = weMomentsCustomerService.count(queryWrapper);
+                vo.setCustomerNum(count);
+            }
+        }
+
+        //客户标签
+        List<String> tagIds = new ArrayList<>();
+        for (WeMomentsTaskMobileVO i : vos) {
+            if (StrUtil.isBlank(i.getCustomerTag())) {
+                continue;
+            }
+            List<String> list = JSONArray.parseArray(i.getCustomerTag(), String.class);
+            i.setCustomerTags(list);
+            tagIds.addAll(list);
+        }
+        if (CollectionUtil.isNotEmpty(tagIds)) {
+            tagIds = tagIds.stream().distinct().collect(Collectors.toList());
+            LambdaQueryWrapper<WeTag> queryWrapper = Wrappers.lambdaQuery(WeTag.class);
+            queryWrapper.select(WeTag::getTagId, WeTag::getName);
+            queryWrapper.in(WeTag::getTagId, tagIds);
+            queryWrapper.eq(WeTag::getDelFlag, Constants.COMMON_STATE);
+            List<WeTag> list = weTagService.list(queryWrapper);
+            if (CollectionUtil.isNotEmpty(list)) {
+                Map<String, String> map = list.stream().collect(Collectors.toMap(WeTag::getTagId, WeTag::getName));
+                for (WeMomentsTaskMobileVO i : vos) {
+                    if (StrUtil.isBlank(i.getCustomerTag())) {
+                        continue;
+                    }
+                    List<String> customerTagIds = i.getCustomerTags();
+                    List<String> customerTags = new ArrayList<>();
+                    for (String customerTagId : customerTagIds) {
+                        String tagName = map.get(customerTagId);
+                        if (StrUtil.isNotBlank(tagName)) {
+                            customerTags.add(tagName);
+                        }
+                    }
+                    i.setCustomerTags(customerTags);
+                }
+            }
+        }
+        return vos;
+    }
+
+    @Override
+    public WeMomentsTaskMobileVO mobileGet(Long weMomentsTaskId) {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        if (BeanUtil.isEmpty(loginUser)) {
+            return null;
+        }
+        //详情
+        String weUserId = loginUser.getSysUser().getWeUserId();
+        WeMomentsTaskMobileVO vo = this.baseMapper.mobileGet(weUserId, weMomentsTaskId);
+
+        //附件
+        LambdaQueryWrapper<WeMomentsAttachments> wrapper = Wrappers.lambdaQuery(WeMomentsAttachments.class);
+        wrapper.eq(WeMomentsAttachments::getMomentsTaskId, weMomentsTaskId);
+        List<WeMomentsAttachments> attachmentsList = weMomentsAttachmentsService.list(wrapper);
+        if (CollectionUtil.isNotEmpty(attachmentsList)) {
+            List<Long> materialIds = attachmentsList.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
+            List<WeMaterial> weMaterials = weMaterialService.listByIds(materialIds);
+            vo.setMaterialList(weMaterials);
+        }
+        //客户标签
+        if (StrUtil.isNotBlank(vo.getCustomerTag())) {
+            List<String> tagIds = JSONArray.parseArray(vo.getCustomerTag(), String.class);
+            LambdaQueryWrapper<WeTag> queryWrapper = Wrappers.lambdaQuery(WeTag.class);
+            queryWrapper.select(WeTag::getName);
+            queryWrapper.in(WeTag::getTagId, tagIds);
+            queryWrapper.eq(WeTag::getDelFlag, Constants.COMMON_STATE);
+            List<WeTag> list = weTagService.list(queryWrapper);
+            if (CollectionUtil.isNotEmpty(list)) {
+                List<String> tags = list.stream().map(WeTag::getName).collect(Collectors.toList());
+                vo.setCustomerTags(tags);
+            }
+        }
+
+        //客户数
+        //任务状态：1未开始，2进行中，3已结束
+        if (vo.getStatus().equals(1)) {
+            List<String> tagIds = JSONArray.parseArray(vo.getCustomerTag(), String.class);
+            if (CollectionUtil.isNotEmpty(tagIds)) {
+                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(tagIds, ListUtil.toList(weUserId));
+                vo.setCustomerNum(weUserIds.size());
+            } else {
+                LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+                queryWrapper.eq(WeCustomer::getAddUserId, weUserId);
+                queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+                queryWrapper.ne(WeCustomer::getTrackState, 5);
+                int count = weCustomerService.count(queryWrapper);
+                vo.setCustomerNum(count);
+            }
+        } else {
+            LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
+            queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId);
+            queryWrapper.eq(WeMomentsCustomer::getWeUserId, weUserId);
+            queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
+            int count = weMomentsCustomerService.count(queryWrapper);
+            vo.setCustomerNum(count);
+        }
+        return vo;
+    }
+
     /**
      * 迭代获取员工的执行情况
      *
@@ -178,7 +326,7 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         weMomentsUser.setExecuteStatus(status);
         weMomentsUser.setExecuteCount(0);
         weMomentsUser.setDelFlag(Constants.COMMON_STATE);
-        if(BeanUtil.isNotEmpty(SecurityUtils.getLoginUser())){
+        if (BeanUtil.isNotEmpty(SecurityUtils.getLoginUser())) {
             weMomentsUser.setCreateById(SecurityUtils.getLoginUser().getSysUser().getUserId());
             weMomentsUser.setCreateBy(SecurityUtils.getLoginUser().getSysUser().getUserName());
         }

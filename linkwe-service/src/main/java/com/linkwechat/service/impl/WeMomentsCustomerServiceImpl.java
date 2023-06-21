@@ -76,7 +76,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
             List<String> collect = sysUsers.stream().map(SysUser::getWeUserId).distinct().collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
                 //标签数量不为0时，获取标签对应的客户数量
-                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(collect, request.getCustomerTag());
+                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(request.getCustomerTag(), collect);
                 return CollectionUtil.isNotEmpty(weUserIds) ? weUserIds.size() : 0;
             }
             //通过条件筛选出的员工数据为0，且没有客户标签时
