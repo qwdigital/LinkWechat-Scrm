@@ -36,7 +36,7 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
     private LoginUser loginUser;
 
 
-    //消息来源 1:通常 2:sop 3:直播 4:短链推广,4:裂变
+    //消息来源 1:通常 2:sop 3:直播 ,4:裂变，5:短链推广
     private Integer msgSource=1;
 
     public void setCurrentUserInfo(LoginUser loginUser) {

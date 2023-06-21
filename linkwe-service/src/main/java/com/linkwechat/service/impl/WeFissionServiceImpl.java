@@ -103,6 +103,10 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     @Transactional
     public void buildWeFission(WeFission weFission) {
 
+        if(null == weFission.getAddWeUserOrGroupCode()){
+            throw new WeComException("当前添加的成员或客群不可为空");
+        }
+
         if(weFission.getId()==null){
             weFission.setId(SnowFlakeUtil.nextId());
             //裂变h5链接
@@ -448,6 +452,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
                 .eq(WeFission::getIsTip,2)
+                .isNotNull(WeFission::getAddWeUserOrGroupCode)
                 .ne(WeFission::getFassionState, 3));
 
         if(CollectionUtil.isNotEmpty(weFissions)){

@@ -30,6 +30,12 @@ public class WeQrUserInfoQuery {
     @ApiModelProperty("工作周期")
     private List<Integer> workCycle;
 
+    @ApiModelProperty("员工信息列表")
+    private List<WeQrUserInfoDetailQuery> qrUserInfosDetail;
+
+    @ApiModelProperty("备用员工id列表")
+    private List<String> spareUserIds;
+
     @ApiModelProperty("开始时间")
     private String beginTime;
 

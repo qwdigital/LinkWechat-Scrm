@@ -101,4 +101,10 @@ public interface IWeQrCodeService extends IService<WeQrCode> {
      * @return
      */
     void updateQrbyWeUserIds(List<String> weUserIds, String configId);
+
+    /**
+     * 更新多人员工活码
+     * @param state  渠道,当前用户通过哪个活码添加
+     */
+    void updateQrMultiplePeople(String state);
 }

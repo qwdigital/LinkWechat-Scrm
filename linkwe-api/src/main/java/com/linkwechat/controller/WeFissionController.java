@@ -4,6 +4,7 @@ package com.linkwechat.controller;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
@@ -55,6 +56,9 @@ public class WeFissionController  extends BaseController {
     @PostMapping("/add")
     public AjaxResult add(@RequestBody WeFission weFission){
 
+
+
+
         iWeFissionService.buildWeFission(weFission);
         return AjaxResult.success();
     }
@@ -68,7 +72,7 @@ public class WeFissionController  extends BaseController {
     @PutMapping("/update")
     public AjaxResult update(@RequestBody WeFission weFission){
 
-        iWeFissionService.updateById(weFission);
+        iWeFissionService.buildWeFission(weFission);
 
         return AjaxResult.success();
     }

@@ -11,6 +11,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.CustomerAddWay;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
@@ -212,6 +213,19 @@ public class WeCustomerController extends BaseController {
 
         return AjaxResult.success(
                 weCustomerService.findWeCustomerInfoByUserId(externalUserid,weUserId,delFlag)
+        );
+    }
+
+
+    /**
+     * 获取客户添加类型
+     * @return
+     */
+    @GetMapping("/findCustomerAddWay")
+    public AjaxResult findCustomerAddWay(){
+
+        return AjaxResult.success(
+                CustomerAddWay.getType()
         );
     }
 

@@ -177,6 +177,10 @@ public class Constants
     public static final Integer DELETE_STATE = 1;
 
 
+    /**
+     * 员工活码 redis key
+     */
+    public static final String USER_CODE_KEY = "user_code:";
 
     /**
      * 企业信息管理 cache key

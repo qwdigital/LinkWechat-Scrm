@@ -63,4 +63,8 @@ public class WeCustomersQuery {
 
     //是否按照无标签查询 true:是 false:不是
     private boolean noTagCheck=false;
+
+    private boolean isFilterLossCustomer=false;
+
+
 }

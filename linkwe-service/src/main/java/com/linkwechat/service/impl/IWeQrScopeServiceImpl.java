@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -41,14 +42,15 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
             List<WeQrScope> scopeList = new ArrayList<>();
             for (WeQrUserInfoQuery userInfo : qrUserInfos) {
                 String uuId = RandomUtil.randomString(18);
-                List<WeQrScope> weQrScopeUserList = Optional.ofNullable(userInfo.getUserIds()).orElseGet(ArrayList::new).stream().map(userId -> {
+                List<WeQrScope> weQrScopeUserList = Optional.ofNullable(userInfo.getQrUserInfosDetail()).orElseGet(ArrayList::new).stream().map(userId -> {
                     WeQrScope weQrScope = new WeQrScope();
                     weQrScope.setQrId(qrId);
                     weQrScope.setScopeId(uuId);
-                    weQrScope.setUserId(userId);
+                    weQrScope.setUserId(userId.getUserId());
+                    weQrScope.setSchedulingNum(userId.getSchedulingNum());
                     weQrScope.setScopeType(1);
                     weQrScope.setType(userInfo.getType());
-                    if(CollectionUtil.isNotEmpty(userInfo.getWorkCycle())){
+                    if(CollUtil.isNotEmpty(userInfo.getWorkCycle())){
                         weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
                     }
                     weQrScope.setBeginTime(userInfo.getBeginTime());
@@ -57,13 +59,30 @@ public class IWeQrScopeServiceImpl extends ServiceImpl<WeQrScopeMapper, WeQrScop
                 }).collect(Collectors.toList());
                 scopeList.addAll(weQrScopeUserList);
 
+                List<WeQrScope> weQrSpareScopeUserList = Optional.ofNullable(userInfo.getSpareUserIds()).orElseGet(ArrayList::new).stream().map(userId -> {
+                    WeQrScope weQrScope = new WeQrScope();
+                    weQrScope.setQrId(qrId);
+                    weQrScope.setScopeId(uuId);
+                    weQrScope.setUserId(userId);
+                    weQrScope.setScopeType(1);
+                    weQrScope.setIsSpareUser(1);
+                    weQrScope.setType(userInfo.getType());
+                    if(CollUtil.isNotEmpty(userInfo.getWorkCycle())){
+                        weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
+                    }
+                    weQrScope.setBeginTime(userInfo.getBeginTime());
+                    weQrScope.setEndTime(userInfo.getEndTime());
+                    return weQrScope;
+                }).collect(Collectors.toList());
+                scopeList.addAll(weQrSpareScopeUserList);
+
                 List<WeQrScope> weQrScopePartyList = Optional.ofNullable(userInfo.getPartys()).orElseGet(ArrayList::new).stream().map(party -> {
                     WeQrScope weQrScope = new WeQrScope();
                     weQrScope.setQrId(qrId);
                     weQrScope.setScopeId(uuId);
                     weQrScope.setParty(String.valueOf(party));
                     weQrScope.setScopeType(2);
-                    if(CollectionUtil.isNotEmpty(userInfo.getWorkCycle())){
+                    if(CollUtil.isNotEmpty(userInfo.getWorkCycle())){
                         weQrScope.setWorkCycle(userInfo.getWorkCycle().stream().map(String::valueOf).collect(Collectors.joining(",")));
                     }
                     weQrScope.setType(userInfo.getType());

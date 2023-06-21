@@ -368,7 +368,7 @@
             GROUP_CONCAT(if(wt.tag_type=1,wt.`name`,null )) as tagNames,
             GROUP_CONCAT(if(wt.tag_type=3,wt.`tag_id`,null )) as personTagIds,
             GROUP_CONCAT(if(wt.tag_type=3,wt.`name`,null )) as personTagNames,
-            wc.track_content as content,
+            wc.track_content as trackContent,
             wc.province_id,
             wc.city_id,
             wc.area_id,
