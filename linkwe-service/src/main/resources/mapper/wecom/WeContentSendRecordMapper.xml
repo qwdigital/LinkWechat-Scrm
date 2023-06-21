@@ -49,7 +49,7 @@
         WHERE
             content_id = #{contentId}
           AND date_format( create_time, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
-
+          and send_by is not null
         GROUP BY
             send_by_id
         ORDER BY

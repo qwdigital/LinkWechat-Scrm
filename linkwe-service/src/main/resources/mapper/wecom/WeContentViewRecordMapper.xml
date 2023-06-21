@@ -49,6 +49,7 @@
         FROM
             we_content_view_record wcvr
         WHERE date_format(wcvr.create_time,'%Y-%m-%d') BETWEEN #{startTime} AND #{endTime}
+          and  wcvr.external_user_name is not null
           and wcvr.content_id=#{contentId}
     </select>
 
