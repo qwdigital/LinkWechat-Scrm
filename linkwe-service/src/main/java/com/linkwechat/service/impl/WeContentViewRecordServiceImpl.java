@@ -139,7 +139,21 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 //            result.add(contentDataDetailVo);
 //        });
 //        result.sort(Comparator.comparing(ContentDataDetailVo::getViewTime).reversed());
-        return this.baseMapper.findContentDataDetailVos(String.valueOf(contentDetailQuery.getContentId()),contentDetailQuery.getBeginTime(),contentDetailQuery.getEndTime());
+        List<ContentDataDetailVo> contentDataDetailVos = this.baseMapper.findContentDataDetailVos(String.valueOf(contentDetailQuery.getContentId())
+                , contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
+
+        if(CollectionUtil.isNotEmpty(contentDataDetailVos)){
+            contentDataDetailVos.stream().forEach(contentDataDetailVo -> {
+                if(contentDataDetailVo.getViewDuration()!= null){
+                    contentDataDetailVo.setViewDurationCpt(DateUtils.formatTime(
+                            contentDataDetailVo.getViewDuration().longValue()
+                    ));
+                }
+
+            });
+        }
+
+        return contentDataDetailVos;
     }
 
     @Override
