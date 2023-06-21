@@ -199,7 +199,7 @@ public class WeSopController extends BaseController {
      */
     @PutMapping("/updateWeSop")
     public AjaxResult updateWeSop(@RequestBody WeSopBase weSopBase){
-        iWeSopBaseService.updateSopState(String.valueOf(weSopBase.getId()),weSopBase.getSopState());
+        iWeSopBaseService.updateWeSop(weSopBase);
         return AjaxResult.success();
     }
 
@@ -237,7 +237,7 @@ public class WeSopController extends BaseController {
     @PutMapping("/updateSopState")
     public AjaxResult startOrStopSop(@RequestBody WeSopBase weSopBase){
 
-        iWeSopBaseService.updateById(weSopBase);
+        iWeSopBaseService.updateSopState(String.valueOf(weSopBase.getId()),weSopBase.getSopState());
 
         return AjaxResult.success();
     }
