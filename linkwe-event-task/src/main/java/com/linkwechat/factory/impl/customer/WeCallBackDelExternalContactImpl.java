@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.enums.TrackState;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.factory.WeEventStrategy;
 import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeCustomerTrajectoryService;
+import com.linkwechat.service.IWeFlowerCustomerTagRelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,13 +32,26 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
+
+    @Autowired
+    private IWeFlowerCustomerTagRelService iWeFlowerCustomerTagRelService;
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
 
-        weCustomerService.remove(new LambdaQueryWrapper<WeCustomer>()
+
+        if(weCustomerService.remove(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID())
-                .eq(WeCustomer::getAddUserId,customerInfo.getUserID()));
+                .eq(WeCustomer::getAddUserId,customerInfo.getUserID()))){
+
+            //清空当前客户对应的标签
+            iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                    .eq(WeFlowerCustomerTagRel::getUserId,customerInfo.getUserID())
+                    .eq(WeFlowerCustomerTagRel::getExternalUserid,customerInfo.getExternalUserID()));
+
+        }
+
         //添加跟进动态
         iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(customerInfo.getExternalUserID(),customerInfo.getUserID(),false,
                 false);
