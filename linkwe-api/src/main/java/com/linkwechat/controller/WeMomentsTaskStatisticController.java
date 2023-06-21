@@ -33,6 +33,7 @@ import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,6 +89,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/14 17:37
      */
+    @ApiOperation("员工统计")
     @GetMapping("/user/{weMomentsTaskId}")
     public AjaxResult userStatistic(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         return AjaxResult.success(weMomentsTaskStatisticService.userStatistic(weMomentsTaskId));
@@ -101,6 +103,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/14 18:11
      */
+    @ApiOperation("员工记录")
     @GetMapping("/user/record")
     public TableDataInfo userRecord(@Validated WeMomentsStatisticUserRecordRequest request) {
         startPage();
@@ -117,12 +120,13 @@ public class WeMomentsTaskStatisticController extends BaseController {
 
 
     /**
-     * 用户记录导出
+     * 员工记录导出
      *
-     * @param request 用户记录统计请求参数
+     * @param request 员工记录导出请求参数
      * @author WangYX
      * @date 2023/06/14 19:00
      */
+    @ApiOperation("员工记录导出")
     @GetMapping("/user/export")
     public void userExport(@Validated WeMomentsStatisticUserRecordRequest request) {
         WeMomentsTask weMomentsTask = weMomentsTaskService.getById(request.getWeMomentsTaskId());
@@ -200,6 +204,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 13:52
      */
+    @ApiOperation("客户统计")
     @GetMapping("/customer/{weMomentsTaskId}")
     public AjaxResult customerStatistic(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         return AjaxResult.success(weMomentsTaskStatisticService.customerStatistic(weMomentsTaskId));
@@ -213,6 +218,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 15:07
      */
+    @ApiOperation("客户记录列表")
     @GetMapping("/customer/record")
     public TableDataInfo customerRecord(@Validated WeMomentsStatisticCustomerRecordRequest request) {
         startPage();
@@ -230,6 +236,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 15:33
      */
+    @ApiOperation("客户记录导出")
     @GetMapping("/customer/export")
     public void customerExport(@Validated WeMomentsStatisticCustomerRecordRequest request) {
         WeMomentsTask weMomentsTask = weMomentsTaskService.getById(request.getWeMomentsTaskId());
@@ -300,6 +307,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 16:08
      */
+    @ApiOperation("互动数据统计")
     @GetMapping("/interact/{weMomentsTaskId}")
     public AjaxResult interactStatistic(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         return AjaxResult.success(weMomentsTaskStatisticService.interactStatistic(weMomentsTaskId));
@@ -313,6 +321,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 16:29
      */
+    @ApiOperation("互动数据记录")
     @GetMapping("/interact/record")
     public TableDataInfo interactRecord(@Validated WeMomentsStatisticInteractRecordRequest request) {
         startPage();
@@ -330,6 +339,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 17:08
      */
+    @ApiOperation("互动数据导出")
     @GetMapping("/interact/export")
     public void interactExport(@Validated WeMomentsStatisticInteractRecordRequest request) {
         WeMomentsTask weMomentsTask = weMomentsTaskService.getById(request.getWeMomentsTaskId());

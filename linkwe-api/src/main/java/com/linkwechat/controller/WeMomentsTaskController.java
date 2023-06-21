@@ -17,6 +17,7 @@ import com.linkwechat.service.IWeMomentsTaskService;
 import com.linkwechat.service.IWeMomentsUserService;
 import com.linkwechat.service.IWeSynchRecordService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +54,7 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/06 18:11
      */
+    @ApiOperation("列表")
     @GetMapping("/list")
     public TableDataInfo list(WeMomentsTaskListRequest request) {
         startPage();
@@ -79,6 +81,7 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/13 15:02
      */
+    @ApiOperation("新增")
     @PostMapping("/add")
     public AjaxResult add(@Validated @RequestBody WeMomentsTaskAddRequest request) {
         return AjaxResult.success(weMomentsTaskService.add(request));
@@ -91,6 +94,7 @@ public class WeMomentsTaskController extends BaseController {
      * @date 2023/06/07 17:01
      * @version 1.0.0
      */
+    @ApiOperation("预估客户数量")
     @PostMapping("/estimate/num")
     public AjaxResult getEstimateCustomerNum(@Validated @RequestBody WeMomentsTaskEstimateCustomerNumRequest request) {
         Integer integer = weMomentsCustomerService.estimateCustomerNum(request);
@@ -104,6 +108,7 @@ public class WeMomentsTaskController extends BaseController {
      * @date 2023/06/09 11:28
      * @version 1.0.0
      */
+    @ApiOperation("详情")
     @GetMapping("/get/{weMomentsTaskId}")
     public AjaxResult get(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         return AjaxResult.success(weMomentsTaskService.get(weMomentsTaskId));
@@ -117,6 +122,7 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/12 10:46
      */
+    @ApiOperation("停止发送朋友圈")
     @GetMapping("/cancel/{weMomentsTaskId}")
     public AjaxResult cancel(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         weMomentsTaskService.cancelSendMoments(weMomentsTaskId);
@@ -130,6 +136,7 @@ public class WeMomentsTaskController extends BaseController {
      * @date 2023/06/13 17:35
      * @version 1.0.0
      */
+    @ApiOperation("提醒执行")
     @GetMapping("/reminder/execution/{weMomentsTaskId}")
     public AjaxResult reminderExecution(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         weMomentsTaskService.reminderExecution(weMomentsTaskId);
@@ -144,6 +151,7 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/12 10:53
      */
+    @ApiOperation("同步朋友圈")
     @GetMapping("/sync/{filterType}")
     public AjaxResult sync(@PathVariable(value = "filterType") Integer filterType) {
         //TODO 这里的同步必须进行执行的次数限制，短时间内多次执行没有任何意义
@@ -158,6 +166,7 @@ public class WeMomentsTaskController extends BaseController {
      * @date 2023/06/13 18:17
      * @version 1.0.0
      */
+    @ApiOperation("成员群发类型任务，员工完成任务")
     @PostMapping("/group/send/finish")
     public AjaxResult groupSendFinish(@RequestBody WeMomentsSyncGroupSendRequest request) {
         weMomentsTaskService.groupSendFinish(request);
@@ -172,6 +181,7 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/20 18:07
      */
+    @ApiOperation("移动端列表")
     @GetMapping("/mobile/list")
     public TableDataInfo mobileList(@Validated WeMomentsTaskMobileRequest request) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
@@ -189,6 +199,7 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/21 9:58
      */
+    @ApiOperation("移动端详情")
     @GetMapping("/mobile/get/{weMomentsTaskId}")
     public AjaxResult mobileGet(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         WeMomentsTaskMobileVO vo = weMomentsUserService.mobileGet(weMomentsTaskId);

@@ -939,6 +939,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             //为null不处理
             return;
         }
+        //企微群发，没有提醒执行操作
+        if (weMomentsTask.getSendType().equals(0)) {
+            return;
+        }
         LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
         queryWrapper.select(WeMomentsUser::getId, WeMomentsUser::getWeUserId, WeMomentsUser::getExecuteCount);
         queryWrapper.eq(WeMomentsUser::getMomentsTaskId, weMomentsTaskId);
