@@ -25,10 +25,10 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.enums.moments.task.WeMomentsTaskSendTypEnum;
 import com.linkwechat.common.exception.ServiceException;
-import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -44,13 +44,11 @@ import com.linkwechat.domain.moments.query.WeMomentsTaskAddRequest;
 import com.linkwechat.domain.moments.query.WeMomentsTaskListRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 import com.linkwechat.domain.msg.QwAppMsgBody;
-import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,11 +96,8 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     private IWeMomentsInteracteService weMomentsInteracteService;
     @Resource
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-
-
-    @Autowired
+    @Resource
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
-
 
     @Override
     public List<WeMomentsTaskVO> selectList(WeMomentsTaskListRequest request) {
@@ -145,7 +140,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
         //发送范围为按条件筛选
         if (request.getScopeType().equals(1)) {
-            //TODO 需进一步完善
             //按条件筛选
             if (CollectionUtil.isNotEmpty(request.getDeptIds())) {
                 task.setDeptIds(JSONObject.toJSONString(request.getDeptIds()));
@@ -243,7 +237,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             return null;
         }
         WeMomentsTaskVO weMomentsTaskVO = BeanUtil.copyProperties(weMomentsTask, WeMomentsTaskVO.class);
-        //TODO 需完善
         if (BeanUtil.isNotEmpty(weMomentsTaskVO.getCustomerTag())) {
             weMomentsTaskVO.setCustomerTag(JSONObject.parseArray(weMomentsTask.getCustomerTag(), String.class));
         }
@@ -612,7 +605,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             MomentsParamDto.Link build = new MomentsParamDto.Link();
             //移动端素材详情地址
             String materialDetailUrl = linkWeChatConfig.getMaterialDetailUrl();
-            String url = String.format(materialDetailUrl, weMaterial.getId(), 1);
+            String url = String.format(materialDetailUrl, weMaterial.getId());
             build.setUrl(url);
             build.setMedia_id(media_id);
             build.setTitle(truncationStr(weMaterial.getMaterialName(), 64));
@@ -639,18 +632,19 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     public void syncWeMomentsHandler(String msg) {
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
-        SecurityContextHolder.setUserName(loginUser.getUserName());
-        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
-        SecurityContextHolder.setUserType(loginUser.getUserType());
+//        SecurityContextHolder.setUserName(loginUser.getUserName());
+//        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
+//        SecurityContextHolder.setUserType(loginUser.getUserType());
 
         Integer filterType = loginUser.getFilterType();
 
+        //同步的时间从当天的开始时间到当前时间
         Long startTime = DateUtil.beginOfDay(new Date()).getTime() / 1000;
         Long endTime = DateUtil.date().getTime() / 1000;
         MomentsListDetailParamDto query = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).filter_type(filterType).build();
 
         List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
-        getByMoment(null, moments, query);
+        getMoment(null, moments, query);
 
         if (CollectionUtil.isNotEmpty(moments)) {
             syncAndSave(moments);
@@ -772,13 +766,13 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     }
 
     @Override
-    public void getByMoment(String nextCursor, List<MomentsListDetailResultDto.Moment> list, MomentsListDetailParamDto query) {
+    public void getMoment(String nextCursor, List<MomentsListDetailResultDto.Moment> list, MomentsListDetailParamDto query) {
         MomentsListDetailResultDto result = qwMomentsClient.momentList(query).getData();
         if (null != result) {
             if (WeConstans.WE_SUCCESS_CODE.equals(result.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(result.getErrCode()) && CollectionUtil.isNotEmpty(result.getMoment_list())) {
                 list.addAll(result.getMoment_list());
                 if (StringUtils.isNotEmpty(result.getNext_cursor())) {
-                    getByMoment(result.getNext_cursor(), list, query);
+                    getMoment(result.getNext_cursor(), list, query);
                 }
             }
         }
@@ -792,7 +786,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @date 2023/06/12 17:15
      */
     public void syncAndSave(List<MomentsListDetailResultDto.Moment> list) {
-        //TODO 需要加锁处理
         for (MomentsListDetailResultDto.Moment moment : list) {
             this.syncAndSave(moment);
         }
@@ -848,6 +841,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 wrapper.eq(WeMomentsTask::getSendType, 0);
                 wrapper.eq(WeMomentsTask::getScopeType, moment.getVisible_type().equals(1) ? 0 : 1);
                 wrapper.eq(WeMomentsTask::getType, moment.getCreate_type());
+                //TODO 这里需验证，是否企微发送的数据都没有创建者
                 wrapper.eq(StrUtil.isNotBlank(sysUser.getUserName()), WeMomentsTask::getCreateBy, sysUser.getUserName());
                 wrapper.eq(WeMomentsTask::getStatus, 2);
                 wrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
@@ -858,20 +852,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     //存在，不处理，等待JobId去同步
                 } else {
                     //不存在就新增
-                    //1.新增朋友圈
-                    Long weMomentsTaskId = this.syncAddMomentsTask(moment, sysUser);
-                    //2.添加朋友圈摊任务和朋友圈绑定表
-                    weMomentsTaskRelationService.syncAddRelation(weMomentsTaskId, moment_id);
-                    //3.同步朋友圈附件
-                    weMomentsAttachmentsService.syncAddMomentsAttachments(weMomentsTaskId, moment);
-                    //4.同步朋友圈发送情况
-                    weMomentsUserService.syncAddMomentsUser(weMomentsTaskId, moment_id);
-                    //5.同步朋友圈的客户情况
-                    weMomentsCustomerService.syncAddMomentsCustomer(weMomentsTaskId, moment_id);
-                    //6.同步员工发送成功的数据
-                    weMomentsCustomerService.syncMomentsCustomerSendSuccess(weMomentsTaskId, moment_id);
-                    //6.同步互动情况
-                    weMomentsInteracteService.syncAddWeMomentsInteracte(weMomentsTaskId, moment_id);
+                    syncAddMomentsRelation(moment, sysUser);
                 }
             } else {
                 //个人发表
@@ -881,15 +862,53 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 wrapper.eq(WeMomentsTask::getType, moment.getCreate_type());
                 wrapper.eq(WeMomentsTask::getStatus, 2);
                 wrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
-                wrapper.lt(WeMomentsTask::getCreateTime, moment.getCreate_time());
+
+                //保持误差在一分钟以内
+                Long create_time = moment.getCreate_time();
+                DateTime date = DateUtil.date(create_time * 1000);
+                DateTime offset = DateUtil.offset(date, DateField.SECOND, -30);
+                DateTime offset1 = DateUtil.offset(date, DateField.SECOND, 30);
+                wrapper.between(WeMomentsTask::getCreateTime, offset, offset1);
+
+                //TODO 这里需验证，是否企微发送的数据都没有创建者
+
                 wrapper.orderByDesc(WeMomentsTask::getCreateTime);
                 List<WeMomentsTask> weMomentsTasks = weMomentsTaskMapper.selectList(wrapper);
-
-                //TODO 待完善
-
-
+                if (CollectionUtil.isNotEmpty(weMomentsTasks)) {
+                    //存在，不处理
+                } else {
+                    //不存在，新增
+                    //1.新增朋友圈
+                    syncAddMomentsRelation(moment, sysUser);
+                }
             }
         }
+    }
+
+    /**
+     * 同步新增朋友圈相关数据
+     *
+     * @param moment  企微朋友圈
+     * @param sysUser 员工数据
+     * @return
+     * @author WangYX
+     * @date 2023/06/21 15:26
+     */
+    private void syncAddMomentsRelation(MomentsListDetailResultDto.Moment moment, SysUser sysUser) {
+        //1.新增朋友圈
+        Long weMomentsTaskId = this.syncAddMomentsTask(moment, sysUser);
+        //2.添加朋友圈摊任务和朋友圈绑定表
+        weMomentsTaskRelationService.syncAddRelation(weMomentsTaskId, moment.getMoment_id());
+        //3.同步朋友圈附件
+        weMomentsAttachmentsService.syncAddMomentsAttachments(weMomentsTaskId, moment);
+        //4.同步朋友圈发送情况
+        weMomentsUserService.syncAddMomentsUser(weMomentsTaskId, moment.getMoment_id());
+        //5.同步朋友圈的客户情况
+        weMomentsCustomerService.syncAddMomentsCustomer(weMomentsTaskId, moment.getMoment_id());
+        //6.同步员工发送成功的数据
+        weMomentsCustomerService.syncMomentsCustomerSendSuccess(weMomentsTaskId, moment.getMoment_id());
+        //6.同步互动情况
+        weMomentsInteracteService.syncAddWeMomentsInteracte(weMomentsTaskId, moment.getMoment_id());
     }
 
 
@@ -990,181 +1009,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 weMomentsUserService.updateBatchById(weMomentsUsers);
             }
         }
-
-    }
-
-    //--------------------------------------------------------------------------------------------------------------//
-
-    /**
-     * 朋友圈列表
-     *
-     * @param weMoments
-     * @return
-     */
-    @Override
-    public List<WeMomentsTask> findMoments(WeMomentsTask weMoments) {
-//        return this.baseMapper.findMoments(weMoments);
-        return null;
-    }
-
-    /**
-     * 发送更新朋友圈
-     *
-     * @param weMoments
-     */
-    @Override
-    public void addOrUpdateMoments(WeMomentsTask weMoments) {
-//        MomentsParamDto momentsParamDto = new MomentsParamDto();
-//        weMoments.setPushTime(new Date());
-//        weMoments.setIsLwPush(1);
-//        if (StringUtils.isNotEmpty(weMoments.getContent())) {
-//            weMoments.getOtherContent().add(WeMoments.OtherContent.builder().annexType(MediaType.TEXT.getMediaType()).other(weMoments.getContent()).build());
-//            momentsParamDto.setText(MomentsParamDto.Text.builder().content(weMoments.getContent()).build());
-//        }
-//        //设置附件
-//        List<WeMoments.OtherContent> otherContent = weMoments.getOtherContent();
-//        if (CollectionUtil.isNotEmpty(otherContent)) {
-//            List<WeMoments.OtherContent> otherContents = otherContent.stream().filter(s -> StringUtils.isNotEmpty(s.getAnnexType()) && StringUtils.isNotEmpty(s.getAnnexUrl())).collect(Collectors.toList());
-//            if (CollectionUtil.isNotEmpty(otherContents)) {
-//                List<Object> attachments = new ArrayList<>();
-//                //图片
-//                if (weMoments.getContentType().equals(MediaType.IMAGE.getMediaType())) {
-//                    otherContents.forEach(image -> {
-//                        String media_id = iWeMaterialService.uploadAttachmentMaterial(image.getAnnexUrl(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
-//                        if (StringUtils.isNotEmpty(media_id)) {
-//                            attachments.add(MomentsParamDto.ImageAttachments.builder().msgtype(MediaType.IMAGE.getMediaType()).image(MomentsParamDto.Image.builder().media_id(media_id).build()).build());
-//                            weMoments.setContent(image.getAnnexUrl());
-//                        }
-//                    });
-//                }
-//                //视频
-//                if (weMoments.getContentType().equals(MediaType.VIDEO.getMediaType())) {
-//                    otherContents.forEach(video -> {
-//                        String media_id = iWeMaterialService.uploadAttachmentMaterial(video.getAnnexUrl(), MediaType.VIDEO.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
-//                        if (StringUtils.isNotEmpty(media_id)) {
-//                            attachments.add(MomentsParamDto.VideoAttachments.builder().msgtype(MediaType.VIDEO.getMediaType()).video(MomentsParamDto.Video.builder().media_id(media_id).build()).build());
-//                            weMoments.setContent(video.getAnnexUrl());
-//                        }
-//                    });
-//                }
-//                //网页链接
-//                if (weMoments.getContentType().equals(MediaType.LINK.getMediaType())) {
-//                    otherContents.forEach(link -> {
-//                        String media_id = iWeMaterialService.uploadAttachmentMaterial(link.getOther(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
-//                        if (StringUtils.isNotEmpty(media_id)) {
-//                            MomentsParamDto.Link build = new MomentsParamDto.Link();
-//                            build.setUrl(link.getAnnexUrl());
-//                            build.setMedia_id(media_id);
-//                            if (StringUtils.isNotEmpty(link.getTitle())) {
-//                                build.setTitle(link.getTitle());
-//                            }
-//                            attachments.add(MomentsParamDto.LinkAttachments.builder().msgtype(MediaType.LINK.getMediaType()).link(build).build());
-//                            weMoments.setContent(link.getAnnexUrl());
-//                        }
-//                    });
-//                }
-//                momentsParamDto.setAttachments(attachments);
-//            }
-//        }
-//        MomentsParamDto.VisibleRange visibleRange = MomentsParamDto.VisibleRange.builder().build();
-//
-//        //设置可见范围
-//        if (weMoments.getScopeType().equals(0)) { //部分
-//            if (StringUtils.isNotEmpty(weMoments.getCustomerTag())) { //客户标签
-//                visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(weMoments.getCustomerTag().split(",")).build());
-//            }
-//            if (StringUtils.isNotEmpty(weMoments.getNoAddUser())) {//指定发送人
-//                visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weMoments.getNoAddUser().split(",")).build());
-//            }
-//        }
-//        momentsParamDto.setVisible_range(visibleRange);
-//        MomentsResultDto weResultDto = qwMomentsClient.addMomentTask(momentsParamDto).getData();
-//        if (Objects.isNull(weResultDto)) {
-//            throw new WeComException("调用企微接口失败");
-//        }
-//        if (ObjectUtil.notEqual(WeConstans.WE_SUCCESS_CODE, weResultDto.getErrCode())) {
-//            throw new WeComException(weResultDto.getErrCode(), weResultDto.getErrMsg());
-//        }
-//        weMoments.setJobId(weResultDto.getJobid());
-//        weMoments.setStatus(1);
-//        this.save(weMoments);
-    }
-
-
-    /**
-     * 朋友圈详情
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    public WeMomentsTask findMomentsDetail(Long id) {
-//        return this.baseMapper.findMomentsDetail(id);
-        return null;
-    }
-
-
-    /**
-     * 同步朋友圈个人互动情况逻辑
-     *
-     * @param msg
-     */
-    @Override
-    @Async
-    public void synchMomentsInteracteHandler(String msg) {
-
-//        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
-//        SecurityContextHolder.setCorpId(loginUser.getCorpId());
-//        SecurityContextHolder.setUserName(loginUser.getUserName());
-//        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
-//        SecurityContextHolder.setUserType(loginUser.getUserType());
-//        List<String> weUserIds = loginUser.getWeUserIds();
-//
-//        Map<String, SysUserVo> userIdMap = new HashMap<>();
-//
-//        if(CollectionUtil.isNotEmpty(weUserIds)){
-//            SysUserQuery userQuery = new SysUserQuery();
-//            userQuery.setWeUserIds(weUserIds);
-//            List<SysUserVo> userList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
-//            if (CollectionUtil.isNotEmpty(userList)) {
-//                userIdMap = userList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, Function.identity(), (key1, key2) -> key2));
-//            }
-//        }
-//
-//        if (CollectionUtil.isNotEmpty(userIdMap)) {
-//            userIdMap.forEach((weUserId, sysUserInfo) ->{
-//                List<WeMoments> weMoments = list(new LambdaQueryWrapper<WeMoments>()
-//                        .eq(WeMoments::getCreator,weUserId).eq(WeMoments::getType, 1)
-//                        .eq(WeMoments::getDelFlag, WeConstans.WE_SUCCESS_CODE));
-//                if (CollectionUtil.isNotEmpty(weMoments)) {
-//                    List<WeMomentsInteracte> interactes = new ArrayList<>();
-//                    weMoments.forEach(moment -> {
-//                        weMomentsInteracteService.remove(new LambdaQueryWrapper<WeMomentsInteracte>()
-//                                .eq(WeMomentsInteracte::getMomentId, moment.getMomentId()));
-//                        interactes.addAll(getInteracte(moment.getMomentId(), moment.getCreator(), sysUserInfo));
-//
-//
-//                    });
-//                    if (CollectionUtil.isNotEmpty(interactes)) {
-//                        weMomentsInteracteService.saveBatch(interactes);
-//
-//                        interactes.forEach(interacte -> {
-//                            if (new Integer(1).equals(interacte.getInteracteUserType())) {//互动人员为客户
-//                                iWeCustomerTrajectoryService.createInteractionTrajectory(
-//                                        interacte.getInteracteUserId(), interacte.getMomentCreteOrId(), new Integer(1).equals(interacte.getInteracteType()) ? TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType() :
-//                                                TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType(), null
-//                                );
-//                            }
-//
-//                        });
-//
-//                    }
-//
-//
-//                }
-//            });
-//
-//        }
     }
 
 
@@ -1175,134 +1019,59 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      */
     @Override
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_MOMENTS_INTERACTE)
-    public void synchMomentsInteracte(List<String> userIds) {
-
+    public void syncMomentsInteract(List<String> userIds) {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         loginUser.setWeUserIds(userIds);
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeHdMomentsRk(), JSONObject.toJSONString(loginUser));
-
-
     }
 
 
-    //获取互动数据
-    private List<WeMomentsInteracte> getInteracte(String momentId, String creator, SysUserVo sysUser) {
-        List<WeMomentsInteracte> interactes = new ArrayList<>();
+    /**
+     * 同步朋友圈个人互动数据
+     * <p>
+     * TODO 朋友圈改动之后，这里的需求牵扯到了，但是需求不懂，就按照改动之前的逻辑来写的，后面需求不对时，需完善
+     *
+     * @param msg
+     * @author WangYX
+     * @date 2023/06/21 16:26
+     */
+    @Override
+    @Async
+    public void syncMomentsInteractHandler(String msg) {
 
-        MomentsInteracteResultDto momentComments = qwMomentsClient.comments(
-                MomentsInteracteParamDto.builder().moment_id(momentId).userid(creator).build()).getData();
+        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
+        SecurityContextHolder.setCorpId(loginUser.getCorpId());
+//        SecurityContextHolder.setUserName(loginUser.getUserName());
+//        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
+//        SecurityContextHolder.setUserType(loginUser.getUserType());
+        List<String> weUserIds = loginUser.getWeUserIds();
 
-        if (momentComments.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
-            List<MomentsInteracteResultDto.Interacte> comment_list = momentComments.getComment_list();
-
-            //评论
-            if (CollectionUtil.isNotEmpty(comment_list)) {
-                comment_list.forEach(k -> {
-                    WeMomentsInteracte.WeMomentsInteracteBuilder builder = WeMomentsInteracte.builder();
-                    builder.interacteUserType(StringUtils.isNotEmpty(k.getUserid()) ? new Integer(0) : new Integer(1));
-                    builder.interacteType(0);
-                    builder.interacteUserId(
-                            StringUtils.isNotEmpty(k.getUserid()) ? k.getUserid() : k.getExternal_userid());
-                    builder.interacteTime(new Date(k.getCreate_time() * 1000L));
-                    builder.momentId(momentId);
-                    WeMomentsInteracte weMomentsInteracte = builder.build();
-                    weMomentsInteracte.setCreateTime(new Date());
-                    weMomentsInteracte.setUpdateTime(new Date());
-                    weMomentsInteracte.setMomentCreteOrId(creator);
-                    if (null != sysUser) {
-                        weMomentsInteracte.setCreateBy(sysUser.getUserName());
-                        weMomentsInteracte.setCreateById(sysUser.getUserId());
-                        weMomentsInteracte.setUpdateBy(sysUser.getUserName());
-                        weMomentsInteracte.setUpdateById(sysUser.getUserId());
+        if (CollectionUtil.isNotEmpty(weUserIds)) {
+            LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
+            queryWrapper.in(WeMomentsUser::getWeUserId, weUserIds);
+            queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
+            List<WeMomentsUser> list = weMomentsUserService.list(queryWrapper);
+            if (CollectionUtil.isNotEmpty(list)) {
+                for (WeMomentsUser weMomentsUser : list) {
+                    weMomentsInteracteService.syncAddWeMomentsInteracte(weMomentsUser.getMomentsTaskId(), weMomentsUser.getMomentsId());
+                    LambdaQueryWrapper<WeMomentsInteracte> wrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
+                    wrapper.eq(WeMomentsInteracte::getMomentsTaskId, weMomentsUser.getMomentsTaskId());
+                    wrapper.eq(WeMomentsInteracte::getMomentId, weMomentsUser.getMomentsId());
+                    wrapper.eq(WeMomentsInteracte::getDelFlag, Constants.COMMON_STATE);
+                    List<WeMomentsInteracte> interactes = weMomentsInteracteService.list(wrapper);
+                    if (CollectionUtil.isNotEmpty(interactes)) {
+                        interactes.stream().forEach(interacte -> {
+                            if (new Integer(1).equals(interacte.getInteracteUserType())) {//互动人员为客户
+                                iWeCustomerTrajectoryService.createInteractionTrajectory(
+                                        interacte.getInteracteUserId(),
+                                        interacte.getMomentCreteOrId(),
+                                        new Integer(1).equals(interacte.getInteracteType()) ? TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType() : TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType(), null
+                                );
+                            }
+                        });
                     }
-
-                    interactes.add(weMomentsInteracte);
-                });
-
+                }
             }
-
-            List<MomentsInteracteResultDto.Interacte> like_list = momentComments.getLike_list();
-
-            if (CollectionUtil.isNotEmpty(like_list)) { //点赞
-                like_list.forEach(k -> {
-                    WeMomentsInteracte weMomentsInteracte = WeMomentsInteracte.builder()
-                            .interacteUserType(StringUtils.isNotEmpty(k.getUserid()) ? new Integer(0) : new Integer(1))
-                            .interacteType(1).interacteUserId(
-                                    StringUtils.isNotEmpty(k.getUserid()) ? k.getUserid() : k.getExternal_userid())
-                            .interacteTime(new Date(k.getCreate_time() * 1000L)).momentId(momentId).build();
-                    weMomentsInteracte.setCreateTime(new Date());
-                    weMomentsInteracte.setUpdateTime(new Date());
-
-                    if (null != sysUser) {
-                        weMomentsInteracte.setCreateBy(sysUser.getUserName());
-                        weMomentsInteracte.setCreateById(sysUser.getUserId());
-                        weMomentsInteracte.setUpdateBy(sysUser.getUserName());
-                        weMomentsInteracte.setUpdateById(sysUser.getUserId());
-                    }
-
-                    interactes.add(weMomentsInteracte);
-                });
-            }
-        }
-        return interactes;
-    }
-
-
-    /**
-     * 设置员工发送结果
-     *
-     * @param weMoments
-     */
-    private void getSendResult(WeMomentsTask weMoments) {
-//        MomentsResultDto momentTask = qwMomentsClient.get_moment_task(
-//                MomentsParamDto.builder().moment_id(weMoments.getMomentId()).build()).getData();
-//
-//        if (null != momentTask) {
-//            if (momentTask.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
-//                List<MomentsResultDto.TaskList> taskList = momentTask.getTask_list();
-//                if (CollectionUtil.isNotEmpty(taskList)) {
-//                    Map<Integer, List<MomentsResultDto.TaskList>> listMap = taskList.stream().collect(Collectors.groupingBy(MomentsResultDto.TaskList::getPublish_status));
-//
-//                    //已发表
-//                    if(listMap.containsKey(1)){
-//                        weMoments.setAddUser(listMap.get(1).stream().map(MomentsResultDto.TaskList::getUserid)
-//                                .collect(Collectors.joining(",")));
-//                    }
-//
-//                    if(listMap.containsKey(0) && ObjectUtil.equal(weMoments.getScopeType(),0)){
-//                        weMoments.setNoAddUser(listMap.get(0).stream().map(MomentsResultDto.TaskList::getUserid)
-//                                .collect(Collectors.joining(",")));
-//                    }else {
-//                        weMoments.setNoAddUser("");
-//                    }
-//                }
-//            }
-//        }
-    }
-
-
-    /**
-     * 批量获取企业朋友圈(30天内数据)
-     *
-     * @param nextCursor
-     * @param list
-     */
-    private void getByMoment(String nextCursor, List<MomentsListDetailResultDto.Moment> list, Integer filterType) {
-        MomentsListDetailParamDto query = MomentsListDetailParamDto.builder().start_time(DateUtils.getBeforeByDayLongTime(-30)).end_time(DateUtils.getBeforeByDayLongTime(0)).cursor(nextCursor).filter_type(filterType).build();
-        getByMoment(nextCursor, list, query);
-    }
-
-
-    /**
-     * 互动数据入库处理
-     *
-     * @param interactes
-     */
-    private void handleInteracte(List<WeMomentsInteracte> interactes, List<WeMomentsTask> weMoments) {
-        if (CollectionUtil.isNotEmpty(interactes)) {
-            weMomentsInteracteService.remove(new LambdaQueryWrapper<WeMomentsInteracte>()
-                    .in(WeMomentsInteracte::getMomentId, weMoments.stream().map(WeMomentsTask::getId).collect(Collectors.toList())));
-            weMomentsInteracteService.saveBatch(interactes);
         }
     }
 }

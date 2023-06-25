@@ -1,5 +1,6 @@
 package com.linkwechat.domain.moments.query;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,14 +31,14 @@ public class WeMomentsStatisticInteractRecordRequest {
     /**
      * 互动开始时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm::ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "互动开始时间")
     private LocalDateTime beginTime;
 
     /**
      * 互动结束时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm::ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "互动结束时间")
     private LocalDateTime endTime;
 
@@ -45,7 +46,7 @@ public class WeMomentsStatisticInteractRecordRequest {
      * 企微员工Id集合
      */
     @ApiModelProperty(value = "企微员工Id集合")
-    private List<String> weUserIds;
+    private String weUserIds;
 
     /**
      * 互动类型:0:评论；1:点赞

@@ -1,6 +1,6 @@
 package com.linkwechat.controller;
 
-import cn.hutool.core.collection.CollectionUtil;
+import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
@@ -8,7 +8,6 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.domain.moments.entity.WeMomentsTask;
 import com.linkwechat.domain.moments.query.*;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
@@ -60,7 +59,7 @@ public class WeMomentsTaskController extends BaseController {
         startPage();
         List<WeMomentsTaskVO> moments = weMomentsTaskService.selectList(request);
         //转化率
-        moments.stream().forEach(i -> {
+        moments.forEach(i -> {
             if (i.getTotal().equals(0)) {
                 i.setFinishRate("0%");
             } else {
@@ -90,9 +89,10 @@ public class WeMomentsTaskController extends BaseController {
     /**
      * 预估客户数量
      *
+     * @param request 预估客户数量请求参数
+     * @return {@link AjaxResult}
      * @author WangYX
-     * @date 2023/06/07 17:01
-     * @version 1.0.0
+     * @date 2023/06/21 15:54
      */
     @ApiOperation("预估客户数量")
     @PostMapping("/estimate/num")
@@ -102,11 +102,12 @@ public class WeMomentsTaskController extends BaseController {
     }
 
     /**
-     * 详情
+     * 朋友圈任务详情
      *
+     * @param weMomentsTaskId 朋友圈任务Id
+     * @return {@link AjaxResult}
      * @author WangYX
-     * @date 2023/06/09 11:28
-     * @version 1.0.0
+     * @date 2023/06/21 15:54
      */
     @ApiOperation("详情")
     @GetMapping("/get/{weMomentsTaskId}")
@@ -132,9 +133,10 @@ public class WeMomentsTaskController extends BaseController {
     /**
      * 提醒执行
      *
+     * @param weMomentsTaskId 朋友圈任务Id
+     * @return {@link AjaxResult}
      * @author WangYX
-     * @date 2023/06/13 17:35
-     * @version 1.0.0
+     * @date 2023/06/21 15:55
      */
     @ApiOperation("提醒执行")
     @GetMapping("/reminder/execution/{weMomentsTaskId}")
@@ -151,22 +153,24 @@ public class WeMomentsTaskController extends BaseController {
      * @author WangYX
      * @date 2023/06/12 10:53
      */
+    @RepeatSubmit
     @ApiOperation("同步朋友圈")
     @GetMapping("/sync/{filterType}")
     public AjaxResult sync(@PathVariable(value = "filterType") Integer filterType) {
-        //TODO 这里的同步必须进行执行的次数限制，短时间内多次执行没有任何意义
         weMomentsTaskService.syncMoments(filterType);
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 
     /**
-     * 成员群发类型任务，员工完成任务
+     * 同步成员群发类型朋友圈
+     * 成员群发类型朋友圈，员工完成任务后，调用该接口，同步企微数据
      *
+     * @param request 同步成员群发类型朋友圈参数
+     * @return {@link AjaxResult}
      * @author WangYX
-     * @date 2023/06/13 18:17
-     * @version 1.0.0
+     * @date 2023/06/21 15:56
      */
-    @ApiOperation("成员群发类型任务，员工完成任务")
+    @ApiOperation("同步成员群发类型朋友圈")
     @PostMapping("/group/send/finish")
     public AjaxResult groupSendFinish(@RequestBody WeMomentsSyncGroupSendRequest request) {
         weMomentsTaskService.groupSendFinish(request);
@@ -176,7 +180,7 @@ public class WeMomentsTaskController extends BaseController {
     /**
      * 移动端列表
      *
-     * @param request
+     * @param request 移动端列表参数
      * @return {@link AjaxResult}
      * @author WangYX
      * @date 2023/06/20 18:07
@@ -188,13 +192,15 @@ public class WeMomentsTaskController extends BaseController {
         request.setWeUserId(sysUser.getWeUserId());
         startPage();
         List<WeMomentsTaskMobileVO> vos = weMomentsUserService.mobileList(request);
-        return getDataTable(vos);
+        TableDataInfo dataTable = getDataTable(vos);
+        dataTable.setTotal(vos.size());
+        return dataTable;
     }
 
     /**
      * 移动端详情
      *
-     * @param
+     * @param weMomentsTaskId 朋友圈任务Id
      * @return {@link AjaxResult}
      * @author WangYX
      * @date 2023/06/21 9:58
@@ -204,60 +210,5 @@ public class WeMomentsTaskController extends BaseController {
     public AjaxResult mobileGet(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         WeMomentsTaskMobileVO vo = weMomentsUserService.mobileGet(weMomentsTaskId);
         return AjaxResult.success(vo);
-    }
-
-
-    //---------------------------------------------------------------------------------------------------------------//
-
-
-    /**
-     * 新增或者编辑朋友圈
-     *
-     * @return
-     */
-    @PostMapping("/addOrUpdate")
-    public AjaxResult addOrUpdate(@RequestBody WeMomentsTask weMoments) {
-        weMomentsTaskService.addOrUpdateMoments(weMoments);
-        return AjaxResult.success();
-    }
-
-
-    /**
-     * 获取朋友圈详情
-     *
-     * @param id
-     * @return
-     */
-    @GetMapping("/findMomentsDetail/{id}")
-    public AjaxResult findMomentsDetail(@PathVariable("id") Long id) {
-        return AjaxResult.success(weMomentsTaskService.findMomentsDetail(id));
-    }
-
-
-    /**
-     * 朋友圈同步
-     *
-     * @param filterType 0:企业朋友圈；1:个人朋友圈
-     * @return {@link AjaxResult}
-     * @author WangYX
-     * @date 2023/06/12 18:03
-     */
-    @GetMapping("/syncMoments")
-    public AjaxResult syncMoments(@RequestParam(defaultValue = "0") Integer filterType) {
-        weMomentsTaskService.syncMoments(filterType);
-        return AjaxResult.success(WeConstans.SYNCH_TIP);
-    }
-
-
-    /**
-     * 个人朋友圈互动数据同步
-     *
-     * @param userIds
-     * @return
-     */
-    @GetMapping("/synchMomentsInteracte/{userIds}")
-    public AjaxResult synchMomentsInteracte(@PathVariable String[] userIds) {
-        weMomentsTaskService.synchMomentsInteracte(CollectionUtil.newArrayList(userIds));
-        return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 }

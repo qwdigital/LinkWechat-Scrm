@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler.listener;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.domain.moments.query.WeMomentsJobIdToMomentsIdRequest;
 import com.linkwechat.service.IWeMomentsTaskService;
 import com.rabbitmq.client.Channel;
@@ -25,6 +26,8 @@ public class QwMomentsListener {
 
     @Resource
     private IWeMomentsTaskService weMomentsTaskService;
+    @Resource
+    private RedisService redisService;
 
     /**
      * 朋友圈任务定时执行
@@ -77,7 +80,16 @@ public class QwMomentsListener {
     public void momentsDataSync(String msg, Channel channel, Message message) {
         try {
             log.info("企微朋友圈同步消息监听：msg:{}", msg);
-            weMomentsTaskService.syncWeMomentsHandler(msg);
+            String key = "momentsSyncKey";
+            String value = "lock";
+            Boolean b = redisService.tryLock(key, value, 60 * 60L);
+            if (b) {
+                try {
+                    weMomentsTaskService.syncWeMomentsHandler(msg);
+                } finally {
+                    redisService.unLock(key, value);
+                }
+            }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +130,7 @@ public class QwMomentsListener {
     public void weHdMomentsSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微朋友圈互动同步消息监听：msg:{}", msg);
-            weMomentsTaskService.synchMomentsInteracteHandler(msg);
+            weMomentsTaskService.syncMomentsInteractHandler(msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();

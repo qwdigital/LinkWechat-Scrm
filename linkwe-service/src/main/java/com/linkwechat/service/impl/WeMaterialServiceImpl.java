@@ -875,7 +875,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             }
         }
         if (Objects.equals(CategoryMediaType.TEXT.getType().toString(), material.getMediaType())) {
-            //文本标题长度不可超过2000个字符
+            //文本标题长度不可超过50个字符
             String materialName = material.getMaterialName();
             if (materialName != null && materialName.length() > 50) {
                 throw new WeComException("文本标题不可超过50个字符!");

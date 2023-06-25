@@ -3,7 +3,6 @@ package com.linkwechat.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -18,6 +17,7 @@ import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,9 +47,8 @@ public class WeCustomerPortraitController extends BaseController {
     @Autowired
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
-    @Autowired
-    private IWeMomentsTaskService iWeMomentsService;
-
+    @Resource
+    private IWeMomentsTaskService weMomentsTaskService;
 
     @Autowired
     private IWeSysFieldTemplateService iWeSysFieldTemplateService;
@@ -244,11 +243,8 @@ public class WeCustomerPortraitController extends BaseController {
      * @return
      */
     @GetMapping("/synchMomentsInteracte/{userId}")
-    public AjaxResult synchMomentsInteracte(@PathVariable String userId) {
-
-        //TODO 朋友圈互动
-        iWeMomentsService.synchMomentsInteracte(CollectionUtil.newArrayList(userId));
-
+    public AjaxResult syncMomentsInteract(@PathVariable String userId) {
+        weMomentsTaskService.syncMomentsInteract(CollectionUtil.newArrayList(userId));
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 

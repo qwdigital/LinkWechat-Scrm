@@ -29,13 +29,13 @@ public class WeMomentsStatisticUserRecordRequest {
      * 企微员工Id集合
      */
     @ApiModelProperty(value = "企微员工Id集合")
-    private List<String> weUserIds;
+    private String weUserIds;
 
     /**
      * 部门Id集合
      */
     @ApiModelProperty(value = "部门Id集合")
-    private List<Long> deptIds;
+    private String deptIds;
 
     /**
      * 执行状态:0未执行，1已执行

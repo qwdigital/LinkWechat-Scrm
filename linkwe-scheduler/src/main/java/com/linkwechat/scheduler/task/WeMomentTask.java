@@ -3,6 +3,7 @@ package com.linkwechat.scheduler.task;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.moments.dto.MomentsListDetailParamDto;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
@@ -25,15 +26,14 @@ import java.util.List;
  * @author danmo
  * @date 2023/04/18 11:22
  **/
-
 @Component
 @Slf4j
 public class WeMomentTask {
 
     @Resource
-    private QwMomentsClient qwMomentsClient;
-    @Resource
     private IWeMomentsTaskService weMomentsTaskService;
+    @Resource
+    private RedisService redisService;
 
     /**
      * 同步30天数据
@@ -79,10 +79,20 @@ public class WeMomentTask {
             endTime = query.getEndTime();
         }
 
-        List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
-        MomentsListDetailParamDto detailParamDto = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).build();
-        weMomentsTaskService.getByMoment(null, moments, detailParamDto);
-        weMomentsTaskService.syncMomentsDataHandle(moments);
+        //加锁，防止并发处理
+        String key = "momentsSyncKey";
+        String value = "lock";
+        Boolean b = redisService.tryLock(key, value, 60 * 60L);
+        if (b) {
+            try {
+                List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
+                MomentsListDetailParamDto detailParamDto = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).build();
+                weMomentsTaskService.getMoment(null, moments, detailParamDto);
+                weMomentsTaskService.syncMomentsDataHandle(moments);
+            } finally {
+                redisService.unLock(key, value);
+            }
+        }
     }
 
     @Data

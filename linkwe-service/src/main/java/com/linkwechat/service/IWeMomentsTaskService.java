@@ -111,10 +111,20 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
      */
     void jobIdToMomentsId(WeMomentsJobIdToMomentsIdRequest request);
 
+    /**
+     * 获取企微朋友圈信息
+     *
+     * @param nextCursor 游标
+     * @param list       从企微获取的朋友圈数据，放到该list中
+     * @param query      查询数据
+     */
+    void getMoment(String nextCursor, List<MomentsListDetailResultDto.Moment> list, MomentsListDetailParamDto query);
 
-    void getByMoment(String nextCursor, List<MomentsListDetailResultDto.Moment> list, MomentsListDetailParamDto query);
-
-
+    /**
+     * 朋友圈定时拉取数据
+     *
+     * @param moments 朋友圈集合
+     */
     void syncMomentsDataHandle(List<MomentsListDetailResultDto.Moment> moments);
 
     /**
@@ -128,17 +138,23 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
     void reminderExecution(Long weMomentsTaskId);
 
 
-    //----------------------------------------------------------------------------------------------------------------
+    /**
+     * 同步朋友圈互动数据
+     *
+     * @param userIds 用户Id集合
+     * @return
+     * @author WangYX
+     * @date 2023/06/21 16:51
+     */
+    void syncMomentsInteract(List<String> userIds);
 
-    List<WeMomentsTask> findMoments(WeMomentsTask weMoments);
-
-    void addOrUpdateMoments(WeMomentsTask weMoments);
-
-
-    WeMomentsTask findMomentsDetail(Long id);
-
-
-    void synchMomentsInteracteHandler(String msg);
-
-    void synchMomentsInteracte(List<String> userIds);
+    /**
+     * 同步朋友圈互动数据
+     *
+     * @param msg
+     * @return
+     * @author WangYX
+     * @date 2023/06/21 16:52
+     */
+    void syncMomentsInteractHandler(String msg);
 }

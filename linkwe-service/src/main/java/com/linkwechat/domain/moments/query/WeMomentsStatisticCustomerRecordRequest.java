@@ -29,7 +29,7 @@ public class WeMomentsStatisticCustomerRecordRequest {
      * 企微员工Id集合
      */
     @ApiModelProperty(value = "企微员工Id集合")
-    private List<String> weUserIds;
+    private String weUserIds;
 
     /**
      * 送达状态 0已送达 1未送达

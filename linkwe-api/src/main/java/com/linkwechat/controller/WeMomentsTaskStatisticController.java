@@ -3,6 +3,7 @@ package com.linkwechat.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -122,7 +123,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
     /**
      * 员工记录导出
      *
-     * @param request 员工记录导出请求参数
+     * @param request 员工记录导出请求参数，
      * @author WangYX
      * @date 2023/06/14 19:00
      */
@@ -161,8 +162,12 @@ public class WeMomentsTaskStatisticController extends BaseController {
     private List<WeMomentsUser> getWeMomentsUsers(@Validated WeMomentsStatisticUserRecordRequest request) {
         LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
         queryWrapper.eq(WeMomentsUser::getMomentsTaskId, request.getWeMomentsTaskId());
-        queryWrapper.in(CollectionUtil.isNotEmpty(request.getWeUserIds()), WeMomentsUser::getWeUserId, request.getWeUserIds());
-        queryWrapper.in(CollectionUtil.isNotEmpty(request.getDeptIds()), WeMomentsUser::getDeptId, request.getDeptIds());
+        if (StrUtil.isNotBlank(request.getWeUserIds())) {
+            queryWrapper.in(WeMomentsUser::getWeUserId, request.getWeUserIds().split(","));
+        }
+        if (StrUtil.isNotBlank(request.getDeptIds())) {
+            queryWrapper.in(WeMomentsUser::getDeptId, request.getDeptIds().split(","));
+        }
         queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
         queryWrapper.eq(request.getStatus() != null, WeMomentsUser::getExecuteStatus, request.getStatus());
         return weMomentsUserService.list(queryWrapper);
@@ -259,6 +264,13 @@ public class WeMomentsTaskStatisticController extends BaseController {
                 List<WeMomentsCustomerVO> data = split.get(i);
                 build.write(data, writeSheet);
             }
+
+            if (split.size() == 0) {
+                //多sheet，1w条数据一个sheet
+                WriteSheet writeSheet = EasyExcel.writerSheet("朋友圈客户统计").build();
+                List<WeMomentsCustomerVO> data = new ArrayList<>();
+                build.write(data, writeSheet);
+            }
             build.finish();
         } catch (IOException e) {
             e.printStackTrace();
@@ -276,7 +288,9 @@ public class WeMomentsTaskStatisticController extends BaseController {
     private List<WeMomentsCustomer> getMomentsCustomers(WeMomentsStatisticCustomerRecordRequest request) {
         LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
         queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, request.getWeMomentsTaskId());
-        queryWrapper.in(CollectionUtil.isNotEmpty(request.getWeUserIds()), WeMomentsCustomer::getWeUserId, request.getWeUserIds());
+        if (StrUtil.isNotBlank(request.getWeUserIds())) {
+            queryWrapper.in(WeMomentsCustomer::getWeUserId, request.getWeUserIds().split(","));
+        }
         queryWrapper.eq(request.getDeliveryStatus() != null, WeMomentsCustomer::getDeliveryStatus, request.getDeliveryStatus());
         queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
         List<WeMomentsCustomer> list = weMomentsCustomerService.list(queryWrapper);
@@ -355,7 +369,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
         try {
             String fileName = URLEncoder.encode(DateUtil.today() + weMomentsTask.getName() + "互动统计", "UTF-8").replaceAll("\\+", "%20");
             response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-            ExcelWriter build = EasyExcel.write(response.getOutputStream(), WeMomentsCustomerVO.class).build();
+            ExcelWriter build = EasyExcel.write(response.getOutputStream(), WeMomentsInteractVO.class).build();
 
             List<List<WeMomentsInteractVO>> split = CollectionUtil.split(vos, 10000);
             for (int i = 0; i < split.size(); i++) {
@@ -364,6 +378,14 @@ public class WeMomentsTaskStatisticController extends BaseController {
                 List<WeMomentsInteractVO> data = split.get(i);
                 build.write(data, writeSheet);
             }
+
+            if (split.size() == 0) {
+                //多sheet，1w条数据一个sheet
+                WriteSheet writeSheet = EasyExcel.writerSheet("互动统计").build();
+                List<WeMomentsInteractVO> data = new ArrayList<>();
+                build.write(data, writeSheet);
+            }
+
             build.finish();
         } catch (IOException e) {
             e.printStackTrace();
@@ -419,7 +441,9 @@ public class WeMomentsTaskStatisticController extends BaseController {
         LambdaQueryWrapper<WeMomentsInteracte> queryWrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
         queryWrapper.eq(WeMomentsInteracte::getMomentsTaskId, request.getWeMomentsTaskId());
         queryWrapper.eq(request.getInteractType() != null, WeMomentsInteracte::getInteracteType, request.getInteractType());
-        queryWrapper.in(CollectionUtil.isNotEmpty(request.getWeUserIds()), WeMomentsInteracte::getWeUserId, request.getWeUserIds());
+        if (StrUtil.isNotBlank(request.getWeUserIds())) {
+            queryWrapper.in(WeMomentsInteracte::getWeUserId, request.getWeUserIds().split(","));
+        }
         queryWrapper.between(request.getBeginTime() != null && request.getEndTime() != null, WeMomentsInteracte::getInteracteTime, request.getBeginTime(), request.getEndTime());
         queryWrapper.eq(WeMomentsInteracte::getInteracteUserType, 1);
         queryWrapper.eq(WeMomentsInteracte::getDelFlag, 0);
