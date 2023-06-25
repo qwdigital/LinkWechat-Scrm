@@ -142,6 +142,7 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
     public void addAccountWelcome(WeAddKfWelcomeQuery query) {
         WeKfInfo weKfInfo = new WeKfInfo();
         weKfInfo.setId(query.getId());
+        weKfInfo.setSplitTime(query.getSplitTime());
         weKfInfo.setReceptionType(query.getReceptionType());
         updateById(weKfInfo);
         List<WeKfWelcomeInfo> welcomeList = query.getWelcome();
