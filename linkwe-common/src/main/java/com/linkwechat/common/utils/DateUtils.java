@@ -615,7 +615,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         Long hour = (ms - day * dd) / hh;
         Long minute = (ms - day * dd - hour * hh) / mi;
         Long second = (ms - day * dd - hour * hh - minute * mi) / ss;
-        Long milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss;
+//        Long milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss;
 
         StringBuffer sb = new StringBuffer();
         if(day > 0) {
@@ -630,9 +630,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         if(second > 0) {
             sb.append(second+"秒");
         }
-        if(milliSecond > 0) {
-            sb.append(milliSecond+"毫秒");
-        }
+//        if(milliSecond > 0) {
+//            sb.append(milliSecond+"毫秒");
+//        }
         return sb.toString();
     }
 

@@ -146,7 +146,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             contentDataDetailVos.stream().forEach(contentDataDetailVo -> {
                 if(contentDataDetailVo.getViewDuration()!= null){
                     contentDataDetailVo.setViewDurationCpt(DateUtils.formatTime(
-                            contentDataDetailVo.getViewDuration().longValue()
+                            contentDataDetailVo.getViewDuration().longValue()*1000
                     ));
                 }
 
