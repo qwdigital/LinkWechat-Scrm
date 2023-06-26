@@ -1012,7 +1012,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                             Date pushEndTime
                                                     = DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS, executeData + " " + weSopPushTimeDto.getPushEndTime());
 
-                                                    if( DateUtils.parseDate(DateUtils.dateTimeNow()).before(
+                                                    if(new Date().before(
                                                             pushEndTime
                                                     )){
 
