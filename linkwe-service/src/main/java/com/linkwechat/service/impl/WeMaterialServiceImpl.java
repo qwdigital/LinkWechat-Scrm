@@ -57,6 +57,7 @@ import com.linkwechat.service.IWeMaterialService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,8 +102,6 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Resource
     private WeTlpMaterialMapper weTlpMaterialMapper;
 
-    @Resource
-    private IWeCustomerService weCustomerService;
 
 
 //    private static Font DEFAULT_FONT;

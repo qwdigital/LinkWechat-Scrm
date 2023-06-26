@@ -141,12 +141,17 @@ public class SopTaskServiceImpl implements SopTaskService {
              if(CollectionUtil.isNotEmpty(weCustomerList)) {
 
                  //如果是新客sop的话获取当天的客户构建执行计划(筛选出前一天)
+                 //如果是新客sop获取新客sop创建以后的时间
                  if (weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XK.getSopKey())) {
                      if (isSelectYdCustomer) {
-                         weCustomerList = weCustomerList.stream().filter(weCustomer ->
-                                 DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(new Date(), -1)).equals(
-                                         DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weCustomer.getAddTime())
-                                 )).collect(Collectors.toList());
+//                         weCustomerList = weCustomerList.stream().filter(weCustomer ->
+//                                 DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(new Date(), -1)).equals(
+//                                         DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weCustomer.getAddTime())
+//                                 )).collect(Collectors.toList());
+                         weCustomerList =  weCustomerList.stream().filter(weCustomer ->
+                             weSopBase.getCreateTime().before(weCustomer.getAddTime())
+                        ).collect(Collectors.toList());
+
                      }
 
                  }
