@@ -148,9 +148,15 @@ public class SopTaskServiceImpl implements SopTaskService {
 //                                 DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(new Date(), -1)).equals(
 //                                         DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weCustomer.getAddTime())
 //                                 )).collect(Collectors.toList());
+
+
+
                          weCustomerList =  weCustomerList.stream().filter(weCustomer ->
-                             weSopBase.getCreateTime().before(weCustomer.getAddTime())
-                        ).collect(Collectors.toList());
+
+                                 DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopBase.getCreateTime())).getTime()
+                                         <= DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weCustomer.getAddTime())).getTime()
+
+                         ).collect(Collectors.toList());
 
                      }
 
