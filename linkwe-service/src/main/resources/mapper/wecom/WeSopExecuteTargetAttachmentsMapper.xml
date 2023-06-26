@@ -53,7 +53,8 @@
         we_sop_execute_target_attachments wseta
         LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id and wset.del_flag=0 and wset.execute_state=1
         LEFT JOIN we_sop_base wsb ON wset.sop_base_id = wsb.id
-        WHERE wsb.del_flag=0
+        WHERE wsb.del_flag=0 and wsb.del_flag=0 and wsb.send_type=1
+        and  date_format(NOW(),'%Y-%m-%d %H:%i:%S') BETWEEN wseta.push_start_time AND  wseta.push_end_time 	and wseta.msg_id is  NULL
         <if test="sopBaseId !=null">
             AND wsb.id=#{sopBaseId}
         </if>

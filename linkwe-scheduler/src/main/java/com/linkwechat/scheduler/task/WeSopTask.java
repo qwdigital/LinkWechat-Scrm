@@ -50,22 +50,8 @@ public class WeSopTask {
     //企业微信发送方式新客sop提醒发送
      @XxlJob("builderXkSopPlanTip")
      public void builderXkSopPlanTip(String params){
-         //获取执行中的新客sop
-         List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
-                 .eq(WeSopBase::getBusinessType, SopType.SOP_TYPE_XK.getSopKey())
-                 .eq(WeSopBase::getDelFlag, Constants.COMMON_STATE)
-                 .eq(WeSopBase::getSopState, 1));
-         if(CollectionUtil.isNotEmpty(weSopBases)){
 
-             weSopBases.stream().forEach(weSopBase -> {
-                 //构建完成以后企业微信发送方式手动触发任务
-                 if (weSopBase.getSendType() == 1) {//企微信发送方式
-                     iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
-                 }
-             });
-
-
-         }
+         iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(null);
 
 
      }

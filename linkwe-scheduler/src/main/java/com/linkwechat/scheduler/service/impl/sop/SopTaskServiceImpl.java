@@ -41,8 +41,8 @@ public class SopTaskServiceImpl implements SopTaskService {
     @Autowired
     private IWeStrategicCrowdService iWeStrategicCrowdService;
 
-    @Autowired
-    private IWeSopExecuteTargetAttachmentsService iWeSopExecuteTargetAttachmentsService;
+//    @Autowired
+//    private IWeSopExecuteTargetAttachmentsService iWeSopExecuteTargetAttachmentsService;
 
     @Override
     public void createOrUpdateSop(WeSopBaseDto weSopBaseDto) {
@@ -74,10 +74,11 @@ public class SopTaskServiceImpl implements SopTaskService {
 
                 }
 
-                if (weSopBase.getSendType() == 1) {//企微信发送方式
-                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
-
-                }
+                //企业微信方式的sop提醒迁移到定时任务下
+//                if (weSopBase.getSendType() == 1) {//企微信发送方式
+//                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
+//
+//                }
             }
 
         }
@@ -96,12 +97,12 @@ public class SopTaskServiceImpl implements SopTaskService {
                 Set<String> executeWeUserIds
                         = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
                 //构建客户sop执行计划
-                iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), true, true);
+                iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), false, true);
 
-                //构建完成以后企业微信发送方式手动触发任务
-                if (weSopBase.getSendType() == 1) {//企微信发送方式
-                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
-                }
+//                //构建完成以后企业微信发送方式手动触发任务
+//                if (weSopBase.getSendType() == 1) {//企微信发送方式
+//                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
+//                }
             });
 
         }

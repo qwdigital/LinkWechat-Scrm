@@ -94,66 +94,124 @@ implements IWeSopExecuteTargetAttachmentsService {
 
             if (CollectionUtil.isNotEmpty(executeWeUserIdGroup)) {
 
-                executeWeUserIdGroup.forEach((k, v) -> {
+                executeWeUserIdGroup.forEach((k, vv) -> {
+                    WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+                    messageQuery.setMsgSource(2);
+                    messageQuery.setBusinessIds(
+                            String.join(",",vv.stream().map(WeSopPushTaskDto::getExcuteTargetAttachId).collect(Collectors.toList()))
+                    );
+                    messageQuery.setIsAll(false);
+                    messageQuery.setIsTask(0);
+                    LoginUser loginUser=new LoginUser();
+                    loginUser.setUserName(weCorpAccount.getCreateBy());
+                    loginUser.setCorpId(weCorpAccount.getCorpId());
+                    loginUser.setSysUser(SysUser.builder()
+                            .build());
+                    messageQuery.setLoginUser(loginUser);
+                    messageQuery.setAttachmentsList(
+                            iWeSopAttachmentsService.weSopAttachmentsToTemplate(
+                                    iWeSopAttachmentsService.listByIds(vv.stream().map(WeSopPushTaskDto::getSopAttachmentId).collect(Collectors.toList()))
+                            )
+                    );
+
+                    List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
+
+                    WeAddGroupMessageQuery.SenderInfo senderInfo = WeAddGroupMessageQuery.SenderInfo.builder()
+                            .userId(k)
+                            .build();
+                    List<WeSopPushTaskDto> weSopPushCustomerTaskDtos = vv.stream().filter(weSopPushTaskDto ->
+                            weSopPushTaskDto.getTargetType() == 1).collect(Collectors.toList());
+
+                    if (CollectionUtil.isNotEmpty(weSopPushCustomerTaskDtos)) {
+                        messageQuery.setChatType(1);
+                        senderInfo.setCustomerList(
+                                weSopPushCustomerTaskDtos.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList())
+                        );
+                    }
+
+                    List<WeSopPushTaskDto> weSopPushGroupTaskDtos = vv.stream().filter(weSopPushTaskDto ->
+                            weSopPushTaskDto.getTargetType() == 2).collect(Collectors.toList());
+
+                    if (CollectionUtil.isNotEmpty(weSopPushGroupTaskDtos)) {
+                        messageQuery.setChatType(2);
+                        senderInfo.setChatList(
+                                weSopPushGroupTaskDtos.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList())
+                        );
+                    }
+
+
+
+                    senderInfos.add(senderInfo);
+//                        messageQuery.setSendTime(kk);
+
+                    messageQuery.setSenderList(senderInfos);
+
+                    //通知用户群发
+                    iWeMessagePushService.officialPushMessage(messageQuery);
+
+
+
+
                     //时间分组
-                    Map<Date, List<WeSopPushTaskDto>> pushTasks
-                            = v.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getPushEndTime));
-                    pushTasks.forEach((kk, vv) -> {
-                        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-                        messageQuery.setMsgSource(2);
-                        messageQuery.setBusinessIds(
-                                String.join(",",vv.stream().map(WeSopPushTaskDto::getExcuteTargetAttachId).collect(Collectors.toList()))
-                        );
-                        messageQuery.setIsAll(false);
-                        LoginUser loginUser=new LoginUser();
-                        loginUser.setUserName(weCorpAccount.getCreateBy());
-                        loginUser.setCorpId(weCorpAccount.getCorpId());
-                        loginUser.setSysUser(SysUser.builder()
-                                .build());
-                        messageQuery.setLoginUser(loginUser);
-                        messageQuery.setAttachmentsList(
-                                iWeSopAttachmentsService.weSopAttachmentsToTemplate(
-                                        iWeSopAttachmentsService.listByIds(vv.stream().map(WeSopPushTaskDto::getSopAttachmentId).collect(Collectors.toList()))
-                                )
-                        );
-
-                        List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
-
-                        WeAddGroupMessageQuery.SenderInfo senderInfo = WeAddGroupMessageQuery.SenderInfo.builder()
-                                .userId(k)
-                                .build();
-                        List<WeSopPushTaskDto> weSopPushCustomerTaskDtos = vv.stream().filter(weSopPushTaskDto ->
-                                weSopPushTaskDto.getTargetType() == 1).collect(Collectors.toList());
-
-                        if (CollectionUtil.isNotEmpty(weSopPushCustomerTaskDtos)) {
-                            messageQuery.setChatType(1);
-                            senderInfo.setCustomerList(
-                                    weSopPushCustomerTaskDtos.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList())
-                            );
-                        }
-
-                        List<WeSopPushTaskDto> weSopPushGroupTaskDtos = vv.stream().filter(weSopPushTaskDto ->
-                                weSopPushTaskDto.getTargetType() == 2).collect(Collectors.toList());
-
-                        if (CollectionUtil.isNotEmpty(weSopPushGroupTaskDtos)) {
-                            messageQuery.setChatType(2);
-                            senderInfo.setChatList(
-                                    weSopPushGroupTaskDtos.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList())
-                            );
-                        }
-
-
-
-                        senderInfos.add(senderInfo);
-                        messageQuery.setSendTime(kk);
-
-                        messageQuery.setSenderList(senderInfos);
-
-                        //通知用户群发
-                        iWeMessagePushService.officialPushMessage(messageQuery);
-
-
-                    });
+//                    Map<Date, List<WeSopPushTaskDto>> pushTasks
+//                            = v.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getPushEndTime));
+//                    pushTasks.forEach((kk, vv) -> {
+//                        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+//                        messageQuery.setMsgSource(2);
+//                        messageQuery.setBusinessIds(
+//                                String.join(",",vv.stream().map(WeSopPushTaskDto::getExcuteTargetAttachId).collect(Collectors.toList()))
+//                        );
+//                        messageQuery.setIsAll(false);
+//                        messageQuery.setIsTask(0);
+//                        LoginUser loginUser=new LoginUser();
+//                        loginUser.setUserName(weCorpAccount.getCreateBy());
+//                        loginUser.setCorpId(weCorpAccount.getCorpId());
+//                        loginUser.setSysUser(SysUser.builder()
+//                                .build());
+//                        messageQuery.setLoginUser(loginUser);
+//                        messageQuery.setAttachmentsList(
+//                                iWeSopAttachmentsService.weSopAttachmentsToTemplate(
+//                                        iWeSopAttachmentsService.listByIds(vv.stream().map(WeSopPushTaskDto::getSopAttachmentId).collect(Collectors.toList()))
+//                                )
+//                        );
+//
+//                        List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
+//
+//                        WeAddGroupMessageQuery.SenderInfo senderInfo = WeAddGroupMessageQuery.SenderInfo.builder()
+//                                .userId(k)
+//                                .build();
+//                        List<WeSopPushTaskDto> weSopPushCustomerTaskDtos = vv.stream().filter(weSopPushTaskDto ->
+//                                weSopPushTaskDto.getTargetType() == 1).collect(Collectors.toList());
+//
+//                        if (CollectionUtil.isNotEmpty(weSopPushCustomerTaskDtos)) {
+//                            messageQuery.setChatType(1);
+//                            senderInfo.setCustomerList(
+//                                    weSopPushCustomerTaskDtos.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList())
+//                            );
+//                        }
+//
+//                        List<WeSopPushTaskDto> weSopPushGroupTaskDtos = vv.stream().filter(weSopPushTaskDto ->
+//                                weSopPushTaskDto.getTargetType() == 2).collect(Collectors.toList());
+//
+//                        if (CollectionUtil.isNotEmpty(weSopPushGroupTaskDtos)) {
+//                            messageQuery.setChatType(2);
+//                            senderInfo.setChatList(
+//                                    weSopPushGroupTaskDtos.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList())
+//                            );
+//                        }
+//
+//
+//
+//                        senderInfos.add(senderInfo);
+////                        messageQuery.setSendTime(kk);
+//
+//                        messageQuery.setSenderList(senderInfos);
+//
+//                        //通知用户群发
+//                        iWeMessagePushService.officialPushMessage(messageQuery);
+//
+//
+//                    });
 
 
                 });
