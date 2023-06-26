@@ -1001,24 +1001,35 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
                                 if(weSopPushTimeDto.getPushTimeType()==2) {//设置推送时间,周期推送，先计算出当前时间至周日下的推送,后续客每周日运行定时任务生成下一周的执行计划
                                     //获取当天是周几
-                                    int currentWeek = DateUtil.dayOfWeek(new Date());
-
-                                    if(currentWeek-1<=new Integer(weSopPushTimeDto.getPushTimePre())){//生成符合条件当前日期下到周日的具体时间
+//                                    int currentWeek = DateUtil.dayOfWeek(new Date());
+//
+//                                    if(currentWeek-1<=new Integer(weSopPushTimeDto.getPushTimePre())){//生成符合条件当前日期下到周日的具体时间
                                         //执行日期
                                         String executeData
                                                 = WeekDateUtils.GetCurrentWeekAllDate().get(Integer.parseInt(weSopPushTimeDto.getPushTimePre()));
 
                                         if(StringUtils.isNotEmpty(executeData)){
-                                            attachments.setPushStartTime(
-                                                    DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,executeData+" "+weSopPushTimeDto.getPushStartTime())
-                                            );
+                                            Date pushEndTime
+                                                    = DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS, executeData + " " + weSopPushTimeDto.getPushEndTime());
 
-                                            attachments.setPushEndTime(
-                                                    DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,executeData+" "+weSopPushTimeDto.getPushEndTime())
-                                            );
+                                                    if( DateUtils.parseDate(DateUtils.dateTimeNow()).before(
+                                                            pushEndTime
+                                                    )){
+
+                                                        attachments.setPushStartTime(
+                                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,executeData+" "+weSopPushTimeDto.getPushStartTime())
+                                                        );
+
+                                                        attachments.setPushEndTime(
+                                                                pushEndTime
+                                                        );
+
+
+                                                    }
+
                                         }
 
-                                    }
+//                                    }
 
 
 
