@@ -80,6 +80,13 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.exchange.sop-ex:Ex_Sop}")
     private String sopEx;
+
+    /**
+     * 客户群新增成员通知交换机
+     */
+    @Value("${wecom.mq.exchange.group-add-user:Ex_GroupAddUser}")
+    private String groupAddUserEx;
+
     /**
      * -------------------路由------------------------------------
      */
@@ -204,6 +211,12 @@ public class RabbitMQSettingConfig {
     //商品图册订单同步路由
     @Value("${wecom.mq.route.sync.product.order:Rk_Product_Order}")
     private String weProductOrderRk;
+
+    /**
+     * 客户群新增成员群活码业务路由
+     */
+    @Value("${wecom.mq.route.group-add-user-code:Rk_GroupAddUserCode}")
+    private String groupAddUserCodeRk;
 
     /**
      * -------------------队列------------------------------------
@@ -337,6 +350,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.leaveUser:Qu_LeaveUser}")
     private String leaveAllocateUserQu;
 
-
+    /**
+     * 客户群新增成员群活码业务队列
+     */
+    @Value("${wecom.mq.queue.group-add-user-code:Qu_GroupAddUserCode}")
+    private String groupAddUserCodeQu;
 
 }

@@ -134,6 +134,7 @@ public class RabbitMQConfig {
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeAuthInstallFanoutEx()).durable(true).build();
     }
 
+
     /**
      * 客户群同步队列
      *
@@ -153,7 +154,6 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncGroupChat() {
         return BindingBuilder.bind(quSyncGroupChat()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupChatRk()).noargs();
     }
-
 
 
     /**
@@ -553,7 +553,7 @@ public class RabbitMQConfig {
      *
      * @return
      */
-   @Bean
+    @Bean
     public Binding bindingExchangeChatMsgQiRule() {
         return BindingBuilder.bind(quChatMsgQiRule()).to(chatMsgAuditEx()).with(rabbitMQSettingConfig.getWeChatMsgQiRuleRk()).noargs();
     }
@@ -591,63 +591,66 @@ public class RabbitMQConfig {
 
     /**
      * sop队列绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingSopExchange(){
+    public Binding bindingSopExchange() {
         return BindingBuilder.bind(sopQu()).to(sopEx()).with(rabbitMQSettingConfig.getSopRk()).noargs();
     }
 
 
     /**
      * sop队列
+     *
      * @return
      */
     @Bean
-    public Queue sopQu(){
+    public Queue sopQu() {
         return new Queue(rabbitMQSettingConfig.getSopQu());
     }
 
     /**
      * sop交换机
+     *
      * @return
      */
     @Bean
-    public Exchange sopEx(){
+    public Exchange sopEx() {
         // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
 
-
     /**
      * 直播交换机
+     *
      * @return
      */
     @Bean
-    public Exchange liveEx(){
+    public Exchange liveEx() {
         return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getWeLiveRk()).durable(true).build();
     }
 
     /**
      * 直播队列绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncWeLive(){
+    public Binding bindingExchangeSyncWeLive() {
         return BindingBuilder.bind(quWeLive()).to(syncEx()).with(rabbitMQSettingConfig.getWeLiveRk()).noargs();
     }
 
     /**
      * 直播同步队列
+     *
      * @return
      */
     @Bean
-    public Queue quWeLive(){
+    public Queue quWeLive() {
         return new Queue(rabbitMQSettingConfig.getLiveQu());
     }
-
-
 
 
     /**
@@ -663,10 +666,11 @@ public class RabbitMQConfig {
 
     /**
      * 同步离职成员队列
+     *
      * @return
      */
     @Bean
-    public Queue quLeaveUser(){
+    public Queue quLeaveUser() {
         return new Queue(rabbitMQSettingConfig.getLeaveAllocateUserQu());
 
     }
@@ -674,13 +678,47 @@ public class RabbitMQConfig {
 
     /**
      * 离职成员同步绑定交换机
+     *
      * @return
      */
     @Bean
-    public Binding bindingQuLeaveUser(){
+    public Binding bindingQuLeaveUser() {
 
         return BindingBuilder.bind(quLeaveUser()).to(syncEx()).with(rabbitMQSettingConfig.getWeLeaveAllocateUserRk()).noargs();
 
     }
+
+
+    /**
+     * 客户群新增成员广播交换机
+     */
+    @Bean
+    public Exchange weGroupAddUserFanoutEx() {
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getGroupAddUserEx()).durable(true).build();
+    }
+
+    /**
+     * 客户群新增成员群活码业务队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quGroupAddUserCode() {
+        return new Queue(rabbitMQSettingConfig.getGroupAddUserCodeQu());
+
+    }
+
+    /**
+     * 客户群新增成员群活码业务队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingGroupAddUserCode() {
+
+        return BindingBuilder.bind(quGroupAddUserCode()).to(weGroupAddUserFanoutEx()).with(rabbitMQSettingConfig.getGroupAddUserCodeRk()).noargs();
+
+    }
+
 }
 
