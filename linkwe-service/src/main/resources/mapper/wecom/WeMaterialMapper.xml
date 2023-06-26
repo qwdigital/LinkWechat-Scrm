@@ -20,6 +20,11 @@
         <result property="linkUrl" column="link_url"/>
     </resultMap>
 
+    <sql id="material">
+        id
+        ,category_id,material_url,content,material_name,digest,cover_url,create_by,create_time,update_by,update_time,audio_time,link_url
+    </sql>
+
 
     <select id="findWeMaterials" resultMap="materialMap">
         SELECT
@@ -259,9 +264,5 @@
 
 
 
-    <sql id="material">
-        id
-        ,category_id,material_url,content,material_name,digest,cover_url,create_by,create_time,update_by,update_time,audio_time,link_url
-    </sql>
 
 </mapper>
