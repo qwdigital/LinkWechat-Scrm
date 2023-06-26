@@ -1,13 +1,22 @@
 package com.linkwechat.scheduler.task;
 
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.enums.SopType;
+import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.scheduler.service.SopTaskService;
+import com.linkwechat.service.IWeSopBaseService;
 import com.linkwechat.service.IWeSopExecuteTargetAttachmentsService;
 import com.linkwechat.service.IWeSopExecuteTargetService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * sop相关定时任务
@@ -29,11 +38,37 @@ public class WeSopTask {
     @Autowired
     private SopTaskService sopTaskService;
 
+    @Autowired
+    private IWeSopBaseService iWeSopBaseService;
+
     @XxlJob("builderXkSopPlan")
     public void builderXkSopPlan(String params){
         log.info("新客sop构建计划>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
         sopTaskService.builderXkPlan();
     }
+
+    //企业微信发送方式新客sop提醒发送
+     @XxlJob("builderXkSopPlanTip")
+     public void builderXkSopPlanTip(String params){
+         //获取执行中的新客sop
+         List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
+                 .eq(WeSopBase::getBusinessType, SopType.SOP_TYPE_XK.getSopKey())
+                 .eq(WeSopBase::getDelFlag, Constants.COMMON_STATE)
+                 .eq(WeSopBase::getSopState, 1));
+         if(CollectionUtil.isNotEmpty(weSopBases)){
+
+             weSopBases.stream().forEach(weSopBase -> {
+                 //构建完成以后企业微信发送方式手动触发任务
+                 if (weSopBase.getSendType() == 1) {//企微信发送方式
+                     iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
+                 }
+             });
+
+
+         }
+
+
+     }
 
 
     @XxlJob("earlyEndSopTask")

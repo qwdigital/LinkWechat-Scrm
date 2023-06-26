@@ -98,6 +98,10 @@ public class SopTaskServiceImpl implements SopTaskService {
                 //构建客户sop执行计划
                 iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), true, true);
 
+                //构建完成以后企业微信发送方式手动触发任务
+                if (weSopBase.getSendType() == 1) {//企微信发送方式
+                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
+                }
             });
 
         }
