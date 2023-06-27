@@ -24,7 +24,7 @@ public class MomentsSendResultVO extends WeResultVo {
     private List<ExternalUserid> customer_list;
 
     @Data
-    public class ExternalUserid {
+    public static class ExternalUserid {
         /**
          * 成员发送成功的外部联系人userid
          */

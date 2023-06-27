@@ -21,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -58,12 +59,15 @@ public class WeMomentsTaskController extends BaseController {
     public TableDataInfo list(WeMomentsTaskListRequest request) {
         startPage();
         List<WeMomentsTaskVO> moments = weMomentsTaskService.selectList(request);
+
         //转化率
+        NumberFormat percentInstance = NumberFormat.getPercentInstance();
+        percentInstance.setMaximumFractionDigits(0);
         moments.forEach(i -> {
             if (i.getTotal().equals(0)) {
-                i.setFinishRate("0%");
+                i.setFinishRate(percentInstance.format(0));
             } else {
-                i.setFinishRate(i.getExecuted() / i.getTotal() / 100 + "%");
+                i.setFinishRate(percentInstance.format(i.getExecuted() / i.getTotal()));
             }
         });
         TableDataInfo dataTable = getDataTable(moments);
@@ -192,9 +196,7 @@ public class WeMomentsTaskController extends BaseController {
         request.setWeUserId(sysUser.getWeUserId());
         startPage();
         List<WeMomentsTaskMobileVO> vos = weMomentsUserService.mobileList(request);
-        TableDataInfo dataTable = getDataTable(vos);
-        dataTable.setTotal(vos.size());
-        return dataTable;
+        return getDataTable(vos);
     }
 
     /**

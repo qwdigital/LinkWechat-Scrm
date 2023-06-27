@@ -162,8 +162,9 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     @Override
     public List<WeMomentsTaskMobileVO> mobileList(WeMomentsTaskMobileRequest request) {
         List<WeMomentsTaskMobileVO> vos = this.baseMapper.mobileList(request);
-        //客户数
+
         for (WeMomentsTaskMobileVO vo : vos) {
+            //客户数
             if (vo.getStatus().equals(1)) {
                 List<String> tagIds = JSONArray.parseArray(vo.getCustomerTag(), String.class);
                 if (CollectionUtil.isNotEmpty(tagIds)) {
@@ -184,6 +185,16 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
                 queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
                 int count = weMomentsCustomerService.count(queryWrapper);
                 vo.setCustomerNum(count);
+            }
+
+            //附件
+            LambdaUpdateWrapper<WeMomentsAttachments> attachmentsWrapper = Wrappers.lambdaUpdate();
+            attachmentsWrapper.eq(WeMomentsAttachments::getMomentsTaskId, vo.getWeMomentsTaskId());
+            List<WeMomentsAttachments> list = weMomentsAttachmentsService.list(attachmentsWrapper);
+            if (CollectionUtil.isNotEmpty(list)) {
+                List<Long> materialIds = list.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
+                List<WeMaterial> weMaterials = weMaterialService.listByIds(materialIds);
+                vo.setMaterialList(weMaterials);
             }
         }
 
@@ -282,6 +293,11 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             vo.setCustomerNum(count);
         }
         return vo;
+    }
+
+    @Override
+    public int count(WeMomentsTaskMobileRequest request) {
+        return this.baseMapper.count(request);
     }
 
     /**

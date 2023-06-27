@@ -85,8 +85,8 @@
         t1.update_by_id,
         t1.update_time,
         t1.del_flag,
-        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_id = t1.id AND t2.execute_status = 1 ) AS executed,
-        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_id = t1.id ) AS total
+        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id AND t2.execute_status = 1 ) AS executed,
+        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id ) AS total
         FROM
         we_moments_task t1
         WHERE t1.del_flag = 0

@@ -113,14 +113,6 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
 
             List<WeMomentsCustomer> customers = new ArrayList<>();
             for (CustomerList item : customerList) {
-                //查询客户数据
-//                LambdaQueryWrapper<WeCustomer> wrapper = Wrappers.lambdaQuery(WeCustomer.class);
-//                wrapper.eq(WeCustomer::getAddUserId, item.getUserid());
-//                wrapper.eq(WeCustomer::getExternalUserid, item.getExternal_userid());
-//                List<WeCustomer> data = weCustomerService.list(wrapper);
-//                Optional<WeCustomer> first = data.stream().findFirst();
-//                WeCustomer weCustomer = first.orElse(null);
-
                 //构建数据
                 WeMomentsCustomer weMomentsCustomer = new WeMomentsCustomer();
                 weMomentsCustomer.setId(IdUtil.getSnowflake().nextId());
@@ -130,7 +122,6 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
                 weMomentsCustomer.setUserId(weMomentsUser.getUserId());
                 weMomentsCustomer.setUserName(weMomentsUser.getUserName());
                 weMomentsCustomer.setExternalUserid(item.getExternal_userid());
-//                weMomentsCustomer.setCustomerName(weCustomer == null ? null : weCustomer.getCustomerName());
                 weMomentsCustomer.setDeliveryStatus(1);
                 weMomentsCustomer.setCreateTime(new Date());
                 weMomentsCustomer.setDelFlag(Constants.COMMON_STATE);
@@ -184,7 +175,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
             if (CollectionUtil.isNotEmpty(collect)) {
                 LambdaUpdateWrapper<WeMomentsCustomer> wrapper = Wrappers.lambdaUpdate(WeMomentsCustomer.class);
                 wrapper.eq(WeMomentsCustomer::getMomentsId, momentsId);
-                wrapper.eq(WeMomentsCustomer::getExternalUserid, weMomentsUser.getWeUserId());
+                wrapper.eq(WeMomentsCustomer::getWeUserId, weMomentsUser.getWeUserId());
                 wrapper.in(WeMomentsCustomer::getExternalUserid, collect);
                 wrapper.set(WeMomentsCustomer::getDeliveryStatus, 0);
                 this.update(wrapper);

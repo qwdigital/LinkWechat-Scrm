@@ -56,57 +56,79 @@
         <result column="customer_tag" property="customerTag"/>
         <result column="execute_status" property="executeStatus"/>
         <result column="status" property="status"/>
-        <collection property="materialList" ofType="com.linkwechat.domain.material.entity.WeMaterial">
-            <result column="material_url" property="materialUrl"/>
-            <result column="material_name" property="materialName"/>
-            <result column="cover_url" property="coverUrl"/>
-            <result column="media_type" property="mediaType"/>
-        </collection>
     </resultMap>
 
 
     <select id="mobileList" resultMap="MobileResult">
-        SELECT t1.execute_status,
-               t1.moments_id,
-               t2.id,
-               t2.name,
-               t2.create_by,
-               t2.execute_time,
-               t2.execute_end_time,
-               t2.content,
-               t2.customer_tag,
-               t2.status,
-               t4.material_url,
-               t4.material_name,
-               t4.cover_url,
-               t4.media_type
-        FROM we_moments_user t1
-                 LEFT JOIN we_moments_task t2 ON t1.moments_task_id = t2.id
-                 LEFT JOIN we_moments_attachments t3 ON t1.moments_task_id = t3.moments_task_id
-                 Left JOIN we_material t4 on t3.material_id = t4.id
-        WHERE t1.del_flag = 0
-          AND t1.we_user_id = #{weUserId}
-          AND t2.status = #{status}
-        ORDER BY t1.create_time DESC
+        SELECT ifnull(t4.execute_status, 0) AS execute_status,
+               t4.moments_id,
+               t3.id,
+               t3.NAME,
+               t3.create_by,
+               t3.execute_time,
+               t3.execute_end_time,
+               t3.content,
+               t3.customer_tag,
+               t3.STATUS
+        FROM we_moments_task t3
+                 JOIN (
+            SELECT t1.moments_task_id,
+                   t1.we_user_id,
+                   t2.execute_status,
+                   t2.moments_id
+            FROM we_moments_estimate_user t1
+                     LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+                AND t1.we_user_id = t2.we_user_id
+        ) AS t4 ON t3.id = t4.moments_task_id
+        WHERE t3.del_flag = 0
+          AND t3.send_type = 2
+          AND t3.status = #{status}
+          AND t4.we_user_id = #{weUserId}
+        ORDER BY t3.create_time DESC
     </select>
 
 
     <select id="mobileGet" resultType="com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO">
-        SELECT t1.execute_status,
-               t1.moments_id,
-               t2.id,
-               t2.name,
-               t2.create_by,
-               t2.execute_time,
-               t2.execute_end_time,
-               t2.content,
-               t2.customer_tag,
-               t2.status
-        FROM we_moments_user t1
-                 LEFT JOIN we_moments_task t2 ON t1.moments_task_id = t2.id
-        WHERE t1.del_flag = 0
-          AND t1.we_user_id = #{weUserId}
-          AND t1.moments_task_id = #{weMomentsTaskId}
+        SELECT ifnull(t4.execute_status, 0) AS execute_status,
+               t3.id,
+               t3.NAME,
+               t3.create_by,
+               t3.execute_time,
+               t3.execute_end_time,
+               t3.content,
+               t3.customer_tag,
+               t3.STATUS
+        FROM we_moments_task t3
+                 JOIN (
+            SELECT t1.moments_task_id,
+                   t1.we_user_id,
+                   t2.execute_status,
+                   t2.moments_id
+            FROM we_moments_estimate_user t1
+                     LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+                AND t1.we_user_id = t2.we_user_id
+        ) AS t4 ON t3.id = t4.moments_task_id
+        WHERE t3.del_flag = 0
+          AND t4.we_user_id = #{weUserId}
+          AND t3.id = #{weMomentsTaskId}
+    </select>
+
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(t3.id)
+        FROM we_moments_task t3
+                 JOIN (
+            SELECT t1.moments_task_id,
+                   t1.we_user_id,
+                   t2.execute_status
+            FROM we_moments_estimate_user t1
+                     LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+                AND t1.we_user_id = t2.we_user_id
+        ) AS t4 ON t3.id = t4.moments_task_id
+        WHERE t3.del_flag = 0
+          AND t3.send_type = 2
+          AND t3.status = #{status}
+          AND t4.we_user_id = #{weUserId}
     </select>
 
 

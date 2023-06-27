@@ -105,6 +105,8 @@
                     #{moduleType}
                 </foreach>
             </if>
+            <if test="pixelSize != null ">and t.pixel_size &lt;= #{pixelSize}</if>
+            <if test="memorySize != null ">and t.memory_size &lt;= #{memorySize}</if>
         </where>
         order by t.create_time desc
     </select>
@@ -261,8 +263,6 @@
             <if test="talkId != null">and t1.talk_id = #{talkId}</if>
         </where>
     </select>
-
-
 
 
 </mapper>

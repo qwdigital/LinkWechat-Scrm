@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class QwMomentsMsgListener {
+public class QwShortLinkPromotionMomentsMsgListener {
 
     @Resource
     private QwMomentsClient qwMomentsClient;

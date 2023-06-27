@@ -125,8 +125,8 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
         List<WeMomentsInteracte> list = weMomentsInteracteMapper.selectList(queryWrapper);
 
         if (CollectionUtil.isNotEmpty(list)) {
-            long comment = list.stream().map(i -> i.getInteracteType().equals(0)).count();
-            long like = list.stream().map(i -> i.getInteracteType().equals(1)).count();
+            long comment = list.stream().filter(i -> i.getInteracteType().equals(0)).count();
+            long like = list.stream().filter(i -> i.getInteracteType().equals(1)).count();
 
             result.put("comment", comment);
             result.put("like", like);

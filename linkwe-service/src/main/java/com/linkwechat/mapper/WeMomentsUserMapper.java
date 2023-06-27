@@ -28,6 +28,16 @@ public interface WeMomentsUserMapper extends BaseMapper<WeMomentsUser> {
      */
     List<WeMomentsTaskMobileVO> mobileList(WeMomentsTaskMobileRequest request);
 
+    /**
+     * 数量
+     *
+     * @param request 移动端列表查询参数
+     * @return {@link int}
+     * @author WangYX
+     * @date 2023/06/26 18:53
+     */
+    int count(WeMomentsTaskMobileRequest request);
+
 
     /**
      * 移动端详情

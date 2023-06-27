@@ -9,6 +9,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.MediaType;
+import com.linkwechat.common.exception.ServiceException;
+import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.entity.WeMomentsAttachments;
 import com.linkwechat.mapper.WeMomentsAttachmentsMapper;
@@ -35,9 +37,14 @@ public class WeMomentsAttachmentsServiceImpl extends ServiceImpl<WeMomentsAttach
 
     @Override
     public void addMomentsAttachments(Long momentsTaskId, List<Long> materialIds) {
-        List<WeMomentsAttachments> list = new ArrayList<>();
-        materialIds.forEach(i -> list.add(build(momentsTaskId, i)));
-        this.saveBatch(list);
+        if (CollectionUtil.isNotEmpty(materialIds)) {
+            //验证附件
+            validateAttachments(materialIds);
+            //添加附件
+            List<WeMomentsAttachments> list = new ArrayList<>();
+            materialIds.forEach(i -> list.add(build(momentsTaskId, i)));
+            this.saveBatch(list);
+        }
     }
 
     /**
@@ -185,6 +192,29 @@ public class WeMomentsAttachmentsServiceImpl extends ServiceImpl<WeMomentsAttach
         weMomentsAttachments.setLocationLongitude(longitude);
         weMomentsAttachments.setLocationName(name);
         this.save(weMomentsAttachments);
+    }
+
+    /**
+     * 验证附件是否符合要求
+     * <p>
+     * 1.图片消息附件。普通图片：总像素不超过1555200。图片大小不超过10M。最多支持传入9个；超过9个报错'invalid attachments size'
+     * 2.图文封面，普通图片：总像素不超过1555200。可通过上传附件资源接口获得
+     *
+     * @param materialIds 素材Id集合
+     * @return
+     * @author WangYX
+     * @date 2023/06/27 13:42
+     */
+    private void validateAttachments(List<Long> materialIds) {
+        Long totalPixel = 1555200L;
+        List<WeMaterial> weMaterials = weMaterialService.listByIds(materialIds);
+        Long pixelSize = 0L;
+        for (WeMaterial weMaterial : weMaterials) {
+            pixelSize += weMaterial.getPixelSize() != null ? weMaterial.getPixelSize() : 0;
+        }
+        if (pixelSize > totalPixel) {
+            throw new ServiceException("附件中图片总像素不能超过1555200！");
+        }
     }
 
 

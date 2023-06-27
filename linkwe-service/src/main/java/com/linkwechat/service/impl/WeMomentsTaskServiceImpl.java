@@ -98,6 +98,8 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
     @Resource
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+    @Resource
+    private IWeMomentsEstimateUserService weMomentsEstimateUserService;
 
     @Override
     public List<WeMomentsTaskVO> selectList(WeMomentsTaskListRequest request) {
@@ -120,6 +122,17 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             throw new ServiceException("任务名称重复！", HttpStatus.BAD_REQUEST);
         }
 
+        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
+            if (LocalDateTime.now().isAfter(request.getExecuteTime())) {
+                throw new ServiceException("任务开始时间不能晚于当前时间！", HttpStatus.BAD_REQUEST);
+            }
+            if (request.getExecuteTime().isAfter(request.getExecuteEndTime())) {
+                throw new ServiceException("任务开始时间不能晚于结束时间！", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (LocalDateTime.now().isAfter(request.getExecuteEndTime())) {
+            throw new ServiceException("任务结束时间不能晚于当前时间！", HttpStatus.BAD_REQUEST);
+        }
         //新增
         WeMomentsTask task = BeanUtil.copyProperties(request, WeMomentsTask.class);
         task.setId(IdUtil.getSnowflake().nextId());
@@ -128,6 +141,12 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         task.setCreateBy(SecurityUtils.getLoginUser().getSysUser().getUserName());
         task.setCreateTime(new Date());
         task.setDelFlag(Constants.COMMON_STATE);
+        task.setDeptIds(null);
+        task.setPostIds(null);
+        task.setUserIds(null);
+        task.setCustomerTag(null);
+        task.setLikeTagIds(null);
+        task.setCustomerTag(null);
 
         //朋友圈类型
         if (request.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())) {
@@ -390,6 +409,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 List<SysUser> momentsTaskExecuteUser = weMomentsUserService.getMomentsTaskExecuteUser(weMomentsTask.getScopeType(), deptIdList, postList, weUserIdList);
                 if (BeanUtil.isNotEmpty(momentsTaskExecuteUser)) {
                     weUserIds = momentsTaskExecuteUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+                    weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
                 }
             }
             //标签不为空，通过标签在筛选一次
@@ -397,6 +417,12 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(weUserIds, customerTagIds);
                 weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
             }
+
+        }
+
+        //3.新增预估朋友圈执行员工
+        if (CollectionUtil.isNotEmpty(weUserIds)) {
+            weMomentsEstimateUserService.batchInsert(weMomentsTask.getId(), weUserIds);
         }
 
         //3.企微群发
@@ -632,9 +658,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     public void syncWeMomentsHandler(String msg) {
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
-//        SecurityContextHolder.setUserName(loginUser.getUserName());
-//        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
-//        SecurityContextHolder.setUserType(loginUser.getUserType());
 
         Integer filterType = loginUser.getFilterType();
 
@@ -786,9 +809,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @date 2023/06/12 17:15
      */
     public void syncAndSave(List<MomentsListDetailResultDto.Moment> list) {
-        for (MomentsListDetailResultDto.Moment moment : list) {
-            this.syncAndSave(moment);
-        }
+        list.forEach(this::syncAndSave);
     }
 
     /**
@@ -814,7 +835,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             //2.同步员工发送成功的数据
             weMomentsCustomerService.syncMomentsCustomerSendSuccess(momentTaskId, moment_id);
             //3.同步互动数据
-            weMomentsInteracteService.syncAddWeMomentsInteracte(momentTaskId, moment_id);
+            weMomentsInteracteService.syncUpdateWeMomentsInteract(momentTaskId, moment_id);
         } else {
             //没有同步过
             Integer create_type = moment.getCreate_type();
@@ -841,7 +862,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 wrapper.eq(WeMomentsTask::getSendType, 0);
                 wrapper.eq(WeMomentsTask::getScopeType, moment.getVisible_type().equals(1) ? 0 : 1);
                 wrapper.eq(WeMomentsTask::getType, moment.getCreate_type());
-                //TODO 这里需验证，是否企微发送的数据都没有创建者
+                //通过企微API发送的数据都没有创建者
                 wrapper.eq(StrUtil.isNotBlank(sysUser.getUserName()), WeMomentsTask::getCreateBy, sysUser.getUserName());
                 wrapper.eq(WeMomentsTask::getStatus, 2);
                 wrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
@@ -869,9 +890,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 DateTime offset = DateUtil.offset(date, DateField.SECOND, -30);
                 DateTime offset1 = DateUtil.offset(date, DateField.SECOND, 30);
                 wrapper.between(WeMomentsTask::getCreateTime, offset, offset1);
-
-                //TODO 这里需验证，是否企微发送的数据都没有创建者
-
+                //通过企微API发送的数据都没有创建者
                 wrapper.orderByDesc(WeMomentsTask::getCreateTime);
                 List<WeMomentsTask> weMomentsTasks = weMomentsTaskMapper.selectList(wrapper);
                 if (CollectionUtil.isNotEmpty(weMomentsTasks)) {

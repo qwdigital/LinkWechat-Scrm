@@ -323,8 +323,6 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                     .backgroundImgPath(poster.getBackgroundImgPath())
                     .width(poster.getWidth())
                     .height(poster.getHeight())
-                    .pixelSize(poster.getPixelSize())
-                    .memorySize(poster.getMemorySize())
                     .posterSubassemblyList(poster.getPosterSubassemblyList())
 
                     .build());
@@ -423,6 +421,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             //获取合成后的海报
             MultipartFile file
                     = new MockMultipartFile(String.valueOf(System.currentTimeMillis()), ".jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
+            purePoster.setMemorySize(file.getSize());
             AjaxResult<FileEntity> result = fileClient.upload(file);
             return result.getData();
         } catch (Exception e) {
@@ -607,6 +606,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         }
         m.setBackgroundImgUrl(poster.getBackgroundImgPath());
         m.setMaterialName(poster.getMaterialName());
+        m.setPixelSize(Long.valueOf(poster.getWidth() * poster.getHeight()));
         return m;
     }
 
@@ -700,6 +700,20 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query) {
+        if (query.getScene().equals(1)) {
+            //企微朋友圈要求：普通图片：总像素不超过1555200。图片大小不超过10M。最多支持传入9个。非图片类型，封面图片像素不超过1555200。
+            //需求要求：单个图片需过滤出1555200的九分之一为标准向下取整来供用户选择；图文则按1555200来过滤。
+            //TODO 不推荐这种做法，最好是前端对该功能进行判断。如选择了2张图片，把图片的像素和加起来进行判断。
+            //TODO 不推荐后端做的原因：这里进行限制，会导致不符合条件的素材无法展示到前端。比如，只选择一张图片，大小超过1555200的九分之一，但不超过1555200，就无法展示。不太符合业务逻辑。
+            //TODO 前端无时间修改，搁置。
+            if (query.getMediaType().equals(CategoryMediaType.IMAGE.getType().toString())) {
+                query.setPixelSize(172800L);
+                query.setMemorySize(10 * 1024 * 1024L);
+            } else {
+                query.setPixelSize(1555200L);
+                query.setMemorySize(10 * 1024 * 1024L);
+            }
+        }
         return weMaterialMapper.selectListByLkQuery(query);
     }
 

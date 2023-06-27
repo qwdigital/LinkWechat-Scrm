@@ -38,6 +38,11 @@ public class LinkMediaQuery extends BaseEntity {
     @ApiModelProperty("素材标题")
     private String materialName;
 
+    /**
+     * 素材类型
+     *
+     * @see com.linkwechat.common.enums.CategoryMediaType
+     */
     @ApiModelProperty("素材类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报 6 海报字体")
     private String mediaType;
 
@@ -52,4 +57,20 @@ public class LinkMediaQuery extends BaseEntity {
 
     @ApiModelProperty("海报类型：1通用海报，2裂变海报")
     private Integer type;
+
+    /**
+     * 应用场景：1朋友圈
+     * 默认值 -1
+     */
+    private Integer scene = -1;
+
+    /**
+     * 像素大小
+     */
+    private Long pixelSize;
+
+    /**
+     * 内存大小
+     */
+    private Long memorySize;
 }
