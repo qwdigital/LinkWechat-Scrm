@@ -6,6 +6,7 @@ import com.linkwechat.domain.material.entity.WeContentSendRecord;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.query.ContentDetailQuery;
 import com.linkwechat.domain.material.vo.ContentDataDetailVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,5 +16,8 @@ public interface WeContentSendRecordMapper extends BaseMapper<WeContentSendRecor
     ContentDataDetailVo getWeMaterialDataCount(ContentDetailQuery contentDetailQuery);
 
     List<WeContentSendViewDto> selectSendTotalNumGroupByContentId();
+
+
+    List<ContentDataDetailVo> findContentDataDetailVo(@Param("contentId") String contentId,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
 }
