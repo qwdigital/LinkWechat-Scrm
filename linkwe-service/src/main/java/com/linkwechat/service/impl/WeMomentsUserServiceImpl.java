@@ -240,12 +240,14 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     public WeMomentsTaskMobileVO mobileGet(Long weMomentsTaskId) {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         if (BeanUtil.isEmpty(loginUser)) {
-            return null;
+            throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
         //详情
         String weUserId = loginUser.getSysUser().getWeUserId();
         WeMomentsTaskMobileVO vo = this.baseMapper.mobileGet(weUserId, weMomentsTaskId);
-
+        if (BeanUtil.isEmpty(vo)) {
+            throw new ServiceException("暂无权限操作！", HttpStatus.FORBIDDEN);
+        }
         //附件
         LambdaQueryWrapper<WeMomentsAttachments> wrapper = Wrappers.lambdaQuery(WeMomentsAttachments.class);
         wrapper.eq(WeMomentsAttachments::getMomentsTaskId, weMomentsTaskId);
