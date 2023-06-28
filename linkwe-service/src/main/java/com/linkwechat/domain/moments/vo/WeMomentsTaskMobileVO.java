@@ -103,7 +103,7 @@ public class WeMomentsTaskMobileVO {
     /**
      * 朋友圈任务状态：1未开始，2进行中，3已结束
      */
-    @JsonIgnore
+    @ApiModelProperty(value = "朋友圈任务状态：1未开始，2进行中，3已结束")
     private Integer status;
 
 

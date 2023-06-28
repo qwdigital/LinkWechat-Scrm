@@ -468,7 +468,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 //设置应用id
                 template.setAppId(weCorpAccount.getAgentId());
 
-                String url = String.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
+                String url = StringUtils.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
                 String content = "【朋友圈营销】<br/> 管理员下发一条【" + weMomentsTask.getName() + "】的朋友圈营销任务，请及时执行 <br/><br/>" +
                         "<a href='" + url + "'>去处理</a>";
 
