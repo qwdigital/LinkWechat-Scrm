@@ -47,9 +47,17 @@
         FROM
             we_content_send_record
         WHERE
-            content_id = #{contentId}
+            send_by is not null
+          <if test="contentId != null and contentId != ''">
+              AND  content_id = #{contentId}
+          </if>
+
+          <if test="talkId != null and talkId != ''">
+              AND  talk_id = #{talkId}
+          </if>
+
           AND date_format( create_time, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
-          and send_by is not null
+
         GROUP BY
             send_by_id
         ORDER BY

@@ -18,6 +18,6 @@ public interface WeContentSendRecordMapper extends BaseMapper<WeContentSendRecor
     List<WeContentSendViewDto> selectSendTotalNumGroupByContentId();
 
 
-    List<ContentDataDetailVo> findContentDataDetailVo(@Param("contentId") String contentId,@Param("startTime") String startTime,@Param("endTime") String endTime);
+    List<ContentDataDetailVo> findContentDataDetailVo(@Param("contentId") String contentId,@Param("talkId") String talkId,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
 }
