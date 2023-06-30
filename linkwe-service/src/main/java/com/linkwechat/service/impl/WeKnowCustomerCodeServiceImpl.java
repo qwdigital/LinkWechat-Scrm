@@ -196,7 +196,7 @@ public class WeKnowCustomerCodeServiceImpl extends ServiceImpl<WeKnowCustomerCod
         //素材附件
         List<WeMessageTemplate> attachments = weKnowCustomerCode.getAttachments();
         if(CollectionUtil.isNotEmpty(attachments)){
-            if(!isUpdate){
+            if(isUpdate){
                 iWeKnowCustomerAttachmentsService.saveBatchByKnowCustomerId(weKnowCustomerCode.getId(),attachments);
             }else{
                 iWeKnowCustomerAttachmentsService.updateBatchByKnowCustomerId(weKnowCustomerCode.getId(), attachments);

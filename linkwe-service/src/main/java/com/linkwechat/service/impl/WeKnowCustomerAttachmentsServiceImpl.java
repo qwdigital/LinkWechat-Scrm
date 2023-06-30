@@ -2,10 +2,12 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.know.WeKnowCustomerAttachments;
 import com.linkwechat.domain.media.WeMessageTemplate;
+import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.sop.WeSopAttachments;
 import com.linkwechat.mapper.WeKnowCustomerAttachmentsMapper;
 import com.linkwechat.service.IWeKnowCustomerAttachmentsService;
@@ -41,7 +43,6 @@ implements IWeKnowCustomerAttachmentsService {
 
         this.remove(new LambdaQueryWrapper<WeKnowCustomerAttachments>()
                 .eq(WeKnowCustomerAttachments::getKnowCustomerId,knowCustomerId));
-
 
 
         saveBatchByKnowCustomerId(knowCustomerId,attachments);
