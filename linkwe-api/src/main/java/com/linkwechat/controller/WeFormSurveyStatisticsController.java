@@ -20,7 +20,6 @@ import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.form.query.WeFormSiteStasQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyRadioQuery;
@@ -578,15 +577,14 @@ public class WeFormSurveyStatisticsController extends BaseController {
 
                 //表单数据
                 String answer = weFormSurveyAnswer.getAnswer();
-                JSONArray jsonArray = JSON.parseArray(answer);
+                List<JSONObject> jsonArray = JSON.parseArray(answer,JSONObject.class);
                 //根据问题编号，将表单分组
-                Map<String, List<Object>> answerList = jsonArray.stream().collect(Collectors.groupingBy(o -> JSON.parseObject(o.toString()).getString("questionNumber")));
+                Map<Integer, List<JSONObject>> answerList = jsonArray.stream().collect(Collectors.groupingBy(i -> i.getInteger("questionNumber")));
                 //遍历问题
                 answerList.forEach((k, v) -> {
                     if (v.size() > 1 ) {
                         //多选框的处理
-                        Object o = v.get(0);
-                        JSONObject jsonObject = JSON.parseObject(o.toString());
+                        JSONObject jsonObject = v.get(0);
                         String options = jsonObject.getString("options");
                         String[] split = options.split(",");
                         StringBuffer defaultValue = new StringBuffer();
@@ -600,8 +598,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
                         }
                         item.add(defaultValue.toString());
                     } else {
-                        Object o = v.get(0);
-                        JSONObject jsonObject = JSON.parseObject(o.toString());
+                        JSONObject jsonObject = v.get(0);
 
                         Integer formCodeId = jsonObject.getInteger("formCodeId");
 
