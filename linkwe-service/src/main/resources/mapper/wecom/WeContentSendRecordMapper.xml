@@ -57,9 +57,9 @@
           </if>
 
           <if test="startTime != null and startTime != ''  and endTime != null and endTime !=''">
-
+              AND date_format( create_time, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
           </if>
-          AND date_format( create_time, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
+
 
         GROUP BY
             send_by_id
