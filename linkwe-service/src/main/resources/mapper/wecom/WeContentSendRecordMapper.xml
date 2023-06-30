@@ -56,6 +56,9 @@
               AND  talk_id = #{talkId}
           </if>
 
+          <if test="startTime != null and startTime != ''  and endTime != null and endTime !=''">
+
+          </if>
           AND date_format( create_time, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
 
         GROUP BY
