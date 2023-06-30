@@ -583,7 +583,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
                 Map<String, List<Object>> answerList = jsonArray.stream().collect(Collectors.groupingBy(o -> JSON.parseObject(o.toString()).getString("questionNumber")));
                 //遍历问题
                 answerList.forEach((k, v) -> {
-                    if (v.size() > 1) {
+                    if (v.size() > 1 ) {
                         //多选框的处理
                         Object o = v.get(0);
                         JSONObject jsonObject = JSON.parseObject(o.toString());
@@ -603,13 +603,14 @@ public class WeFormSurveyStatisticsController extends BaseController {
                         Object o = v.get(0);
                         JSONObject jsonObject = JSON.parseObject(o.toString());
 
-                        //省市联动
-                        String cascader = "el-cascader";
-                        //日期
-                        String date = "el-date-picker";
+                        Integer formCodeId = jsonObject.getInteger("formCodeId");
 
-                        String tag = jsonObject.getString("tag");
-                        if (tag.equals(cascader)) {
+                        if(ObjectUtil.equal(6,formCodeId)){
+                            String options = jsonObject.getString("options");
+                            String[] split = options.split(",");
+                            item.add(split[jsonObject.getInteger("defaultValue")]);
+                        }
+                        else if (ObjectUtil.equal(9,formCodeId)) {
                             String defaultValue = jsonObject.getString("defaultValue");
                             if (defaultValue.contains("[") || defaultValue.contains("]")) {
                                 //级联选择
@@ -631,7 +632,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
                                 }
                                 item.add(value.toString());
                             }
-                        } else if (tag.equals(date)) {
+                        } else if (ObjectUtil.equal(10,formCodeId)) {
                             //日期处理
                             String defaultValue = jsonObject.getString("defaultValue");
                             DateTime parse = DateUtil.parse(defaultValue);
