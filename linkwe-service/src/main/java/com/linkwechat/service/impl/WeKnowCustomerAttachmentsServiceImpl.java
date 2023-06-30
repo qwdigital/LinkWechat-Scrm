@@ -39,20 +39,8 @@ implements IWeKnowCustomerAttachmentsService {
     @Override
     public void updateBatchByKnowCustomerId(Long knowCustomerId, List<WeMessageTemplate> attachments) {
 
-        if(CollectionUtil.isNotEmpty(attachments)){
-            List<WeMessageTemplate> weMessageTemplates
-                    = attachments.stream().filter(attachment -> attachment.getId() != null).collect(Collectors.toList());
-            if(CollectionUtil.isNotEmpty(weMessageTemplates)){
-                this.remove(new LambdaQueryWrapper<WeKnowCustomerAttachments>()
-                        .eq(WeKnowCustomerAttachments::getKnowCustomerId,knowCustomerId)
-                        .notIn(WeKnowCustomerAttachments::getId,weMessageTemplates.stream().map(WeMessageTemplate::getId).collect(Collectors.toList())));
-
-            }
-
-        }else{
-            this.remove(new LambdaQueryWrapper<WeKnowCustomerAttachments>()
-                    .eq(WeKnowCustomerAttachments::getKnowCustomerId,knowCustomerId));
-        }
+        this.remove(new LambdaQueryWrapper<WeKnowCustomerAttachments>()
+                .eq(WeKnowCustomerAttachments::getKnowCustomerId,knowCustomerId));
 
 
 
