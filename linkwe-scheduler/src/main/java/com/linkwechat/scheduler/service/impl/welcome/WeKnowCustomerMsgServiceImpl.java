@@ -76,7 +76,7 @@ public class WeKnowCustomerMsgServiceImpl extends AbstractWelcomeMsgServiceImpl 
                 if (CollectionUtil.isNotEmpty(weKnowCustomerCodeTags)) {
                     makeCustomerTag(query.getExternalUserID(), query.getUserID(),
                             weKnowCustomerCodeTags.stream().map(v -> {
-                                return new WeTagVo(v.getTagName(), v.getTagId());
+                                return new WeTagVo( v.getTagId(),v.getTagName());
                             }).collect(Collectors.toList())
                     );
                 }
