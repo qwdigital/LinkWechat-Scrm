@@ -3,6 +3,7 @@ package com.linkwechat.factory.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.WeKfMsgTypeEnum;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
@@ -55,6 +56,7 @@ public class WeKfMsgOrEventImpl implements WeCallBackEventFactory {
     public void eventHandle(String message) {
         WeBackBaseVo weBackBaseVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackBaseVo.class);
         String corpId = weBackBaseVo.getToUserName();
+        SecurityContextHolder.setCorpId(corpId);
         String nextCursor = weKfMsgCursorService.getKfMsgCursor(corpId);
         //读取会话消息
         WeKfGetMsgQuery weKfGetMsgQuery = new WeKfGetMsgQuery();
