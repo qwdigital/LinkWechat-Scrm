@@ -14,8 +14,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.SiteStasConstants;
-import com.linkwechat.common.constant.SiteStasConstants;
-import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.vo.SysAreaVo;
@@ -423,7 +421,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @ApiOperation("导出用户统计")
     @Log(title = "导出用户统计")
     @PostMapping("/user/export")
-    public AjaxResult userExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
+    public void userExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
         Date startTime = null;
         Date endTime = null;
         String type = query.getType();
@@ -459,8 +457,16 @@ public class WeFormSurveyStatisticsController extends BaseController {
             weFormSurveyAnswerVO.setIsCorpUser("否");
             list.add(weFormSurveyAnswerVO);
         }
-        ExcelUtil<WeFormSurveyAnswerVO> util = new ExcelUtil<>(WeFormSurveyAnswerVO.class);
-        return util.exportExcel(list, "user");
+        try {
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("用户统计", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            EasyExcel.write(response.getOutputStream(), WeFormSurveyAnswerVO.class).sheet("用户信息").doWrite(list);
+        } catch (IOException e) {
+            log.error("用户统计列表导出异常：query:{}", JSONObject.toJSONString(query), e);
+        }
     }
 
 
@@ -470,7 +476,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @ApiOperation("统计数据导出")
     @Log(title = "统计数据导出")
     @PostMapping("/data/export")
-    public AjaxResult dataExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
+    public void dataExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
         String type = query.getType();
         if (StringUtils.isNotBlank(type) && type.equals("week")) {
             query.setStartDate(DateUtil.offsetWeek(new Date(), -1));
@@ -495,8 +501,17 @@ public class WeFormSurveyStatisticsController extends BaseController {
                 list.add(weFormSurveyStatisticsVO);
             }
         }
-        ExcelUtil<WeFormSurveyStatisticsVO> util = new ExcelUtil<>(WeFormSurveyStatisticsVO.class);
-        return util.exportExcel(list, "data");
+
+        try {
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("统计数据", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            EasyExcel.write(response.getOutputStream(), WeFormSurveyStatisticsVO.class).sheet("数据明细").doWrite(list);
+        } catch (IOException e) {
+            log.error("统计数据列表导出异常：query:{}", JSONObject.toJSONString(query), e);
+        }
     }
 
     /**
