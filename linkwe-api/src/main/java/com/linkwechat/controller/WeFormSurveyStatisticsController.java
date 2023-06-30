@@ -550,10 +550,11 @@ public class WeFormSurveyStatisticsController extends BaseController {
             JSONArray jsonArray = JSON.parseArray(styles).getJSONArray(0);
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-
                 List<String> header = new ArrayList<>();
-                header.add(jsonObject.getString("label"));
-                head.add(header);
+                if(StringUtils.isNotBlank(jsonObject.getString("label"))){
+                    header.add(jsonObject.getString("label"));
+                    head.add(header);
+                }
             }
         }
 
@@ -567,6 +568,8 @@ public class WeFormSurveyStatisticsController extends BaseController {
 
         //导出的数据
         List<List<Object>> exportList = new ArrayList<>();
+
+
         //填充数据
         if (list != null && list.size() > 0) {
             for (WeFormSurveyAnswer weFormSurveyAnswer : list) {
