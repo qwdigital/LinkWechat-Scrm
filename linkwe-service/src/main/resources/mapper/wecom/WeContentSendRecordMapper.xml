@@ -40,6 +40,33 @@
             content_id
     </select>
 
+    <select id="findContentDataDetailVo" resultType="com.linkwechat.domain.material.vo.ContentDataDetailVo">
+        SELECT
+            count( id ) as sendTotalNum,
+            send_by  as sendBy
+        FROM
+            we_content_send_record
+        WHERE
+            send_by is not null
+          <if test="contentId != null and contentId != ''">
+              AND  content_id = #{contentId}
+          </if>
+
+          <if test="talkId != null and talkId != ''">
+              AND  talk_id = #{talkId}
+          </if>
+
+          <if test="startTime != null and startTime != ''  and endTime != null and endTime !=''">
+              AND date_format( create_time, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
+          </if>
+
+
+        GROUP BY
+            send_by_id
+        ORDER BY
+            count( id ) DESC
+    </select>
+
 
 
 </mapper>

@@ -38,5 +38,21 @@
         </where>
     </select>
 
+    <select id="findContentDataDetailVos" resultType="com.linkwechat.domain.material.vo.ContentDataDetailVo">
+        SELECT
+            COUNT(wcvr.id) as viewTotalNum,
+            wcvr.external_avatar as viewAvatar,
+            wcvr.external_user_name as viewBy,
+            IF((SELECT count(wc.id) from we_customer wc WHERE wc.unionid=wcvr.view_unionid)>0,1,0)	 as isCustomer,
+            wcvr.external_user_id as externalUserid,
+            ROUND(sum(wcvr.view_watch_time)/ 1000,0) as viewDuration
+        FROM
+            we_content_view_record wcvr
+        WHERE date_format(wcvr.create_time,'%Y-%m-%d') BETWEEN #{startTime} AND #{endTime}
+          and  wcvr.external_user_name is not null
+          and wcvr.content_id=#{contentId}
+        GROUP BY wcvr.external_user_name
+    </select>
+
 
 </mapper>
