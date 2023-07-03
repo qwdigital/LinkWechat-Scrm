@@ -107,7 +107,7 @@ public class WeContentSendRecordServiceImpl extends ServiceImpl<WeContentSendRec
 //        });
 //
 //        result.sort(Comparator.comparing(ContentDataDetailVo::getSendTotalNum).reversed());
-        return this.baseMapper.findContentDataDetailVo(String.valueOf( contentDetailQuery.getContentId()), contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
+        return this.baseMapper.findContentDataDetailVo(String.valueOf( contentDetailQuery.getContentId()),String.valueOf(contentDetailQuery.getTalkId()), contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
     }
 
     @Override
