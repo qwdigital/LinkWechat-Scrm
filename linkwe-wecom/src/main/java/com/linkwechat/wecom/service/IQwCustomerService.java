@@ -2,10 +2,10 @@ package com.linkwechat.wecom.service;
 
 
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
@@ -21,7 +21,6 @@ import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQu
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.customer.UnionidToExternalUserIdVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
@@ -29,6 +28,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -285,4 +285,34 @@ public interface IQwCustomerService {
      * @return
      */
     WeResultVo editCorpTag(WeUpdateCorpTagQuery query);
+
+
+
+
+    /**
+     * 创建获客链接
+     * @param query
+     * @return
+     */
+    WeLinkCustomerVo createCustomerLink(WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 编辑获客链接
+     * @param query
+     * @return
+     */
+    WeResultVo updateCustomerLink(WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 删除获客链接
+     * @param query
+     * @return
+     */
+    WeResultVo deleteCustomerLink(WeLinkCustomerQuery query);
 }

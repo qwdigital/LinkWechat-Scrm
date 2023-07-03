@@ -1,12 +1,11 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
@@ -22,7 +21,6 @@ import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQu
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.customer.UnionidToExternalUserIdVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
@@ -30,6 +28,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -58,8 +57,6 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Autowired
     private WeCustomerClient weCustomerClient;
 
-    @Autowired
-    private LinkWeChatConfig linkWeChatConfig;
 
     @Override
     public WeFollowUserListVo getFollowUserList(WeBaseQuery query) {
@@ -251,6 +248,21 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeResultVo editCorpTag(WeUpdateCorpTagQuery query) {
         return weCustomerClient.editCorpTag(query);
+    }
+
+    @Override
+    public WeLinkCustomerVo createCustomerLink(WeLinkCustomerQuery query) {
+        return weCustomerClient.createCustomerLink(query);
+    }
+
+    @Override
+    public WeResultVo updateCustomerLink(WeLinkCustomerQuery query) {
+        return weCustomerClient.updateCustomerLink(query);
+    }
+
+    @Override
+    public WeResultVo deleteCustomerLink(WeLinkCustomerQuery query) {
+        return weCustomerClient.deleteCustomerLink(query);
     }
 
 
