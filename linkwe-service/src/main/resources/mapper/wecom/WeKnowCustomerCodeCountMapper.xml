@@ -78,8 +78,8 @@
         SELECT
             wcc.create_time as date,
 
-            count(DISTINCT if(wcc.new_or_old=0,id,null)) as newCustomerScanNumber,
-
+--             count(DISTINCT if(wcc.new_or_old=0,id,null)) as newCustomerScanNumber,
+             count(DISTINCT id) as newCustomerScanNumber,
             (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid
                  )  as addCustomerNumber,
 
