@@ -372,6 +372,7 @@ public class WeMaterialController extends BaseController {
         result.add(MaterialMediaTypeVO.builder().type(2).name("视频").sort(6).build());
         result.add(MaterialMediaTypeVO.builder().type(3).name("文件").sort(7).build());
         result.add(MaterialMediaTypeVO.builder().type(5).name("海报").sort(8).build());
+        result.add(MaterialMediaTypeVO.builder().type(18).name("智能表单").sort(9).build());
         result = result.stream().sorted(Comparator.comparing(MaterialMediaTypeVO::getSort)).collect(Collectors.toList());
         return AjaxResult.success(result);
     }

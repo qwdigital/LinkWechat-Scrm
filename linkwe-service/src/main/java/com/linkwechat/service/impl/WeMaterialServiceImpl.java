@@ -710,8 +710,17 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query) {
         if(CategoryMediaType.ZLBDURL.getType().equals(query.getMediaType())){
+            WeFormSurveyCatalogueQuery catalogueQuery = WeFormSurveyCatalogueQuery.builder().surveyState(1).surveyName(query.getMaterialName())
+                    .build();
+
+            if(StringUtils.isNotEmpty(query.getCategoryId())){
+                catalogueQuery.setGroupId(
+                        Long.parseLong(query.getCategoryId())
+                        );
+            }
+
             return iWeFormSurveyCatalogueService.findFormToWeMaterialNewVo(
-                    WeFormSurveyCatalogueQuery.builder().surveyState(1).surveyName(query.getMaterialName()).build()
+                    catalogueQuery
             );
         }
         return weMaterialMapper.selectListByLkQuery(query);
