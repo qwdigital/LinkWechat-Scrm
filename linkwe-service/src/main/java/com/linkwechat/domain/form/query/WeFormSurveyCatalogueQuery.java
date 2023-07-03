@@ -2,7 +2,10 @@ package com.linkwechat.domain.form.query;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
@@ -13,6 +16,9 @@ import java.util.Date;
  * @date 2022年09月20日 18:24
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeFormSurveyCatalogueQuery {
 
     @ApiModelProperty(value = "id")

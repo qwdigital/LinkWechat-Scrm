@@ -50,10 +50,7 @@ import com.linkwechat.handler.TextMaterialImportDataListener;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeTalkMaterialMapper;
 import com.linkwechat.mapper.WeTlpMaterialMapper;
-import com.linkwechat.service.IWeContentSendRecordService;
-import com.linkwechat.service.IWeContentViewRecordService;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeMaterialService;
+import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -101,6 +98,10 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
     @Resource
     private WeTlpMaterialMapper weTlpMaterialMapper;
+
+
+    @Resource
+    private IWeFormSurveyCatalogueService iWeFormSurveyCatalogueService;
 
 
 
@@ -707,6 +708,9 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query) {
+        if(CategoryMediaType.ZLBDURL.getType().equals(query.getMediaType())){
+            return iWeFormSurveyCatalogueService.findFormToWeMaterialNewVo();
+        }
         return weMaterialMapper.selectListByLkQuery(query);
     }
 

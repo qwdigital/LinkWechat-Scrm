@@ -21,8 +21,9 @@ public enum CategoryMediaType {
     KF_TALK(14,"客服话术"),
     ZNBD(15,"智能表单"),
     SOPTLP(16,"SOP模板"),
-    QFTLP(17,"群发模板")
-    ;
+    QFTLP(17,"群发模板"),
+
+    ZLBDURL(18,"智能表单");
 
 
     private final Integer type;

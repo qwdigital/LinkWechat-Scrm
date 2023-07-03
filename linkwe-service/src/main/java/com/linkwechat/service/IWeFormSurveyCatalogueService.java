@@ -1,9 +1,11 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.config.WeSideBarConfig;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.domain.form.query.WeAddFormSurveyCatalogueQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
+import com.linkwechat.domain.material.vo.WeMaterialNewVo;
 
 import java.util.List;
 
@@ -24,6 +26,14 @@ public interface IWeFormSurveyCatalogueService extends IService<WeFormSurveyCata
     WeFormSurveyCatalogue getInfo(Long id);
 
     List<WeFormSurveyCatalogue> getList(WeFormSurveyCatalogueQuery query);
+
+
+    /**
+     * 获取的表单转化为素材
+     * @param query
+     * @return
+     */
+    List<WeMaterialNewVo> findFormToWeMaterialNewVo();
 
     void updateStatus(WeFormSurveyCatalogueQuery query);
 

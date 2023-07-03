@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -18,6 +20,8 @@ import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.domain.form.query.WeAddFormSurveyCatalogueQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
 import com.linkwechat.domain.material.entity.WeCategory;
+import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.material.vo.WeMaterialNewVo;
 import com.linkwechat.mapper.WeCategoryMapper;
 import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
 import com.linkwechat.mapper.WeFormSurveyCatalogueMapper;
@@ -29,6 +33,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,8 +50,7 @@ import java.util.stream.Collectors;
 @Service
 public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCatalogueMapper, WeFormSurveyCatalogue> implements IWeFormSurveyCatalogueService {
 
-    @Autowired
-    private IWeFormSurveyStatisticsService weFormSurveyStatisticsService;
+
     @Resource
     private WeFormSurveyCatalogueMapper weFormSurveyCatalogueMapper;
     @Resource
@@ -56,6 +60,10 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
 
     @Resource
     private RedisTemplate redisTemplate;
+
+
+    @Resource
+    private LinkWeChatConfig linkWeChatConfig;
 
     @Override
     public Long add(WeAddFormSurveyCatalogueQuery query) {
@@ -164,6 +172,51 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
         return catalogueList;
     }
 
+    @Override
+    public List<WeMaterialNewVo> findFormToWeMaterialNewVo(){
+        List<WeMaterialNewVo>  weMaterialNewVos=new ArrayList<>();
+
+        List<WeFormSurveyCatalogue> catalogues = this.getList(WeFormSurveyCatalogueQuery.builder()
+                        .surveyState(1)
+                .build());
+
+       ;
+
+        if(CollectionUtil.isNotEmpty(catalogues)){
+            catalogues.stream().forEach(weFormSurveyCatalogue -> {
+
+                if(StringUtils.isNotEmpty(weFormSurveyCatalogue.getChannelsName())){
+                    ListUtil.toList(weFormSurveyCatalogue.getChannelsName().split(",")).stream().forEach(k->{
+                        WeMaterialNewVo weMaterialNewVo =new  WeMaterialNewVo();
+                        weMaterialNewVo.setMaterialName(weFormSurveyCatalogue.getSurveyName() + " 渠道:"+k);
+                        weMaterialNewVo.setMaterialUrl(
+                                StringUtils.substringBeforeLast(linkWeChatConfig.getH5Domain(), "/") + weFormSurveyCatalogue.getHtmlPath()
+                                        + "?id=true&formId=" + weFormSurveyCatalogue.getId() + "&dataSource=" + k
+                        );
+                        weMaterialNewVos.add(
+                                weMaterialNewVo
+                        );
+                    });
+
+
+                }else{
+                    WeMaterialNewVo weMaterialNewVo =new  WeMaterialNewVo();
+                    weMaterialNewVo.setMaterialName(weFormSurveyCatalogue.getSurveyName());
+                    weMaterialNewVo.setMaterialUrl(
+                            StringUtils.substringBeforeLast(linkWeChatConfig.getH5Domain(), "/") + weFormSurveyCatalogue.getHtmlPath()
+                                    + "?id=true&formId=" + weFormSurveyCatalogue.getId()
+                    );
+                    weMaterialNewVos.add(
+                            weMaterialNewVo
+                    );
+                }
+            });
+        }
+
+
+        return weMaterialNewVos;
+
+    }
     @Override
     public void updateStatus(WeFormSurveyCatalogueQuery query) {
         if (Objects.isNull(query.getSurveyState())) {
