@@ -32,6 +32,7 @@ import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
 import com.linkwechat.domain.material.ao.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.entity.WeTalkMaterial;
@@ -709,7 +710,9 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query) {
         if(CategoryMediaType.ZLBDURL.getType().equals(query.getMediaType())){
-            return iWeFormSurveyCatalogueService.findFormToWeMaterialNewVo();
+            return iWeFormSurveyCatalogueService.findFormToWeMaterialNewVo(
+                    WeFormSurveyCatalogueQuery.builder().surveyState(1).surveyName(query.getMaterialName()).build()
+            );
         }
         return weMaterialMapper.selectListByLkQuery(query);
     }

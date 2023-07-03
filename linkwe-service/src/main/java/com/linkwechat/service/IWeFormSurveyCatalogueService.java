@@ -33,7 +33,7 @@ public interface IWeFormSurveyCatalogueService extends IService<WeFormSurveyCata
      * @param query
      * @return
      */
-    List<WeMaterialNewVo> findFormToWeMaterialNewVo();
+    List<WeMaterialNewVo> findFormToWeMaterialNewVo(WeFormSurveyCatalogueQuery query);
 
     void updateStatus(WeFormSurveyCatalogueQuery query);
 

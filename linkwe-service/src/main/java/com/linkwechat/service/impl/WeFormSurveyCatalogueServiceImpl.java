@@ -173,14 +173,11 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
     }
 
     @Override
-    public List<WeMaterialNewVo> findFormToWeMaterialNewVo(){
+    public List<WeMaterialNewVo> findFormToWeMaterialNewVo(WeFormSurveyCatalogueQuery query){
         List<WeMaterialNewVo>  weMaterialNewVos=new ArrayList<>();
 
-        List<WeFormSurveyCatalogue> catalogues = this.getList(WeFormSurveyCatalogueQuery.builder()
-                        .surveyState(1)
-                .build());
+        List<WeFormSurveyCatalogue> catalogues = this.getList(query);
 
-       ;
 
         if(CollectionUtil.isNotEmpty(catalogues)){
             catalogues.stream().forEach(weFormSurveyCatalogue -> {
