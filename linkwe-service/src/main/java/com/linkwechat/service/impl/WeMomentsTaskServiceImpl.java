@@ -768,11 +768,13 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         //游标
         query.setCursor(null);
         //开始时间
-        long startTime = Timestamp.valueOf(request.getSendTime()).getTime() / 1000;
-        query.setStart_time(startTime);
+        DateTime date = DateUtil.date(request.getSendTime());
+        //提前3秒
+        DateTime advanceTime = DateUtil.offset(date, DateField.SECOND, -3);
+        query.setStart_time(advanceTime.getTime() / 1000);
         //结束时间往后偏移30秒
-        DateTime offset = DateUtil.offset(DateUtil.date(request.getSendTime()), DateField.SECOND, 30);
-        query.setEnd_time(offset.getTime() / 1000);
+        DateTime putOffTime = DateUtil.offset(date, DateField.SECOND, 30);
+        query.setEnd_time(putOffTime.getTime() / 1000);
         query.setLimit(1);
         AjaxResult<MomentsListDetailResultDto> result = qwMomentsClient.momentList(query);
 
@@ -785,7 +787,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     //1.添加朋友圈任务和朋友圈绑定表
                     weMomentsTaskRelationService.syncAddRelation(request.getWeMomentsTaskId(), i.getMoment_id());
                     //2.同步朋友圈发送情况
-                    weMomentsUserService.syncAddMomentsUser(request.getWeMomentsTaskId(), i.getMoment_id());
+                    weMomentsUserService.syncAddMomentsUser(request.getWeMomentsTaskId(), i, sysUser);
                     //3.同步朋友圈的客户情况
                     weMomentsCustomerService.syncAddMomentsCustomer(request.getWeMomentsTaskId(), i.getMoment_id());
                     //4.同步员工发送成功的数据
@@ -793,7 +795,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 });
             }
         }
-
     }
 
     @Override

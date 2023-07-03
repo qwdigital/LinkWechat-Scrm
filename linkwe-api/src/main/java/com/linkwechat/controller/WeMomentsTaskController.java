@@ -69,7 +69,7 @@ public class WeMomentsTaskController extends BaseController {
             if (i.getTotal().equals(0)) {
                 i.setFinishRate(percentInstance.format(0));
             } else {
-                i.setFinishRate(percentInstance.format(i.getExecuted() / i.getTotal()));
+                i.setFinishRate(percentInstance.format(Double.valueOf(i.getExecuted()) / Double.valueOf(i.getTotal())));
             }
         });
         TableDataInfo dataTable = getDataTable(moments);

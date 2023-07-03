@@ -140,12 +140,12 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
             long todaySend = list.stream().filter(i -> i.getDeliveryStatus().equals(0)).filter(i -> beginTime.getTime() <= i.getUpdateTime().getTime() && i.getUpdateTime().getTime() <= endTime.getTime()).count();
 
             if (weMomentsTask.getSendType().equals(2)) {
-                result.put("failSend", result.get("predictSend") - nonSend - sent);
+                result.put("nonSend", result.get("predictSend") - sent);
             } else {
                 result.put("predictSend", predictSend);
                 result.put("failSend", predictSend - nonSend - sent);
+                result.put("nonSend", nonSend);
             }
-            result.put("nonSend", nonSend);
             result.put("sent", sent);
             result.put("todaySend", todaySend);
         }
