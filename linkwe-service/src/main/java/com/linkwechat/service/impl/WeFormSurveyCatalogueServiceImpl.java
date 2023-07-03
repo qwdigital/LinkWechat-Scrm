@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SiteStatsConstants;
+import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
@@ -190,6 +191,7 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
                                 StringUtils.substringBeforeLast(linkWeChatConfig.getH5Domain(), "/") + weFormSurveyCatalogue.getHtmlPath()
                                         + "?id=true&formId=" + weFormSurveyCatalogue.getId() + "&dataSource=" + k
                         );
+                        weMaterialNewVo.setMediaType(String.valueOf(CategoryMediaType.ZLBDURL.getType()));
                         weMaterialNewVos.add(
                                 weMaterialNewVo
                         );
