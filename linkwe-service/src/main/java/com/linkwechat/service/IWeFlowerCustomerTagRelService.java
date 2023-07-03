@@ -46,4 +46,16 @@ public interface IWeFlowerCustomerTagRelService extends IService<WeFlowerCustome
     List<String> getCountByTagIdAndUserId(List<String> tagIds, List<String> userIds);
 
 
+    /**
+     * 通过标签Id和用户Id获取客户 （不去重）
+     *
+     * @param tagIds  标签Id集合
+     * @param userIds 企微用户Id集合
+     * @return {@link List<WeFlowerCustomerTagRel>}
+     * @author WangYX
+     * @date 2023/06/30 18:35
+     */
+    List<WeFlowerCustomerTagRel> getListByTagIdAndUserId(List<String> tagIds, List<String> userIds);
+
+
 }

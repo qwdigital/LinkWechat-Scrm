@@ -35,6 +35,11 @@ public class WeFlowerCustomerTagRelServiceImpl extends ServiceImpl<WeFlowerCusto
 
     @Override
     public List<String> getCountByTagIdAndUserId(List<String> tagIds, List<String> userIds) {
-        return this.baseMapper.getCountByTagIdAndUserId(tagIds,userIds);
+        return this.baseMapper.getCountByTagIdAndUserId(tagIds, userIds);
+    }
+
+    @Override
+    public List<WeFlowerCustomerTagRel> getListByTagIdAndUserId(List<String> tagIds, List<String> userIds) {
+        return this.baseMapper.getListByTagIdAndUserId(tagIds, userIds);
     }
 }

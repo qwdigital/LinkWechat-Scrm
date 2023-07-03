@@ -21,18 +21,19 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto.TaskList;
-import com.linkwechat.domain.moments.entity.WeMomentsAttachments;
-import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
-import com.linkwechat.domain.moments.entity.WeMomentsUser;
+import com.linkwechat.domain.moments.entity.*;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.fegin.QwSysUserClient;
+import com.linkwechat.mapper.WeMomentsEstimateCustomerMapper;
+import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.mapper.WeMomentsUserMapper;
 import com.linkwechat.service.*;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,10 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
     @Resource
     private IWeCustomerService weCustomerService;
+    @Resource
+    private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
+    @Resource
+    private WeMomentsTaskMapper weMomentsTaskMapper;
 
     @Override
     public void addMomentsUser(Long momentsTaskId, List<SysUser> users) {
@@ -143,6 +148,17 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     }
 
     @Override
+    public void syncAddMomentsUser(Long momentsTaskId, MomentsListDetailResultDto.Moment moment, SysUser sysUser) {
+        //朋友圈创建来源。0：企业 1：个人
+        if (moment.getCreate_type().equals(0)) {
+            this.syncAddMomentsUser(momentsTaskId, moment.getMoment_id());
+        } else if (moment.getCreate_type().equals(1)) {
+            WeMomentsUser build = build(momentsTaskId, moment.getMoment_id(), sysUser, 1);
+            this.save(build);
+        }
+    }
+
+    @Override
     public void syncUpdateMomentsUser(Long momentsTaskId, String momentsId) {
         List<TaskList> taskLists = iterateGetMomentTask(momentsId, null);
         if (BeanUtil.isNotEmpty(taskLists)) {
@@ -161,53 +177,50 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
 
     @Override
     public List<WeMomentsTaskMobileVO> mobileList(WeMomentsTaskMobileRequest request) {
+
         List<WeMomentsTaskMobileVO> vos = this.baseMapper.mobileList(request);
+
+        //客户标签
+        List<String> tagIds = new ArrayList<>();
 
         for (WeMomentsTaskMobileVO vo : vos) {
             //客户数
-            if (vo.getStatus().equals(1)) {
-                List<String> tagIds = JSONArray.parseArray(vo.getCustomerTag(), String.class);
-                if (CollectionUtil.isNotEmpty(tagIds)) {
-                    List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(tagIds, ListUtil.toList(request.getWeUserId()));
-                    vo.setCustomerNum(weUserIds.size());
-                } else {
-                    LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
-                    queryWrapper.eq(WeCustomer::getAddUserId, request.getWeUserId());
-                    queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-                    queryWrapper.ne(WeCustomer::getTrackState, 5);
-                    int count = weCustomerService.count(queryWrapper);
-                    vo.setCustomerNum(count);
-                }
-            } else {
-                LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
-                queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, vo.getWeMomentsTaskId());
-                queryWrapper.eq(WeMomentsCustomer::getWeUserId, request.getWeUserId());
-                queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
-                int count = weMomentsCustomerService.count(queryWrapper);
-                vo.setCustomerNum(count);
-            }
+            LambdaQueryWrapper<WeMomentsEstimateCustomer> queryWrapper = Wrappers.lambdaQuery();
+            queryWrapper.eq(WeMomentsEstimateCustomer::getMomentsTaskId, vo.getWeMomentsTaskId());
+            int count = weMomentsEstimateCustomerMapper.selectCount(queryWrapper);
+            vo.setCustomerNum(count);
 
             //附件
-            LambdaUpdateWrapper<WeMomentsAttachments> attachmentsWrapper = Wrappers.lambdaUpdate();
+            LambdaQueryWrapper<WeMomentsAttachments> attachmentsWrapper = Wrappers.lambdaQuery();
             attachmentsWrapper.eq(WeMomentsAttachments::getMomentsTaskId, vo.getWeMomentsTaskId());
             List<WeMomentsAttachments> list = weMomentsAttachmentsService.list(attachmentsWrapper);
             if (CollectionUtil.isNotEmpty(list)) {
                 List<Long> materialIds = list.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
-                List<WeMaterial> weMaterials = weMaterialService.listByIds(materialIds);
+                LambdaQueryWrapper<WeMaterial> wrapper = Wrappers.lambdaQuery();
+                wrapper.select(WeMaterial::getId,
+                        WeMaterial::getMaterialName,
+                        WeMaterial::getMaterialUrl,
+                        WeMaterial::getMediaType,
+                        WeMaterial::getDigest,
+                        WeMaterial::getCoverUrl,
+                        WeMaterial::getWidth,
+                        WeMaterial::getHeight,
+                        WeMaterial::getPixelSize,
+                        WeMaterial::getMemorySize
+                );
+                wrapper.in(WeMaterial::getId, materialIds);
+                List<WeMaterial> weMaterials = weMaterialService.list(wrapper);
                 vo.setMaterialList(weMaterials);
+            }
+
+            //客户标签
+            if (StrUtil.isNotBlank(vo.getCustomerTag())) {
+                List<String> tagIdLists = JSONArray.parseArray(vo.getCustomerTag(), String.class);
+                vo.setCustomerTags(tagIdLists);
+                tagIds.addAll(tagIdLists);
             }
         }
 
-        //客户标签
-        List<String> tagIds = new ArrayList<>();
-        for (WeMomentsTaskMobileVO i : vos) {
-            if (StrUtil.isBlank(i.getCustomerTag())) {
-                continue;
-            }
-            List<String> list = JSONArray.parseArray(i.getCustomerTag(), String.class);
-            i.setCustomerTags(list);
-            tagIds.addAll(list);
-        }
         if (CollectionUtil.isNotEmpty(tagIds)) {
             tagIds = tagIds.stream().distinct().collect(Collectors.toList());
             LambdaQueryWrapper<WeTag> queryWrapper = Wrappers.lambdaQuery(WeTag.class);
@@ -242,6 +255,12 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         if (BeanUtil.isEmpty(loginUser)) {
             throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
+
+        WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return null;
+        }
+
         //详情
         String weUserId = loginUser.getSysUser().getWeUserId();
         WeMomentsTaskMobileVO vo = this.baseMapper.mobileGet(weUserId, weMomentsTaskId);
@@ -272,28 +291,12 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         }
 
         //客户数
-        //任务状态：1未开始，2进行中，3已结束
-        if (vo.getStatus().equals(1)) {
-            List<String> tagIds = JSONArray.parseArray(vo.getCustomerTag(), String.class);
-            if (CollectionUtil.isNotEmpty(tagIds)) {
-                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(tagIds, ListUtil.toList(weUserId));
-                vo.setCustomerNum(weUserIds.size());
-            } else {
-                LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
-                queryWrapper.eq(WeCustomer::getAddUserId, weUserId);
-                queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-                queryWrapper.ne(WeCustomer::getTrackState, 5);
-                int count = weCustomerService.count(queryWrapper);
-                vo.setCustomerNum(count);
-            }
-        } else {
-            LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
-            queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId);
-            queryWrapper.eq(WeMomentsCustomer::getWeUserId, weUserId);
-            queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
-            int count = weMomentsCustomerService.count(queryWrapper);
-            vo.setCustomerNum(count);
-        }
+        LambdaQueryWrapper<WeMomentsEstimateCustomer> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(WeMomentsEstimateCustomer::getMomentsTaskId, weMomentsTaskId);
+        queryWrapper.eq(WeMomentsEstimateCustomer::getWeUserId, loginUser.getSysUser().getWeUserId());
+        int count = weMomentsEstimateCustomerMapper.selectCount(queryWrapper);
+        vo.setCustomerNum(count);
+
         return vo;
     }
 

@@ -14,6 +14,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto.CustomerList;
@@ -77,6 +78,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
             if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
                 //标签数量不为0时，获取标签对应的客户数量
                 List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(request.getCustomerTag(), collect);
+                weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
                 return CollectionUtil.isNotEmpty(weUserIds) ? weUserIds.size() : 0;
             }
             //通过条件筛选出的员工数据为0，且没有客户标签时
@@ -89,6 +91,44 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
             queryWrapper.ne(WeCustomer::getTrackState, 5);
             queryWrapper.in(WeCustomer::getAddUserId, collect);
             return weCustomerService.count(queryWrapper);
+        }
+    }
+
+    @Override
+    public List<WeCustomer> estimateCustomers(WeMomentsTaskEstimateCustomerNumRequest request) {
+        if (request.getScopeType().equals(0)) {
+            //全部客户
+            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+            queryWrapper.ne(WeCustomer::getTrackState, 5);
+            return weCustomerService.list(queryWrapper);
+        } else {
+            //通过条件筛选
+            if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
+                //标签数量不为0时，获取标签对应的客户数量
+                List<WeFlowerCustomerTagRel> list = weFlowerCustomerTagRelService.getListByTagIdAndUserId(request.getCustomerTag(), request.getUserIds());
+                if (CollectionUtil.isNotEmpty(list)) {
+                    List<String> weUserId = list.stream().map(i -> i.getUserId()).distinct().collect(Collectors.toList());
+                    List<String> externalUserId = list.stream().map(i -> i.getExternalUserid()).distinct().collect(Collectors.toList());
+                    LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+                    queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+                    queryWrapper.ne(WeCustomer::getTrackState, 5);
+                    queryWrapper.in(WeCustomer::getAddUserId, weUserId);
+                    queryWrapper.in(WeCustomer::getExternalUserid, externalUserId);
+                    return weCustomerService.list(queryWrapper);
+                }
+                return CollectionUtil.newArrayList();
+            }
+            //通过条件筛选出的员工数据为0，且没有客户标签时
+            if (CollectionUtil.isEmpty(request.getUserIds())) {
+                return CollectionUtil.newArrayList();
+            }
+            //员工数据不为0时，获取员工对应的全部的客户数量
+            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+            queryWrapper.ne(WeCustomer::getTrackState, 5);
+            queryWrapper.in(WeCustomer::getAddUserId, request.getUserIds());
+            return weCustomerService.list(queryWrapper);
         }
     }
 
@@ -118,7 +158,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
                 weMomentsCustomer.setId(IdUtil.getSnowflake().nextId());
                 weMomentsCustomer.setMomentsTaskId(weMomentsTaskId);
                 weMomentsCustomer.setMomentsId(momentsId);
-                weMomentsCustomer.setWeUserId(item.getUserid());
+                weMomentsCustomer.setWeUserId(weMomentsUser.getWeUserId());
                 weMomentsCustomer.setUserId(weMomentsUser.getUserId());
                 weMomentsCustomer.setUserName(weMomentsUser.getUserName());
                 weMomentsCustomer.setExternalUserid(item.getExternal_userid());

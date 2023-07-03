@@ -74,5 +74,28 @@
         </if>
     </select>
 
+    <select id="getListByTagIdAndUserId" resultType="com.linkwechat.domain.WeFlowerCustomerTagRel">
+        SELECT
+        t1.*
+        FROM
+        we_flower_customer_tag_rel t1
+        JOIN sys_user t2 ON t1.user_id = t2.we_user_id AND t2.del_flag = 0 AND t2.is_user_leave = 0
+        JOIN we_customer t3 on t1.external_userid = t3.external_userid and t1.user_id = t3.add_user_id and
+        t3.track_state !=5
+        WHERE t1.del_flag = 0
+        <if test="tagIds!=null and tagIds.size()>0">
+            AND t1.tag_id IN
+            <foreach collection="tagIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="userIds!=null and userIds.size()>0">
+            AND t1.user_id IN
+            <foreach collection="userIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
 
 </mapper>

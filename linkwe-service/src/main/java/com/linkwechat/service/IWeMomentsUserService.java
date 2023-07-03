@@ -2,6 +2,7 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.entity.WeMomentsUser;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
@@ -46,14 +47,28 @@ public interface IWeMomentsUserService extends IService<WeMomentsUser> {
 
 
     /**
-     * 同步数据时，添加朋友圈执行员工
+     * 同步数据时，添加朋友圈执行员工 (仅支持企业群发)
      *
      * @param momentsTaskId 朋友圈任务Id
-     * @param momentsId     朋友圈Id
+     * @param momentsId     朋友圈Id 仅支持企业发表的朋友圈id
      * @author WangYX
      * @date 2023/06/12 14:50
      */
     void syncAddMomentsUser(Long momentsTaskId, String momentsId);
+
+    /**
+     * 同步数据时，添加朋友圈执行员工
+     * <p>
+     * 兼容企业群发和个人发送
+     *
+     * @param momentsTaskId 朋友圈任务Id
+     * @param moment        企微朋友圈
+     * @param sysUser       发送员工
+     * @return
+     * @author WangYX
+     * @date 2023/06/30 11:05
+     */
+    void syncAddMomentsUser(Long momentsTaskId, MomentsListDetailResultDto.Moment moment, SysUser sysUser);
 
 
     /**

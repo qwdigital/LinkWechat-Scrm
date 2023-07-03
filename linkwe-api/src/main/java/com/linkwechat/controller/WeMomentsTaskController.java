@@ -1,5 +1,6 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -192,8 +194,10 @@ public class WeMomentsTaskController extends BaseController {
     @ApiOperation("移动端列表")
     @GetMapping("/mobile/list")
     public TableDataInfo mobileList(@Validated WeMomentsTaskMobileRequest request) {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        request.setWeUserId(sysUser.getWeUserId());
+        if (BeanUtil.isEmpty(SecurityUtils.getLoginUser())) {
+            return getDataTable(Collections.EMPTY_LIST);
+        }
+        request.setWeUserId(SecurityUtils.getLoginUser().getSysUser().getWeUserId());
         startPage();
         List<WeMomentsTaskMobileVO> vos = weMomentsUserService.mobileList(request);
         return getDataTable(vos);

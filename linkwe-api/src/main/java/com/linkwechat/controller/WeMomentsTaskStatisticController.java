@@ -16,16 +16,11 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
-import com.linkwechat.domain.moments.entity.WeMomentsInteracte;
-import com.linkwechat.domain.moments.entity.WeMomentsTask;
-import com.linkwechat.domain.moments.entity.WeMomentsUser;
+import com.linkwechat.domain.moments.entity.*;
 import com.linkwechat.domain.moments.query.WeMomentsStatisticCustomerRecordRequest;
 import com.linkwechat.domain.moments.query.WeMomentsStatisticInteractRecordRequest;
 import com.linkwechat.domain.moments.query.WeMomentsStatisticUserRecordRequest;
-import com.linkwechat.domain.moments.vo.WeMomentsCustomerVO;
-import com.linkwechat.domain.moments.vo.WeMomentsInteractVO;
-import com.linkwechat.domain.moments.vo.WeMomentsUserVO;
+import com.linkwechat.domain.moments.vo.*;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
@@ -78,6 +73,10 @@ public class WeMomentsTaskStatisticController extends BaseController {
     private IWeCustomerService weCustomerService;
     @Resource
     private IWeMomentsTaskService weMomentsTaskService;
+    @Resource
+    private IWeMomentsEstimateUserService weMomentsEstimateUserService;
+    @Resource
+    private IWeMomentsEstimateCustomerService weMomentsEstimateCustomerService;
 
 
     //=============================员工start=============================//
@@ -160,17 +159,27 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @date 2023/06/20 11:07
      */
     private List<WeMomentsUser> getWeMomentsUsers(@Validated WeMomentsStatisticUserRecordRequest request) {
-        LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
-        queryWrapper.eq(WeMomentsUser::getMomentsTaskId, request.getWeMomentsTaskId());
-        if (StrUtil.isNotBlank(request.getWeUserIds())) {
-            queryWrapper.in(WeMomentsUser::getWeUserId, request.getWeUserIds().split(","));
+        WeMomentsTask weMomentsTask = weMomentsTaskService.getById(request.getWeMomentsTaskId());
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return CollectionUtil.newArrayList();
         }
-        if (StrUtil.isNotBlank(request.getDeptIds())) {
-            queryWrapper.in(WeMomentsUser::getDeptId, request.getDeptIds().split(","));
+        if (weMomentsTask.getSendType().equals(2)) {
+            //成员群发
+            List<WeMomentsEstimateUserVO> executeUsers = weMomentsEstimateUserService.getExecuteUsers(request);
+            return BeanUtil.copyToList(executeUsers, WeMomentsUser.class);
+        } else {
+            LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
+            queryWrapper.eq(WeMomentsUser::getMomentsTaskId, request.getWeMomentsTaskId());
+            if (StrUtil.isNotBlank(request.getWeUserIds())) {
+                queryWrapper.in(WeMomentsUser::getWeUserId, request.getWeUserIds().split(","));
+            }
+            if (StrUtil.isNotBlank(request.getDeptIds())) {
+                queryWrapper.in(WeMomentsUser::getDeptId, request.getDeptIds().split(","));
+            }
+            queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
+            queryWrapper.eq(request.getStatus() != null, WeMomentsUser::getExecuteStatus, request.getStatus());
+            return weMomentsUserService.list(queryWrapper);
         }
-        queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
-        queryWrapper.eq(request.getStatus() != null, WeMomentsUser::getExecuteStatus, request.getStatus());
-        return weMomentsUserService.list(queryWrapper);
     }
 
     /**
@@ -183,7 +192,12 @@ public class WeMomentsTaskStatisticController extends BaseController {
     private void getDeptData(List<WeMomentsUserVO> vos) {
         if (CollectionUtil.isNotEmpty(vos)) {
             //获取部门数据
-            List<Integer> deptIds = vos.stream().map(i -> i.getDeptId().intValue()).distinct().collect(Collectors.toList());
+            List<Integer> deptIds = vos.stream().filter(i -> i.getDeptId() != null).map(i -> i.getDeptId().intValue()).distinct().collect(Collectors.toList());
+
+            if (CollectionUtil.isEmpty(deptIds)) {
+                return;
+            }
+
             SysDeptQuery query = new SysDeptQuery();
             query.setDeptIds(deptIds);
             AjaxResult<List<SysDeptVo>> deptResult = sysDeptClient.getListByDeptIds(query);
@@ -286,25 +300,36 @@ public class WeMomentsTaskStatisticController extends BaseController {
      * @date 2023/06/20 15:34
      */
     private List<WeMomentsCustomer> getMomentsCustomers(WeMomentsStatisticCustomerRecordRequest request) {
-        LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
-        queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, request.getWeMomentsTaskId());
-        if (StrUtil.isNotBlank(request.getWeUserIds())) {
-            queryWrapper.in(WeMomentsCustomer::getWeUserId, request.getWeUserIds().split(","));
+        //朋友圈任务
+        WeMomentsTask weMomentsTask = weMomentsTaskService.getById(request.getWeMomentsTaskId());
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return CollectionUtil.newArrayList();
         }
-        queryWrapper.eq(request.getDeliveryStatus() != null, WeMomentsCustomer::getDeliveryStatus, request.getDeliveryStatus());
-        queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
-        List<WeMomentsCustomer> list = weMomentsCustomerService.list(queryWrapper);
 
-        if (CollectionUtil.isNotEmpty(list)) {
-            List<String> externalUserIds = list.stream().map(WeMomentsCustomer::getExternalUserid).collect(Collectors.toList());
-            LambdaQueryWrapper<WeCustomer> wrapper = Wrappers.lambdaQuery(WeCustomer.class);
-            wrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName);
-            wrapper.in(WeCustomer::getExternalUserid, externalUserIds);
-            List<WeCustomer> weCustomers = weCustomerService.list(wrapper);
-            Map<String, String> map = weCustomers.stream().collect(Collectors.toMap(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, (k1, k2) -> k2));
-            list.forEach(i -> i.setCustomerName(map.get(i.getExternalUserid())));
+        if (weMomentsTask.getSendType().equals(2)) {
+            List<WeMomentsEstimateCustomerVO> estimateCustomer = weMomentsEstimateCustomerService.getEstimateCustomer(request);
+            return BeanUtil.copyToList(estimateCustomer, WeMomentsCustomer.class);
+        } else {
+            LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
+            queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, request.getWeMomentsTaskId());
+            if (StrUtil.isNotBlank(request.getWeUserIds())) {
+                queryWrapper.in(WeMomentsCustomer::getWeUserId, request.getWeUserIds().split(","));
+            }
+            queryWrapper.eq(request.getDeliveryStatus() != null, WeMomentsCustomer::getDeliveryStatus, request.getDeliveryStatus());
+            queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
+            List<WeMomentsCustomer> list = weMomentsCustomerService.list(queryWrapper);
+
+            if (CollectionUtil.isNotEmpty(list)) {
+                List<String> externalUserIds = list.stream().map(WeMomentsCustomer::getExternalUserid).collect(Collectors.toList());
+                LambdaQueryWrapper<WeCustomer> wrapper = Wrappers.lambdaQuery(WeCustomer.class);
+                wrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName);
+                wrapper.in(WeCustomer::getExternalUserid, externalUserIds);
+                List<WeCustomer> weCustomers = weCustomerService.list(wrapper);
+                Map<String, String> map = weCustomers.stream().collect(Collectors.toMap(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, (k1, k2) -> k2));
+                list.forEach(i -> i.setCustomerName(map.get(i.getExternalUserid())));
+            }
+            return list;
         }
-        return list;
     }
 
 

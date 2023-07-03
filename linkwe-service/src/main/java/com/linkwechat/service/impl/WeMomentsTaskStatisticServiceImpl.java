@@ -1,17 +1,14 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
-import com.linkwechat.domain.moments.entity.WeMomentsInteracte;
-import com.linkwechat.domain.moments.entity.WeMomentsUser;
-import com.linkwechat.mapper.WeMomentsCustomerMapper;
-import com.linkwechat.mapper.WeMomentsInteracteMapper;
-import com.linkwechat.mapper.WeMomentsUserMapper;
+import com.linkwechat.domain.moments.entity.*;
+import com.linkwechat.mapper.*;
 import com.linkwechat.service.IWeMomentsTaskStatisticService;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +34,12 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
     private WeMomentsCustomerMapper weMomentsCustomerMapper;
     @Resource
     private WeMomentsInteracteMapper weMomentsInteracteMapper;
+    @Resource
+    private WeMomentsTaskMapper weMomentsTaskMapper;
+    @Resource
+    private WeMomentsEstimateUserMapper weMomentsEstimateUserMapper;
+    @Resource
+    private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
 
 
     @Override
@@ -48,6 +51,21 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
         result.put("executed", 0L);
         result.put("todayExecute", 0L);
         result.put("remindCount", 0L);
+
+        //获取朋友圈任务详情
+        WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return result;
+        }
+
+        //成员群发
+        if (weMomentsTask.getSendType().equals(2)) {
+            LambdaQueryWrapper<WeMomentsEstimateUser> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(WeMomentsEstimateUser::getMomentsTaskId, weMomentsTaskId);
+            Integer count = weMomentsEstimateUserMapper.selectCount(wrapper);
+            result.put("targetExecute", Long.valueOf(count));
+            result.put("nonExecute", Long.valueOf(count));
+        }
 
         //查询数据
         LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
@@ -65,9 +83,14 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
             long executed = list.stream().filter(i -> i.getExecuteStatus().equals(1)).count();
             long todayExecute = list.stream().filter(i -> i.getExecuteStatus().equals(1)).filter(i -> beginTime.getTime() <= i.getUpdateTime().getTime() && i.getUpdateTime().getTime() <= endTime.getTime()).count();
             long remindCount = Long.valueOf(list.stream().max(Comparator.comparing(WeMomentsUser::getExecuteCount)).get().getExecuteCount());
+
             //返回结果
-            result.put("targetExecute", targetExecute);
-            result.put("nonExecute", nonExecute);
+            if (weMomentsTask.getSendType().equals(2)) {
+                result.put("nonExecute", result.get("targetExecute") - executed);
+            } else {
+                result.put("targetExecute", targetExecute);
+                result.put("nonExecute", nonExecute);
+            }
             result.put("executed", executed);
             result.put("todayExecute", todayExecute);
             result.put("remindCount", remindCount);
@@ -85,6 +108,21 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
         result.put("failSend", 0L);
         result.put("todaySend", 0L);
 
+        //获取朋友圈任务详情
+        WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return result;
+        }
+
+        //成员群发
+        if (weMomentsTask.getSendType().equals(2)) {
+            LambdaQueryWrapper<WeMomentsEstimateCustomer> wrapper = Wrappers.lambdaQuery();
+            wrapper.eq(WeMomentsEstimateCustomer::getMomentsTaskId, weMomentsTaskId);
+            Integer count = weMomentsEstimateCustomerMapper.selectCount(wrapper);
+            result.put("predictSend", Long.valueOf(count));
+            result.put("nonSend", Long.valueOf(count));
+        }
+
         LambdaQueryWrapper<WeMomentsCustomer> queryWrapper = Wrappers.lambdaQuery(WeMomentsCustomer.class);
         queryWrapper.eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId);
         queryWrapper.eq(WeMomentsCustomer::getDelFlag, Constants.COMMON_STATE);
@@ -101,10 +139,14 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
             long sent = list.stream().filter(i -> i.getDeliveryStatus().equals(0)).count();
             long todaySend = list.stream().filter(i -> i.getDeliveryStatus().equals(0)).filter(i -> beginTime.getTime() <= i.getUpdateTime().getTime() && i.getUpdateTime().getTime() <= endTime.getTime()).count();
 
-            result.put("predictSend", predictSend);
+            if (weMomentsTask.getSendType().equals(2)) {
+                result.put("failSend", result.get("predictSend") - nonSend - sent);
+            } else {
+                result.put("predictSend", predictSend);
+                result.put("failSend", predictSend - nonSend - sent);
+            }
             result.put("nonSend", nonSend);
             result.put("sent", sent);
-            result.put("failSend", predictSend - nonSend - sent);
             result.put("todaySend", todaySend);
         }
         return result;

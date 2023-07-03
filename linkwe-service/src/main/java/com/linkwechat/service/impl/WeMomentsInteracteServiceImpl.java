@@ -68,7 +68,7 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
         queryWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
         queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
         List<WeMomentsUser> list = weMomentsUserMapper.selectList(queryWrapper);
-        if (BeanUtil.isNotEmpty(list)) {
+        if (CollectionUtil.isNotEmpty(list)) {
             //2.删除同步之前的互动数据
             removeInteracte(momentsTaskId, momentsId);
             //3.同步互动数据

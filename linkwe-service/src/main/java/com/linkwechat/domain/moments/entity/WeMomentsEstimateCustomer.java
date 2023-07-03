@@ -2,34 +2,28 @@ package com.linkwechat.domain.moments.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 /**
- * 预估朋友圈执行员工
+ * 预估朋友圈可见客户
  *
  * @author WangYX
- * @version 2.0.0
- * @date 2023/06/26 19:23
+ * @version 1.0.0
+ * @date 2023/07/03 10:12
  */
-@ApiModel("预估朋友圈执行员工")
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@TableName("we_moments_estimate_user")
-public class WeMomentsEstimateUser implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+@TableName("we_moments_estimate_customer")
+public class WeMomentsEstimateCustomer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键Id
+     * 主键id
      */
     @ApiModelProperty(value = "主键Id")
     @TableField("id")
@@ -52,7 +46,7 @@ public class WeMomentsEstimateUser implements Serializable {
     /**
      * 企微员工id
      */
-    @ApiModelProperty(value = "企微员工id")
+    @ApiModelProperty(value = "员工id")
     @TableField("we_user_id")
     private String weUserId;
 
@@ -64,25 +58,17 @@ public class WeMomentsEstimateUser implements Serializable {
     private String userName;
 
     /**
-     * 部门id
+     * 客户id
      */
-    @ApiModelProperty(value = "部门id")
-    @TableField("dept_id")
-    private Long deptId;
+    @ApiModelProperty(value = "客户id")
+    @TableField("external_userid")
+    private String externalUserid;
 
     /**
-     * 部门名称
+     * 客户名称
      */
-    @ApiModelProperty(value = "部门名称")
-    @TableField("dept_name")
-    private String deptName;
-
-    /**
-     * 提醒执行次数
-     */
-    @ApiModelProperty(value = "提醒执行次数")
-    @TableField("execute_count")
-    private Integer executeCount;
-
+    @ApiModelProperty(value = "客户名称")
+    @TableField("customer_name")
+    private String customerName;
 
 }

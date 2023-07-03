@@ -2,9 +2,12 @@ package com.linkwechat.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
 import com.linkwechat.domain.moments.query.WeMomentsTaskAddRequest;
 import com.linkwechat.domain.moments.query.WeMomentsTaskEstimateCustomerNumRequest;
+
+import java.util.List;
 
 /**
  * 朋友圈可见客户 服务类
@@ -25,6 +28,16 @@ public interface IWeMomentsCustomerService extends IService<WeMomentsCustomer> {
      * @date 2023/06/07 17:01
      */
     Integer estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request);
+
+    /**
+     * 预估客户
+     *
+     * @param request 客户范围查询参数
+     * @return {@link List< WeCustomer>}
+     * @author WangYX
+     * @date 2023/06/30 18:14
+     */
+    List<WeCustomer> estimateCustomers(WeMomentsTaskEstimateCustomerNumRequest request);
 
 
     /**

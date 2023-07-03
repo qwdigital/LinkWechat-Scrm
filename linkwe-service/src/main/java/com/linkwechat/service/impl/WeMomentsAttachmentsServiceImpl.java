@@ -187,7 +187,7 @@ public class WeMomentsAttachmentsServiceImpl extends ServiceImpl<WeMomentsAttach
         weMomentsAttachments.setId(IdUtil.getSnowflake().nextId());
         weMomentsAttachments.setMomentsTaskId(momentsTaskId);
         weMomentsAttachments.setIsMaterial(0);
-        weMomentsAttachments.setMsgType(2);
+        weMomentsAttachments.setMsgType(3);
         weMomentsAttachments.setLocationLatitude(latitude);
         weMomentsAttachments.setLocationLongitude(longitude);
         weMomentsAttachments.setLocationName(name);

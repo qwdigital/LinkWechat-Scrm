@@ -1,6 +1,5 @@
 package com.linkwechat.mapper;
 
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import org.apache.ibatis.annotations.Param;
@@ -47,5 +46,17 @@ public interface WeFlowerCustomerTagRelMapper extends BaseMapper<WeFlowerCustome
      * @date 2023/06/13 16:15
      */
     List<String> getCountByTagIdAndUserId(@Param("tagIds") List<String> tagIds, @Param("userIds") List<String> userIds);
+
+
+    /**
+     * 通过标签Id和用户Id获取客户 （不去重）
+     *
+     * @param tagIds  标签Id集合
+     * @param userIds 企微用户Id集合
+     * @return {@link List<WeFlowerCustomerTagRel>}
+     * @author WangYX
+     * @date 2023/06/30 18:35
+     */
+    List<WeFlowerCustomerTagRel> getListByTagIdAndUserId(@Param("tagIds") List<String> tagIds, @Param("userIds") List<String> userIds);
 
 }
