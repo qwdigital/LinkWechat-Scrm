@@ -1346,5 +1346,15 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     }
 
+    @Override
+    public List<WeCustomerChannelCountVo> countCustomerChannel(String state, String startTime, String endTime, Integer delFlag) {
+        return this.baseMapper.countCustomerChannel(state,startTime,endTime,delFlag);
+    }
+
+    @Override
+    public Integer totalScanCodeNumber(String state) {
+        return this.baseMapper.totalScanCodeNumber(state);
+    }
+
 
 }

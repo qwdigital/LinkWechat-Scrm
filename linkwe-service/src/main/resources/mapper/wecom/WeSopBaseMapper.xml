@@ -53,7 +53,7 @@
         wset.create_time,
         wset.execute_end_time as executeEndTime,
         wset.sop_base_id,
-        IFNULL(ROUND((SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id)/(SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id and execute_state=1)*100,0),0) as efficiency
+        IFNULL(ROUND((SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id and execute_state=1)/(SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id )*100,0),0) as efficiency
         FROM
         we_sop_execute_target wset
         LEFT JOIN we_customer wc ON wset.target_id=wc.external_userid
