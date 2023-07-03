@@ -128,7 +128,10 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
                         result.addAll(build(momentsTaskId, momentsId, weMomentsUser.getWeUserId(), 1, like_list));
                     }
                     if (CollectionUtil.isNotEmpty(result)) {
+                        //保存
                         this.saveBatch(result);
+                        //打标签
+                        this.interactTag(momentsTaskId, result);
                     }
                 }
             }
