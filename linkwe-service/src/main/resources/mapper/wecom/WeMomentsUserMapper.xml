@@ -90,7 +90,7 @@
 
     <select id="mobileGet" resultType="com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO">
         SELECT ifnull(t4.execute_status, 0) AS execute_status,
-               t3.id,
+               t3.id as weMomentsTaskId,
                t3.NAME,
                t3.create_by,
                t3.execute_time,

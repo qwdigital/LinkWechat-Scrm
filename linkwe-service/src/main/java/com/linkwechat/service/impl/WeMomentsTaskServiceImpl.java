@@ -743,6 +743,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         log.info("成员朋友发送结束！，任务Id：{}，发送成员：{}", request.getWeMomentsTaskId(), sysUser.getWeUserId());
 
+        WeMomentsTask weMomentsTask = this.getById(request.getWeMomentsTaskId());
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return;
+        }
 
         //判断是否已经执行过
         LambdaQueryWrapper<WeMomentsUser> wrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
@@ -769,7 +773,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         //结束时间往后偏移30秒
         DateTime offset = DateUtil.offset(DateUtil.date(request.getSendTime()), DateField.SECOND, 30);
         query.setEnd_time(offset.getTime() / 1000);
-        query.setLimit(20);
+        query.setLimit(1);
         AjaxResult<MomentsListDetailResultDto> result = qwMomentsClient.momentList(query);
 
         if (result.getCode() == HttpStatus.SUCCESS) {
@@ -789,6 +793,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 });
             }
         }
+
     }
 
     @Override

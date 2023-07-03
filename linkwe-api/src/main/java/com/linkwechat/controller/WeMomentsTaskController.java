@@ -178,7 +178,7 @@ public class WeMomentsTaskController extends BaseController {
      */
     @ApiOperation("同步成员群发类型朋友圈")
     @PostMapping("/group/send/finish")
-    public AjaxResult groupSendFinish(@RequestBody WeMomentsSyncGroupSendRequest request) {
+    public AjaxResult groupSendFinish(@Validated @RequestBody WeMomentsSyncGroupSendRequest request) {
         weMomentsTaskService.groupSendFinish(request);
         return AjaxResult.success();
     }
