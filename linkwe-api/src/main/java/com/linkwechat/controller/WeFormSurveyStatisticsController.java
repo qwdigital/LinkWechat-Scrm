@@ -14,15 +14,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.SiteStasConstants;
-import com.linkwechat.common.constant.SiteStasConstants;
-import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.form.query.WeFormSiteStasQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyRadioQuery;
@@ -423,7 +420,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @ApiOperation("导出用户统计")
     @Log(title = "导出用户统计")
     @PostMapping("/user/export")
-    public AjaxResult userExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
+    public void userExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
         Date startTime = null;
         Date endTime = null;
         String type = query.getType();
@@ -459,8 +456,16 @@ public class WeFormSurveyStatisticsController extends BaseController {
             weFormSurveyAnswerVO.setIsCorpUser("否");
             list.add(weFormSurveyAnswerVO);
         }
-        ExcelUtil<WeFormSurveyAnswerVO> util = new ExcelUtil<>(WeFormSurveyAnswerVO.class);
-        return util.exportExcel(list, "user");
+        try {
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("用户统计", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            EasyExcel.write(response.getOutputStream(), WeFormSurveyAnswerVO.class).sheet("用户信息").doWrite(list);
+        } catch (IOException e) {
+            log.error("用户统计列表导出异常：query:{}", JSONObject.toJSONString(query), e);
+        }
     }
 
 
@@ -470,7 +475,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @ApiOperation("统计数据导出")
     @Log(title = "统计数据导出")
     @PostMapping("/data/export")
-    public AjaxResult dataExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
+    public void dataExport(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
         String type = query.getType();
         if (StringUtils.isNotBlank(type) && type.equals("week")) {
             query.setStartDate(DateUtil.offsetWeek(new Date(), -1));
@@ -495,8 +500,17 @@ public class WeFormSurveyStatisticsController extends BaseController {
                 list.add(weFormSurveyStatisticsVO);
             }
         }
-        ExcelUtil<WeFormSurveyStatisticsVO> util = new ExcelUtil<>(WeFormSurveyStatisticsVO.class);
-        return util.exportExcel(list, "data");
+
+        try {
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("统计数据", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            EasyExcel.write(response.getOutputStream(), WeFormSurveyStatisticsVO.class).sheet("数据明细").doWrite(list);
+        } catch (IOException e) {
+            log.error("统计数据列表导出异常：query:{}", JSONObject.toJSONString(query), e);
+        }
     }
 
     /**
@@ -535,10 +549,11 @@ public class WeFormSurveyStatisticsController extends BaseController {
             JSONArray jsonArray = JSON.parseArray(styles).getJSONArray(0);
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-
                 List<String> header = new ArrayList<>();
-                header.add(jsonObject.getString("label"));
-                head.add(header);
+                if(StringUtils.isNotBlank(jsonObject.getString("label"))){
+                    header.add(jsonObject.getString("label"));
+                    head.add(header);
+                }
             }
         }
 
@@ -552,6 +567,8 @@ public class WeFormSurveyStatisticsController extends BaseController {
 
         //导出的数据
         List<List<Object>> exportList = new ArrayList<>();
+
+
         //填充数据
         if (list != null && list.size() > 0) {
             for (WeFormSurveyAnswer weFormSurveyAnswer : list) {
@@ -560,15 +577,14 @@ public class WeFormSurveyStatisticsController extends BaseController {
 
                 //表单数据
                 String answer = weFormSurveyAnswer.getAnswer();
-                JSONArray jsonArray = JSON.parseArray(answer);
+                List<JSONObject> jsonArray = JSON.parseArray(answer,JSONObject.class);
                 //根据问题编号，将表单分组
-                Map<String, List<Object>> answerList = jsonArray.stream().collect(Collectors.groupingBy(o -> JSON.parseObject(o.toString()).getString("questionNumber")));
+                Map<Integer, List<JSONObject>> answerList = jsonArray.stream().collect(Collectors.groupingBy(i -> i.getInteger("questionNumber")));
                 //遍历问题
                 answerList.forEach((k, v) -> {
-                    if (v.size() > 1) {
+                    if (v.size() > 1 ) {
                         //多选框的处理
-                        Object o = v.get(0);
-                        JSONObject jsonObject = JSON.parseObject(o.toString());
+                        JSONObject jsonObject = v.get(0);
                         String options = jsonObject.getString("options");
                         String[] split = options.split(",");
                         StringBuffer defaultValue = new StringBuffer();
@@ -582,16 +598,16 @@ public class WeFormSurveyStatisticsController extends BaseController {
                         }
                         item.add(defaultValue.toString());
                     } else {
-                        Object o = v.get(0);
-                        JSONObject jsonObject = JSON.parseObject(o.toString());
+                        JSONObject jsonObject = v.get(0);
 
-                        //省市联动
-                        String cascader = "el-cascader";
-                        //日期
-                        String date = "el-date-picker";
+                        Integer formCodeId = jsonObject.getInteger("formCodeId");
 
-                        String tag = jsonObject.getString("tag");
-                        if (tag.equals(cascader)) {
+                        if(ObjectUtil.equal(6,formCodeId)){
+                            String options = jsonObject.getString("options");
+                            String[] split = options.split(",");
+                            item.add(split[jsonObject.getInteger("defaultValue")]);
+                        }
+                        else if (ObjectUtil.equal(9,formCodeId)) {
                             String defaultValue = jsonObject.getString("defaultValue");
                             if (defaultValue.contains("[") || defaultValue.contains("]")) {
                                 //级联选择
@@ -613,7 +629,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
                                 }
                                 item.add(value.toString());
                             }
-                        } else if (tag.equals(date)) {
+                        } else if (ObjectUtil.equal(10,formCodeId)) {
                             //日期处理
                             String defaultValue = jsonObject.getString("defaultValue");
                             DateTime parse = DateUtil.parse(defaultValue);
