@@ -21,7 +21,7 @@ public class WeAddFormSurveyAnswerQuery {
      * 手机号
      */
     @ApiModelProperty(value = "手机号")
-    @NotNull(message = "手机号不能为空")
+    //@NotNull(message = "手机号不能为空")
     private String mobile;
 
 

@@ -159,4 +159,8 @@ public class WeFormSurveyAnswer extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "删除标识 0 正常 1 删除")
     @TableField("del_flag")
     private Integer delFlag;
+
+    @ApiModelProperty(value = "是否为客户")
+    @TableField(exist = false)
+    private Boolean isOfficeCustomer;
 }
