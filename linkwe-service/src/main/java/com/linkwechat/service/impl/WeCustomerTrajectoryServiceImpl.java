@@ -379,7 +379,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
             wrapper.eq(WeCustomerTrajectory::getTrajectoryType,trajectory.getTrajectoryType());
         }
         wrapper.eq(WeCustomerTrajectory::getCreateById, SecurityUtils.getUserId());
-
+        wrapper.groupBy(WeCustomerTrajectory::getContent);
         wrapper.orderByDesc(WeCustomerTrajectory::getCreateTime);
 
         return this.list(wrapper);
@@ -399,6 +399,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
             wrapper.eq(WeCustomerTrajectory::getTrajectoryType,trajectory.getTrajectoryType());
         }
 
+        wrapper.groupBy(WeCustomerTrajectory::getContent);
         wrapper.orderByDesc(WeCustomerTrajectory::getCreateTime);
 
         if(StringUtils.isNotEmpty(trajectory.getParams().get("dataScope").toString())){
