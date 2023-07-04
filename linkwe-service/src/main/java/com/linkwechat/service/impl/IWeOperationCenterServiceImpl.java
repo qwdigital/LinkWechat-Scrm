@@ -215,8 +215,12 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
                 if (CollectionUtil.isNotEmpty(WePageCountVos)) {
                     realCnt.setApplyCnt(WePageCountVos.get(0).getNewApplyCnt());
                 }
+
                 if (lostCntMap.containsKey(realCnt.getXTime())) {
                     realCnt.setLostCnt(lostCntMap.get(realCnt.getXTime()));
+                }else{
+                    realCnt.setLostCnt(0);
+
                 }
             });
         }
