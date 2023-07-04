@@ -62,6 +62,10 @@
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
        </where>
+           <if test="noRepeat">
+                GROUP BY  wcr.external_userid
+           </if>
+
         ORDER BY wcr.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
