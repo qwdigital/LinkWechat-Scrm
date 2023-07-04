@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.moments.dto.MomentsListDetailParamDto;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.entity.WeMomentsTask;
-import com.linkwechat.domain.moments.query.WeMomentsJobIdToMomentsIdRequest;
-import com.linkwechat.domain.moments.query.WeMomentsSyncGroupSendRequest;
-import com.linkwechat.domain.moments.query.WeMomentsTaskAddRequest;
-import com.linkwechat.domain.moments.query.WeMomentsTaskListRequest;
+import com.linkwechat.domain.moments.query.*;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 
 import java.util.List;
@@ -96,11 +93,19 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
      * 成员群发类型任务，员工完成任务
      *
      * @param request 员工完成任务
-     * @return
      * @author WangYX
      * @date 2023/06/13 9:41
      */
     void groupSendFinish(WeMomentsSyncGroupSendRequest request);
+
+    /**
+     * 获取成员群发执行结果
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/07/04 15:00
+     */
+    void getGroupSendExecuteResult(WeMomentsSyncGroupSendMqRequest request);
 
     /**
      * jobId换取MomentsId

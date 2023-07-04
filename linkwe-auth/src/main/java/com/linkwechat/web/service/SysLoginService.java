@@ -108,7 +108,7 @@ public class SysLoginService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("登录异常：{}", e.getMessage());
-            throw new ServiceException("登录异常，请联系管理员！");
+            throw new ServiceException("用户不存在/密码错误");
         }
         // 生成token
         LoginUser sysUserVo = findLoginUser(sysUser);

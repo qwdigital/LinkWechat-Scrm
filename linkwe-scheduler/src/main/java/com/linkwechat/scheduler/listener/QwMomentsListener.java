@@ -3,6 +3,8 @@ package com.linkwechat.scheduler.listener;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.domain.moments.query.WeMomentsJobIdToMomentsIdRequest;
+import com.linkwechat.domain.moments.query.WeMomentsSyncGroupSendMqRequest;
+import com.linkwechat.domain.moments.query.WeMomentsSyncGroupSendRequest;
 import com.linkwechat.service.IWeMomentsTaskService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,7 @@ public class QwMomentsListener {
     private RedisService redisService;
 
     /**
-     * 朋友圈任务定时执行
+     * 朋友圈发送任务定时执行
      *
      * @author WangYX
      * @date 2023/06/09 18:22
@@ -40,11 +42,11 @@ public class QwMomentsListener {
     @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_Delay_Execute}")
     public void momentsExecute(String msg, Channel channel, Message message) {
         try {
-            log.info("朋友圈任务定时执行处理：msg:{}", msg);
+            log.info("朋友圈发送任务定时执行处理：msg:{}", msg);
             momentsExecute(Long.valueOf(msg));
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
-            log.error("朋友圈任务定时执行处理失败 msg:{},error:{}", msg, e);
+            log.error("朋友圈发送任务定时执行失败 msg:{},error:{}", msg, e);
         }
     }
 
@@ -94,6 +96,26 @@ public class QwMomentsListener {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微朋友圈同步-消息处理失败 msg:{},error:{}", msg, e);
+        }
+    }
+
+    /**
+     * 获取成员群发执行结果
+     *
+     * @author WangYX
+     * @date 2023/07/04 15:03
+     * @version 1.0.0
+     */
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_Get_Group_Send_Result}")
+    public void getGroupSendExecuteResult(String msg, Channel channel, Message message) {
+        try {
+            log.info("获取成员群发执行结果处理：msg:{}", msg);
+            WeMomentsSyncGroupSendMqRequest request = JSONObject.parseObject(msg, WeMomentsSyncGroupSendMqRequest.class);
+            weMomentsTaskService.getGroupSendExecuteResult(request);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            log.error("获取成员群发执行结果失败 msg:{},error:{}", msg, e);
         }
     }
 

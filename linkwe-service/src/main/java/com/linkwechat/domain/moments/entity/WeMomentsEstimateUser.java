@@ -84,5 +84,12 @@ public class WeMomentsEstimateUser implements Serializable {
     @TableField("execute_count")
     private Integer executeCount;
 
+    /**
+     * 执行状态:0未执行，1已执行
+     */
+    @ApiModelProperty(value = "执行状态:0未执行，1已执行")
+    @TableField("execute_status")
+    private Integer executeStatus;
+
 
 }

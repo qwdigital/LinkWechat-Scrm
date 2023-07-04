@@ -140,6 +140,11 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_JobId_To_MomentsId}")
     private String weMomentsDelayJobIdToMomentsIdRK;
+    /**
+     * 获取成员群发执行结果路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Get_Group_Send_Result}")
+    private String weMomentsDelayGetGroupSendResultRK;
 
 
     //客服账号同步路由
@@ -344,6 +349,11 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_JobId_To_MomentsId}")
     private String weMomentsDelayJobIdToMomentsIdQu;
+    /**
+     * 获取成员群发执行结果队列
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_Get_Group_Send_Result}")
+    private String weMomentsDelayGetGroupSendResultQu;
 
 
     //员工与部门同步队列

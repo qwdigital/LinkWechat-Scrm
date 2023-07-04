@@ -1,6 +1,7 @@
 package com.linkwechat.domain.moments.query;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -31,4 +32,9 @@ public class WeMomentsSyncGroupSendRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime sendTime;
+
+    /**
+     * 执行成员
+     */
+    private SysUser user;
 }

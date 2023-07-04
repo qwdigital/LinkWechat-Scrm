@@ -319,6 +319,30 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(weMomentsJobIdToMomentsId()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK()).noargs();
     }
 
+    /**
+     * 获取成员群发执行结果队列
+     *
+     * @author WangYX
+     * @date 2023/07/04 15:14
+     * @version 1.0.0
+     */
+    @Bean
+    public Queue weMomentsGetGroupSendResult() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayGetGroupSendResultQu());
+    }
+
+    /**
+     * 获取成员群发执行结果队列绑定交换机
+     *
+     * @author WangYX
+     * @date 2023/07/04 15:14
+     * @version 1.0.0
+     */
+    @Bean
+    public Binding bindingExchangeDelayGetGroupSendResult() {
+        return BindingBuilder.bind(weMomentsGetGroupSendResult()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayGetGroupSendResultRK()).noargs();
+    }
+
 
     /**
      * 客服账号同步队列

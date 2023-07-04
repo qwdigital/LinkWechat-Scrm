@@ -45,6 +45,7 @@ public class IWeMomentsEstimateUserServiceImpl extends ServiceImpl<WeMomentsEsti
                         .deptName(i.getDeptName())
                         .momentsTaskId(weMomentsTaskId)
                         .executeCount(0)
+                        .executeStatus(0)
                         .build()));
         this.saveBatch(list);
     }

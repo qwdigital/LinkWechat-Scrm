@@ -74,7 +74,7 @@
                  JOIN (
             SELECT t1.moments_task_id,
                    t1.we_user_id,
-                   t2.execute_status,
+                   t1.execute_status,
                    t2.moments_id
             FROM we_moments_estimate_user t1
                      LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
@@ -102,7 +102,7 @@
                  JOIN (
             SELECT t1.moments_task_id,
                    t1.we_user_id,
-                   t2.execute_status,
+                   t1.execute_status,
                    t2.moments_id
             FROM we_moments_estimate_user t1
                      LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
