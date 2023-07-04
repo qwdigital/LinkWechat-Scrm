@@ -62,9 +62,11 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
         if (weMomentsTask.getSendType().equals(2)) {
             LambdaQueryWrapper<WeMomentsEstimateUser> wrapper = Wrappers.lambdaQuery();
             wrapper.eq(WeMomentsEstimateUser::getMomentsTaskId, weMomentsTaskId);
-            Integer count = weMomentsEstimateUserMapper.selectCount(wrapper);
-            result.put("targetExecute", Long.valueOf(count));
-            result.put("nonExecute", Long.valueOf(count));
+            List<WeMomentsEstimateUser> weMomentsEstimateUsers = weMomentsEstimateUserMapper.selectList(wrapper);
+            result.put("targetExecute", Long.valueOf(weMomentsEstimateUsers.size()));
+            result.put("nonExecute", Long.valueOf(weMomentsEstimateUsers.size()));
+            Integer executeCount = weMomentsEstimateUsers.stream().max(Comparator.comparing(WeMomentsEstimateUser::getExecuteCount)).get().getExecuteCount();
+            result.put("remindCount", Long.valueOf(executeCount));
         }
 
         //查询数据
@@ -90,10 +92,10 @@ public class WeMomentsTaskStatisticServiceImpl implements IWeMomentsTaskStatisti
             } else {
                 result.put("targetExecute", targetExecute);
                 result.put("nonExecute", nonExecute);
+                result.put("remindCount", remindCount);
             }
             result.put("executed", executed);
             result.put("todayExecute", todayExecute);
-            result.put("remindCount", remindCount);
         }
         return result;
     }
