@@ -27,6 +27,6 @@ public interface WeContentViewRecordMapper extends BaseMapper<WeContentViewRecor
      * 获取轨迹素材客户查看明细
      * @return
      */
-    List<ContentDataDetailVo>  findContentDataDetailVos(@Param("contentId") String content_id,@Param("startTime") String startTime,@Param("endTime") String endTime);
+    List<ContentDataDetailVo>  findContentDataDetailVos(@Param("contentId") Long content_id,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
 }
