@@ -47,14 +47,10 @@ public class WeIndexController {
     @Autowired
     private IWeCustomerService iWeCustomerService;
 
-    @Autowired
-    private IWeCorpAccountService iWeCorpAccountService;
 
     @Autowired
     private IWeOperationCenterService weOperationCenterService;
 
-    @Autowired
-    private IWeSynchRecordService iWeSynchRecordService;
 
     @Autowired
     private IWeShortLinkService weShortLinkService;

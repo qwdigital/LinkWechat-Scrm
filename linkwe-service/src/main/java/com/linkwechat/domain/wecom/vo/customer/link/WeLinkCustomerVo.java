@@ -18,7 +18,7 @@ public class WeLinkCustomerVo extends WeResultVo {
 
 
     @Data
-    private class Link{
+    public class Link{
 
         //获客链接的id
         private String link_id;

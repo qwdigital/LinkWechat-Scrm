@@ -1,8 +1,7 @@
 package com.linkwechat.domain.wecom.query.customer.link;
 
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 
 /**
@@ -10,6 +9,9 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeLinkCustomerQuery extends WeBaseQuery {
 
     //获客链接的id
@@ -26,6 +28,9 @@ public class WeLinkCustomerQuery extends WeBaseQuery {
 
     //range.user_list和range.department_list不可同时为空
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public class Range{
 
         //此获客链接关联的userid列表，最多可关联100个
