@@ -438,21 +438,19 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     && CollectionUtil.isEmpty(customerTagIds)) {
                 throw new ServiceException("成员来源和客户标签必须二选一！");
             }
-            if (BeanUtil.isNotEmpty(weMomentsTask.getDeptIds()) || BeanUtil.isNotEmpty(weMomentsTask.getPostIds()) || BeanUtil.isNotEmpty(weMomentsTask.getUserIds())) {
-                List<Long> deptIdList = JSONObject.parseArray(weMomentsTask.getDeptIds(), Long.class);
-                List<String> postList = JSONObject.parseArray(weMomentsTask.getPostIds(), String.class);
-                List<String> weUserIdList = JSONObject.parseArray(weMomentsTask.getUserIds(), String.class);
-                List<SysUser> momentsTaskExecuteUser = weMomentsUserService.getMomentsTaskExecuteUser(weMomentsTask.getScopeType(), deptIdList, postList, weUserIdList);
-                if (BeanUtil.isNotEmpty(momentsTaskExecuteUser)) {
-                    weUserIds = momentsTaskExecuteUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
-                    weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-                }
-            }
-            //标签不为空，通过标签在筛选一次
-            if (CollectionUtil.isNotEmpty(customerTagIds)) {
-                weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(weUserIds, customerTagIds);
-                weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-            }
+        }
+        List<Long> deptIdList = JSONObject.parseArray(weMomentsTask.getDeptIds(), Long.class);
+        List<String> postList = JSONObject.parseArray(weMomentsTask.getPostIds(), String.class);
+        List<String> weUserIdList = JSONObject.parseArray(weMomentsTask.getUserIds(), String.class);
+        List<SysUser> momentsTaskExecuteUser = weMomentsUserService.getMomentsTaskExecuteUser(weMomentsTask.getScopeType(), deptIdList, postList, weUserIdList);
+        if (BeanUtil.isNotEmpty(momentsTaskExecuteUser)) {
+            weUserIds = momentsTaskExecuteUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
+        }
+        //标签不为空，通过标签在筛选一次
+        if (CollectionUtil.isNotEmpty(customerTagIds)) {
+            weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(weUserIds, customerTagIds);
+            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
         }
 
         //3.新增预估朋友圈执行员工（成员群发时，才添加）
