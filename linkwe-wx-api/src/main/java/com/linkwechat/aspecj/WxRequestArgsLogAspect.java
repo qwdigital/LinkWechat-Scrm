@@ -25,8 +25,8 @@ import javax.servlet.ServletResponse;
  *
  * @author ruoyi
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class WxRequestArgsLogAspect {
     private static final Logger log = LoggerFactory.getLogger(WxRequestArgsLogAspect.class);
 
