@@ -14,8 +14,8 @@ alter table we_qr_code add is_exclusive tinyint default 0 null comment '是否�
 ### ● 日期：2023.07.05 朋友圈相关sql
 ```sql
 -- 删除第一版朋友圈表
-delete from we_moments;
-delete from we_moments_interacte;
+DROP TABLE IF EXISTS we_moments;
+DROP TABLE IF EXISTS we_moments_interacte;
 
 -- 新增第二版朋友圈相关表
 DROP TABLE IF EXISTS `we_moments_task`;
