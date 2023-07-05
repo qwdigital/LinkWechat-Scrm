@@ -206,8 +206,8 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             //延迟发送朋友圈
             delaySendMoments(task);
         } else {
-            //马上执行
-            sendWeMoments(task, request.getMaterialIds());
+            //异步，马上执行
+            immediatelySendMoments(task);
         }
         //取消发送朋友圈
         delayCancelMoments(task);
@@ -241,6 +241,24 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     private void delaySendMoments(WeMomentsTask task) {
         long intervalTime = DateUtil.betweenMs(DateUtil.date(), DateUtil.date(task.getExecuteTime()));
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayExecuteRk(), task.getId().toString(), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", intervalTime);
+            return message;
+        });
+    }
+
+    /**
+     * 异步执行-立即执行发送朋友圈
+     *
+     * @param task 朋友圈任务
+     * @return
+     * @author WangYX
+     * @date 2023/07/05 9:59
+     */
+    private void immediatelySendMoments(WeMomentsTask task) {
+        //延迟100毫秒
+        long intervalTime = 100L;
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayCancelRk(), task.getId().toString(), message -> {
             //注意这里时间可使用long类型,毫秒单位，设置header
             message.getMessageProperties().setHeader("x-delay", intervalTime);
             return message;
@@ -585,7 +603,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 if (weMaterial.getMediaType().equals(CategoryMediaType.IMAGE_TEXT.getType().toString())) {
                     String coverUrl = weMaterial.getCoverUrl();
                     if (BeanUtil.isEmpty(coverUrl)) {
-                        coverUrl = "https://demo.linkwechat.net/static/TEXT_PIC.png";
+                        coverUrl = "https://dev.linkwechat.net/fileUpload/ecd3b3c7-828f-4404-9e5a-6a1a0fefafc6.png";
                     }
                     String media_id = weMaterialService.uploadAttachmentMaterial(coverUrl, MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
                     if (StringUtils.isNotEmpty(media_id)) {
@@ -601,7 +619,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 //文章
                 if (weMaterial.getMediaType().equals(CategoryMediaType.ARTICLE.getType().toString())) {
                     if (BeanUtil.isEmpty(weMaterial.getCoverUrl())) {
-                        weMaterial.setCoverUrl("https://demo.linkwechat.net/static/TEXT_PIC.png");
+                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/ecd3b3c7-828f-4404-9e5a-6a1a0fefafc6.png");
                     }
                     convertWeChatMaterial(attachments, weMaterial);
                 }
@@ -610,15 +628,15 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 if (weMaterial.getMediaType().equals(CategoryMediaType.FILE.getType().toString())) {
                     int indexOf = weMaterial.getMaterialUrl().lastIndexOf(".");
                     String substring = weMaterial.getMaterialUrl().substring(indexOf);
-                    if (substring.equals("ppt")) {
+                    if ("ppt".equals(substring)) {
                         //ppt
-                        weMaterial.setCoverUrl("https://demo.linkwechat.net/static/PPT.png");
-                    } else if (substring.equals("word")) {
+                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/563331c3-5ad5-4b99-9e06-04a58480698d.png");
+                    } else if ("word".equals(substring)) {
                         //word
-                        weMaterial.setCoverUrl("https://demo.linkwechat.net/static/WORD.png");
+                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/a66d85bb-28c7-4549-841d-f980848fea06.png");
                     } else {
                         //pdf
-                        weMaterial.setCoverUrl("https://demo.linkwechat.net/static/PDF.png");
+                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/5bdeeb73-b09e-45b7-906f-5ff6af265f49.png");
                     }
                     convertWeChatMaterial(attachments, weMaterial);
                 }

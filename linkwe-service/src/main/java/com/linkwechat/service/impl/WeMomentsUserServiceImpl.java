@@ -255,7 +255,7 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         if (BeanUtil.isEmpty(loginUser)) {
             throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
-
+        //数据不存在，直接返回
         WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
         if (BeanUtil.isEmpty(weMomentsTask)) {
             return null;
