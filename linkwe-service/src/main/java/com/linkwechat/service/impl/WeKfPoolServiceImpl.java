@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -331,21 +332,37 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
                 return isPolling(corpId, openKfId, externalUserId);
             }
         } else {
+            String userId = null;
             //空闲分配
             List<String> servicerList = kfUserList.stream()
                     .filter(servicer -> servicer.getStatus().equals(1))
                     .map(WeKfUser::getUserId).collect(Collectors.toList());
-            List<Map<String, Object>> receptionCntList = getReceptionGroupByCnt(corpId, openKfId, externalUserId, servicerList);
-            if (CollectionUtil.isEmpty(receptionCntList)) {
+            if(CollectionUtil.isEmpty(servicerList)){
                 return false;
+            }
+            List<Map<String, Object>> receptionCntList = getReceptionGroupByCnt(corpId, openKfId, externalUserId, servicerList);
+
+            //当前全部空闲
+            if (CollectionUtil.isEmpty(receptionCntList)) {
+                //随机取一个
+                Collections.shuffle(servicerList);
+                userId = servicerList.get(0);
+            }
+            //当前部分空闲
+            else if(ObjectUtil.notEqual(servicerList.size(),receptionCntList.size())){
+                List<String> serverUserIds = receptionCntList.stream().map(Map::keySet).flatMap(Collection::stream).collect(Collectors.toList());
+                List<String> subList = CollectionUtil.subtractToList(servicerList, serverUserIds);
+                Collections.shuffle(subList);
+                userId = subList.get(0);
+            } else {
+                Map<String, Object> receptionCnt = receptionCntList.stream().min(Comparator.comparingInt(item -> (Integer) item.get("num"))).get();
+                Integer num = (Integer) receptionCnt.get("num");
+                userId = (String) receptionCnt.get("userId");
+                if (num >= receiveLimit) {
+                    return false;
+                }
             }
 
-            Map<String, Object> receptionCnt = receptionCntList.stream().min(Comparator.comparingInt(item -> (Integer) item.get("num"))).get();
-            Integer num = (Integer) receptionCnt.get("num");
-            String userId = (String) receptionCnt.get("userId");
-            if (num >= receiveLimit) {
-                return false;
-            }
             allocationServicer(corpId, openKfId
                     , externalUserId, userId, WeKfStatusEnum.SERVICER.getType());
         }
