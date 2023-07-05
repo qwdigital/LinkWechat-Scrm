@@ -261,7 +261,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
                     newTQuRadio.setLabel("pie");
                     Integer value = weFormSurveyRadioService.countDefaultValue(newTQuRadio);
                     map.put("value", value);
-                    if(ObjectUtil.notEqual("9",number.getQuestionNumber())){
+                    if(ObjectUtil.equal("6",number.getQuestionNumber()) || ObjectUtil.equal("7",number.getQuestionNumber())){
                         String[] split = options.split(",");
                         map.put("name", split[Integer.parseInt(defaultValue)]);
                     }else {

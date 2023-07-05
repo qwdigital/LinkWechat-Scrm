@@ -134,6 +134,7 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
     @Override
     public List<WeFormSurveyAnswer> selectCustomerList(WeFormSurveyStatisticQuery query) {
         QueryWrapper<WeFormSurveyAnswer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("mobile,name,avatar,addr,city,open_id,union_id,create_time");
         queryWrapper.eq("belong_id", query.getBelongId());
         queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), "data_source", query.getDataSource());
         queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
