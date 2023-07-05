@@ -333,7 +333,7 @@ public class WeKfPoolServiceImpl extends ServiceImpl<WeKfPoolMapper, WeKfPool> i
         } else {
             //空闲分配
             List<String> servicerList = kfUserList.stream()
-                    .filter(servicer -> servicer.getStatus().equals(0))
+                    .filter(servicer -> servicer.getStatus().equals(1))
                     .map(WeKfUser::getUserId).collect(Collectors.toList());
             List<Map<String, Object>> receptionCntList = getReceptionGroupByCnt(corpId, openKfId, externalUserId, servicerList);
             if (CollectionUtil.isEmpty(receptionCntList)) {
