@@ -586,7 +586,7 @@ public class WeFormSurveyStatisticsController extends BaseController {
 
                         Integer formCodeId = jsonObject.getInteger("formCodeId");
 
-                        if (ObjectUtil.equal(6, formCodeId) || ObjectUtil.equal(7, formCodeId) || ObjectUtil.equal(8, formCodeId)) {
+                        if (ObjectUtil.equal(6, formCodeId) ||  ObjectUtil.equal(8, formCodeId)) {
                             String options = jsonObject.getString("options");
                             String[] split = options.split(",");
                             item.add(split[jsonObject.getInteger("defaultValue")]);
