@@ -222,6 +222,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @date 2023/06/09 13:53
      */
     private void delayCancelMoments(WeMomentsTask task) {
+        log.info("取消发送朋友圈:Id为{}", task.getId());
         //执行结束时间，添加结束操作
         long intervalTime = DateUtil.betweenMs(DateUtil.date(), DateUtil.date(task.getExecuteEndTime()));
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayCancelRk(), task.getId().toString(), message -> {
@@ -239,6 +240,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @date 2023/06/09 13:51
      */
     private void delaySendMoments(WeMomentsTask task) {
+        log.info("延迟发送朋友圈:Id为{}", task.getId());
         long intervalTime = DateUtil.betweenMs(DateUtil.date(), DateUtil.date(task.getExecuteTime()));
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayExecuteRk(), task.getId().toString(), message -> {
             //注意这里时间可使用long类型,毫秒单位，设置header
@@ -256,9 +258,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @date 2023/07/05 9:59
      */
     private void immediatelySendMoments(WeMomentsTask task) {
+        log.info("异步执行-立即执行发送朋友圈:Id为{}", task.getId());
         //延迟100毫秒
         long intervalTime = 100L;
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayCancelRk(), task.getId().toString(), message -> {
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayExecuteRk(), task.getId().toString(), message -> {
             //注意这里时间可使用long类型,毫秒单位，设置header
             message.getMessageProperties().setHeader("x-delay", intervalTime);
             return message;
@@ -368,11 +371,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
     @Override
     public void sendWeMoments(Long weMomentsTaskId) {
-        //只有未开始的任务才可以执行
+        //任务不存在，不执行
         LambdaQueryWrapper<WeMomentsTask> queryWrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
         queryWrapper.eq(WeMomentsTask::getId, weMomentsTaskId);
         queryWrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
-        queryWrapper.eq(WeMomentsTask::getStatus, 1);
         WeMomentsTask weMomentsTask = this.getOne(queryWrapper);
         if (BeanUtil.isEmpty(weMomentsTask)) {
             return;
