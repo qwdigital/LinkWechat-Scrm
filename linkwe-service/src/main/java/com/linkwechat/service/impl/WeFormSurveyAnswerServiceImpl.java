@@ -94,7 +94,6 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), WeFormSurveyAnswer::getDataSource, query.getDataSource());
         queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
         queryWrapper.apply(Objects.nonNull(query.getEndDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndDate()) + "'");
-        queryWrapper.isNotNull(WeFormSurveyAnswer::getMobile);
         return list(queryWrapper);
     }
 
