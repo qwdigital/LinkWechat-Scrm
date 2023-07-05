@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service;
 
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.moments.vo.MomentsSendResultVO;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 
 /**
@@ -62,10 +63,25 @@ public interface IQwMomentsService {
     MomentsResultDto getMomentCustomerList(MomentsParamDto momentsParamDto);
 
     /**
-     * 停止发表企业朋友圈
+     * 停止朋友圈任务
      *
-     * @param cancelMomentTaskDto
-     * @return
+     * @param dto 停止朋友圈任务参数
+     * @return {@link WeResultVo}
+     * @author WangYX
+     * @date 2023/06/12 10:29
      */
-    WeResultVo cancel_moment_task(CancelMomentTaskDto cancelMomentTaskDto);
+    WeResultVo cancelMomentTask(MomentsCancelDTO dto);
+
+
+    /**
+     * 获取客户朋友圈发表后的可见客户列表
+     *
+     * @param dto 获取客户朋友圈发表后的可见客户列表
+     * @return {@link WeResultVo}
+     * @author WangYX
+     * @date 2023/06/12 10:29
+     */
+    MomentsSendResultVO getMomentSendResult(MomentsSendResultDTO dto);
+
+
 }

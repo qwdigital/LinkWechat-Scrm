@@ -80,6 +80,8 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.exchange.sop-ex:Ex_Sop}")
     private String sopEx;
+
+
     /**
      * -------------------路由------------------------------------
      */
@@ -109,7 +111,6 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.group-tag:Rk_GroupTag}")
     private String weGroupTagRk;
 
-
     //员工与部门同步路由
     @Value("${wecom.mq.route.sync.user-depart:Rk_UserDepart}")
     private String userDepartRk;
@@ -120,13 +121,37 @@ public class RabbitMQSettingConfig {
 
 
     //朋友圈同步路由
+    /**
+     * 朋友圈同步路由
+     */
     @Value("${wecom.mq.route.sync.we-moments:Rk_Moments}")
     private String weMomentsRk;
-
-
-    //朋友圈互动同步路由
+    /**
+     * 朋友圈互动同步路由
+     */
     @Value("${wecom.mq.route.sync.we-hd-moments:Rk_Hd_Moments}")
     private String weHdMomentsRk;
+    /**
+     * 朋友圈定时执行路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Delay_Execute}")
+    private String weMomentsDelayExecuteRk;
+    /**
+     * 朋友圈定时取消路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Delay_Cancel}")
+    private String weMomentsDelayCancelRk;
+    /**
+     * 朋友圈JobId换取MomentId路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_JobId_To_MomentsId}")
+    private String weMomentsDelayJobIdToMomentsIdRK;
+    /**
+     * 获取成员群发执行结果路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Get_Group_Send_Result}")
+    private String weMomentsDelayGetGroupSendResultRK;
+
 
     //客服账号同步路由
     @Value("${wecom.mq.route.sync.kf-account:Rk_KfAccount}")
@@ -305,15 +330,36 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.sync.grouptag:Qu_GroupTag}")
     private String grouptagQu;
 
-
-    //朋友圈队列
+    /**
+     * 朋友圈同步队列
+     */
     @Value("${wecom.mq.queue.sync.we-moments:Qu_Moments}")
     private String weMomentsQu;
-
-
-    //朋友圈互动队列
+    /**
+     * 朋友圈互动同步队列
+     */
     @Value("${wecom.mq.queue.sync.we-hd-moments:Qu_Hd_Moments}")
     private String weHdMomentsQu;
+    /**
+     * 朋友圈定时发送队列
+     */
+    @Value("${wecom.mq.queue.delay.we-moments:Qu_Moments_Delay_Execute}")
+    private String weMomentsDelayExecuteQu;
+    /**
+     * 朋友圈定时取消队列
+     */
+    @Value("${wecom.mq.queue.delay.we-moments:Qu_Moments_Delay_Cancel}")
+    private String weMomentsDelayCancelQu;
+    /**
+     * 朋友圈JobId换取MomentId队列
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_JobId_To_MomentsId}")
+    private String weMomentsDelayJobIdToMomentsIdQu;
+    /**
+     * 获取成员群发执行结果队列
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_Get_Group_Send_Result}")
+    private String weMomentsDelayGetGroupSendResultQu;
 
 
     //员工与部门同步队列

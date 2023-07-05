@@ -87,7 +87,7 @@ public class WeMaterialController extends BaseController {
     @ApiOperation("更新素材信息")
     public AjaxResult edit(@RequestBody WeMaterial material) {
         Integer moduleType = material.getModuleType();
-        if (moduleType.equals(1) &&material.getCategoryId() == null) {
+        if (moduleType.equals(1) && material.getCategoryId() == null) {
             throw new CustomException("请先选择素材分组！");
         }
         materialService.addOrUpdate(material);
@@ -162,7 +162,6 @@ public class WeMaterialController extends BaseController {
         if (digest != null && digest.length() > 100) {
             throw new CustomException("海报描述不可超过100个字符！");
         }
-//        WeMaterial material = materialService.generateSimpleImg(poster);
         WeMaterial material = materialService.builderSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
         material.setModuleType(poster.getModuleType());

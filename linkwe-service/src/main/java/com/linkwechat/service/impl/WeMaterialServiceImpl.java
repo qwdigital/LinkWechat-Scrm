@@ -195,7 +195,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     }
 
     @Override
-    public WeMediaVo uploadWebhookMaterial(String key,String url, String type, String name) {
+    public WeMediaVo uploadWebhookMaterial(String key, String url, String type, String name) {
         return mediaClient.webhookUpload(new WeMediaQuery(key, type, url, name)).getData();
     }
 
@@ -319,10 +319,10 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
         try {
             FileEntity fileEntity = this.builderPoster(PurePoster.builder()
-                            .backgroundImgPath(poster.getBackgroundImgPath())
-                            .width(poster.getWidth())
-                            .height(poster.getHeight())
-                            .posterSubassemblyList(poster.getPosterSubassemblyList())
+                    .backgroundImgPath(poster.getBackgroundImgPath())
+                    .width(poster.getWidth())
+                    .height(poster.getHeight())
+                    .posterSubassemblyList(poster.getPosterSubassemblyList())
 
                     .build());
 
@@ -334,11 +334,9 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             return material;
 
         } catch (Exception e) {
-           log.error("海报素材构建失败:"+e.getMessage());
-           throw e;
+            log.error("海报素材构建失败:" + e.getMessage());
+            throw e;
         }
-
-
 
 
     }
@@ -346,7 +344,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Override
     public FileEntity builderPoster(PurePoster purePoster) throws Exception {
 
-        if(StringUtils.isEmpty(purePoster.getBackgroundImgPath())){
+        if (StringUtils.isEmpty(purePoster.getBackgroundImgPath())) {
             throw new WeComException("海报背景不可为空");
         }
         //海报组件数组为空，直接返回图片
@@ -355,67 +353,65 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             throw new WeComException("海报中元素不可为空");
         }
 
-            //构建海报生成器
-            ImageCombiner combiner = new ImageCombiner(purePoster.getBackgroundImgPath(),
-                    purePoster.getWidth()>=375?375:purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
+        //构建海报生成器
+        ImageCombiner combiner = new ImageCombiner(purePoster.getBackgroundImgPath(),
+                purePoster.getWidth() >= 375 ? 375 : purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
 
 
-            //海报中元素
-            List<WePosterSubassembly> posterSubassemblyList = purePoster.getPosterSubassemblyList();
-            if(CollectionUtil.isNotEmpty(posterSubassemblyList)){
+        //海报中元素
+        List<WePosterSubassembly> posterSubassemblyList = purePoster.getPosterSubassemblyList();
+        if (CollectionUtil.isNotEmpty(posterSubassemblyList)) {
 
-                //合成素材到海报中
-                posterSubassemblyList.stream().forEach(wePosterSubassembly->{
+            //合成素材到海报中
+            posterSubassemblyList.stream().forEach(wePosterSubassembly -> {
 
-                    //元素为文字的处理
-                    if (wePosterSubassembly.getType().equals(1)) {
+                //元素为文字的处理
+                if (wePosterSubassembly.getType().equals(1)) {
 
-                        TextElement textPrice = new TextElement(wePosterSubassembly.getContent(),"/font/default.ttf",
-                                wePosterSubassembly.getFontSize(),
-                                wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
-
-
-                        if(StringUtils.isNotEmpty(wePosterSubassembly.getFontColor())){
-                            textPrice.setColor(
-                                   new Color(
-                                           Integer.parseInt(wePosterSubassembly.getFontColor().substring(1), 16)
-                                   )
-                            );
-                        }
+                    TextElement textPrice = new TextElement(wePosterSubassembly.getContent(), "/font/default.ttf",
+                            wePosterSubassembly.getFontSize(),
+                            wePosterSubassembly.getLeft(), wePosterSubassembly.getTop());
 
 
-                        //设置字体对齐方式
-                        Integer fontTextAlign = wePosterSubassembly.getFontTextAlign();
-                        if(new Integer(2).equals(fontTextAlign)){//居中
-                            textPrice.setCenter(true);
-                        }else if(new Integer(1).equals(fontTextAlign)){ //左对齐
-                            textPrice.setDirection(Direction.LeftRight);
-                        }else if(new Integer(3).equals(fontTextAlign)){//右对齐
-                            textPrice.setDirection(Direction.RightLeft);
-                        }
-
-                        combiner.addElement(textPrice);         //加入待绘制集合
-
-
-
-
-                    }else{ //图片处理
-                        String imgPath = wePosterSubassembly.getImgPath();
-                        if(StringUtils.isNotEmpty(imgPath)){
-                            //二维码（强制按指定宽度、高度缩放）
-                            combiner.addImageElement(imgPath,
-                                    wePosterSubassembly.getLeft()
-                                    , wePosterSubassembly.getTop(),
-                                    wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight()
-                                    , wePosterSubassembly.getType().equals(3)?ZoomMode.WidthHeight:ZoomMode.Width);
-                        }
+                    if (StringUtils.isNotEmpty(wePosterSubassembly.getFontColor())) {
+                        textPrice.setColor(
+                                new Color(
+                                        Integer.parseInt(wePosterSubassembly.getFontColor().substring(1), 16)
+                                )
+                        );
                     }
+
+
+                    //设置字体对齐方式
+                    Integer fontTextAlign = wePosterSubassembly.getFontTextAlign();
+                    if (new Integer(2).equals(fontTextAlign)) {//居中
+                        textPrice.setCenter(true);
+                    } else if (new Integer(1).equals(fontTextAlign)) { //左对齐
+                        textPrice.setDirection(Direction.LeftRight);
+                    } else if (new Integer(3).equals(fontTextAlign)) {//右对齐
+                        textPrice.setDirection(Direction.RightLeft);
+                    }
+
+                    combiner.addElement(textPrice);         //加入待绘制集合
+
+
+                } else { //图片处理
+                    String imgPath = wePosterSubassembly.getImgPath();
+                    if (StringUtils.isNotEmpty(imgPath)) {
+                        //二维码（强制按指定宽度、高度缩放）
+                        combiner.addImageElement(imgPath,
+                                wePosterSubassembly.getLeft()
+                                , wePosterSubassembly.getTop(),
+                                wePosterSubassembly.getWidth(), wePosterSubassembly.getHeight()
+                                , wePosterSubassembly.getType().equals(3) ? ZoomMode.WidthHeight : ZoomMode.Width);
+                    }
+                }
 
 
             });
 
 
-            }
+        }
 
         //执行图片合并
         try {
@@ -423,11 +419,12 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
             //获取合成后的海报
             MultipartFile file
-                    = new MockMultipartFile(String.valueOf(System.currentTimeMillis()),".jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
+                    = new MockMultipartFile(String.valueOf(System.currentTimeMillis()), ".jpg", org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE, combiner.getCombinedImageStream());
+            purePoster.setMemorySize(file.getSize());
             AjaxResult<FileEntity> result = fileClient.upload(file);
             return result.getData();
         } catch (Exception e) {
-            log.error("海报构建失败:"+e.getMessage());
+            log.error("海报构建失败:" + e.getMessage());
             throw new WeComException("海报构建失败");
         }
 
@@ -572,7 +569,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         weMediaQuery.setAttachmentType(attachmentType);
         weMediaQuery.setName(name);
         AjaxResult<WeMediaVo> result = mediaClient.uploadAttachment(weMediaQuery);
-        return result != null && null !=result.getData() ? result.getData() : null;
+        return result != null && null != result.getData() ? result.getData() : null;
     }
 
     /**
@@ -584,21 +581,15 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public String mediaGet(String media_id, String fileType, String extentType) {
-
         byte[] data = mediaClient.mediaGet(new WeMediaQuery(media_id)).getData();
-
-
         String fileName = String.valueOf(SnowFlakeUtil.nextId());
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain",
-                data);
-
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain", data);
         try {
             WeMaterialFileVo weMaterialFileVO = this.uploadWeMaterialFile(mockMultipartFile, fileType);
             return weMaterialFileVO.getMaterialUrl();
         } catch (Exception e) {
             log.error("朋友圈资源获取失败:" + e.getMessage());
         }
-
         return null;
     }
 
@@ -614,6 +605,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         }
         m.setBackgroundImgUrl(poster.getBackgroundImgPath());
         m.setMaterialName(poster.getMaterialName());
+        m.setPixelSize(Long.valueOf(poster.getWidth() * poster.getHeight()));
         return m;
     }
 
@@ -707,6 +699,20 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query) {
+        if (query.getScene().equals(1)) {
+            //企微朋友圈要求：普通图片：总像素不超过1555200。图片大小不超过10M。最多支持传入9个。非图片类型，封面图片像素不超过1555200。
+            //需求要求：单个图片需过滤出1555200的九分之一为标准向下取整来供用户选择；图文则按1555200来过滤。
+            //TODO 不推荐这种做法，最好是前端对该功能进行判断。如选择了2张图片，把图片的像素和加起来进行判断。
+            //TODO 不推荐后端做的原因：这里进行限制，会导致不符合条件的素材无法展示到前端。比如，只选择一张图片，大小超过1555200的九分之一，但不超过1555200，就无法展示。不太符合业务逻辑。
+            //TODO 前端无时间修改，搁置。
+            if (query.getMediaType().equals(CategoryMediaType.IMAGE.getType().toString())) {
+                query.setPixelSize(172800L);
+                query.setMemorySize(10 * 1024 * 1024L);
+            } else {
+                query.setPixelSize(1555200L);
+                query.setMemorySize(10 * 1024 * 1024L);
+            }
+        }
         return weMaterialMapper.selectListByLkQuery(query);
     }
 
@@ -873,6 +879,10 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                     BeanUtil.copyProperties(material, weMaterial);
                     weMaterial.setMaterialUrl(weMaterialImgAo.getMaterialUrl());
                     weMaterial.setMaterialName(weMaterialImgAo.getMaterialName());
+                    weMaterial.setWidth(weMaterialImgAo.getWidth());
+                    weMaterial.setHeight(weMaterialImgAo.getHeight());
+                    weMaterial.setPixelSize(weMaterialImgAo.getPixelSize());
+                    weMaterial.setMemorySize(weMaterialImgAo.getMemorySize());
                     saveOrUpdate(weMaterial);
                     ids.add(weMaterial.getId());
                 });
@@ -880,7 +890,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             }
         }
         if (Objects.equals(CategoryMediaType.TEXT.getType().toString(), material.getMediaType())) {
-            //文本标题长度不可超过2000个字符
+            //文本标题长度不可超过50个字符
             String materialName = material.getMaterialName();
             if (materialName != null && materialName.length() > 50) {
                 throw new WeComException("文本标题不可超过50个字符!");
@@ -950,7 +960,6 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         ids.add(material.getId());
         return ids;
     }
-
 
 
     @Override
@@ -1049,6 +1058,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
     /**
      * 替换海报中占位符,生成实际二维码
+     *
      * @param actualCodeUrl
      * @param posterId
      * @return
@@ -1060,8 +1070,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             List<WePosterSubassembly> wePosterSubassemblies = JSONArray.parseArray(material.getPosterSubassembly(), WePosterSubassembly.class);
             wePosterSubassemblies.stream().filter(Objects::nonNull)
                     .filter(wePosterSubassembly -> wePosterSubassembly.getType() == 3).forEach(wePosterSubassembly -> {
-                        wePosterSubassembly.setImgPath(actualCodeUrl);
-                    });
+                wePosterSubassembly.setImgPath(actualCodeUrl);
+            });
             WePoster wePoster = BeanUtil.copyProperties(material, WePoster.class);
             wePoster.setTitle(material.getMaterialName());
             wePoster.setSampleImgPath(material.getMaterialUrl());
@@ -1074,7 +1084,6 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
         return material;
     }
-
 
 
 }

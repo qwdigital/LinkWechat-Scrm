@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.moments.dto.CancelMomentTaskDto;
+import com.linkwechat.domain.moments.dto.MomentsCancelDTO;
 import com.linkwechat.domain.moments.dto.MomentsCreateResultDto;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTaskEndQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeCancelGroupMsgSendQuery;
@@ -183,10 +184,11 @@ public class QwShortLinkGroupMsgEndListener {
                     Optional.ofNullable(momentTaskResult).filter(o -> o.getCode() == 200).ifPresent(m -> {
                         MomentsCreateResultDto data = m.getData();
                         MomentsCreateResultDto.Result result = data.getResult();
+
                         //停止发送朋友圈
-                        CancelMomentTaskDto cancelMomentTaskDto = new CancelMomentTaskDto();
-                        cancelMomentTaskDto.setMoment_id(result.getMomentId());
-                        qwMomentsClient.cancel_moment_task(cancelMomentTaskDto);
+                        MomentsCancelDTO momentsCancelDTO = new MomentsCancelDTO();
+                        momentsCancelDTO.setMoment_id(result.getMomentId());
+                        qwMomentsClient.cancel_moment_task(momentsCancelDTO);
 
                         //更新员工短链任务推广
                         LambdaUpdateWrapper<WeShortLinkUserPromotionTask> updateWrapper = Wrappers.lambdaUpdate();
