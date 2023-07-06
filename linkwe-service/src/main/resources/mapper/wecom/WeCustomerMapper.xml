@@ -326,6 +326,9 @@
                 AND  date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
         </where>
+        <if test="weCustomerList.noRepeat">
+            GROUP BY  wc.external_userid
+        </if>
     </select>
 
 
