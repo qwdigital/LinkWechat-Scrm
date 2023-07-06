@@ -147,7 +147,7 @@ public class QwKfChatMsgTimeOutListener {
             weKfMsg.setContent(weKfMsgQuery.getContext().toJSONString());
             weKfMsg.setOrigin(WeKfOriginEnum.SERVICER_SEND.getType());
             weKfMsg.setCorpId(SecurityUtils.getCorpId());
-            weKfMsg.setSendTime(new Date());
+            weKfMsg.setSendTime(DateUtil.parseDateTime(DateUtil.now()));
             if(weKfMsgService.save(weKfMsg)){
                 query.setSendTime(DateUtil.formatDateTime(weKfMsg.getSendTime()));
                 rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeKfChatMsgDelayEx(), rabbitMQSettingConfig.getWeKfChatEndMsgRk(), JSONObject.toJSONString(query), message -> {

@@ -242,11 +242,11 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
         } else {
             kfTimeOutOffSet = DateUtil.offset(new Date(), DateField.HOUR_OF_DAY, query.getKfTimeOut());
         }
-        if (timeOutOffSet.isAfterOrEquals(endOffSet)) {
+        if (ObjectUtil.equal(1,query.getTimeOutNotice()) && timeOutOffSet.isAfterOrEquals(endOffSet)) {
             throw new WeComException("客户超时时间不能小于结束时间");
         }
 
-        if (kfTimeOutOffSet.isAfterOrEquals(endOffSet)) {
+        if (ObjectUtil.equal(1,query.getKfTimeOutNotice()) && kfTimeOutOffSet.isAfterOrEquals(endOffSet)) {
             throw new WeComException("客服超时时间不能小于结束时间");
         }
     }
@@ -538,6 +538,11 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
             if(ObjectUtil.equal(1, weKfInfo.getEndContentType())){
                 weKfMsgQuery.setMsgtype(WeKfMsgTypeEnum.MSGMENU.getType());
                 JSONObject endMsgMenuContentObj = JSONObject.parseObject(kfEndMsgMenuContent);
+
+                if(StringUtils.isNotEmpty(weKfInfo.getEndContent())){
+                    endMsgMenuContentObj.put("head_content",weKfInfo.getEndContent());
+                }
+
                 JSONArray list = endMsgMenuContentObj.getJSONArray("list");
                 list.stream().map(item -> (JSONObject) item).forEach(item ->{
                     if("click".equals(item.getString("type"))){
