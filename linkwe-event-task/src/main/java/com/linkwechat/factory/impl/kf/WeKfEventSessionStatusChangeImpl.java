@@ -2,6 +2,7 @@ package com.linkwechat.factory.impl.kf;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.WeKfStatusEnum;
 import com.linkwechat.domain.WeKfInfo;
@@ -43,6 +44,7 @@ public class WeKfEventSessionStatusChangeImpl extends WeKfEventStrategy {
         String msgStr = message.toJSONString();
         log.info("客服会话状态变更: msg:{}", msgStr);
         WeKfSyncEventMsgVo weKfSyncEventMs = JSONObject.parseObject(msgStr, WeKfSyncEventMsgVo.class);
+        SecurityContextHolder.setCorpId(weKfSyncEventMs.getCorpId());
         //从接待池接入会话
         if(ObjectUtil.equal(1,weKfSyncEventMs.getChangeType())){
             String msgCode = weKfSyncEventMs.getMsgCode();
