@@ -226,7 +226,16 @@
 
 
     <select id="countWeCustomerList" resultType="long">
-        SELECT count(0) FROM we_customer wcr
+        SELECT
+        <choose>
+            <when test="weCustomerList.noRepeat">
+                count(DISTINCT wcr.external_userid)
+            </when>
+            <otherwise>
+                count(0)
+            </otherwise>
+        </choose>
+        FROM we_customer wcr
         <where>
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
@@ -275,9 +284,7 @@
             </if>
         </where>
 
-        <if test="weCustomerList.noRepeat">
-            GROUP BY  wcr.external_userid
-        </if>
+
     </select>
 
     <select id="noRepeatCountCustomer" resultType="long">
@@ -330,9 +337,6 @@
                 AND  date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
         </where>
-        <if test="weCustomerList.noRepeat">
-            GROUP BY  wc.external_userid
-        </if>
     </select>
 
 
