@@ -55,4 +55,8 @@ public class WeChatContactMsgVo {
 
     @ApiModelProperty("消息ID")
     private String msgId;
+
+
+    @ApiModelProperty("群聊ID")
+    private String roomId;
 }

@@ -6,6 +6,7 @@ import com.linkwechat.fallback.QwSysAreaFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public interface QwSysAreaClient {
 
     @GetMapping("/system/area/getChildListById")
-    AjaxResult<List<SysAreaVo>> getChildListById(Integer id);
+    AjaxResult<List<SysAreaVo>> getChildListById(@RequestParam("id") Integer id);
 
 
 

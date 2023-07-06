@@ -1356,5 +1356,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return this.baseMapper.totalScanCodeNumber(state);
     }
 
+    @Override
+    public List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds) {
+        return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
+    }
+
 
 }
