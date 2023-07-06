@@ -276,7 +276,7 @@
         </where>
 
         <if test="weCustomerList.noRepeat">
-            GROUP BY  wc.external_userid
+            GROUP BY  wcr.external_userid
         </if>
     </select>
 
