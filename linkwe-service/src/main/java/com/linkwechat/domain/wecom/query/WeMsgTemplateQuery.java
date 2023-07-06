@@ -112,6 +112,16 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
         public static class Image {
             private String media_id;
             private String pic_url;
+
+
+            public Image(){
+
+            }
+
+            public Image(String mediaId, String picUrl){
+                this.media_id=mediaId;
+                this.pic_url=picUrl;
+            }
         }
     }
 
@@ -135,6 +145,16 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
             private String picurl;
             private String desc;
             private String url;
+
+            public Link(){
+
+            }
+            public Link(String title,String picurl,String desc,String url){
+                this.title=title;
+                this.picurl=picurl;
+                this.desc=desc;
+                this.url=url;
+            }
         }
     }
 
@@ -158,6 +178,17 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
             private String pic_media_id;
             private String appid;
             private String page;
+
+            public Miniprogram(){
+
+            }
+            public Miniprogram( String title, String mediaId, String appId, String page){
+                this.title=title;
+                this.pic_media_id=mediaId;
+                this.appid=appId;
+                this.page=page;
+
+            }
         }
     }
 
