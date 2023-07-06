@@ -195,7 +195,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
     private void getDeptData(List<WeMomentsUserVO> vos) {
         if (CollectionUtil.isNotEmpty(vos)) {
             //获取部门数据
-            List<Integer> deptIds = vos.stream().filter(i -> i.getDeptId() != null).map(i -> i.getDeptId().intValue()).distinct().collect(Collectors.toList());
+            List<Long> deptIds = vos.stream().filter(i -> i.getDeptId() != null).map(i -> i.getDeptId()).distinct().collect(Collectors.toList());
 
             if (CollectionUtil.isEmpty(deptIds)) {
                 return;
