@@ -131,11 +131,11 @@
         from we_chat_contact_msg t
         <where>
             <if test="fromId != null and fromId != ''">
-                and (t.from_id = #{fromId} or find_in_set(#{fromId},t.to_list))
+                and (t.from_id = #{fromId} or or t.to_list = #{fromId})
             </if>
 
             <if test="toList != null and toList != ''">
-                and (find_in_set(#{fromId},t.to_list) or t.from_id = #{toList})
+                and (t.to_list = #{fromId} or t.from_id = #{toList})
             </if>
             <choose>
                 <when test="roomId != null and roomId != ''">
