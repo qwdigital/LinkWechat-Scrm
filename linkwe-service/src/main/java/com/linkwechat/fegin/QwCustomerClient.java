@@ -355,7 +355,7 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/addWeGroupMsg")
+    @PostMapping("/customer/addWeGroupMsg")
     public AjaxResult<WeGroupMsgVo>  addWeGroupMsg(@RequestBody WeGroupMsgQuery query);
 
     /**
@@ -363,7 +363,7 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/updateWeGroupMsg")
+    @PostMapping("/customer/updateWeGroupMsg")
     public AjaxResult<WeResultVo>  updateWeGroupMsg(@RequestBody WeGroupMsgQuery query);
 
 
@@ -372,6 +372,6 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/delWeGroupMsg")
+    @PostMapping("/customer/delWeGroupMsg")
     public AjaxResult<WeResultVo> delWeGroupMsg(@RequestBody WeGroupMsgQuery query);
 }
