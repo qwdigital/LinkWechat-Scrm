@@ -200,6 +200,6 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      * 通过eid查询客户简单信息
      * @param externalUserIds
      */
-    List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
+    List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(@Param("externalUserIds") List<String> externalUserIds);
 
 }

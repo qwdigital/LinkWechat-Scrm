@@ -138,12 +138,12 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
                 }
 
                 List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>()
-                        .select(WeGroupMember::getUserId,WeGroupMember::getName,WeGroupMember::getAvatar)
-                        .in(WeGroupMember::getUserId)
+                        .select(WeGroupMember::getUserId,WeGroupMember::getName)
+                        .in(WeGroupMember::getUserId,customerIds)
                         .eq(WeGroupMember::getType, 2)
-                        .groupBy(WeGroupMember::getUserId,WeGroupMember::getName,WeGroupMember::getAvatar));
+                        .groupBy(WeGroupMember::getUserId,WeGroupMember::getName));
                 if(CollectionUtil.isNotEmpty(groupMemberList)){
-                    userIdAndNameMap = groupMemberList.stream().collect(Collectors.toMap(WeGroupMember::getUserId, item -> item.getName() + "_" + item.getAvatar(), (key1, key2) -> key2));
+                    userIdAndNameMap = groupMemberList.stream().collect(Collectors.toMap(WeGroupMember::getUserId, WeGroupMember::getName, (key1, key2) -> key2));
                 }
             }
 
@@ -168,15 +168,9 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
                 }
 
                 if (userIdAndNameMap.containsKey(msgVo.getFromId())) {
-                    String nameAndAvatar = userIdAndNameMap.get(msgVo.getFromId());
-                    if(StringUtils.isNotEmpty(nameAndAvatar)){
-                        String[] nameAndAvatarSplit = nameAndAvatar.split("_");
-                        if(StringUtils.isNotEmpty(nameAndAvatarSplit[0])){
-                            msgVo.setName(nameAndAvatarSplit[0]);
-                        }
-                        if(StringUtils.isNotEmpty(nameAndAvatarSplit[1])){
-                            msgVo.setAvatar(nameAndAvatarSplit[1]);
-                        }
+                    String name = userIdAndNameMap.get(msgVo.getFromId());
+                    if(StringUtils.isNotEmpty(name)){
+                        msgVo.setName(name);
                     }
                 }
                 if (customerAndNameMap.containsKey(msgVo.getFromId())) {

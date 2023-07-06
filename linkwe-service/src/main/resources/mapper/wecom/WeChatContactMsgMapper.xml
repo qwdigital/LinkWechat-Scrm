@@ -127,55 +127,55 @@
         room_id,
         `action`,
         msg_type,
-        contact,
-        from we_chat_contact_msg wccm
+        contact
+        from we_chat_contact_msg t
         <where>
             <if test="fromId != null and fromId != ''">
-                and (wccm.from_id = #{fromId} or find_in_set(#{fromId},wccm.to_list))
+                and (t.from_id = #{fromId} or find_in_set(#{fromId},t.to_list))
             </if>
 
             <if test="toList != null and toList != ''">
-                and (find_in_set(#{fromId},wccm.to_list) or wccm.from_id = #{toList})
+                and (find_in_set(#{fromId},t.to_list) or t.from_id = #{toList})
             </if>
             <choose>
                 <when test="roomId != null and roomId != ''">
-                    and wccm.room_id = #{roomId}
+                    and t.room_id = #{roomId}
                 </when>
                 <when test="fullSearch == 1">
 
                 </when>
                 <otherwise>
-                    and wccm.room_id = ''
+                    and t.room_id = ''
                 </otherwise>
             </choose>
 
             <if test="msgType != null and msgType != ''">
-                and find_in_set(wccm.msg_type,#{msgType})
+                and find_in_set(t.msg_type,#{msgType})
             </if>
 
             <if test="action != null and action != ''">
-                and wccm.action = #{action}
+                and t.action = #{action}
             </if>
             <if test="contact != null and contact != ''">
-                and wccm.contact like concat('%', #{contact}, '%')
+                and t.contact like concat('%', #{contact}, '%')
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND wccm.msg_time &gt;= date_format(#{beginTime},'%Y-%m-%d')
+                AND t.msg_time &gt;= date_format(#{beginTime},'%Y-%m-%d')
             </if>
 
             <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND wccm.msg_time &lt;= date_format(#{endTime},'%Y-%m-%d')
+                AND t.msg_time &lt;= date_format(#{endTime},'%Y-%m-%d')
             </if>
 
             <if test="userName != null and userName != ''">
-                and exists(select 1 from sys_user su where su.user_name like concat('%', #{userName}, '%') and wccm.from_id = su.we_user_id)
+                and exists(select 1 from sys_user su where su.user_name like concat('%', #{userName}, '%') and t.from_id = su.we_user_id)
             </if>
 
             <if test="customerName != null and customerName != ''">
                 and (exists(select 1 from we_group_member wgm where wgm.name like concat('%', #{customerName}, '%') and
-                wccm.from_id = wgm.user_id and wgm.type = 2)
+                t.from_id = wgm.user_id and wgm.type = 2)
                 or exists(select 1 from we_customer wc where wc.customer_name like concat('%', #{customerName}, '%') and
-                wccm.from_id = wc.external_userid ))
+                t.from_id = wc.external_userid ))
             </if>
         </where>
     </select>
