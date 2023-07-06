@@ -10,6 +10,7 @@ import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.resolver.PlaceholderResolver;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.operation.query.WeOperationCustomerQuery;
@@ -209,7 +210,9 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
         List<WeCustomerRealCntVo> customerLostCnt = weOperationCenterMapper.getCustomerLostCnt(query);
         if (CollectionUtil.isNotEmpty(dayCountDataByTime)) {
             Map<String, List<WePageCountVo>> listMap = dayCountDataByTime.stream().collect(Collectors.groupingBy(WePageCountVo::getXTime));
-            Map<String, Integer> lostCntMap = customerLostCnt.stream().collect(Collectors.groupingBy(WeCustomerRealCntVo::getXTime, Collectors.summingInt(WeCustomerRealCntVo::getLostCnt)));
+            Map<String, Integer> lostCntMap = customerLostCnt.stream()
+                    .filter(item-> StringUtils.isNotEmpty(item.getXTime()))
+                    .collect(Collectors.groupingBy(WeCustomerRealCntVo::getXTime, Collectors.summingInt(WeCustomerRealCntVo::getLostCnt)));
             customerRealCnt.forEach(realCnt -> {
                 List<WePageCountVo> WePageCountVos = listMap.get(realCnt.getXTime());
                 if (CollectionUtil.isNotEmpty(WePageCountVos)) {

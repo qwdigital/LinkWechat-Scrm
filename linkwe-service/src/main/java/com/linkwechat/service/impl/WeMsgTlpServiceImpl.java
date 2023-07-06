@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -107,30 +108,41 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
     public void synchGroupWelcomMsg(WeMsgTlpDto weMsgTlpDto,Long tlpId) {
 
         WeMsgTlp weMsgTlp = this.getById(tlpId);
-        WeGroupMsgQuery weGroupMsgQuery=new WeGroupMsgQuery();
-        weGroupMsgQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(), weMsgTlpDto.getAttachmentList());
+        WeGroupMsgQuery weGroupMsgQuery=new WeGroupMsgQuery(
+                linkWeChatConfig.getH5Domain(),weMsgTlpDto.getTemplateInfo(), weMsgTlpDto.getAttachmentList()
+        );
+//        weGroupMsgQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(), weMsgTlpDto.getAttachmentList());
+
 
 
         if(null != weMsgTlp && StringUtils.isNotEmpty(weMsgTlp.getTemplateId())){
-
+            weGroupMsgQuery.setTemplate_id(weMsgTlp.getTemplateId());
             WeResultVo weResultVo = qwCustomerClient.updateWeGroupMsg(weGroupMsgQuery).getData();
-            if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weResultVo.getErrCode())){
-                throw new WeComException(weResultVo.getErrMsg());
+
+            if(null != weResultVo){
+                if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weResultVo.getErrCode())){
+                    throw new WeComException(weResultVo.getErrMsg());
+                }
             }
+
 
         }else{//新增
             WeGroupMsgVo weGroupMsgVo = qwCustomerClient.addWeGroupMsg(
                     weGroupMsgQuery
             ).getData();
-            if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weGroupMsgVo.getErrCode())){
-                throw new WeComException(weGroupMsgVo.getErrMsg());
+
+            if(null != weGroupMsgVo){
+                if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weGroupMsgVo.getErrCode())){
+                    throw new WeComException(weGroupMsgVo.getErrMsg());
+                }
+
+                if(StringUtils.isNotEmpty(weGroupMsgVo
+                        .getTemplate_id())){
+                    weMsgTlp.setTemplateId(weGroupMsgVo.getTemplate_id());
+                    this.updateById(weMsgTlp);
+                }
             }
 
-            if(StringUtils.isNotEmpty(weGroupMsgVo
-                    .getTemplate_id())){
-                weMsgTlp.setTemplateId(weGroupMsgVo.getTemplate_id());
-                this.updateById(weMsgTlp);
-            }
         }
 
 
@@ -171,6 +183,10 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
                 .in(WeMsgTlp::getId, ids));
 
         if(CollectionUtil.isNotEmpty(weMsgTlps)){
+
+            removeByIds(ids);
+
+
             log.info("模板删除ids:{}", ids.toString());
             weTlpMaterialMapper.delete(new LambdaQueryWrapper<WeTlpMaterial>().in(WeTlpMaterial::getTlpId,
                     ids));

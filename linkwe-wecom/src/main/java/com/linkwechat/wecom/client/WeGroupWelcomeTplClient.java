@@ -25,7 +25,7 @@ public interface WeGroupWelcomeTplClient {
      * @param query
      * @return
      */
-    @Request(url = "/group_welcome_template/add", type = "POST")
+    @Request(url = "/externalcontact/group_welcome_template/add", type = "POST")
     WeGroupMsgVo  addWeGroupMsg(@JSONBody WeGroupMsgQuery query);
 
 
@@ -34,7 +34,7 @@ public interface WeGroupWelcomeTplClient {
      * @param query
      * @return
      */
-    @Request(url = "/group_welcome_template/edit", type = "POST")
+    @Request(url = "/externalcontact/group_welcome_template/edit", type = "POST")
     WeResultVo updateWeGroupMsg(@JSONBody WeGroupMsgQuery query);
 
 
@@ -44,7 +44,7 @@ public interface WeGroupWelcomeTplClient {
      * @param query
      * @return
      */
-    @Request(url = "/group_welcome_template/del", type = "POST")
+    @Request(url = "/externalcontact/group_welcome_template/del", type = "POST")
     WeResultVo delWeGroupMsg(@JSONBody WeGroupMsgQuery query);
 
 }

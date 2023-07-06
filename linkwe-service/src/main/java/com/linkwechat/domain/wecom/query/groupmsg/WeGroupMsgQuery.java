@@ -63,14 +63,23 @@ public class WeGroupMsgQuery extends WeBaseQuery {
      */
     private Integer notify;
 
+    public WeGroupMsgQuery(String domain, String templateInfo,List<WeMessageTemplate> messageTemplates){
+        this.text = new WeMsgTemplateQuery.Text();
+        text.setContent(templateInfo);
+        setAttachmentsList(domain,messageTemplates,templateInfo);
 
-    public void setAttachmentsList(String domain, List<WeMessageTemplate> messageTemplates) {
+    }
+
+
+    public void setAttachmentsList(String domain, List<WeMessageTemplate> messageTemplates, String templateInfo) {
         if (CollectionUtil.isNotEmpty(messageTemplates)) {
             messageTemplates.forEach(messageTemplate -> {
-                if (ObjectUtil.equal(WeMsgTypeEnum.TEXT.getMessageType(), messageTemplate.getMsgType())) {
-                    this.text = new WeMsgTemplateQuery.Text();
-                    text.setContent(messageTemplate.getContent());
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
+//                if (ObjectUtil.equal(WeMsgTypeEnum.TEXT.getMessageType(), messageTemplate.getMsgType())) {
+//                    this.text = new WeMsgTemplateQuery.Text();
+//                    text.setContent(messageTemplate.getContent());
+//                } else
+//
+                    if (ObjectUtil.equal(WeMsgTypeEnum.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
                     this.image= new WeMsgTemplateQuery.Images.Image(messageTemplate.getMediaId(),
                             messageTemplate.getPicUrl());
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getMsgType())) {
