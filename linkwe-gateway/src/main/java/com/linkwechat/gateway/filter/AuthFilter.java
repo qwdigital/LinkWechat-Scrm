@@ -134,7 +134,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
         String token = request.getHeaders().getFirst(TokenConstants.AUTHENTICATION);
 
         if (StrUtil.isBlank(token)) {
-            token = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
+            //判断是否是websocket链接
+            String connection = request.getHeaders().getFirst("Connection");
+            String upgrade = request.getHeaders().getFirst("Upgrade");
+            if ("Upgrade".equals(connection) && "websocket".equals(upgrade)) {
+                token = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
+            }
         }
 
         // 如果前端设置了令牌前缀，则裁剪掉前缀

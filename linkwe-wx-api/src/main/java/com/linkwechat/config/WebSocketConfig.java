@@ -1,7 +1,7 @@
 package com.linkwechat.config;
 
-import com.linkwechat.websocket.WeMaterialWebSocketServer;
 import com.linkwechat.interceptor.WebSocketHandshakeInterceptor;
+import com.linkwechat.websocket.WeMaterialWebSocketServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -31,8 +31,13 @@ public class WebSocketConfig implements WebSocketConfigurer {
         return new ServerEndpointExporter();
     }
 
+    /**
+     * 注册WebSocket处理类
+     *
+     * @param registry
+     */
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(weMaterialWebSocketServer,"/info").addInterceptors(webSocketHandshakeInterceptor).setAllowedOrigins("*");
+        registry.addHandler(weMaterialWebSocketServer, "/material/websocket/action/addView").addInterceptors(webSocketHandshakeInterceptor).setAllowedOrigins("*");
     }
 }
