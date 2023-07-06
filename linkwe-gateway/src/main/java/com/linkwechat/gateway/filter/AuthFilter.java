@@ -1,5 +1,6 @@
 package com.linkwechat.gateway.filter;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.constant.CacheConstants;
 import com.linkwechat.common.constant.HttpStatus;
@@ -70,11 +71,11 @@ public class AuthFilter implements GlobalFilter, Ordered {
             //之后改为策略模式
             String loginType = JwtUtils.getValue(claims, SecurityConstants.LOGIN_TYPE);
             addHeader(mutate, SecurityConstants.LOGIN_TYPE, loginType);
-            if(StringUtils.isNotEmpty(loginType) && loginType.equals("LinkWeChatWXAPI")){
+            if (StringUtils.isNotEmpty(loginType) && loginType.equals("LinkWeChatWXAPI")) {
                 WxLoginUser wxLoginUser = getWxLoginUser(token);
                 // 设置用户信息到请求
                 addHeader(mutate, SecurityConstants.LOGIN_USER, JSONObject.toJSONString(wxLoginUser));
-            }else {
+            } else {
                 String corpId = JwtUtils.getCorpId(claims);
                 String corpName = JwtUtils.getCorpName(claims);
                 String userId = JwtUtils.getUserId(claims);
@@ -92,7 +93,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
                 addHeader(mutate, SecurityConstants.USER_KEY, userKey);
                 addHeader(mutate, SecurityConstants.LOGIN_USER, JSONObject.toJSONString(loginUser));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
 
@@ -115,7 +116,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     }
 
     private Mono<Void> unauthorizedResponse(ServerWebExchange exchange, String msg) {
-        log.error("[鉴权异常处理]请求路径:{},msg:{}", exchange.getRequest().getPath(),msg);
+        log.error("[鉴权异常处理]请求路径:{},msg:{}", exchange.getRequest().getPath(), msg);
         return ServletUtils.webFluxResponseWriter(exchange.getResponse(), msg, HttpStatus.UNAUTHORIZED);
     }
 
@@ -131,10 +132,21 @@ public class AuthFilter implements GlobalFilter, Ordered {
      */
     private String getToken(ServerHttpRequest request) {
         String token = request.getHeaders().getFirst(TokenConstants.AUTHENTICATION);
+
+        if (StrUtil.isBlank(token)) {
+            //判断是否是websocket链接
+            String connection = request.getHeaders().getFirst("Connection");
+            String upgrade = request.getHeaders().getFirst("Upgrade");
+            if ("Upgrade".equals(connection) && "websocket".equals(upgrade)) {
+                token = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
+            }
+        }
+
         // 如果前端设置了令牌前缀，则裁剪掉前缀
         if (StringUtils.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
             token = token.replaceFirst(TokenConstants.PREFIX, StringUtils.EMPTY);
         }
+
         return token;
     }
 
@@ -158,6 +170,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
         return null;
     }
+
     public WxLoginUser getWxLoginUser(String token) {
         try {
             if (StringUtils.isNotEmpty(token)) {
