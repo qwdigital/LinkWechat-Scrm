@@ -113,15 +113,18 @@
                 left join we_customer wc on wccm.from_id = wc.external_userid  and (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 0
                 <where>
                         <if test="fromId != null and fromId != ''">
-                                and (wccm.from_id = #{fromId} or wccm.to_list = #{fromId})
+                                and (wccm.from_id = #{fromId} or find_in_set(#{fromId},wccm.to_list))
                         </if>
 
                         <if test="toList != null and toList != ''">
-                                and (wccm.to_list = #{toList} or wccm.from_id = #{toList})
+                                and (find_in_set(#{fromId},wccm.to_list) or wccm.from_id = #{toList})
                         </if>
                         <choose>
                             <when test="roomId != null and roomId != ''">
                                  and wccm.room_id = #{roomId}
+                            </when>
+                            <when test="fullSearch == 1">
+
                             </when>
                             <otherwise>
                                 and wccm.room_id = ''

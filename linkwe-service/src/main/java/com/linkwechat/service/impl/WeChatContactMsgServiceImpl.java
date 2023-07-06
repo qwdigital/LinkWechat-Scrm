@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.WeChatContactMsg;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
+import com.linkwechat.domain.msgaudit.query.WeChatContactMsgQuery;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.mapper.WeChatContactMsgMapper;
 import com.linkwechat.service.IWeChatContactMsgService;
@@ -103,7 +104,7 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
     }
 
     @Override
-    public List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsg weChatContactMsg) {
-        return this.baseMapper.selectFullSearchChatList(weChatContactMsg);
+    public List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsgQuery query) {
+        return this.baseMapper.selectFullSearchChatList(query);
     }
 }
