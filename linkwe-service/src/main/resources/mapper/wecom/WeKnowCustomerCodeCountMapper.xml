@@ -80,7 +80,7 @@
 
 --             count(DISTINCT if(wcc.new_or_old=0,id,null)) as newCustomerScanNumber,
              count(DISTINCT id) as newCustomerScanNumber,
-            (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid
+            (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid and wc.track_state !=5 and wc.del_flag=0
                  )  as addCustomerNumber,
 
             count(DISTINCT if(wcc.new_or_old=1,id,null)) as oldCustomerScanNumber,
