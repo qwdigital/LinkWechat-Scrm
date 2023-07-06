@@ -86,7 +86,7 @@ public class WeMaterialWebSocketServer implements WebSocketHandler {
      */
     private void businessHandler(WeMaterialMobileAddViewRequest request) {
 
-        log.info("业务数据：{}", JSONObject.toJSONString(request));
+        log.info("链接断开，业务数据：{}", JSONObject.toJSONString(request));
 
         //如果其中有一个为null，该条数据不处理
         if (StringUtils.isEmpty(request.getSendUserId()) || StringUtils.isEmpty(request.getOpenid())
