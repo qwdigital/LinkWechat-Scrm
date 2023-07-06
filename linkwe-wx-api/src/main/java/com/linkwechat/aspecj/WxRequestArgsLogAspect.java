@@ -1,6 +1,7 @@
 package com.linkwechat.aspecj;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.WeCorpAccount;
@@ -25,8 +26,8 @@ import javax.servlet.ServletResponse;
  *
  * @author ruoyi
  */
-//@Aspect
-//@Component
+@Aspect
+@Component
 public class WxRequestArgsLogAspect {
     private static final Logger log = LoggerFactory.getLogger(WxRequestArgsLogAspect.class);
 
@@ -59,7 +60,7 @@ public class WxRequestArgsLogAspect {
         // 设置方法名称
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = joinPoint.getSignature().getName();
-        log.info("wecom 接口请求入参className:{},methodName:{},params:{}", className, methodName, JSONObject.toJSONString(arguments));
+        log.info("wecom 接口请求入参className:{},methodName:{},params:{}", className, methodName, JSONObject.toJSONString(arguments, SerializerFeature.IgnoreNonFieldGetter));
         for (Object arg : args) {
             if (arg instanceof WxBaseQuery) {
                 WxBaseQuery query = (WxBaseQuery) arg;
