@@ -180,3 +180,38 @@ ALTER TABLE `we_material` MODIFY `height` int DEFAULT NULL COMMENT '图片高（
 ALTER TABLE `we_material` MODIFY `media_type` varchar(255) DEFAULT NULL COMMENT '资源类型(0图片，1语音，2视频，3文件，4文本，5海报，9图文，10链接，11小程序，12文章)';
 ```
 ---
+
+### ● 日期：2023-07-06 线索公海相关sql
+```sql
+DROP TABLE IF EXISTS `we_leads_template_settings`;
+CREATE TABLE `we_leads_template_settings` (
+  `id` bigint(20) NOT NULL COMMENT '主键',
+  `table_entry_name` varchar(255) NOT NULL COMMENT '表项名称',
+  `table_entry_id` varchar(255) NOT NULL COMMENT '表项Id',
+  `table_entry_attr` tinyint(4) DEFAULT NULL COMMENT '表项属性 0 填写项 1 下拉项',
+  `data_attr` tinyint(4) DEFAULT NULL COMMENT '数据属性 0 文本 1 数字 2 日期',
+  `datetime_type` tinyint(4) DEFAULT NULL COMMENT '日期类型 0 日期 1 日期+时间',
+  `max_input_len` int(11) DEFAULT NULL COMMENT '输入长度',
+  `can_edit` tinyint(4) DEFAULT NULL COMMENT '是否可被编辑 0 可被编辑 1 不可被编辑',
+  `is_required` tinyint(1) DEFAULT NULL COMMENT '是否必填项 0选填 1必填',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `create_by` varchar(255) NOT NULL COMMENT '创建人',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+  `create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索模版配置表';
+
+CREATE TABLE `we_leads_template_table_entry_content` (
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`leads_template_settings_id` bigint(20) NOT NULL COMMENT '模版表id',
+`content` varchar(255) NOT NULL COMMENT '内容',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '修改时间',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索模版配置表项内容表';
+
+```
