@@ -1,162 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeChatContactMsgMapper">
 
-        <resultMap type="com.linkwechat.domain.WeChatContactMsg" id="WeChatContactMsgResult">
-                <result property="id" column="id"/>
-                <result property="msgId" column="msg_id"/>
-                <result property="fromId" column="from_id"/>
-                <result property="toList" column="to_list"/>
-                <result property="roomId" column="room_id"/>
-                <result property="action" column="action"/>
-                <result property="msgType" column="msg_type"/>
-                <result property="msgTime" column="msg_time"/>
-                <result property="contact" column="contact"/>
-                <result property="createBy" column="create_by"/>
-                <result property="createTime" column="create_time"/>
-                <result property="updateBy" column="update_by"/>
-                <result property="updateTime" column="update_time"/>
-        </resultMap>
+    <resultMap type="com.linkwechat.domain.WeChatContactMsg" id="WeChatContactMsgResult">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="fromId" column="from_id"/>
+        <result property="toList" column="to_list"/>
+        <result property="roomId" column="room_id"/>
+        <result property="action" column="action"/>
+        <result property="msgType" column="msg_type"/>
+        <result property="msgTime" column="msg_time"/>
+        <result property="contact" column="contact"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
 
-        <sql id="chatSql">select msg_id, from_id, to_list as receiver, `action`, msg_time, msg_type,is_external, contact from we_chat_contact_msg</sql>
+    <sql id="chatSql">select msg_id,
+                             from_id,
+                             to_list as receiver,
+                             `action`,
+                             msg_time,
+                             msg_type,
+                             is_external,
+                             contact
+                      from we_chat_contact_msg</sql>
 
-        <select id="selectExternalChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
-        select t.*, wc.customer_name as name, wc.avatar from
-            (
-                select receiver, msg_time,`action`, msg_type, contact
-                from
-                    (
-                        select to_list as receiver, `action` , msg_time, msg_type, contact
-                        from we_chat_contact_msg
-                        where from_id = #{fromId} and is_external = 0 and room_id = ''
-                            union
-                        select from_id as receiver, `action`, msg_time, msg_type, contact
-                        from we_chat_contact_msg
-                        where FIND_IN_SET(#{fromId}, to_list) and is_external = 0 and room_id = ''
-                        order by msg_time desc
-                ) as msg group by receiver order by msg.msg_time desc) t
-        inner join we_customer wc on t.receiver = wc.external_userid  and wc.add_user_id=#{fromId}
+    <select id="selectExternalChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
+        select t.*, wc.customer_name as name, wc.avatar
+        from (
+                 select receiver, msg_time, `action`, msg_type, contact
+                 from (
+                          select to_list as receiver, `action`, msg_time, msg_type, contact
+                          from we_chat_contact_msg
+                          where from_id = #{fromId}
+                            and is_external = 0
+                            and room_id = ''
+                          union
+                          select from_id as receiver, `action`, msg_time, msg_type, contact
+                          from we_chat_contact_msg
+                          where FIND_IN_SET(#{fromId}, to_list)
+                            and is_external = 0
+                            and room_id = ''
+                          order by msg_time desc
+                      ) as msg
+                 group by receiver
+                 order by msg.msg_time desc) t
+                 inner join we_customer wc on t.receiver = wc.external_userid and wc.add_user_id = #{fromId}
     </select>
 
-        <select id="selectAloneChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
-                select t.*, ifnull(wu.user_name, wc.customer_name) as name, ifnull(wu.avatar, wc.avatar) as avatar
-                from (select receiver, msg_time, `action`, msg_type, contact
-                from (select to_list as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
-                where from_id = #{fromId}
-                and room_id = ''
-                <if test="contact != null and contact != ''">
-                        and contact like concat('%', #{contact}, '%')
-                </if>
-                union
-                select from_id as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
-                where FIND_IN_SET(#{fromId}, to_list)
-                and room_id = ''
-                <if test="contact != null and contact != ''">
-                        and contact like concat('%', #{contact}, '%')
-                </if>
-                order by msg_time desc) as msg
-                group by receiver order by msg.msg_time desc) as t
-                left join sys_user wu on t.receiver = wu.we_user_id and (case when LOCATE('wm', t.receiver) or LOCATE('wo', t.receiver) then 0 else 1 end) = 1
-                left join we_customer wc on t.receiver = wc.external_userid  and (case when LOCATE('wm', t.receiver) or LOCATE('wo', t.receiver) then 0 else 1 end) = 0;
-        </select>
-
-
-        <select id="selectInternalChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
-        select t.*, wu.user_name as name , wu.avatar from
-            (
-                select receiver, msg_time,`action`, msg_type, contact
-                from
-                    (
-                        select to_list as receiver, `action` , msg_time, msg_type, contact
-                        from we_chat_contact_msg
-                        where from_id = #{fromId} and is_external = 1 and room_id = ''
-                            union
-                        select from_id as receiver, `action`, msg_time, msg_type, contact
-                        from we_chat_contact_msg
-                        where FIND_IN_SET(#{fromId}, to_list) and is_external = 1 and room_id = ''
-                        order by msg_time desc
-                ) as msg group by receiver order by msg.msg_time desc) t
-        inner join sys_user wu on t.receiver = wu.we_user_id
+    <select id="selectAloneChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
+        select t.*, ifnull(wu.user_name, wc.customer_name) as name, ifnull(wu.avatar, wc.avatar) as avatar
+        from (select receiver, msg_time, `action`, msg_type, contact
+        from (select to_list as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
+        where from_id = #{fromId}
+        and room_id = ''
+        <if test="contact != null and contact != ''">
+            and contact like concat('%', #{contact}, '%')
+        </if>
+        union
+        select from_id as receiver, `action`, msg_time, msg_type, contact from we_chat_contact_msg
+        where FIND_IN_SET(#{fromId}, to_list)
+        and room_id = ''
+        <if test="contact != null and contact != ''">
+            and contact like concat('%', #{contact}, '%')
+        </if>
+        order by msg_time desc) as msg
+        group by receiver order by msg.msg_time desc) as t
+        left join sys_user wu on t.receiver = wu.we_user_id and (case when LOCATE('wm', t.receiver) or LOCATE('wo',
+        t.receiver) then 0 else 1 end) = 1
+        left join we_customer wc on t.receiver = wc.external_userid and (case when LOCATE('wm', t.receiver) or
+        LOCATE('wo', t.receiver) then 0 else 1 end) = 0;
     </select>
 
-        <select id="selectGroupChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
-        select t.*, wg.group_name as name , '' as avatar from
-            (
-                select receiver, msg_time,`action`, msg_type, contact
-                from
-                    (
-                        select room_id as receiver, `action` , msg_time, msg_type, contact
-                        from we_chat_contact_msg
-                        where from_id = #{fromId} and room_id &lt;&gt; ''
-                            union
-                        select room_id as receiver, `action`, msg_time, msg_type, contact
-                        from we_chat_contact_msg
-                        where FIND_IN_SET(#{fromId}, to_list) and room_id  &lt;&gt; ''
-                        order by msg_time desc
-                ) as msg group by receiver order by msg.msg_time desc) t
-        inner join we_group wg on t.receiver = wg.chat_id
+
+    <select id="selectInternalChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
+        select t.*, wu.user_name as name, wu.avatar
+        from (
+                 select receiver, msg_time, `action`, msg_type, contact
+                 from (
+                          select to_list as receiver, `action`, msg_time, msg_type, contact
+                          from we_chat_contact_msg
+                          where from_id = #{fromId}
+                            and is_external = 1
+                            and room_id = ''
+                          union
+                          select from_id as receiver, `action`, msg_time, msg_type, contact
+                          from we_chat_contact_msg
+                          where FIND_IN_SET(#{fromId}, to_list)
+                            and is_external = 1
+                            and room_id = ''
+                          order by msg_time desc
+                      ) as msg
+                 group by receiver
+                 order by msg.msg_time desc) t
+                 inner join sys_user wu on t.receiver = wu.we_user_id
     </select>
 
-        <select id="selectFullSearchChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
-                select * from
-                (
-                select distinct
-                from_id,
-                msg_time,
-                `action`,
-                msg_type,
-                contact,
-                ifnull(wc.customer_name,wu.user_name) as name,
-                ifnull(wc.avatar,wu.avatar) as avatar
-                from we_chat_contact_msg wccm
-                left join sys_user wu on wccm.from_id = wu.we_user_id and  (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 1
-                left join we_customer wc on wccm.from_id = wc.external_userid  and (case when LOCATE('wm', wccm.from_id) or LOCATE('wo', wccm.from_id) then 0 else 1 end) = 0
-                <where>
-                        <if test="fromId != null and fromId != ''">
-                                and (wccm.from_id = #{fromId} or find_in_set(#{fromId},wccm.to_list))
-                        </if>
+    <select id="selectGroupChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
+        select t.*, wg.group_name as name, '' as avatar
+        from (
+                 select receiver, msg_time, `action`, msg_type, contact
+                 from (
+                          select room_id as receiver, `action`, msg_time, msg_type, contact
+                          from we_chat_contact_msg
+                          where from_id = #{fromId}
+                            and room_id &lt;&gt; ''
+                          union
+                          select room_id as receiver, `action`, msg_time, msg_type, contact
+                          from we_chat_contact_msg
+                          where FIND_IN_SET(#{fromId}, to_list)
+                            and room_id &lt;&gt; ''
+                          order by msg_time desc
+                      ) as msg
+                 group by receiver
+                 order by msg.msg_time desc) t
+                 inner join we_group wg on t.receiver = wg.chat_id
+    </select>
 
-                        <if test="toList != null and toList != ''">
-                                and (find_in_set(#{fromId},wccm.to_list) or wccm.from_id = #{toList})
-                        </if>
-                        <choose>
-                            <when test="roomId != null and roomId != ''">
-                                 and wccm.room_id = #{roomId}
-                            </when>
-                            <when test="fullSearch == 1">
+    <select id="selectFullSearchChatList" resultType="com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo">
+        select
+        from_id,
+        msg_time,
+        room_id,
+        `action`,
+        msg_type,
+        contact,
+        from we_chat_contact_msg wccm
+        <where>
+            <if test="fromId != null and fromId != ''">
+                and (wccm.from_id = #{fromId} or find_in_set(#{fromId},wccm.to_list))
+            </if>
 
-                            </when>
-                            <otherwise>
-                                and wccm.room_id = ''
-                            </otherwise>
-                        </choose>
+            <if test="toList != null and toList != ''">
+                and (find_in_set(#{fromId},wccm.to_list) or wccm.from_id = #{toList})
+            </if>
+            <choose>
+                <when test="roomId != null and roomId != ''">
+                    and wccm.room_id = #{roomId}
+                </when>
+                <when test="fullSearch == 1">
 
-                        <if test="msgType != null and msgType != ''">
-                            and find_in_set(wccm.msg_type,#{msgType})
-                        </if>
+                </when>
+                <otherwise>
+                    and wccm.room_id = ''
+                </otherwise>
+            </choose>
 
-                        <if test="action != null and action != ''">
-                                and wccm.action = #{action}
-                        </if>
-                        <if test="contact != null and contact != ''">
-                                and wccm.contact like concat('%', #{contact}, '%')
-                        </if>
-                         <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                             AND wccm.msg_time &gt;= date_format(#{beginTime},'%Y-%m-%d')
-                         </if>
+            <if test="msgType != null and msgType != ''">
+                and find_in_set(wccm.msg_type,#{msgType})
+            </if>
 
-                         <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                             AND wccm.msg_time &lt;= date_format(#{endTime},'%Y-%m-%d')
-                         </if>
+            <if test="action != null and action != ''">
+                and wccm.action = #{action}
+            </if>
+            <if test="contact != null and contact != ''">
+                and wccm.contact like concat('%', #{contact}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND wccm.msg_time &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
 
-                        <if test="userName != null and userName != ''">
-                                and wu.user_name like concat('%', #{userName}, '%')
-                        </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND wccm.msg_time &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
 
-                        <if test="customerName != null and customerName != ''">
-                                and wc.customer_name like concat('%', #{customerName}, '%')
-                        </if>
-                </where>
-                ) t
-        </select>
+            <if test="userName != null and userName != ''">
+                and exists(select 1 from sys_user su where su.user_name like concat('%', #{userName}, '%') and wccm.from_id = su.we_user_id)
+            </if>
+
+            <if test="customerName != null and customerName != ''">
+                and (exists(select 1 from we_group_member wgm where wgm.name like concat('%', #{customerName}, '%') and
+                wccm.from_id = wgm.user_id and wgm.type = 2)
+                or exists(select 1 from we_customer wc where wc.customer_name like concat('%', #{customerName}, '%') and
+                wccm.from_id = wc.external_userid ))
+            </if>
+        </where>
+    </select>
 </mapper>

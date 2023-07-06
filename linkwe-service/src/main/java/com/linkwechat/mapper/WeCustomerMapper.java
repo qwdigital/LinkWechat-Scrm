@@ -196,5 +196,10 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      */
     List<String> findWeCustomerListEuIds(@Param("weCustomerList") WeCustomersQuery weCustomersQuery);
 
+    /**
+     * 通过eid查询客户简单信息
+     * @param externalUserIds
+     */
+    List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
 
 }

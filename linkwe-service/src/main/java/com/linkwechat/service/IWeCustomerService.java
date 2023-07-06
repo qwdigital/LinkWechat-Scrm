@@ -10,10 +10,7 @@ import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
-import com.linkwechat.domain.customer.vo.WeCustomerAddUserVo;
-import com.linkwechat.domain.customer.vo.WeCustomerDetailInfoVo;
-import com.linkwechat.domain.customer.vo.WeCustomerPortraitVo;
-import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.customer.vo.*;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 
 import java.util.List;
@@ -275,7 +272,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      */
     List<WeCustomersVo> findWeCustomersForCommonAssembly( WeGroupMessageExecuteUsertipVo executeUserOrGroup );
 
-
-
-
+    /**
+     * 通过eid查询客户简单信息
+     * @param externalUserIds
+     */
+    List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
 }
