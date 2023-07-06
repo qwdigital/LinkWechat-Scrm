@@ -38,8 +38,7 @@
         inner join sys_user su on wccsm.from_id = su.we_user_id and su.del_flag = 0
         <where>
             <if test="scopeType != null and scopeType == 1">
---                 and wccsm.from_id = #{auditScopeId}
-                   and su.we_user_id=#{auditScopeId}
+                and wccsm.from_id = #{auditScopeId}
             </if>
             <if test="scopeType != null and scopeType == 2">
                 and (su.dept_id = #{auditScopeId} OR su.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE FIND_IN_SET

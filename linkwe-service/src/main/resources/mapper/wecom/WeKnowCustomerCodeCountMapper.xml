@@ -13,13 +13,13 @@
             (
                 SELECT
 
-                    count(DISTINCT if(to_days(wcc.create_time) = to_days(now()) and wcc.new_or_old=0,id,null)) as tdNewCustomerScanNumber,
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(now()) and wcc.new_or_old=0,unionid,null)) as tdNewCustomerScanNumber,
 
-                    count(DISTINCT if(to_days(wcc.create_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wcc.new_or_old=0,id,null)) as ydNewCustomerScanNumber,
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wcc.new_or_old=0,unionid,null)) as ydNewCustomerScanNumber,
 
-                    count(DISTINCT if(to_days(wcc.create_time) = to_days(now()) and wcc.new_or_old=1,id,null)) as tdOldCustomerScanNumber,
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(now()) and wcc.new_or_old=1,unionid,null)) as tdOldCustomerScanNumber,
 
-                    count(DISTINCT if(to_days(wcc.create_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wcc.new_or_old=1,id,null)) as ydOldCustomerScanNumber,
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wcc.new_or_old=1,unionid,null)) as ydOldCustomerScanNumber,
 
 
                     IFNULL((SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid AND

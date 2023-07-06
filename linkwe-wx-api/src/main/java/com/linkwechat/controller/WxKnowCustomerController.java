@@ -2,6 +2,7 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
@@ -62,7 +63,9 @@ public class WxKnowCustomerController {
 
         if(weKnowCustomerCode != null){
             List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getUnionid, unionid));
+                    .eq(WeCustomer::getUnionid, unionid)
+                    .ne(WeCustomer::getTrackState,5)
+                    .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE));
             WeKnowCustomerCodeCount weKnowCustomerCodeCount = WeKnowCustomerCodeCount.builder()
                     .knowCustomerId(knowCustomerId)
                     .unionid(unionid)

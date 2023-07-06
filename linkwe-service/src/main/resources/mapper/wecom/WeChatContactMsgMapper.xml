@@ -138,7 +138,7 @@
                         <if test="contact != null and contact != ''">
                                 and wccm.contact like concat('%', #{contact}, '%')
                         </if>
-                        <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+                        <if test="beginTime != null and endTime != null">
                                 AND date_format(wccm.msg_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
                         </if>
 
