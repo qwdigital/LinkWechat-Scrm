@@ -124,6 +124,31 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
+    public List<WeCustomersVo>  findWeCustomerInfoFromWechat(List<String> externalUserids){
+        List<WeCustomersVo> weCustomersVos=new ArrayList<>();
+
+        externalUserids.stream().forEach(k->{
+
+            WeCustomersVo weCustomersVo=new WeCustomersVo();
+            weCustomersVo.setCustomerName("@客户");
+            weCustomersVo.setExternalUserid(k);
+            WeCustomerDetailVo weCustomerDetailVo = qwCustomerClient.getCustomerDetail(WeCustomerQuery.builder()
+                    .external_userid(k)
+                    .build()).getData();
+            if(WeConstans.WE_SUCCESS_CODE.equals(weCustomerDetailVo.getErrCode())&&
+                    weCustomerDetailVo != null && weCustomerDetailVo.getExternalContact() != null){
+                weCustomersVo.setCustomerName(weCustomerDetailVo.getExternalContact().getName());
+            }
+
+            weCustomersVos.add(weCustomersVo);
+
+        });
+
+
+        return weCustomersVos;
+    }
+
+    @Override
     public TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
 
         TableDataInfo<List<WeCustomersVo>> tableDataInfo = new TableDataInfo<>();

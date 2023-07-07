@@ -30,6 +30,14 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
     /**
+     * 获取客户相关信息，直接从企业微信获取
+     * @param externalUserids
+     * @return
+     */
+    List<WeCustomersVo>  findWeCustomerInfoFromWechat(List<String> externalUserids);
+
+
+    /**
      * 应用客户列表
      * @param weCustomersQuery
      * @param pageDomain
