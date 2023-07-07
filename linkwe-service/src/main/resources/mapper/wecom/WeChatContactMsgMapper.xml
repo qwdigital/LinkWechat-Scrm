@@ -159,10 +159,13 @@
             <if test="contact != null and contact != ''">
                 and t.contact like concat('%', #{contact}, '%')
             </if>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND t.msg_time &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
 
-           <if test="beginTime != null and endTime != null ">
-               AND  date_format(t.msg_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
-           </if>
+            <if test="endTime != null"><!-- 结束时间检索 -->
+                AND t.msg_time &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
 
             <if test="userName != null and userName != ''">
                 and exists(select 1 from sys_user su where su.user_name like concat('%', #{userName}, '%') and t.from_id = su.we_user_id)
