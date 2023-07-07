@@ -135,7 +135,7 @@
             </if>
 
             <if test="toList != null and toList != ''">
-                and (t.to_list = #{fromId} or t.from_id = #{toList})
+                and (t.to_list = #{toList} or t.from_id = #{toList})
             </if>
             <choose>
                 <when test="roomId != null and roomId != ''">

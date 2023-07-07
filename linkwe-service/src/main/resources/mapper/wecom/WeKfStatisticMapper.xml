@@ -4,7 +4,7 @@
 
     <select id="getSceneCustomerAnalysis" resultType="com.linkwechat.domain.kf.vo.WeKfSceneAnalysisVo">
         select
-            (select count(1) from we_kf_pool) visit_cnt,
+            (select count(1) from we_kf_event_msg where event_type = 'enter_session' ) visit_cnt,
             (select count(1) from we_kf_pool where session_start_time is not null ) as consult_cnt,
             (select count(1) from we_kf_pool where user_id is not null ) as reception_cnt,
             (select count(1) from we_kf_event_msg where event_type = 'enter_session' and  date_format(send_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_visit_cnt,
