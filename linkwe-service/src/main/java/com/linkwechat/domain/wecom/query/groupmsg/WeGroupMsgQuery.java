@@ -2,6 +2,7 @@ package com.linkwechat.domain.wecom.query.groupmsg;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -79,18 +80,18 @@ public class WeGroupMsgQuery extends WeBaseQuery {
 //                    text.setContent(messageTemplate.getContent());
 //                } else
 //
-                    if (ObjectUtil.equal(WeMsgTypeEnum.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
+                    if (ObjectUtil.equal(CategoryMediaType.IMAGE.getType(), messageTemplate.getMsgType())) {
                     this.image= new WeMsgTemplateQuery.Images.Image(messageTemplate.getMediaId(),
                             messageTemplate.getPicUrl());
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getMsgType())) {
+                } else if (ObjectUtil.equal(CategoryMediaType.LINK.getType(), messageTemplate.getMsgType())) {
                    this.link = new WeMsgTemplateQuery.Links.Link(messageTemplate.getTitle(),
                             messageTemplate.getPicUrl(), messageTemplate.getDescription(), messageTemplate.getLinkUrl());
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
+                } else if (ObjectUtil.equal(CategoryMediaType.APPLET.getType(), messageTemplate.getMsgType())) {
                     this.miniprogram= new WeMsgTemplateQuery.Miniprograms.Miniprogram(messageTemplate.getTitle(),
                             messageTemplate.getMediaId(), messageTemplate.getAppId(),
                             StringUtils.isNotEmpty(messageTemplate.getLinkUrl())
                                     ?messageTemplate.getLinkUrl(): messageTemplate.getFileUrl());
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.VIDEO.getMessageType(), messageTemplate.getMsgType())) { //视频
+                } else if (ObjectUtil.equal(CategoryMediaType.VIDEO.getType(), messageTemplate.getMsgType())) { //视频
 
                     String materialUrl= StringUtils.isNotEmpty(messageTemplate.getLinkUrl())
                             ?messageTemplate.getLinkUrl(): messageTemplate.getFileUrl();
@@ -102,7 +103,7 @@ public class WeGroupMsgQuery extends WeBaseQuery {
 
 
 
-                } else if (ObjectUtil.equal(WeMsgTypeEnum.FILE.getMessageType(), messageTemplate.getMsgType())) { //文件
+                } else if (ObjectUtil.equal(CategoryMediaType.FILE.getType(), messageTemplate.getMsgType())) { //文件
                     String materialUrl= StringUtils.isNotEmpty(messageTemplate.getLinkUrl())
                             ?messageTemplate.getLinkUrl(): messageTemplate.getFileUrl();
                     String linkUrl=domain+"/#/metrialDetail?mediaType="+WeMsgTypeEnum.FILE.getMessageType()+"&materialUrl="+materialUrl;
@@ -112,8 +113,8 @@ public class WeGroupMsgQuery extends WeBaseQuery {
                             linkUrl);
 
 
-                }else if(ObjectUtil.equal(WeMsgTypeEnum.NEWS.getMessageType(), messageTemplate.getMsgType())
-                        ||ObjectUtil.equal(WeMsgTypeEnum.POSTERS.getMessageType(), messageTemplate.getMsgType())){//文章或海报
+                }else if(ObjectUtil.equal(CategoryMediaType.IMAGE_TEXT.getType(), messageTemplate.getMsgType())
+                        ||ObjectUtil.equal(CategoryMediaType.POSTER.getType(), messageTemplate.getMsgType())){//文章或海报
                     String linkUrl=domain+ "/#/metrialDetail?materiaId=" + messageTemplate.getMaterialId();
 
                     this.link= new WeMsgTemplateQuery.Links.Link( messageTemplate.getTitle(),
