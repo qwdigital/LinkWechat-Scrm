@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 企业微信群(WeGroup)
@@ -192,6 +193,89 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
 
 
+
+
+    @Override
+    public List<WeGroup> findGroupInfoFromWechat(WeGroupChatListQuery chatListQuery){
+
+
+        List<WeGroup> weGroups = new LinkedList<>();
+
+        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
+
+        this.getGroupChatList(groupChatList,chatListQuery);
+
+        if (CollectionUtil.isNotEmpty(groupChatList)) {
+
+
+            List<WeGroup> weGroupList = this.list(new LambdaQueryWrapper<WeGroup>()
+                    .in(WeGroup::getChatId, groupChatList.stream().map(WeGroupChatListVo.GroupChat::getChatId).collect(Collectors.toList())));
+
+
+
+
+
+            groupChatList.stream().forEach(k->{
+
+                WeGroup weGroup = new WeGroup();
+                weGroup.setChatId(k.getChatId());
+                weGroup.setGroupName("@企微群");
+                weGroup.setDelFlag(Constants.COMMON_STATE);
+                weGroup.setCreateBy(SecurityUtils.getUserName());
+                weGroup.setCreateById(SecurityUtils.getUserId());
+                weGroup.setUpdateBy(SecurityUtils.getUserName());
+                weGroup.setUpdateById(SecurityUtils.getUserId());
+                weGroup.setCreateTime(new Date());
+                weGroup.setUpdateTime(new Date());
+
+
+                if(CollectionUtil.isNotEmpty(weGroupList)) {
+                    WeGroup oldWeGroup
+                            = weGroupList.stream().filter(item -> item.getChatId().equals(k.getChatId())).findFirst().get();
+                    if(null != oldWeGroup){
+                        weGroup.setGroupName(oldWeGroup.getGroupName());
+                    }
+
+                }
+
+
+                weGroups.add(weGroup);
+
+            });
+
+
+
+
+
+
+
+//            for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
+//                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
+//                WeGroupChatDetailVo weGroupChatDetailVo = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery).getData();
+//
+//                if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()) && weGroupChatDetailVo.getGroupChat() != null) {
+//                    WeGroupChatDetailVo.GroupChatDetail detail = weGroupChatDetailVo.getGroupChat();
+//                    WeGroup weGroup = new WeGroup();
+//                    weGroup.transformQwParams(detail);
+//                    weGroup.setStatus(groupChat.getStatus());
+//                    weGroup.setDelFlag(Constants.COMMON_STATE);
+//                    weGroup.setCreateBy(SecurityUtils.getUserName());
+//                    weGroup.setCreateById(SecurityUtils.getUserId());
+//                    weGroup.setUpdateBy(SecurityUtils.getUserName());
+//                    weGroup.setUpdateById(SecurityUtils.getUserId());
+//                    weGroup.setCreateTime(new Date());
+//                    weGroup.setUpdateTime(new Date());
+//                    weGroups.add(weGroup);
+//                }
+//
+//            }
+
+
+
+        }
+
+        return weGroups;
+    }
 
     @Override
     public void getGroupChatList( List<WeGroupChatListVo.GroupChat> groupChatList,WeGroupChatListQuery chatListQuery){
@@ -365,6 +449,14 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     weGroupMember.setChatId(chatId);
                     weGroupMember.transformQwParams(groupMember);
                     weGroupMember.setDelFlag(Constants.COMMON_STATE);
+
+                    //新增群成员发送通知任务
+                    JSONObject noticeObj = new JSONObject();
+                    noticeObj.put("chatId",chatId);
+                    noticeObj.put("userId",weGroupMember.getUserId());
+                    noticeObj.put("status",weGroupMember.getState());
+                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getGroupAddUserEx(),rabbitMQSettingConfig.getGroupAddUserCodeRk(),noticeObj.toJSONString());
+
                     //任务宝处理逻辑
                     iWeFissionService.handleGroupFissionRecord(weGroupMember.getState(),weGroupMember);
                     return weGroupMember;

@@ -21,8 +21,8 @@
         update_by_id
         ) values
         <foreach collection="weAllocateGroups" item="item" index="index" separator=",">
-            (#{item.id},#{item.chatId},#{item.newOwner},#{item.oldOwner},#{item.allocateTime},#{item.status},#{item.errMsg},
-             #{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById})
+            (#{item.id},#{item.chatId},#{item.newOwner},#{item.errMsg},#{item.status} ,#{item.oldOwner},#{item.allocateTime},
+            #{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById})
         </foreach>
         ON DUPLICATE KEY UPDATE
         chat_id=IFNULL(VALUES(chat_id),we_allocate_group.chat_id),
@@ -35,6 +35,8 @@
         update_by=IFNULL(VALUES(update_by),we_allocate_group.update_by),
         update_by_id=IFNULL(VALUES(update_by_id),we_allocate_group.update_by_id);
     </insert>
+
+
 
 
 
