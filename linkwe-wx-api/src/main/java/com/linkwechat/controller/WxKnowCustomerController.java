@@ -71,8 +71,9 @@ public class WxKnowCustomerController {
                     .build();
 
             if(CollectionUtil.isNotEmpty(weCustomers)){//老客新客
-                weKnowCustomerCodeCount.setNewOrOld(1);
+
                 if(weKnowCustomerCode.getIsAddAllUser().equals(new Integer(1))){//已添加任意成员
+                    weKnowCustomerCodeCount.setNewOrOld(1);
                     weKnowCustomerCode.setNewOrOldWeCustomer(false);
                 }else{//已添加指定成员
                     String weUserIds=null;String deptIds=null;String positions=null;
@@ -106,6 +107,7 @@ public class WxKnowCustomerController {
                         List<String> appointWeUserIds = listAjaxResult.getData();
                         if(CollectionUtil.isNotEmpty( weCustomers.stream().filter(weCustomer
                                 -> appointWeUserIds.contains(weCustomer.getAddUserId())).collect(Collectors.toList()))){
+                            weKnowCustomerCodeCount.setNewOrOld(1);
                             weKnowCustomerCode.setNewOrOldWeCustomer(false);
                         }
                     }
