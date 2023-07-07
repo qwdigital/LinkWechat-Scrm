@@ -194,6 +194,45 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
 
     @Override
+    public List<WeGroup> findGroupInfoFromWechat(WeGroupChatListQuery chatListQuery){
+
+
+        List<WeGroup> weGroups = new LinkedList<>();
+
+        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
+
+        this.getGroupChatList(groupChatList,chatListQuery);
+
+        if (CollectionUtil.isNotEmpty(groupChatList)) {
+            for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
+                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
+                WeGroupChatDetailVo weGroupChatDetailVo = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery).getData();
+
+                if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()) && weGroupChatDetailVo.getGroupChat() != null) {
+                    WeGroupChatDetailVo.GroupChatDetail detail = weGroupChatDetailVo.getGroupChat();
+                    WeGroup weGroup = new WeGroup();
+                    weGroup.transformQwParams(detail);
+                    weGroup.setStatus(groupChat.getStatus());
+                    weGroup.setDelFlag(Constants.COMMON_STATE);
+                    weGroup.setCreateBy(SecurityUtils.getUserName());
+                    weGroup.setCreateById(SecurityUtils.getUserId());
+                    weGroup.setUpdateBy(SecurityUtils.getUserName());
+                    weGroup.setUpdateById(SecurityUtils.getUserId());
+                    weGroup.setCreateTime(new Date());
+                    weGroup.setUpdateTime(new Date());
+                    weGroups.add(weGroup);
+                }
+
+            }
+
+
+
+        }
+
+        return weGroups;
+    }
+
+    @Override
     public void getGroupChatList( List<WeGroupChatListVo.GroupChat> groupChatList,WeGroupChatListQuery chatListQuery){
         WeGroupChatListVo groupChatListVo = qwCustomerClient.getGroupChatList(chatListQuery).getData();
         if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())

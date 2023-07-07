@@ -36,6 +36,13 @@ public class WeAllocateGroup extends BaseEntity
     /** 分配的群id */
     private String chatId;
 
+    /**群名称*/
+    private String chatName;
+    /**接替员工名称*/
+    private String takeoverName;
+    /**接替员工部门名称*/
+    private String takeoverDeptName;
+
     /** 新群主 */
     private String newOwner;
 
