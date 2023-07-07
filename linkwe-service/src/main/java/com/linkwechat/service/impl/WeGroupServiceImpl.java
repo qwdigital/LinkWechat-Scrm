@@ -449,6 +449,14 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     weGroupMember.setChatId(chatId);
                     weGroupMember.transformQwParams(groupMember);
                     weGroupMember.setDelFlag(Constants.COMMON_STATE);
+
+                    //新增群成员发送通知任务
+                    JSONObject noticeObj = new JSONObject();
+                    noticeObj.put("chatId",chatId);
+                    noticeObj.put("userId",weGroupMember.getUserId());
+                    noticeObj.put("status",weGroupMember.getState());
+                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getGroupAddUserEx(),rabbitMQSettingConfig.getGroupAddUserCodeRk(),noticeObj.toJSONString());
+
                     //任务宝处理逻辑
                     iWeFissionService.handleGroupFissionRecord(weGroupMember.getState(),weGroupMember);
                     return weGroupMember;
