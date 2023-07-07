@@ -4,6 +4,6 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import lombok.Data;
 
 @Data
-public class WeGroupMsgVo extends WeResultVo {
+public class WeGroupMsgTplVo extends WeResultVo {
     private String template_id;
 }

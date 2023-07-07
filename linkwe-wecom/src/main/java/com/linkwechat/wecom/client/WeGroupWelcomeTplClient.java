@@ -7,7 +7,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Retry;
 import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
@@ -26,7 +26,7 @@ public interface WeGroupWelcomeTplClient {
      * @return
      */
     @Request(url = "/externalcontact/group_welcome_template/add", type = "POST")
-    WeGroupMsgVo  addWeGroupMsg(@JSONBody WeGroupMsgQuery query);
+    WeGroupMsgTplVo addWeGroupMsg(@JSONBody WeGroupMsgQuery query);
 
 
     /**

@@ -202,12 +202,13 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
     }
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createWaitAllocateCustomerAndGroup(String[] weUserIds) {
+    public void createWaitAllocateCustomerAndGroup(List<String> weUserIds) {
         List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
         List<WeAllocateGroup> weAllocateGroups=new ArrayList<>();
-        Arrays.asList(weUserIds).forEach(weUserId->{
+        weUserIds.forEach(weUserId->{
             //客户分配
             List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                     .delFlag(Constants.COMMON_STATE)

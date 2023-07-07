@@ -3,18 +3,15 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeMsgTlp;
 import com.linkwechat.domain.material.entity.WeMaterial;
-import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msgtlp.dto.WeMsgTlpDto;
 import com.linkwechat.domain.msgtlp.entity.WeTlpMaterial;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpAddQuery;
@@ -22,7 +19,7 @@ import com.linkwechat.domain.msgtlp.query.WeMsgTlpQuery;
 import com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo;
 import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeMsgTlpMapper;
@@ -30,7 +27,6 @@ import com.linkwechat.mapper.WeTlpMaterialMapper;
 import com.linkwechat.service.IWeMsgTlpAttachmentsService;
 import com.linkwechat.service.IWeMsgTlpService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +34,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 欢迎语模板表(WeMsgTlp)
@@ -131,18 +126,18 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
 
 
         }else{//新增
-            WeGroupMsgVo weGroupMsgVo = qwCustomerClient.addWeGroupMsg(
+            WeGroupMsgTplVo weGroupMsgTplVo = qwCustomerClient.addWeGroupMsg(
                     weGroupMsgQuery
             ).getData();
 
-            if(null != weGroupMsgVo){
-                if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weGroupMsgVo.getErrCode())){
-                    throw new WeComException(weGroupMsgVo.getErrMsg());
+            if(null != weGroupMsgTplVo){
+                if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weGroupMsgTplVo.getErrCode())){
+                    throw new WeComException(weGroupMsgTplVo.getErrMsg());
                 }
 
-                if(StringUtils.isNotEmpty(weGroupMsgVo
+                if(StringUtils.isNotEmpty(weGroupMsgTplVo
                         .getTemplate_id())){
-                    weMsgTlp.setTemplateId(weGroupMsgVo.getTemplate_id());
+                    weMsgTlp.setTemplateId(weGroupMsgTplVo.getTemplate_id());
                     this.updateById(weMsgTlp);
                 }
             }
