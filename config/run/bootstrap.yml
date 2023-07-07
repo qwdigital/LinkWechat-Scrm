@@ -1,5 +1,8 @@
 spring:
-  profiles: local
+  config:
+    activate:
+      on-profile: local
+  # profiles: local
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
@@ -26,7 +29,10 @@ spring:
         server-addr: ${spring.cloud.nacos.config.server-addr}
 ---
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
+  # profiles: dev
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true
@@ -53,7 +59,10 @@ spring:
         server-addr: ${spring.cloud.nacos.config.server-addr}
 ---
 spring:
-  profiles: prod
+  config:
+    activate:
+      on-profile: prod
+  # profiles: prod
   main:
     allow-bean-definition-overriding: true
     allow-circular-references: true

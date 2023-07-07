@@ -25,7 +25,7 @@ public class WeLeadsTemplateTableEntryContent {
     /**
      * id
      */
-    @TableField(value = "id")
+    @TableId(value = "id")
     private Long id;
 
     /**

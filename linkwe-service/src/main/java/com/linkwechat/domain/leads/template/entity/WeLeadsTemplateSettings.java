@@ -13,16 +13,16 @@ import lombok.*;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName(value = "we_sea_leads_template_settings")
+@TableName(value = "we_leads_template_settings")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeSeaLeadsTemplateSettings extends BaseEntity {
+public class WeLeadsTemplateSettings extends BaseEntity {
 
     /**
      * id
      */
-    @TableField(value = "id")
+    @TableId(value = "id")
     private Long id;
 
     /**
@@ -73,7 +73,7 @@ public class WeSeaLeadsTemplateSettings extends BaseEntity {
      * @see com.linkwechat.common.enums.leads.template.RequiredEnum
      */
     @TableField(value = "is_required")
-    private Integer isRequired;
+    private Integer required;
 
     /**
      * 用于排序

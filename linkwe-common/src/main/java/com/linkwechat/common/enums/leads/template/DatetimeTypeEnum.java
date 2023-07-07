@@ -17,12 +17,12 @@ public enum DatetimeTypeEnum {
     /**
      * 日期
      */
-    DATE("日期", 0, "yyyy/MM/dd"),
+    DATE("日期", 0, "yyyy-MM-dd"),
 
     /**
      * 日期+时间
      */
-    DATETIME("日期+时间", 1, "yyyy/MM/dd HH:mm:ss");
+    DATETIME("日期+时间", 1, "yyyy-MM-dd HH:mm:ss");
 
     private final Integer code;
 

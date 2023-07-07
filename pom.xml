@@ -68,6 +68,7 @@
         <qiniu.version>7.2.7</qiniu.version>
         <wechatpay-httpclient.version>0.4.9</wechatpay-httpclient.version>
         <combiner.version>2.6.3</combiner.version>
+        <orika.version>1.5.2</orika.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -497,11 +498,16 @@
                 <version>${wechatpay-httpclient.version}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>com.freewayso</groupId>
                 <artifactId>image-combiner</artifactId>
                 <version>${combiner.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ma.glasnost.orika</groupId>
+                <artifactId>orika-core</artifactId>
+                <version>${orika.version}</version>
             </dependency>
 
         </dependencies>
