@@ -982,6 +982,40 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
         return messageTemplates;
     }
 
+
+    @Override
+    public List<WeMessageTemplate> msgTplToMediaIdByCategoryMediaType(List<WeMessageTemplate> messageTemplates){
+        Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
+            if (CategoryMediaType.IMAGE.getType().toString().equals(messageTemplate.getMsgType())) {
+                WeMediaVo weMedia = this.uploadTemporaryMaterial(messageTemplate.getPicUrl()
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getPicUrl()));
+                messageTemplate.setMediaId(weMedia.getMediaId());
+            } else if (CategoryMediaType.APPLET.getType().toString().equals( messageTemplate.getMsgType())) {
+                WeMediaVo weMedia = this.uploadTemporaryMaterial(messageTemplate.getPicUrl()
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getPicUrl()));
+                messageTemplate.setMediaId(weMedia.getMediaId());
+            }
+//            else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
+////                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+////                        , MessageType.IMAGE.getMessageType()
+////                        , FileUtil.getName(messageTemplate.getMediaId()));
+////                messageTemplate.setMediaId(weMedia.getMediaId());
+//            } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
+////                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
+////                        , MessageType.IMAGE.getMessageType()
+////                        , FileUtil.getName(messageTemplate.getMediaId()));
+////                messageTemplate.setMediaId(weMedia.getMediaId());
+//            }
+        });
+        return messageTemplates;
+
+
+    }
+
+
+
     @Override
     public List<WeMaterial> getWeMaterialListByTalkId(Long talkId) {
         return this.baseMapper.getWeMaterialListByTalkId(talkId);

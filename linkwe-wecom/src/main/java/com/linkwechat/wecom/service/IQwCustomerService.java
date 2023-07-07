@@ -1,8 +1,8 @@
 package com.linkwechat.wecom.service;
 
 
+
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
@@ -15,6 +15,7 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
@@ -33,6 +34,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -309,4 +311,31 @@ public interface IQwCustomerService {
      * @return
      */
     WeResultVo editCorpTag(WeUpdateCorpTagQuery query);
+
+
+
+
+    /**
+     * 添加入群欢迎语素材
+     * @param query
+     * @return
+     */
+    WeGroupMsgVo addWeGroupMsg(WeGroupMsgQuery query);
+
+
+    /**
+     * 编辑入群欢迎语素材
+     * @param query
+     * @return
+     */
+    WeResultVo updateWeGroupMsg(WeGroupMsgQuery query);
+
+
+
+    /**
+     * 编辑入群欢迎语素材
+     * @param query
+     * @return
+     */
+    WeResultVo delWeGroupMsg(WeGroupMsgQuery query);
 }

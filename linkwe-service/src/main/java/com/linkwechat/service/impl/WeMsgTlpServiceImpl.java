@@ -3,18 +3,27 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeMsgTlp;
 import com.linkwechat.domain.material.entity.WeMaterial;
+import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msgtlp.dto.WeMsgTlpDto;
 import com.linkwechat.domain.msgtlp.entity.WeTlpMaterial;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpAddQuery;
 import com.linkwechat.domain.msgtlp.query.WeMsgTlpQuery;
 import com.linkwechat.domain.msgtlp.vo.WeMsgTlpVo;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
+import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeMsgTlpMapper;
 import com.linkwechat.mapper.WeTlpMaterialMapper;
@@ -54,6 +63,16 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
     private WeTlpMaterialMapper weTlpMaterialMapper;
 
 
+    @Resource
+    private QwCustomerClient qwCustomerClient;
+
+    @Resource
+    private LinkWeChatConfig linkWeChatConfig;
+
+    @Resource
+    private  WeMaterialServiceImpl iWeMaterialService;
+
+
     @Transactional(rollbackFor = {WeComException.class, Exception.class})
     @Override
     public void addOrUpdate(WeMsgTlpDto weMsgTlpDto) {
@@ -81,6 +100,57 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
             weTlpMaterial.setTlpId(id);
             weTlpMaterialMapper.insert(weTlpMaterial);
         });
+
+
+        if(new Integer(3).equals(weMsgTlpDto.getTplType())){ //群欢迎语同步企业微信
+                 this.synchGroupWelcomMsg(weMsgTlpDto,weMsgTlp.getId());
+        }
+    }
+
+    @Override
+    public void synchGroupWelcomMsg(WeMsgTlpDto weMsgTlpDto,Long tlpId) {
+
+        WeMsgTlp weMsgTlp = this.getById(tlpId);
+        WeGroupMsgQuery weGroupMsgQuery=new WeGroupMsgQuery(
+                linkWeChatConfig.getH5Domain(),weMsgTlpDto.getTemplateInfo(),
+                iWeMaterialService.msgTplToMediaIdByCategoryMediaType(weMsgTlpDto.getAttachmentList())
+        );
+//        weGroupMsgQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(), weMsgTlpDto.getAttachmentList());
+
+
+
+        if(null != weMsgTlp && StringUtils.isNotEmpty(weMsgTlp.getTemplateId())){
+            weGroupMsgQuery.setTemplate_id(weMsgTlp.getTemplateId());
+            WeResultVo weResultVo = qwCustomerClient.updateWeGroupMsg(weGroupMsgQuery).getData();
+
+            if(null != weResultVo){
+                if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weResultVo.getErrCode())){
+                    throw new WeComException(weResultVo.getErrMsg());
+                }
+            }
+
+
+        }else{//新增
+            WeGroupMsgVo weGroupMsgVo = qwCustomerClient.addWeGroupMsg(
+                    weGroupMsgQuery
+            ).getData();
+
+            if(null != weGroupMsgVo){
+                if(!new Integer(WeConstans.WE_SUCCESS_CODE).equals(weGroupMsgVo.getErrCode())){
+                    throw new WeComException(weGroupMsgVo.getErrMsg());
+                }
+
+                if(StringUtils.isNotEmpty(weGroupMsgVo
+                        .getTemplate_id())){
+                    weMsgTlp.setTemplateId(weGroupMsgVo.getTemplate_id());
+                    this.updateById(weMsgTlp);
+                }
+            }
+
+        }
+
+
+
     }
 
     @Transactional(rollbackFor = {WeComException.class, Exception.class})
@@ -112,9 +182,39 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
         if (CollectionUtil.isEmpty(ids)) {
             throw new WeComException("模板ID不能为空");
         }
-        update(Wrappers.lambdaUpdate(WeMsgTlp.class).set(WeMsgTlp::getDelFlag, 1).in(WeMsgTlp::getId, ids));
-        log.info("模板删除ids:{}", ids.toString());
-        weTlpMaterialMapper.delete(new LambdaQueryWrapper<WeTlpMaterial>().in(WeTlpMaterial::getTlpId, ids));
+
+        List<WeMsgTlp> weMsgTlps = list(new LambdaQueryWrapper<WeMsgTlp>()
+                .in(WeMsgTlp::getId, ids));
+
+        if(CollectionUtil.isNotEmpty(weMsgTlps)){
+
+            removeByIds(ids);
+
+
+            log.info("模板删除ids:{}", ids.toString());
+            weTlpMaterialMapper.delete(new LambdaQueryWrapper<WeTlpMaterial>().in(WeTlpMaterial::getTlpId,
+                    ids));
+
+
+            weMsgTlps.stream().forEach(k->{
+
+                if(k.getTplType().equals(3)){
+                    qwCustomerClient.delWeGroupMsg(WeGroupMsgQuery.builder()
+                            .template_id(k.getTemplateId())
+                            .build());
+                }
+
+
+            });
+
+
+        }
+
+
+
+//        update(Wrappers.lambdaUpdate(WeMsgTlp.class).set(WeMsgTlp::getDelFlag, 1).in(WeMsgTlp::getId, ids));
+//        log.info("模板删除ids:{}", ids.toString());
+//        weTlpMaterialMapper.delete(new LambdaQueryWrapper<WeTlpMaterial>().in(WeTlpMaterial::getTlpId, ids));
     }
 
     @Override
