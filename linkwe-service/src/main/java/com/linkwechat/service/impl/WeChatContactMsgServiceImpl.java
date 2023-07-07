@@ -134,7 +134,7 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
                 List<WeCustomerSimpleInfoVo> customerSimpleInfos = weCustomerService.getCustomerSimpleInfo(customerIds);
 
                 if(CollectionUtil.isNotEmpty(customerSimpleInfos)){
-                    userIdAndNameMap = customerSimpleInfos.stream().collect(Collectors.toMap(WeCustomerSimpleInfoVo::getExternalUserid, item -> item.getCustomerName() + "_" + item.getAvatar(), (key1, key2) -> key2));
+                    customerAndNameMap = customerSimpleInfos.stream().collect(Collectors.toMap(WeCustomerSimpleInfoVo::getExternalUserid, item -> item.getCustomerName() + "_" + item.getAvatar(), (key1, key2) -> key2));
                 }
 
                 List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>()
@@ -188,5 +188,19 @@ public class WeChatContactMsgServiceImpl extends ServiceImpl<WeChatContactMsgMap
             }
         }
         return weChatContactMsgVos;
+    }
+
+    public static void main(String[] args) {
+
+        String nameAndAvatar = "云店铺客服_https://wework.qpic.cn/wwpic/25283_-c3xxJaeSpa87Ji_1680091204/0";
+        if(StringUtils.isNotEmpty(nameAndAvatar)){
+            String[] nameAndAvatarSplit = nameAndAvatar.split("_");
+            if(StringUtils.isNotEmpty(nameAndAvatarSplit[0])){
+                System.out.println(nameAndAvatarSplit[0]);
+            }
+            if(StringUtils.isNotEmpty(nameAndAvatarSplit[1])){
+                System.out.println(nameAndAvatarSplit[1]);
+            }
+        }
     }
 }
