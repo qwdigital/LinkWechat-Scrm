@@ -368,7 +368,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //发送消息
             QwAppMsgBody qwAppMsgBody = new QwAppMsgBody();
             qwAppMsgBody.setCorpId(SecurityUtils.getCorpId());
-            qwAppMsgBody.setCorpUserIds(Lists.newArrayList(data.getOpenUserid()));
+            qwAppMsgBody.setCorpUserIds(Lists.newArrayList(data.getWeUserId()));
 
             //发送模板
             WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
