@@ -67,31 +67,36 @@ public class WeGroupMsgQuery extends WeBaseQuery {
     public WeGroupMsgQuery(String domain, String templateInfo,List<WeMessageTemplate> messageTemplates){
         this.text = new WeMsgTemplateQuery.Text();
         text.setContent(templateInfo);
-        setAttachmentsList(domain,messageTemplates,templateInfo);
+        setAttachmentsList(domain,messageTemplates);
 
     }
 
 
-    public void setAttachmentsList(String domain, List<WeMessageTemplate> messageTemplates, String templateInfo) {
+    public void setAttachmentsList(String domain, List<WeMessageTemplate> messageTemplates) {
         if (CollectionUtil.isNotEmpty(messageTemplates)) {
             messageTemplates.forEach(messageTemplate -> {
 //                if (ObjectUtil.equal(WeMsgTypeEnum.TEXT.getMessageType(), messageTemplate.getMsgType())) {
 //                    this.text = new WeMsgTemplateQuery.Text();
 //                    text.setContent(messageTemplate.getContent());
 //                } else
+
 //
-                    if (ObjectUtil.equal(CategoryMediaType.IMAGE.getType(), messageTemplate.getMsgType())) {
+                if (CategoryMediaType.IMAGE.getType().toString().equals(messageTemplate.getMsgType())) {
                     this.image= new WeMsgTemplateQuery.Images.Image(messageTemplate.getMediaId(),
                             messageTemplate.getPicUrl());
-                } else if (ObjectUtil.equal(CategoryMediaType.LINK.getType(), messageTemplate.getMsgType())) {
-                   this.link = new WeMsgTemplateQuery.Links.Link(messageTemplate.getTitle(),
+                } else if (CategoryMediaType.LINK.getType().toString().equals(messageTemplate.getMsgType())) {
+                    this.link = new WeMsgTemplateQuery.Links.Link(messageTemplate.getTitle(),
                             messageTemplate.getPicUrl(), messageTemplate.getDescription(), messageTemplate.getLinkUrl());
-                } else if (ObjectUtil.equal(CategoryMediaType.APPLET.getType(), messageTemplate.getMsgType())) {
+
+                } else if (CategoryMediaType.APPLET.getType().toString().equals( messageTemplate.getMsgType())) {//小程序
+
+
                     this.miniprogram= new WeMsgTemplateQuery.Miniprograms.Miniprogram(messageTemplate.getTitle(),
                             messageTemplate.getMediaId(), messageTemplate.getAppId(),
                             StringUtils.isNotEmpty(messageTemplate.getLinkUrl())
                                     ?messageTemplate.getLinkUrl(): messageTemplate.getFileUrl());
-                } else if (ObjectUtil.equal(CategoryMediaType.VIDEO.getType(), messageTemplate.getMsgType())) { //视频
+
+                } else if (CategoryMediaType.VIDEO.getType().toString().equals(messageTemplate.getMsgType())) { //视频
 
                     String materialUrl= StringUtils.isNotEmpty(messageTemplate.getLinkUrl())
                             ?messageTemplate.getLinkUrl(): messageTemplate.getFileUrl();
@@ -103,7 +108,7 @@ public class WeGroupMsgQuery extends WeBaseQuery {
 
 
 
-                } else if (ObjectUtil.equal(CategoryMediaType.FILE.getType(), messageTemplate.getMsgType())) { //文件
+                } else if (CategoryMediaType.FILE.getType().toString().equals(messageTemplate.getMsgType())) { //文件
                     String materialUrl= StringUtils.isNotEmpty(messageTemplate.getLinkUrl())
                             ?messageTemplate.getLinkUrl(): messageTemplate.getFileUrl();
                     String linkUrl=domain+"/#/metrialDetail?mediaType="+WeMsgTypeEnum.FILE.getMessageType()+"&materialUrl="+materialUrl;
@@ -113,9 +118,9 @@ public class WeGroupMsgQuery extends WeBaseQuery {
                             linkUrl);
 
 
-                }else if(ObjectUtil.equal(CategoryMediaType.IMAGE_TEXT.getType(), messageTemplate.getMsgType())
-                        ||ObjectUtil.equal(CategoryMediaType.POSTER.getType(), messageTemplate.getMsgType())){//文章或海报
-                    String linkUrl=domain+ "/#/metrialDetail?materiaId=" + messageTemplate.getMaterialId();
+                }else if(CategoryMediaType.IMAGE_TEXT.getType().toString().equals(messageTemplate.getMsgType())
+                        ||CategoryMediaType.POSTER.getType().toString().equals(messageTemplate.getMsgType())){//图文或海报
+                    String linkUrl=domain+ "/#/metrialDetail?materiaId=" + messageTemplate.getMediaId();
 
                     this.link= new WeMsgTemplateQuery.Links.Link( messageTemplate.getTitle(),
                             messageTemplate.getPicUrl(), messageTemplate.getDescription(),
@@ -125,7 +130,6 @@ public class WeGroupMsgQuery extends WeBaseQuery {
             });
         }
     }
-
 
 
 

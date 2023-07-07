@@ -69,6 +69,9 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
 
+    @Resource
+    private  WeMaterialServiceImpl iWeMaterialService;
+
 
     @Transactional(rollbackFor = {WeComException.class, Exception.class})
     @Override
@@ -109,7 +112,8 @@ public class WeMsgTlpServiceImpl extends ServiceImpl<WeMsgTlpMapper, WeMsgTlp> i
 
         WeMsgTlp weMsgTlp = this.getById(tlpId);
         WeGroupMsgQuery weGroupMsgQuery=new WeGroupMsgQuery(
-                linkWeChatConfig.getH5Domain(),weMsgTlpDto.getTemplateInfo(), weMsgTlpDto.getAttachmentList()
+                linkWeChatConfig.getH5Domain(),weMsgTlpDto.getTemplateInfo(),
+                iWeMaterialService.msgTplToMediaIdByCategoryMediaType(weMsgTlpDto.getAttachmentList())
         );
 //        weGroupMsgQuery.setAttachmentsList(linkWeChatConfig.getH5Domain(), weMsgTlpDto.getAttachmentList());
 
