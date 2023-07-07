@@ -64,7 +64,6 @@ public class WxKnowCustomerController {
         if(weKnowCustomerCode != null){
             List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
                     .eq(WeCustomer::getUnionid, unionid)
-                    .ne(WeCustomer::getTrackState,5)
                     .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE));
             WeKnowCustomerCodeCount weKnowCustomerCodeCount = WeKnowCustomerCodeCount.builder()
                     .knowCustomerId(knowCustomerId)
