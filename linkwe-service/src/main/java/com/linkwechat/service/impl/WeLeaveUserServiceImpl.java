@@ -127,22 +127,32 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
     @Transactional(rollbackFor = Exception.class)
     public void allocateLeaveUserAboutData(WeLeaveUserInfoAllocate weLeaveUserInfoAllocate) {
 
-        //获取所需分配的客户
-        List<WeAllocateCustomer> weAllocateCustomers = iWeAllocateCustomerService.list(new LambdaQueryWrapper<WeAllocateCustomer>()
-                .isNull(WeAllocateCustomer::getTakeoverUserid)
+
+        //所需分配客户
+         List<WeAllocateCustomer> weAllocateCustomers = iWeAllocateCustomerService.list(new LambdaQueryWrapper<WeAllocateCustomer>()
                 .eq(WeAllocateCustomer::getHandoverUserid, weLeaveUserInfoAllocate.getHandoverUserid()));
 
-        if(CollectionUtil.isNotEmpty(weAllocateCustomers)){
-            weAllocateCustomers.stream().forEach(k->{
-                k.setTakeoverUserid(weLeaveUserInfoAllocate.getTakeoverUserid());
-                k.setAllocateTime(new Date());
-            });
 
-            if(iWeAllocateCustomerService.updateBatchById(
-                    weAllocateCustomers)){
+        List<SysUser> sysUsers =
+                qwSysUserClient.findAllSysUser(weLeaveUserInfoAllocate.getTakeoverUserid()
+                        , null, null).getData();
+
+        if(CollectionUtil.isNotEmpty(weAllocateCustomers)) {
+                    weAllocateCustomers.stream().forEach(k -> {
 
 
-                AjaxResult<WeTransferCustomerVo> weTransferCustomerVo = qwCustomerClient.resignedTransferCustomer(
+                        if(CollectionUtil.isNotEmpty(sysUsers)){
+                            SysUser sysUser = sysUsers.stream().findFirst().get();
+                            k.setTakeoverName(sysUser.getUserName());
+                            k.setTakeoverDeptName(sysUser.getDeptName());
+                        }
+
+                        k.setTakeoverUserid(weLeaveUserInfoAllocate.getTakeoverUserid());
+                        k.setAllocateTime(new Date());
+                    });
+
+
+             WeTransferCustomerVo transferCustomerVo = qwCustomerClient.resignedTransferCustomer(
                         WeTransferCustomerQuery.builder()
                                 .external_userid(
                                         weAllocateCustomers.stream().map(WeAllocateCustomer::getExternalUserid).collect(Collectors.toList())
@@ -150,29 +160,27 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                 .handover_userid(weLeaveUserInfoAllocate.getHandoverUserid())
                                 .takeover_userid(weLeaveUserInfoAllocate.getTakeoverUserid())
                                 .build()
-                );
+                ).getData();
 
+            if(null != transferCustomerVo && ! transferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                throw new WeComException( WeErrorCodeEnum.parseEnum(transferCustomerVo.getErrCode()).getErrorMsg());
 
-                if(null != weTransferCustomerVo){
-                    WeTransferCustomerVo weTransferCustomer = weTransferCustomerVo.getData();
-
-                    if(weTransferCustomer != null && !weTransferCustomer.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                        throw new WeComException( WeErrorCodeEnum.parseEnum(weTransferCustomer.getErrCode()).getErrorMsg());
-
-                    }
-
-                }
             }
+
+
 
         }
 
-
-        //获取所需分配的群
+//        获取所需分配的群
         List<WeAllocateGroup> weAllocateGroups = iWeAllocateGroupService.list(new LambdaQueryWrapper<WeAllocateGroup>()
-                        .isNull(WeAllocateGroup::getNewOwner)
                 .eq(WeAllocateGroup::getOldOwner, weLeaveUserInfoAllocate.getHandoverUserid()));
         if(CollectionUtil.isNotEmpty(weAllocateGroups)){
             weAllocateGroups.stream().forEach(k->{
+                if(CollectionUtil.isNotEmpty(sysUsers)){
+                    SysUser sysUser = sysUsers.stream().findFirst().get();
+                    k.setTakeoverName(sysUser.getUserName());
+                    k.setTakeoverDeptName(sysUser.getDeptName());
+                }
                k.setNewOwner(weLeaveUserInfoAllocate.getTakeoverUserid());
                k.setAllocateTime(new Date());
             });
@@ -205,82 +213,6 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void createWaitAllocateCustomerAndGroup(String[] weUserIds) {
-        List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
-        List<WeAllocateGroup> weAllocateGroups=new ArrayList<>();
-        Arrays.asList(weUserIds).forEach(weUserId->{
-            //客户分配
-            List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
-                    .delFlag(Constants.COMMON_STATE)
-                    .firstUserId(weUserId)
-                    .build(), null);
-
-            if(CollectionUtil.isNotEmpty(weCustomerList)){
-                weCustomerList.stream().forEach(k->{
-                    WeAllocateCustomer allocateCustomer = WeAllocateCustomer.builder()
-                            .allocateTime(new Date())
-                            .extentType(new Integer(0))
-                            .externalUserid(k.getExternalUserid())
-                            .handoverUserid(weUserId)
-                            .status(new Integer(1))
-                            .failReason("离职继承")
-                            .build();
-                    allocateCustomer.setCreateBy(SecurityUtils.getUserName());
-                    allocateCustomer.setCreateById(SecurityUtils.getUserId());
-                    allocateCustomer.setCreateTime(new Date());
-                    allocateCustomer.setUpdateBy(SecurityUtils.getUserName());
-                    allocateCustomer.setUpdateById(SecurityUtils.getUserId());
-                    allocateCustomer.setUpdateTime(new Date());
-                    allocateCustomers.add(allocateCustomer);
-                });
-
-
-
-
-            }
-
-
-            //群分配记录
-            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
-                    .eq(WeGroup::getOwner, weUserId));
-            if(CollectionUtil.isNotEmpty(weGroups)){
-                weGroups.stream().forEach(weGroup -> {
-
-                    WeAllocateGroup weAllocateGroup = WeAllocateGroup.builder()
-                            .chatId(weGroup.getChatId())
-                            .oldOwner(weUserId)
-                            .status(new Integer(1))
-                            .build();
-                    weAllocateGroup.setCreateBy(SecurityUtils.getUserName());
-                    weAllocateGroup.setCreateById(SecurityUtils.getUserId());
-                    weAllocateGroup.setCreateTime(new Date());
-                    weAllocateGroup.setUpdateBy(SecurityUtils.getUserName());
-                    weAllocateGroup.setUpdateById(SecurityUtils.getUserId());
-                    weAllocateGroup.setUpdateTime(new Date());
-                    weAllocateGroups.add(
-                            weAllocateGroup
-                    );
-                });
-
-
-            }
-
-        });
-
-        if(CollectionUtil.isNotEmpty(allocateCustomers)){
-            iWeAllocateCustomerService.saveOrUpdateBatch(allocateCustomers);
-        }
-
-
-        if(CollectionUtil.isNotEmpty(weAllocateGroups)){
-            iWeAllocateGroupService.saveOrUpdateBatch(weAllocateGroups);
-        }
-
-
-
-    }
 
     @Override
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_LEAVE_USER)

@@ -46,11 +46,7 @@ public interface IWeLeaveUserService extends IService<SysLeaveUser> {
     void allocateLeaveUserAboutData(WeLeaveUserInfoAllocate weLeaveUserInfoAllocate);
 
 
-    /**
-     * 构建等待分配的
-     * @param weUserIds
-     */
-    void createWaitAllocateCustomerAndGroup(String[] weUserIds);
+
 
 
     /**
