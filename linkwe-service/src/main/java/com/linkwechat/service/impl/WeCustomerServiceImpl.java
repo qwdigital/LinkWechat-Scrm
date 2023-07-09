@@ -138,10 +138,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 WeCustomersVo weCustomersVo = new WeCustomersVo();
                 weCustomersVo.setCustomerName("@微信客户");
                 if (CollectionUtil.isNotEmpty(weCustomers)) {
-                    WeCustomer weCustomer
-                            = weCustomers.stream().filter(item -> item.getExternalUserid().equals(k)).findFirst().get();
-                    if (null != weCustomer) {
-                        weCustomersVo.setCustomerName(weCustomer.getCustomerName());
+                    List<WeCustomer> weCustomerss
+                            = weCustomers.stream().filter(item -> item.getExternalUserid().equals(k)).collect(Collectors.toList());
+                    if (CollectionUtil.isNotEmpty(weCustomerss)) {
+
+                        weCustomersVo.setCustomerName( weCustomerss.stream().findFirst().get().getCustomerName());
                     }
                 }
 
