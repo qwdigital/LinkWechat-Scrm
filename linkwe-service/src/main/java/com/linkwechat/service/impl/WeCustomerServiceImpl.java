@@ -1117,11 +1117,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
-                if (CollectionUtil.isNotEmpty(tags)) {
-                    iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                            .eq(WeFlowerCustomerTagRel::getExternalUserid,externalContact.getExternalUserId())
-                            .eq(WeFlowerCustomerTagRel::getUserId,followUserEntity.getUserId()));
 
+                iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .eq(WeFlowerCustomerTagRel::getExternalUserid,externalContact.getExternalUserId())
+                        .eq(WeFlowerCustomerTagRel::getUserId,followUserEntity.getUserId()));
+
+                if (CollectionUtil.isNotEmpty(tags)) {
                     List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
                             .id(SnowFlakeUtil.nextId())
                             .externalUserid(externalContact.getExternalUserId())
@@ -1131,6 +1132,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+
+                    List<WeTag> addTag = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                            .eq(WeTag::getTagId, tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId).collect(Collectors.toList())));
+
+                    if (CollectionUtil.isNotEmpty(addTag)) {
+                        iWeCustomerTrajectoryService.createEditTrajectory(externalContact.getExternalUserId(),
+                                followUserEntity.getUserId(),
+                                TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType(),
+                                String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                        );
+                    }
                 }
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
