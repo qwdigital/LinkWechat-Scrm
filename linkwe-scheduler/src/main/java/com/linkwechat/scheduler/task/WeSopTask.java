@@ -34,8 +34,6 @@ public class WeSopTask {
     @Autowired
     private SopTaskService sopTaskService;
 
-    @Autowired
-    private IWeSopBaseService iWeSopBaseService;
 
     @XxlJob("builderXkSopPlan")
     public void builderXkSopPlan(String params){

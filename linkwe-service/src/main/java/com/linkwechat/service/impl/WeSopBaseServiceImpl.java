@@ -1093,19 +1093,43 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
                         if(CollectionUtil.isNotEmpty(targetAttachments)){
                             iWeSopExecuteTargetAttachmentsService.saveOrUpdateBatch(targetAttachments);
+
+                            Set<Long> sopExecuteTargetIds = weSopExecuteTargets.stream().map(WeSopExecuteTarget::getId).collect(Collectors.toSet());
+
+                            if(sopExecuteTargetIds.removeAll(
+                                    targetAttachments.stream().map(WeSopExecuteTargetAttachments::getExecuteTargetId).collect(Collectors.toSet()))){
+
+
+                                executeTargetService.removeByIds(
+                                        sopExecuteTargetIds
+                                );
+
+
+
+                            }
+
+                        }else{//为空,则删除当前所有不满足条件的执行目标
+                            executeTargetService.removeByIds(
+                                    weSopExecuteTargets.stream().map(WeSopExecuteTarget::getId).collect(Collectors.toSet())
+                            );
+
                         }
+
+
+
+                    }
                         //移除不存在任务的执行客户
-                        List<WeSopExecuteTargetAttachments> sopExecuteTargetAttachments = iWeSopExecuteTargetAttachmentsService.list(new LambdaQueryWrapper<WeSopExecuteTargetAttachments>()
-                                .in(WeSopExecuteTargetAttachments::getExecuteTargetId
-                                        , weSopExecuteTargets.stream().map(WeSopExecuteTarget::getId).collect(Collectors.toList())));
-                        if(CollectionUtil.isNotEmpty(sopExecuteTargetAttachments)){
-                            executeTargetService.remove(new LambdaQueryWrapper<WeSopExecuteTarget>()
-                                    .eq(WeSopExecuteTarget::getSopBaseId,weSopBase.getId())
-                                    .notIn(WeSopExecuteTarget::getId,sopExecuteTargetAttachments
-                                            .stream().map(WeSopExecuteTargetAttachments::getExecuteTargetId).collect(Collectors.toList())));
-                        }else{
-                            executeTargetService.removeByIds(weSopExecuteTargets.stream().map(WeSopExecuteTarget::getId).collect(Collectors.toList()));
-                        }
+//                        List<WeSopExecuteTargetAttachments> sopExecuteTargetAttachments = iWeSopExecuteTargetAttachmentsService.list(new LambdaQueryWrapper<WeSopExecuteTargetAttachments>()
+//                                .in(WeSopExecuteTargetAttachments::getExecuteTargetId
+//                                        , weSopExecuteTargets.stream().map(WeSopExecuteTarget::getId).collect(Collectors.toList())));
+//                        if(CollectionUtil.isNotEmpty(sopExecuteTargetAttachments)){
+//                            executeTargetService.remove(new LambdaQueryWrapper<WeSopExecuteTarget>()
+//                                    .eq(WeSopExecuteTarget::getSopBaseId,weSopBase.getId())
+//                                    .notIn(WeSopExecuteTarget::getId,sopExecuteTargetAttachments
+//                                            .stream().map(WeSopExecuteTargetAttachments::getExecuteTargetId).collect(Collectors.toList())));
+//                        }else{
+//                            executeTargetService.removeByIds(weSopExecuteTargets.stream().map(WeSopExecuteTarget::getId).collect(Collectors.toList()));
+//                        }
 
 
                     }
@@ -1117,7 +1141,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
-        }else{
+        else{
 
             //处理不满足当前条件的生效客群(针对客群sop编辑)
             executeTargetService.editSopExceptionEnd(weSopBase.getId(),
