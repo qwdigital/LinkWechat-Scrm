@@ -431,7 +431,7 @@ implements IWeSopExecuteTargetService {
                         = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
                 //构建客群sop执行计划
                 iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
-                        ,iWeSopBaseService.builderExecuteGroup((WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds),true);
+                        ,iWeSopBaseService.builderExecuteGroup(weSopBase,(WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds),true);
 
             });
         }

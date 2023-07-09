@@ -711,7 +711,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public Map<String, List<LinkGroupChatListVo>> builderExecuteGroup(WeSopExecuteConditVo executeCustomerOrGroup, Set<String> executeWeUserIds) {
+    public Map<String, List<LinkGroupChatListVo>> builderExecuteGroup(WeSopBase weSopBase,WeSopExecuteConditVo executeCustomerOrGroup, Set<String> executeWeUserIds) {
         Map<String,List<LinkGroupChatListVo>> weGroupMap=new HashMap<>();
 
 
@@ -747,10 +747,23 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         }
         List<LinkGroupChatListVo> weGroups =  iWeGroupService.getPageList(weGroupChatQuery);
         if(CollectionUtil.isNotEmpty(weGroups)){
+
+            if (weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XQPY.getSopKey())) {
+
+                weGroups =  weGroups.stream().filter(LinkGroupChatListVo ->
+                        DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopBase.getCreateTime())).getTime()
+                                <= DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, LinkGroupChatListVo.getAddTime())).getTime()
+                ).collect(Collectors.toList());
+
+            }
+
+
             weGroupMap.putAll(
                     weGroups.stream().collect(Collectors.groupingBy(LinkGroupChatListVo::getOwner))
             );
         }
+
+
 
         return weGroupMap;
     }

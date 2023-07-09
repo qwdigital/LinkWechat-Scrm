@@ -68,7 +68,7 @@ public class SopTaskServiceImpl implements SopTaskService {
                     }else if (weSopBase.getBaseType() == 2) { //客群sop
                         //构建客群sop执行计划
                         iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
-                                , iWeSopBaseService.builderExecuteGroup((WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), isCreateOrUpdate);
+                                , iWeSopBaseService.builderExecuteGroup(weSopBase,(WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), isCreateOrUpdate);
 
                     }
 
@@ -101,7 +101,7 @@ public class SopTaskServiceImpl implements SopTaskService {
                 }else if (weSopBase.getBaseType() == 2) { //客群sop
                     //构建客群sop执行计划
                     iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
-                            , iWeSopBaseService.builderExecuteGroup((WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), false);
+                            , iWeSopBaseService.builderExecuteGroup(weSopBase,(WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), false);
 
                 }
 

@@ -152,11 +152,12 @@ public interface IWeSopBaseService extends IService<WeSopBase> {
 
     /**
      * 构建生效群(key:执行成员weUserId;value:执行员工作为群主的群)
+     * @param weSopBase
      * @param executeCustomerOrGroup
      * @param executeWeUserIds
      * @return
      */
-    Map<String,List<LinkGroupChatListVo>> builderExecuteGroup(WeSopExecuteConditVo executeCustomerOrGroup,Set<String> executeWeUserIds);
+    Map<String,List<LinkGroupChatListVo>> builderExecuteGroup(WeSopBase weSopBase,WeSopExecuteConditVo executeCustomerOrGroup,Set<String> executeWeUserIds);
 
 
 
