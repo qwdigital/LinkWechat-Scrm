@@ -34,6 +34,9 @@ public class WeAllocateCustomer extends BaseEntity
     /** 接替成员的userid */
     private String takeoverUserid;
 
+    /**离职成员主键*/
+    private Long leaveUserId;
+
     /** 被分配的客户id */
     private String externalUserid;
 

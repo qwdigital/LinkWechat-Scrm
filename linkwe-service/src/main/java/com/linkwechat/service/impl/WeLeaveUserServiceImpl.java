@@ -255,6 +255,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
            infoList.stream()
                     .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid)).forEach((k,v)->{
 
+                         Long leaveUserId=SnowFlakeUtil.nextId();
 
                        List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomerInfoFromWechat(
                                v.stream().map(WeLeaveUserVo.Info::getExternal_userid).collect(Collectors.toList())
@@ -268,6 +269,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                              allocateCustomers.add(
                                      WeAllocateCustomer.builder()
                                              .id(SnowFlakeUtil.nextId())
+                                             .leaveUserId(leaveUserId)
                                              .customerName(vv.getCustomerName())
                                              .allocateTime(new Date())
                                              .extentType(new Integer(0))
@@ -301,6 +303,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                 allocateGroups.add(
                                         WeAllocateGroup.builder()
                                                 .id(SnowFlakeUtil.nextId())
+                                                .leaveUserId(leaveUserId)
                                                 .chatId(chat.getChatId())
                                                 .chatName(chat.getGroupName())
                                                 .oldOwner(k)
@@ -319,7 +322,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                qwSysUserClient.findAllSysUser(k, null, null).getData();
 
                        SysLeaveUser leaveUser = SysLeaveUser.builder()
-                               .id(SnowFlakeUtil.nextId())
+                               .id(leaveUserId)
                                .weUserId(k)
                                .allocateCustomerNum(v.size())
                                .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))

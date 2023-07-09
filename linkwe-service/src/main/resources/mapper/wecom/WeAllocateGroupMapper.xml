@@ -21,12 +21,13 @@
         update_by_id,
         chat_name,
         takeover_name,
-        takeover_dept_name
+        takeover_dept_name,
+        leave_user_id
         ) values
         <foreach collection="weAllocateGroups" item="item" index="index" separator=",">
             (#{item.id},#{item.chatId},#{item.newOwner},#{item.oldOwner},#{item.allocateTime},#{item.status},#{item.errMsg},
              #{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById},
-             #{item.chatName},#{item.takeoverName},#{item.takeoverDeptName})
+             #{item.chatName},#{item.takeoverName},#{item.takeoverDeptName},#{item.leaveUserId})
         </foreach>
         ON DUPLICATE KEY UPDATE
         chat_id=IFNULL(VALUES(chat_id),we_allocate_group.chat_id),

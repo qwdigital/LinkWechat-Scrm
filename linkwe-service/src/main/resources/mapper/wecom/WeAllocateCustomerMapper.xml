@@ -24,12 +24,13 @@
         update_by_id,
         customer_name,
         takeover_name,
-        takeover_dept_name
+        takeover_dept_name,
+        leave_user_id
         ) values
         <foreach collection="weAllocateCustomers" item="item" index="index" separator=",">
             (#{item.id},#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason}
             ,#{item.extentType},#{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById}
-            ,#{item.customerName},#{item.takeoverName},#{item.takeoverDeptName})
+            ,#{item.customerName},#{item.takeoverName},#{item.takeoverDeptName},#{item.leaveUserId})
         </foreach>
         ON DUPLICATE KEY UPDATE
             takeover_userid=IFNULL(VALUES(takeover_userid),we_allocate_customer.takeover_userid),

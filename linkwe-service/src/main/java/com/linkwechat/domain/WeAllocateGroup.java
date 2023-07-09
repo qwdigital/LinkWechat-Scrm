@@ -36,6 +36,9 @@ public class WeAllocateGroup extends BaseEntity
     /** 分配的群id */
     private String chatId;
 
+    /**离职成员主键*/
+    private Long leaveUserId;
+
     /**群名称*/
     private String chatName;
     /**接替员工名称*/
