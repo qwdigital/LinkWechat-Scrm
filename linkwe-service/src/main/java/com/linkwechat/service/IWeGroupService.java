@@ -67,6 +67,14 @@ public interface IWeGroupService extends IService<WeGroup> {
 
 
     /**
+     * 企业微信端获取群相关信息(信息不入库)
+     * @param chatListQuery
+     * @return
+     */
+    List<WeGroup> findGroupInfoFromWechat(WeGroupChatListQuery chatListQuery);
+
+
+    /**
      * 从企业微信端获取的群信息
      * @param groupChatList
      * @param chatListQuery
