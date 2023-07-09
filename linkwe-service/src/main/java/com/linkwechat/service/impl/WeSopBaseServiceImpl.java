@@ -997,8 +997,6 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                         .build();
 
 
-
-
                                 if(weSopPushTimeDto.getPushTimeType()==2) {//设置推送时间,周期推送，先计算出当前时间至周日下的推送,后续客每周日运行定时任务生成下一周的执行计划
                                     //获取当天是周几
 //                                    int currentWeek = DateUtil.dayOfWeek(new Date());
@@ -1040,6 +1038,23 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                     attachments.setPushEndTime(
                                             DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,weSopPushTimeDto.getPushTimePre()+" "+weSopPushTimeDto.getPushEndTime())
                                     );
+                                }else if(weSopPushTimeDto.getPushTimeType()==3){ //新群
+
+                                    if(weSopPushTimeDto.getPushTimePre().matches("^[0-9]*$")){
+                                        //推送日期
+                                        String pushDate = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(weSopExecuteTarget.getAddCustomerOrCreateGoupTime()
+                                                , new Integer(weSopPushTimeDto.getPushTimePre())));
+
+                                        attachments.setPushStartTime(
+                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushStartTime())
+                                        );
+
+                                        attachments.setPushEndTime(
+                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushEndTime())
+                                        );
+                                    }
+
+
                                 }
 
 

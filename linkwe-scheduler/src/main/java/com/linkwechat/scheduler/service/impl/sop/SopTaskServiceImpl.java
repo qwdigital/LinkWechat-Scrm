@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler.service.impl.sop;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -41,8 +42,7 @@ public class SopTaskServiceImpl implements SopTaskService {
     @Autowired
     private IWeStrategicCrowdService iWeStrategicCrowdService;
 
-//    @Autowired
-//    private IWeSopExecuteTargetAttachmentsService iWeSopExecuteTargetAttachmentsService;
+
 
     @Override
     public void createOrUpdateSop(WeSopBaseDto weSopBaseDto) {
@@ -74,11 +74,6 @@ public class SopTaskServiceImpl implements SopTaskService {
 
                 }
 
-                //企业微信方式的sop提醒迁移到定时任务下
-//                if (weSopBase.getSendType() == 1) {//企微信发送方式
-//                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
-//
-//                }
             }
 
         }
@@ -86,23 +81,30 @@ public class SopTaskServiceImpl implements SopTaskService {
 
     @Override
     public void builderXkPlan() {
+
         //获取执行中的新客sop
         List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
-                .eq(WeSopBase::getBusinessType, SopType.SOP_TYPE_XK.getSopKey())
+                .in(WeSopBase::getBusinessType, ListUtil.toList(SopType.SOP_TYPE_XK.getSopKey(),SopType.SOP_TYPE_XQPY.getSopKey()))
                 .eq(WeSopBase::getDelFlag, Constants.COMMON_STATE)
                 .eq(WeSopBase::getSopState, 1));
 
         if (CollectionUtil.isNotEmpty(weSopBases)) {
             weSopBases.stream().forEach(weSopBase -> {
+
                 Set<String> executeWeUserIds
                         = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
-                //构建客户sop执行计划
-                iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), false, true);
+                if (weSopBase.getBaseType() == 1) { //客户sop
 
-//                //构建完成以后企业微信发送方式手动触发任务
-//                if (weSopBase.getSendType() == 1) {//企微信发送方式
-//                    iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(String.valueOf(weSopBase.getId()));
-//                }
+                    //构建客户sop执行计划
+                    iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), false, true);
+
+                }else if (weSopBase.getBaseType() == 2) { //客群sop
+                    //构建客群sop执行计划
+                    iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
+                            , iWeSopBaseService.builderExecuteGroup((WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), false);
+
+                }
+
             });
 
         }

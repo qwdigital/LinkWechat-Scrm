@@ -43,10 +43,10 @@ public class WeSopTask {
         sopTaskService.builderXkPlan();
     }
 
-    //企业微信发送方式新客sop提醒发送
+
      @XxlJob("builderXkSopPlanTip")
      public void builderXkSopPlanTip(String params){
-
+         log.info("企业微信发送方式新客sop提醒发送>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
          iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(null);
 
 
