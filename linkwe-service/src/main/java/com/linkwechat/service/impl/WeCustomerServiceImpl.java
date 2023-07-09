@@ -1118,6 +1118,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
                 if (CollectionUtil.isNotEmpty(tags)) {
+                    iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                            .eq(WeFlowerCustomerTagRel::getExternalUserid,externalContact.getExternalUserId())
+                            .eq(WeFlowerCustomerTagRel::getUserId,followUserEntity.getUserId()));
+
                     List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
                             .id(SnowFlakeUtil.nextId())
                             .externalUserid(externalContact.getExternalUserId())
