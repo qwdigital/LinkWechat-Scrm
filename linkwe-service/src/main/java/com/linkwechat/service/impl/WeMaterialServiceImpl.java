@@ -32,6 +32,7 @@ import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
 import com.linkwechat.domain.material.ao.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.entity.WeTalkMaterial;
@@ -50,10 +51,7 @@ import com.linkwechat.handler.TextMaterialImportDataListener;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeTalkMaterialMapper;
 import com.linkwechat.mapper.WeTlpMaterialMapper;
-import com.linkwechat.service.IWeContentSendRecordService;
-import com.linkwechat.service.IWeContentViewRecordService;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeMaterialService;
+import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -101,6 +99,10 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
     @Resource
     private WeTlpMaterialMapper weTlpMaterialMapper;
+
+
+    @Resource
+    private IWeFormSurveyCatalogueService iWeFormSurveyCatalogueService;
 
 
 
@@ -707,6 +709,20 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
      */
     @Override
     public List<WeMaterialNewVo> selectListByLkQuery(LinkMediaQuery query) {
+        if(String.valueOf(CategoryMediaType.ZLBDURL.getType()).equals(query.getMediaType())){
+            WeFormSurveyCatalogueQuery catalogueQuery = WeFormSurveyCatalogueQuery.builder().surveyState(1).surveyName(query.getMaterialName())
+                    .build();
+
+            if(StringUtils.isNotEmpty(query.getCategoryId())){
+                catalogueQuery.setGroupId(
+                        Long.parseLong(query.getCategoryId())
+                        );
+            }
+
+            return iWeFormSurveyCatalogueService.findFormToWeMaterialNewVo(
+                    catalogueQuery
+            );
+        }
         return weMaterialMapper.selectListByLkQuery(query);
     }
 
