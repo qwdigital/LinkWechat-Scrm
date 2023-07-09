@@ -77,15 +77,6 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @Resource
     private IWeFormSurveySiteStasService weFormSurveySiteStasService;
 
-    /**
-     * 新增访问记录
-     */
-    @PostMapping("/add")
-    @ApiOperation(value = "新增访问记录", httpMethod = "POST")
-    public AjaxResult addStatistics(@RequestBody @Validated WeFormSurveyStatistics query) {
-        weFormSurveyStatisticsService.addStatistics(query);
-        return AjaxResult.success();
-    }
 
     /**
      * 查询基本表单统计信息
@@ -102,8 +93,8 @@ public class WeFormSurveyStatisticsController extends BaseController {
     @ApiOperation("折线图")
     public AjaxResult lineChart(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
         String type = query.getType();
-        Date startTime = null;
-        Date endTime = null;
+        DateTime startTime = null;
+        DateTime endTime = null;
         Map<String, Object> legendData = new HashMap<>();
         String[] legendArray = new String[]{"总访问量", "总访问用户", "有效收集量"};
         legendData.put("data", legendArray);
@@ -116,10 +107,10 @@ public class WeFormSurveyStatisticsController extends BaseController {
             } else if (type.equals("month")) {
                 startTime = DateUtil.offsetMonth(new Date(), -1);
             }
-            endTime = new Date();
+            endTime = DateUtil.date();
         } else {
-            startTime = query.getStartDate();
-            endTime = query.getEndDate();
+            startTime = DateUtil.date(query.getStartDate());
+            endTime =  DateUtil.date(query.getEndDate());
         }
         List<DateTime> timeList = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
         String[] xAxisArray = new String[timeList.size()];
@@ -129,16 +120,23 @@ public class WeFormSurveyStatisticsController extends BaseController {
         int[] collectionVolumeArray = new int[timeList.size()];
         String[] collectionRateArray = new String[timeList.size()];
         int[] averageTimeArray = new int[timeList.size()];
+
+        WeFormSurveyStatisticQuery surveyStatistics = new WeFormSurveyStatisticQuery();
+        surveyStatistics.setStartDate(startTime);
+        surveyStatistics.setEndDate(endTime);
+        surveyStatistics.setDataSource(query.getDataSource());
+        surveyStatistics.setBelongId(query.getBelongId());
+
+        List<WeFormSurveyStatistics> statisticsList = weFormSurveyStatisticsService.dataList(surveyStatistics);
+
         for (int i = 0; i < timeList.size(); i++) {
             xAxisArray[i] = timeList.get(i).toDateStr();
-            WeFormSurveyStatisticQuery surveyStatistics = new WeFormSurveyStatisticQuery();
-            surveyStatistics.setStartDate(DateUtil.parseDate(timeList.get(i).toDateStr()));
-            surveyStatistics.setEndDate(DateUtil.parseDate(timeList.get(i).toDateStr()));
-            surveyStatistics.setDataSource(query.getDataSource());
-            surveyStatistics.setBelongId(query.getBelongId());
 
-            List<WeFormSurveyStatistics> statistics = weFormSurveyStatisticsService.dataList(surveyStatistics);
-            if (CollectionUtil.isNotEmpty(statistics)) {
+            if (CollectionUtil.isNotEmpty(statisticsList)) {
+                int finalI = i;
+                List<WeFormSurveyStatistics> statistics = statisticsList.stream()
+                        .filter(statistic -> Objects.equals(DateUtil.formatDate(statistic.getCreateTime()), timeList.get(finalI).toDateStr()))
+                        .collect(Collectors.toList());
                 for (WeFormSurveyStatistics list : statistics) {
                     Integer totalVisits = list.getTotalVisits();
                     Integer totalUser = list.getTotalUser();

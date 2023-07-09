@@ -142,17 +142,19 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         List<WeFormSurveyAnswer> resultList = list(queryWrapper);
         if (CollectionUtil.isNotEmpty(resultList)) {
             List<String> unionIds = resultList.stream().map(WeFormSurveyAnswer::getUnionId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-            List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().select(WeCustomer::getId, WeCustomer::getUnionid).in(WeCustomer::getUnionid, unionIds).eq(WeCustomer::getDelFlag, 0));
+            if(CollectionUtil.isNotEmpty(unionIds)){
+                List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().select(WeCustomer::getId, WeCustomer::getUnionid).in(WeCustomer::getUnionid, unionIds).eq(WeCustomer::getDelFlag, 0));
 
-            Map<String, Long> unionIdAndCountMap = new HashMap<>(16);
-            if (CollectionUtil.isNotEmpty(weCustomers)) {
-                unionIdAndCountMap = weCustomers.stream().collect(Collectors.groupingBy(WeCustomer::getUnionid, Collectors.counting()));
-            }
-            for (WeFormSurveyAnswer list : resultList) {
-                if (unionIdAndCountMap.containsKey(list.getUnionId())) {
-                    list.setIsOfficeCustomer(true);
-                } else {
-                    list.setIsOfficeCustomer(false);
+                Map<String, Long> unionIdAndCountMap = new HashMap<>(16);
+                if (CollectionUtil.isNotEmpty(weCustomers)) {
+                    unionIdAndCountMap = weCustomers.stream().collect(Collectors.groupingBy(WeCustomer::getUnionid, Collectors.counting()));
+                }
+                for (WeFormSurveyAnswer list : resultList) {
+                    if (unionIdAndCountMap.containsKey(list.getUnionId())) {
+                        list.setIsOfficeCustomer(true);
+                    } else {
+                        list.setIsOfficeCustomer(false);
+                    }
                 }
             }
         }
