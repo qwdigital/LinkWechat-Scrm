@@ -330,6 +330,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                              allocateCustomers.add(
                                      WeAllocateCustomer.builder()
                                              .id(SnowFlakeUtil.nextId())
+                                             .customerName(vv.getCustomerName())
                                              .allocateTime(new Date())
                                              .extentType(new Integer(0))
                                              .externalUserid(vv.getExternalUserid())
