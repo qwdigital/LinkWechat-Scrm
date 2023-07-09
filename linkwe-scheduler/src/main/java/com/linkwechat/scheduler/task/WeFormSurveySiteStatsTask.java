@@ -1,7 +1,9 @@
 package com.linkwechat.scheduler.task;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SiteStasConstants;
@@ -55,7 +57,7 @@ public class WeFormSurveySiteStatsTask {
         String jobParam = XxlJobHelper.getJobParam();
         log.info("智能表单站点统计定时任务>>>>>>>>>>>>>>>>>>启动 params:{}", jobParam);
         List<WeFormSurveyCatalogue> weFormSurveyCatalogueList = weFormSurveyCatalogueService.getListIgnoreTenantId();
-        if (weFormSurveyCatalogueList != null && weFormSurveyCatalogueList.size() > 0) {
+        if (CollectionUtil.isNotEmpty(weFormSurveyCatalogueList)) {
             for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogueList) {
                 //每天的站点数据统计
                 dayByDaySiteStas(weFormSurveyCatalogue);
@@ -101,25 +103,15 @@ public class WeFormSurveySiteStatsTask {
         answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDelFlag, Constants.NORMAL_CODE);
         List<WeFormSurveyAnswer> list = weFormSurveyAnswerService.list(answerQueryWrapper);
 
-        //上次站点统计的数据
-        QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
-        WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
 
-        if (ObjectUtil.isNull(one)) {
-            //总的数据
-            one = new WeFormSurveySiteStas();
-            one.setBelongId(weFormSurveyCatalogue.getId());
-            one.setTotalVisits(pv);
-            one.setTotalUser(uv.intValue());
-            one.setCollectionVolume(list != null ? list.size() : 0);
-            boolean save = weFormSurveySiteStasService.save(one);
-        } else {
-            one.setTotalVisits(pv);
-            one.setTotalUser(uv.intValue());
-            one.setCollectionVolume(list != null ? list.size() : one.getCollectionVolume());
-            weFormSurveySiteStasService.updateById(one);
-        }
+        //总的数据
+        WeFormSurveySiteStas  siteStas = new WeFormSurveySiteStas();
+        siteStas.setBelongId(weFormSurveyCatalogue.getId());
+        siteStas.setTotalVisits(pv);
+        siteStas.setTotalUser(uv.intValue());
+        siteStas.setCollectionVolume(list != null ? list.size() : 0);
+
+        weFormSurveySiteStasService.saveOrUpdate(siteStas,new LambdaQueryWrapper<WeFormSurveySiteStas>().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId()));
     }
 
 
@@ -143,8 +135,8 @@ public class WeFormSurveySiteStatsTask {
             Long uv = redisTemplate.opsForSet().size(ipKey) - 1;
 
             //之前总的统计数据
-            QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
+            LambdaQueryWrapper<WeFormSurveySiteStas> queryWrapper = new LambdaQueryWrapper<WeFormSurveySiteStas>();
+            queryWrapper.eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId()).last("limit 1");
             WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
             if (ObjectUtil.isNull(one)) {
                 one = new WeFormSurveySiteStas();
