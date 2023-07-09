@@ -168,6 +168,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
             }
 
 
+                  iWeAllocateCustomerService.saveOrUpdateBatch(weAllocateCustomers);
 
         }
 
@@ -185,25 +186,21 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                k.setAllocateTime(new Date());
             });
 
-            if(iWeAllocateGroupService.updateBatchById(weAllocateGroups)){
 
-                AjaxResult<WeTransferCustomerVo> ajaxResult = qwCustomerClient.transferGroupChat(
-                        WeTransferGroupChatQuery.builder()
-                                .chat_id_list(weAllocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList()))
-                                .new_owner(weLeaveUserInfoAllocate.getTakeoverUserid())
-                                .build()
-                );
+            WeTransferCustomerVo weTransferCustomerVo = qwCustomerClient.transferGroupChat(
+                    WeTransferGroupChatQuery.builder()
+                            .chat_id_list(weAllocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList()))
+                            .new_owner(weLeaveUserInfoAllocate.getTakeoverUserid())
+                            .build()
+            ).getData();
 
-                if(ajaxResult != null){
-                    WeTransferCustomerVo weTransferCustomerVo = ajaxResult.getData();
-                                        if(weTransferCustomerVo != null && !weTransferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-
-                        throw new WeComException( WeErrorCodeEnum.parseEnum(weTransferCustomerVo.getErrCode()).getErrorMsg());
-                    }
-
-                }
+            if(weTransferCustomerVo != null &&  ! weTransferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                throw new WeComException( WeErrorCodeEnum.parseEnum(weTransferCustomerVo.getErrCode()).getErrorMsg());
 
             }
+
+            iWeAllocateGroupService.saveOrUpdateBatch(weAllocateGroups);
+
         }
 
         this.update(SysLeaveUser.builder()
