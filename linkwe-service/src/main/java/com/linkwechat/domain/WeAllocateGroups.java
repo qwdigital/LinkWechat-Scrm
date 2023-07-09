@@ -25,6 +25,9 @@ public class WeAllocateGroups extends BaseEntity {
     /**群名称*/
     private String groupName;
 
+    /**离职成员主键*/
+    private Long leaveUserId;
+
     /**群客户数量*/
     private Integer memberNum;
 
