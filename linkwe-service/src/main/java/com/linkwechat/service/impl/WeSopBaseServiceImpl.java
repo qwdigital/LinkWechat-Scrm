@@ -1039,20 +1039,25 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                             DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,weSopPushTimeDto.getPushTimePre()+" "+weSopPushTimeDto.getPushEndTime())
                                     );
                                 }else if(weSopPushTimeDto.getPushTimeType()==3){ //新群
+                                  if(weSopBase.getCreateTime()
+                                          .before(weSopExecuteTarget.getAddTime())){
 
-                                    if(weSopPushTimeDto.getPushTimePre().matches("^[0-9]*$")){
-                                        //推送日期
-                                        String pushDate = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(weSopExecuteTarget.getAddCustomerOrCreateGoupTime()
-                                                , new Integer(weSopPushTimeDto.getPushTimePre())));
+                                      if(weSopPushTimeDto.getPushTimePre().matches("^[0-9]*$")){
+                                          //推送日期
+                                          String pushDate = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(weSopExecuteTarget.getAddCustomerOrCreateGoupTime()
+                                                  , new Integer(weSopPushTimeDto.getPushTimePre())));
 
-                                        attachments.setPushStartTime(
-                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushStartTime())
-                                        );
+                                          attachments.setPushStartTime(
+                                                  DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushStartTime())
+                                          );
 
-                                        attachments.setPushEndTime(
-                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushEndTime())
-                                        );
-                                    }
+                                          attachments.setPushEndTime(
+                                                  DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushEndTime())
+                                          );
+                                      }
+
+                                  }
+
 
 
                                 }
