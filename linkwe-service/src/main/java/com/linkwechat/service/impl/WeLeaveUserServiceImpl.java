@@ -90,6 +90,9 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
     @Autowired
     QwSysUserClient qwSysUserClient;
 
+    @Autowired
+    private IWeCorpAccountService iWeCorpAccountService;
+
 
 
 
@@ -314,6 +317,9 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
             //待分配的离职客户
             List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
 
+
+            List<SysLeaveUser> sysLeaveUsers=new ArrayList<>();
+
            infoList.stream()
                     .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid)).forEach((k,v)->{
 
@@ -379,53 +385,71 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                   //离职员工入库(后期开放离职员工数据可拓展)
                   List<SysUser> sysUsers =
                                qwSysUserClient.findAllSysUser(k, null, null).getData();
-                       if(CollectionUtil.isNotEmpty(sysUsers)){
-                           SysUser sysUser = sysUsers.stream().findFirst().get();
-                                                sysUser.setIsUserLeave(1);
-                             SysLeaveUser leaveUser = SysLeaveUser.builder()
-                                     .id(SnowFlakeUtil.nextId())
-                                     .userName(sysUser.getUserName())
-                                     .deptNames(sysUser.getDeptName())
-                                     .weUserId(sysUser.getWeUserId())
-                                     .allocateCustomerNum(v.size())
-                                     .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
-                                     .allocateGroupNum(weGroups.size())
-                                     .isAllocate(0)
-                                     .delFlag(Constants.COMMON_STATE)
-                                     .build();
 
-                             leaveUser.setCreateBy(SecurityUtils.getUserName());
-                             leaveUser.setCreateTime(new Date());
-                             leaveUser.setCreateById(SecurityUtils.getUserId());
-                             leaveUser.setUpdateBy(SecurityUtils.getUserName());
-                             leaveUser.setUpdateTime(new Date());
-                             leaveUser.setUpdateById(SecurityUtils.getUserId());
+                       SysLeaveUser leaveUser = SysLeaveUser.builder()
+                               .id(SnowFlakeUtil.nextId())
+                               .weUserId(k)
+                               .allocateCustomerNum(v.size())
+                               .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
+                               .allocateGroupNum(weGroups.size())
+                               .isAllocate(0)
+                               .delFlag(Constants.COMMON_STATE)
+                               .build();
+
+                       leaveUser.setCreateBy(SecurityUtils.getUserName());
+                       leaveUser.setCreateTime(new Date());
+                       leaveUser.setCreateById(SecurityUtils.getUserId());
+                       leaveUser.setUpdateBy(SecurityUtils.getUserName());
+                       leaveUser.setUpdateTime(new Date());
+                       leaveUser.setUpdateById(SecurityUtils.getUserId());
+
+                 if(CollectionUtil.isNotEmpty(sysUsers)){
+                      SysUser sysUser = sysUsers.stream().findFirst().get();
+                     sysUser.setIsUserLeave(1);
+
+                     leaveUser.setUserName(sysUser.getUserName());
+                     leaveUser.setDeptNames(sysUser.getDeptName());
+                     leaveUser.setWeUserId(sysUser.getWeUserId());
+
+                       }else{
+                        leaveUser.setUserName("@企微成员");
+                         List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.list();
+
+                     if(CollectionUtil.isNotEmpty(weCorpAccounts)){
+                         leaveUser.setDeptNames( weCorpAccounts.stream().findFirst().get().getCompanyName());
+                     }
+                 }
 
 
-                             //构建离职员工数据
-                             this.baseMapper.batchAddOrUpdate(
-                                     ListUtil.toList(
-                                             leaveUser
-                                     )
-                             );
+                       sysLeaveUsers.add( leaveUser);
+
+
+                    });
 
 
 
-                       }
+            //构建离职员工数据
+            if(CollectionUtil.isNotEmpty(sysLeaveUsers)){
+                this.baseMapper.batchAddOrUpdate(
+                        sysLeaveUsers
+                );
+
+            }
 
 
 
-                //待分配的客户，群等信息入库
-                if(CollectionUtil.isNotEmpty(allocateGroups)){
+
+            //待分配的客户，群等信息入库
+            if(CollectionUtil.isNotEmpty(allocateGroups)){
 //                    iWeGroupService.update(WeGroup.builder()
 //                                    .ownerLeave(1)
 //                            .build(), new LambdaQueryWrapper<WeGroup>()
 //                            .in(WeGroup::getChatId,allocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList())));
-                    iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
-                }
+                iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
+            }
 
 
-                       //            //离职待分配员工客户数据处理
+            //            //离职待分配员工客户数据处理
             if(CollectionUtil.isNotEmpty(allocateCustomers)){
 //                allocateCustomers.stream().forEach(k->{
 //                    iWeCustomerService.saveOrUpdate(WeCustomer.builder()
@@ -440,10 +464,6 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                         allocateCustomers
                 );
             }
-
-
-
-                    });
 
 //            //待分配的离职客户
 //            List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
