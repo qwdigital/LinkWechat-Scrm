@@ -103,18 +103,7 @@ public class QwDataSyncListener {
     }
 
 
-    @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.sync.we-moments:Qu_Moments}")
-    public void weMomentsSubscribe(String msg, Channel channel, Message message) {
-        try {
-            log.info("企微朋友圈同步消息监听：msg:{}", msg);
-            weMomentsService.synchWeMomentsHandler(msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("企微朋友圈同步-消息处理失败 msg:{},error:{}", msg, e);
-        }
-    }
+
 
 
     /*@RabbitHandler
