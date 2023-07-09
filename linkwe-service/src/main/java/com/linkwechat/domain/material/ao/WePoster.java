@@ -94,6 +94,18 @@ public class WePoster {
     private Integer posterQrType;
 
     /**
+     * 像素大小
+     */
+    @TableField(value = "pixel_size")
+    private Long pixelSize;
+
+    /**
+     * 内存大小
+     */
+    @TableField(value = "memory_size")
+    private Long memorySize;
+
+    /**
      * 海报组件数组
      */
     private List<WePosterSubassembly> posterSubassemblyList;

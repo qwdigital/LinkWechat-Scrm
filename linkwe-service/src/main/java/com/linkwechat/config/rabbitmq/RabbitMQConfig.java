@@ -176,7 +176,6 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quWeCustomer()).to(syncEx()).with(rabbitMQSettingConfig.getWeCustomerRk()).noargs();
     }
 
-
     /**
      * 员工部门队列
      *
@@ -196,7 +195,6 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncUserDepart() {
         return BindingBuilder.bind(quUserDepart()).to(syncEx()).with(rabbitMQSettingConfig.getUserDepartRk()).noargs();
     }
-
 
     /**
      * 员工队列
@@ -239,6 +237,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(weGroupTag()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupTagRk()).noargs();
     }
 
+
     /**
      * 朋友圈同步队列
      *
@@ -255,10 +254,9 @@ public class RabbitMQConfig {
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncWemoments() {
+    public Binding bindingExchangeSyncWeMoments() {
         return BindingBuilder.bind(weMoments()).to(syncEx()).with(rabbitMQSettingConfig.getWeMomentsRk()).noargs();
     }
-
 
     /**
      * 朋友圈互动同步队列
@@ -276,8 +274,96 @@ public class RabbitMQConfig {
      * @return
      */
     @Bean
-    public Binding bindingExchangeSyncHdWemoments() {
+    public Binding bindingExchangeSyncHdWeMoments() {
         return BindingBuilder.bind(weHdMoments()).to(syncEx()).with(rabbitMQSettingConfig.getWeHdMomentsRk()).noargs();
+    }
+
+    /**
+     * 朋友圈定时执行队列
+     *
+     * @return 定时执行队列
+     */
+    @Bean
+    public Queue weMomentsDelayExecute() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayExecuteQu());
+    }
+
+    /**
+     * 朋友圈定时执行队列绑定延迟交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeDelayMomentDelayExecute() {
+        return BindingBuilder.bind(weMomentsDelayExecute()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayExecuteRk()).noargs();
+    }
+
+    /**
+     * 朋友圈定时取消队列
+     *
+     * @return 定时取消队列
+     */
+    @Bean
+    public Queue weMomentsDelayCancel() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayCancelQu());
+    }
+
+    /**
+     * 朋友圈定时执行队列绑定延迟交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeDelayMomentDelayCancel() {
+        return BindingBuilder.bind(weMomentsDelayCancel()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayCancelRk()).noargs();
+    }
+
+    /**
+     * 朋友圈jobId换取momentsId队列
+     *
+     * @author WangYX
+     * @date 2023/06/13 10:30
+     * @version 1.0.0
+     */
+    @Bean
+    public Queue weMomentsJobIdToMomentsId() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdQu());
+    }
+
+    /**
+     * 朋友圈jobId换取momentsId绑定交换机
+     *
+     * @author WangYX
+     * @date 2023/06/13 10:30
+     * @version 1.0.0
+     */
+    @Bean
+    public Binding bindingExchangeDelayJobIdToMomentsId() {
+        return BindingBuilder.bind(weMomentsJobIdToMomentsId()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK()).noargs();
+    }
+
+    /**
+     * 获取成员群发执行结果队列
+     *
+     * @author WangYX
+     * @date 2023/07/04 15:14
+     * @version 1.0.0
+     */
+    @Bean
+    public Queue weMomentsGetGroupSendResult() {
+        return new Queue(rabbitMQSettingConfig.getWeMomentsDelayGetGroupSendResultQu());
+    }
+
+    /**
+     * 获取成员群发执行结果队列绑定交换机
+     *
+     * @author WangYX
+     * @date 2023/07/04 15:14
+     * @version 1.0.0
+     */
+    @Bean
+    public Binding bindingExchangeDelayGetGroupSendResult() {
+        return BindingBuilder.bind(weMomentsGetGroupSendResult()).to(delayEx()).with(rabbitMQSettingConfig.getWeMomentsDelayGetGroupSendResultRK()).noargs();
     }
 
 
@@ -693,7 +779,6 @@ public class RabbitMQConfig {
     @Bean
     public Queue quLeaveUser() {
         return new Queue(rabbitMQSettingConfig.getLeaveAllocateUserQu());
-
     }
 
 
@@ -704,9 +789,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public Binding bindingQuLeaveUser() {
-
         return BindingBuilder.bind(quLeaveUser()).to(syncEx()).with(rabbitMQSettingConfig.getWeLeaveAllocateUserRk()).noargs();
-
     }
 
     /**

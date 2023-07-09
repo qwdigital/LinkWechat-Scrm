@@ -1,6 +1,7 @@
 package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.moments.vo.MomentsSendResultVO;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.client.WeMomentsClient;
 import com.linkwechat.wecom.service.IQwMomentsService;
@@ -50,7 +51,12 @@ public class QwMomentsServiceImpl implements IQwMomentsService {
     }
 
     @Override
-    public WeResultVo cancel_moment_task(CancelMomentTaskDto cancelMomentTaskDto) {
-        return weMomentsClient.cancel_moment_task(cancelMomentTaskDto);
+    public WeResultVo cancelMomentTask(MomentsCancelDTO dto) {
+        return weMomentsClient.cancel_moment_task(dto);
+    }
+
+    @Override
+    public MomentsSendResultVO getMomentSendResult(MomentsSendResultDTO dto) {
+        return weMomentsClient.get_moment_send_result(dto);
     }
 }

@@ -325,6 +325,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         weContentViewRecord.setViewWatchTime(weContentViewRecordQuery.getViewWatchTime());
         weContentViewRecord.setIsAuth(1);
         if (ObjectUtil.isNotNull(weCustomer)) {
+            //TODO
             weContentViewRecord.setExternalUserId(weCustomer.getExternalUserid());
             weContentViewRecord.setExternalUserName(weCustomer.getCustomerName());
             weContentViewRecord.setIsCustomer(weCustomer.getCustomerType().equals(1) ? 0 : 1);

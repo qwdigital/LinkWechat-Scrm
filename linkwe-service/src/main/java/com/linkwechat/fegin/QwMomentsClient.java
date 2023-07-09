@@ -2,6 +2,7 @@ package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.moments.vo.MomentsSendResultVO;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.fallback.QwMomentsFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -75,12 +76,28 @@ public interface QwMomentsClient {
     @PostMapping("/moments/get_moment_customer_list")
     AjaxResult<MomentsResultDto> get_moment_customer_list(@RequestBody MomentsParamDto momentsParamDto);
 
+
     /**
-     * 停止发表企业朋友圈
+     * 停止朋友圈任务
      *
-     * @param cancelMomentTaskDto
-     * @return
+     * @param momentsCancelDTO 停止朋友圈任务参数
+     * @return {@link AjaxResult<WeResultVo>}
+     * @author WangYX
+     * @date 2023/06/12 10:33
      */
     @PostMapping("/moments/cancel_moment_task")
-    AjaxResult<WeResultVo> cancel_moment_task(@RequestBody CancelMomentTaskDto cancelMomentTaskDto);
+    AjaxResult<WeResultVo> cancel_moment_task(@RequestBody MomentsCancelDTO momentsCancelDTO);
+
+
+    /**
+     * 获取客户朋友圈发表后的可见客户列表
+     *
+     * @param momentsSendResultDTO 获取客户朋友圈发表后的可见客户列表
+     * @return {@link AjaxResult<MomentsSendResultVO>}
+     * @author WangYX
+     * @date 2023/06/12 10:33
+     */
+    @PostMapping("/moments/get_moment_send_result")
+    AjaxResult<MomentsSendResultVO> get_moment_send_result(@RequestBody MomentsSendResultDTO momentsSendResultDTO);
+
 }

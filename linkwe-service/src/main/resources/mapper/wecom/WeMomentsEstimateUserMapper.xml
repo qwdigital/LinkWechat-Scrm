@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeMomentsEstimateUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.moments.entity.WeMomentsEstimateUser">
+        <id column="id" property="id"/>
+        <result column="moments_task_id" property="momentsTaskId"/>
+        <result column="user_id" property="userId"/>
+        <result column="we_user_id" property="weUserId"/>
+        <result column="user_name" property="userName"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="execute_count" property="executeCount"/>
+        <result column="execute_status" property="executeStatus"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, moments_task_id, user_id, we_user_id, user_name, dept_id, dept_name, execute_count,execute_status
+    </sql>
+
+
+    <select id="getNonExecuteUser" resultType="com.linkwechat.domain.moments.entity.WeMomentsEstimateUser">
+        SELECT t1.*
+        FROM we_moments_estimate_user t1
+                 LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+            AND t1.we_user_id = t2.we_user_id
+        WHERE t2.id IS NULL
+          and t1.moments_task_id = #{weMomentsTaskId}
+    </select>
+
+    <select id="getExecuteUsers" resultType="com.linkwechat.domain.moments.vo.WeMomentsEstimateUserVO">
+        SELECT t1.*,
+        ifnull(t2.execute_status,0) as execute_status
+        FROM we_moments_estimate_user t1
+        LEFT JOIN we_moments_user t2
+        ON t1.moments_task_id = t2.moments_task_id AND t1.we_user_id = t2.we_user_id
+        WHERE t1.moments_task_id = #{weMomentsTaskId}
+        <if test="weUserIds!=null and weUserIds !=''">
+            and t1.we_user_id in
+            <foreach collection="weUserIds.split(',')" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deptIds!=null and deptIds !=''">
+            and t1.dept_id in
+            <foreach collection="deptIds.split(',')" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="status!=null">
+            <choose>
+                <when test="status == 0">
+                    AND (t2.execute_status = #{status} or t2.execute_status is null)
+                </when>
+                <when test="status == 1">
+                    AND t2.execute_status = #{status}
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

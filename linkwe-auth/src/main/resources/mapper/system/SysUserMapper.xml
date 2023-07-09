@@ -629,7 +629,7 @@
                 and  su.we_user_status = #{weUserStatus}
             </if>
             <if test="isAllocate != null">
-                and  su.isAllocate = #{isAllocate}
+                and  su.is_allocate = #{isAllocate}
             </if>
             <if test="isOpenChat != null">
                 and  su.is_open_chat = #{isOpenChat}

@@ -14,6 +14,7 @@ import com.linkwechat.domain.WeShortLinkPromotionTemplateMoments;
 import com.linkwechat.domain.WeShortLinkUserPromotionTask;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
+//import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsAddQuery;
@@ -55,6 +56,7 @@ public class MomentsPromotion extends PromotionType {
     @Resource
     private RabbitMQSettingConfig rabbitMQSettingConfig;
 
+    //TODO 代码需重新调整
 
     @Override
     public Long saveAndSend(WeShortLinkPromotionAddQuery query, WeShortLinkPromotion weShortLinkPromotion) throws IOException {
@@ -266,9 +268,9 @@ public class MomentsPromotion extends PromotionType {
             weMoments.setCustomerTag(String.valueOf(object));
         }
         //附件
-        List<WeMoments.OtherContent> otherContents = new ArrayList<>();
+        List<WeShortLinkPromotionMomentsDto.OtherContent> otherContents = new ArrayList<>();
         attachments.stream().findFirst().ifPresent(i -> {
-            WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
+            WeShortLinkPromotionMomentsDto.OtherContent otherContent = new WeShortLinkPromotionMomentsDto.OtherContent();
             otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
             otherContent.setAnnexUrl(i.getPicUrl());
             otherContents.add(otherContent);
@@ -306,9 +308,9 @@ public class MomentsPromotion extends PromotionType {
         }
 
         //附件
-        List<WeMoments.OtherContent> otherContents = new ArrayList<>();
+        List<WeShortLinkPromotionMomentsDto.OtherContent> otherContents = new ArrayList<>();
         attachments.stream().findFirst().ifPresent(i -> {
-            WeMoments.OtherContent otherContent = new WeMoments.OtherContent();
+            WeShortLinkPromotionMomentsDto.OtherContent otherContent = new WeShortLinkPromotionMomentsDto.OtherContent();
             otherContent.setAnnexType(MediaType.IMAGE.getMediaType());
             otherContent.setAnnexUrl(i.getPicUrl());
         });

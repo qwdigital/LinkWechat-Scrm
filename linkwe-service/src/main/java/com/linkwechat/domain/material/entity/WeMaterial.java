@@ -88,12 +88,12 @@ public class WeMaterial extends BaseEntity {
     private Long type;
 
     /**
-     * 海报背景宽度
+     * 图片宽度
      */
     private Integer width;
 
     /**
-     * 海报背景高度
+     * 图片高度
      */
     private Integer height;
 
@@ -147,6 +147,18 @@ public class WeMaterial extends BaseEntity {
      */
     @TableField(value = "poster_qr_type")
     private Integer posterQrType;
+
+    /**
+     * 像素大小
+     */
+    @TableField(value = "pixel_size")
+    private Long pixelSize;
+
+    /**
+     * 内存大小
+     */
+    @TableField(value = "memory_size")
+    private Long memorySize;
 
     @TableField(exist = false)
     private List<WeMaterialImgAo> weMaterialImgAoList;

@@ -219,6 +219,17 @@ public class LinkWeChatConfig {
     private String appMsgUrl;
 
 
+    /**
+     * 素材中心素材详情
+     */
+    private String materialDetailUrl;
+
+    /**
+     * 朋友圈移动端列表页
+     */
+    private String momentsUrl;
+
+
     public String getName() {
         return name;
     }

@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +47,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class QwMomentsMsgListener {
+public class QwShortLinkPromotionMomentsMsgListener {
 
     @Resource
     private QwMomentsClient qwMomentsClient;
@@ -155,10 +154,11 @@ public class QwMomentsMsgListener {
         if (StringUtils.isNotEmpty(weMoments.getContent())) {
             momentsParamDto.setText(MomentsParamDto.Text.builder().content(weMoments.getContent()).build());
         }
+
         //设置附件
-        List<WeMoments.OtherContent> otherContent = weMoments.getOtherContent();
+        List<WeShortLinkPromotionMomentsDto.OtherContent> otherContent = weMoments.getOtherContent();
         if (CollectionUtil.isNotEmpty(otherContent)) {
-            List<WeMoments.OtherContent> otherContents = otherContent.stream().filter(s -> StringUtils.isNotEmpty(s.getAnnexType()) && StringUtils.isNotEmpty(s.getAnnexUrl())).collect(Collectors.toList());
+            List<WeShortLinkPromotionMomentsDto.OtherContent> otherContents = otherContent.stream().filter(s -> StringUtils.isNotEmpty(s.getAnnexType()) && StringUtils.isNotEmpty(s.getAnnexUrl())).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(otherContents)) {
                 List<Object> attachments = new ArrayList<>();
                 //图片

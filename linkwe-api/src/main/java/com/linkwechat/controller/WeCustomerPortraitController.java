@@ -3,7 +3,6 @@ package com.linkwechat.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -18,6 +17,7 @@ import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/portrait")
-public class WeCustomerPortraitController extends BaseController{
+public class WeCustomerPortraitController extends BaseController {
 
 
     @Autowired
@@ -47,19 +47,16 @@ public class WeCustomerPortraitController extends BaseController{
     @Autowired
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
-    @Autowired
-    private  IWeMomentsService iWeMomentsService;
-
+    @Resource
+    private IWeMomentsTaskService weMomentsTaskService;
 
     @Autowired
     private IWeSysFieldTemplateService iWeSysFieldTemplateService;
 
 
-
-
-
     /**
      * 根据客户id和当前企业员工id获取客户详细信息
+     *
      * @param externalUserid
      * @param userId
      * @return
@@ -68,19 +65,19 @@ public class WeCustomerPortraitController extends BaseController{
     public AjaxResult<WeCustomerPortraitVo> findWeCustomerInfo(String externalUserid, String userId) throws Exception {
 
         return AjaxResult.success(
-                weCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid,userId)
+                weCustomerService.findCustomerByOperUseridAndCustomerId(externalUserid, userId)
         );
     }
 
 
     /**
      * 客户画像资料更新
+     *
      * @param weCustomerPortrait
      * @return
      */
     @PostMapping(value = "/updateWeCustomerInfo")
-    public AjaxResult updateWeCustomerInfo(@RequestBody WeCustomerPortraitVo weCustomerPortrait){
-
+    public AjaxResult updateWeCustomerInfo(@RequestBody WeCustomerPortraitVo weCustomerPortrait) {
 
 
         weCustomerService.updateWeCustomerPortrait(weCustomerPortrait);
@@ -92,13 +89,14 @@ public class WeCustomerPortraitController extends BaseController{
 
     /**
      * 获取当前系统所有可用标签
+     *
      * @param userId 员工id
      * @return
      */
     @GetMapping(value = "/findAllTags")
-    public AjaxResult findAllTags(Integer groupTagType,String userId){
+    public AjaxResult findAllTags(Integer groupTagType, String userId) {
 
-        if(groupTagType.equals(new Integer(1))){//企业标签
+        if (groupTagType.equals(new Integer(1))) {//企业标签
             return AjaxResult.success(
                     iWeTagGroupService.selectWeTagGroupList(
                             WeTagGroup.builder()
@@ -110,8 +108,8 @@ public class WeCustomerPortraitController extends BaseController{
         return AjaxResult.success(
                 iWeTagService.list(
                         new LambdaQueryWrapper<WeTag>()
-                                .eq(WeTag::getDelFlag,new Integer(0))
-                                .eq(WeTag::getOwner,userId)
+                                .eq(WeTag::getDelFlag, new Integer(0))
+                                .eq(WeTag::getOwner, userId)
                 )
 
         );
@@ -119,17 +117,17 @@ public class WeCustomerPortraitController extends BaseController{
     }
 
 
-
     /**
      * 客户画像个人标签库新增
+     *
      * @param weTagGroup
      * @return
      */
     @PostMapping("/addOrUpdatePersonTags")
-    public AjaxResult addOrUpdatePersonTags(@RequestBody WeTagGroup weTagGroup){
+    public AjaxResult addOrUpdatePersonTags(@RequestBody WeTagGroup weTagGroup) {
         List<WeTag> weTags = weTagGroup.getWeTags();
-        if(CollectionUtil.isNotEmpty(weTags)){
-            weTags.stream().forEach(k->{
+        if (CollectionUtil.isNotEmpty(weTags)) {
+            weTags.stream().forEach(k -> {
                 k.setId(SnowFlakeUtil.nextId());
                 k.setTagId(k.getId().toString());
                 k.setGroupId(weTagGroup.getGroupId());
@@ -142,11 +140,12 @@ public class WeCustomerPortraitController extends BaseController{
 
     /**
      * 个人标签删除
+     *
      * @param ids
      * @return
      */
     @DeleteMapping("/deletePersonTag/{ids}")
-    public AjaxResult deletePersonTag(@PathVariable String[] ids){
+    public AjaxResult deletePersonTag(@PathVariable String[] ids) {
         iWeTagService.removeByIds(CollectionUtil.newArrayList(ids));
 
         return AjaxResult.success();
@@ -155,11 +154,12 @@ public class WeCustomerPortraitController extends BaseController{
 
     /**
      * 更新客户画像标签
+     *
      * @param weMakeCustomerTag
      * @return
      */
     @PostMapping(value = "/updateWeCustomerPorTraitTag")
-    public AjaxResult updateWeCustomerPorTraitTag(@RequestBody WeMakeCustomerTag weMakeCustomerTag){
+    public AjaxResult updateWeCustomerPorTraitTag(@RequestBody WeMakeCustomerTag weMakeCustomerTag) {
 
 
         weCustomerService.makeLabel(weMakeCustomerTag);
@@ -168,14 +168,14 @@ public class WeCustomerPortraitController extends BaseController{
     }
 
 
-
     /**
      * 查看客户添加的员工
+     *
      * @param externalUserid
      * @return
      */
     @GetMapping(value = "/findAddaddEmployes/{externalUserid}")
-    public AjaxResult findaddEmployes(@PathVariable String externalUserid){
+    public AjaxResult findaddEmployes(@PathVariable String externalUserid) {
         return AjaxResult.success(
                 weCustomerService.findWeUserByCustomerId(externalUserid)
         );
@@ -183,32 +183,34 @@ public class WeCustomerPortraitController extends BaseController{
 
     /**
      * 获取用户添加的群
+     *
      * @param externalUserid
      * @param userId
      * @return
      */
     @GetMapping(value = "/findAddGroupNum")
-    public AjaxResult<WeCustomerAddGroupVo> findAddGroupNum(String externalUserid, String userId){
+    public AjaxResult<WeCustomerAddGroupVo> findAddGroupNum(String externalUserid, String userId) {
 
         return AjaxResult.success(
-                iWeGroupService.findWeGroupByCustomer(userId,externalUserid)
+                iWeGroupService.findWeGroupByCustomer(userId, externalUserid)
         );
     }
 
 
     /**
      * 获取轨迹信息
+     *
      * @param trajectoryType
      * @return
      */
     @GetMapping(value = "/findTrajectory")
-    public TableDataInfo findTrajectory(String userId, String externalUserid, Integer trajectoryType){
+    public TableDataInfo findTrajectory(String userId, String externalUserid, Integer trajectoryType) {
         startPage();
         LambdaQueryWrapper<WeCustomerTrajectory> ne = new LambdaQueryWrapper<WeCustomerTrajectory>()
-                .eq(WeCustomerTrajectory::getWeUserId,userId)
-                .eq(WeCustomerTrajectory::getExternalUseridOrChatid,externalUserid)
+                .eq(WeCustomerTrajectory::getWeUserId, userId)
+                .eq(WeCustomerTrajectory::getExternalUseridOrChatid, externalUserid)
                 .orderByDesc(WeCustomerTrajectory::getCreateTime);
-        if(trajectoryType != null){
+        if (trajectoryType != null) {
             ne.eq(WeCustomerTrajectory::getTrajectoryType, trajectoryType);
         }
         return getDataTable(
@@ -219,12 +221,13 @@ public class WeCustomerPortraitController extends BaseController{
 
 
     /**
-     *编辑跟进动态
+     * 编辑跟进动态
+     *
      * @param trajectory
      * @return
      */
     @PostMapping(value = "/addOrEditWaitHandle")
-    public AjaxResult addOrEditWaitHandle(@RequestBody WeCustomerTrackRecord trajectory){
+    public AjaxResult addOrEditWaitHandle(@RequestBody WeCustomerTrackRecord trajectory) {
 
 
         weCustomerService.addOrEditWaitHandle(trajectory);
@@ -233,45 +236,45 @@ public class WeCustomerPortraitController extends BaseController{
     }
 
 
-
     /**
      * 个人朋友圈互动数据同步
+     *
      * @param userId
      * @return
      */
     @GetMapping("/synchMomentsInteracte/{userId}")
-    public AjaxResult synchMomentsInteracte(@PathVariable String userId){
-
-        iWeMomentsService.synchMomentsInteracte(CollectionUtil.newArrayList(userId));
-
+    public AjaxResult syncMomentsInteract(@PathVariable String userId) {
+        weMomentsTaskService.syncMomentsInteract(CollectionUtil.newArrayList(userId));
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 
     /**
      * 获取指定客户拥有的表单字段以及填充的值
+     *
      * @param weUserId
      * @param externalUserId
      * @return
      */
     @GetMapping("/findSysFieldTemplate")
-    public AjaxResult<List<WeSysFieldTemplate>> findSysFieldTemplate(String weUserId, String externalUserId){
+    public AjaxResult<List<WeSysFieldTemplate>> findSysFieldTemplate(String weUserId, String externalUserId) {
 
-        List<WeSysFieldTemplate> weSysFieldTemplates =   iWeSysFieldTemplateService.findLists(new WeSysFieldTemplate());
+        List<WeSysFieldTemplate> weSysFieldTemplates = iWeSysFieldTemplateService.findLists(new WeSysFieldTemplate());
 
-        for (Iterator iter = weSysFieldTemplates.iterator(); iter.hasNext();) {
+        for (Iterator iter = weSysFieldTemplates.iterator(); iter.hasNext(); ) {
 
             WeSysFieldTemplate weSysFieldTemplate = (WeSysFieldTemplate) iter.next();
-            if(StringUtils.isNotEmpty(weSysFieldTemplate.getVisualTagIds())){
+            if (StringUtils.isNotEmpty(weSysFieldTemplate.getVisualTagIds())) {
                 WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
                         .eq(WeCustomer::getExternalUserid, externalUserId)
                         .eq(WeCustomer::getAddUserId, weUserId));
 
-                if(null != weCustomer && StringUtils.isNotEmpty(weCustomer.getTagIds())){
-                    if(!ListUtil.toList(weCustomer
-                            .getTagIds().split(",")).contains(weSysFieldTemplate.getVisualTagIds())){
+                if (null != weCustomer && StringUtils.isNotEmpty(weCustomer.getTagIds())) {
+                    if (!ListUtil.toList(weCustomer
+                            .getTagIds().split(",")).contains(weSysFieldTemplate.getVisualTagIds())) {
 
                         iter.remove();
-                    };
+                    }
+                    ;
 
 
                 }

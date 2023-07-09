@@ -1,15 +1,17 @@
 package com.linkwechat.domain.material.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.domain.material.entity.WeMaterial;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 //@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WeMaterialNewVo  extends WeMaterial {
+public class WeMaterialNewVo extends WeMaterial {
     private String categoryName;
     private Integer sendNum;
     private Integer viewNum;
