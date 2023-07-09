@@ -37,6 +37,9 @@
         allocate_time=IFNULL(VALUES(allocate_time),we_allocate_group.allocate_time),
         update_time=IFNULL(VALUES(update_time),we_allocate_group.update_time),
         update_by=IFNULL(VALUES(update_by),we_allocate_group.update_by),
+        chat_name=IFNULL(VALUES(chat_name),we_allocate_group.chat_name),
+        takeover_name=IFNULL(VALUES(takeover_name),we_allocate_group.takeover_name),
+        takeover_dept_name=IFNULL(VALUES(takeover_dept_name),we_allocate_group.takeover_dept_name),
         update_by_id=IFNULL(VALUES(update_by_id),we_allocate_group.update_by_id);
     </insert>
 
