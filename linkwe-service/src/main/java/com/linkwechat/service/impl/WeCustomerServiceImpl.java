@@ -128,57 +128,30 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         List<WeCustomersVo> weCustomersVos=new ArrayList<>();
 
 
-        if(CollectionUtil.isNotEmpty(externalUserids)){
+        if(CollectionUtil.isNotEmpty(externalUserids)) {
+
             List<WeCustomer> weCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                     .in(WeCustomer::getExternalUserid, externalUserids));
 
-            if(CollectionUtil.isNotEmpty(weCustomers)){
 
-                weCustomers.stream().forEach(weCustomer -> {
-                    WeCustomersVo weCustomersVo=new WeCustomersVo();
-                    weCustomersVo.setCustomerName(weCustomer.getCustomerName());
-                    weCustomersVo.setExternalUserid(weCustomer.getExternalUserid());
-                    weCustomersVos.add(weCustomersVo);
-                });
-
-//                List<String> collect
-//                        = weCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-                List<String> reduceExternalUserIds = externalUserids
-                        .stream().filter(item -> !
-                                weCustomers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList())
-                                .contains(item))
-                        .collect(Collectors.toList());
-                if(CollectionUtil.isNotEmpty(reduceExternalUserIds)){
-                    reduceExternalUserIds.stream().forEach(k->{
-                        WeCustomersVo weCustomersVo=new WeCustomersVo();
-                        weCustomersVo.setCustomerName("@微信客户");
-                        weCustomersVo.setExternalUserid(k);
-                        weCustomersVos.add(weCustomersVo);
-                    });
+            externalUserids.stream().forEach(k -> {
+                WeCustomersVo weCustomersVo = new WeCustomersVo();
+                weCustomersVo.setCustomerName("@微信客户");
+                if (CollectionUtil.isNotEmpty(weCustomers)) {
+                    WeCustomer weCustomer
+                            = weCustomers.stream().filter(item -> item.getExternalUserid().equals(k)).findFirst().get();
+                    if (null != weCustomer) {
+                        weCustomersVo.setCustomerName(weCustomer.getCustomerName());
+                    }
                 }
 
 
-            }
+                weCustomersVo.setExternalUserid(k);
+                weCustomersVos.add(weCustomersVo);
+            });
+
 
         }
-
-
-//        externalUserids.stream().forEach(k->{
-//
-//            WeCustomersVo weCustomersVo=new WeCustomersVo();
-//            weCustomersVo.setCustomerName("@客户");
-//            weCustomersVo.setExternalUserid(k);
-//            WeCustomerDetailVo weCustomerDetailVo = qwCustomerClient.getCustomerDetail(WeCustomerQuery.builder()
-//                    .external_userid(k)
-//                    .build()).getData();
-//            if(WeConstans.WE_SUCCESS_CODE.equals(weCustomerDetailVo.getErrCode())&&
-//                    weCustomerDetailVo != null && weCustomerDetailVo.getExternalContact() != null){
-//                weCustomersVo.setCustomerName(weCustomerDetailVo.getExternalContact().getName());
-//            }
-//
-//            weCustomersVos.add(weCustomersVo);
-//
-//        });
 
 
         return weCustomersVos;
