@@ -961,7 +961,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public void builderExecuteGroupSopPlan(WeSopBase weSopBase, Map<String, List<LinkGroupChatListVo>> executeGroups, boolean isCreateOrUpdate) {
+    public void builderExecuteGroupSopPlan(WeSopBase weSopBase, Map<String, List<LinkGroupChatListVo>> executeGroups, boolean isCreateOrUpdate,boolean buildXkSopPlan) {
         if(CollectionUtil.isNotEmpty(executeGroups)){
 
 
@@ -1076,9 +1076,14 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                 }
 
 
-                                if(attachments.getPushStartTime() != null && attachments.getPushEndTime() != null){
+                                if(weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XQPY.getSopKey())){
+                                    if(buildXkSopPlan){
+                                        targetAttachments.add(attachments);
+                                    }
+                                }else{
                                     targetAttachments.add(attachments);
                                 }
+
 
 
                             });

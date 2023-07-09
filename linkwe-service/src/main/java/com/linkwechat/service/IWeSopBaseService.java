@@ -185,8 +185,9 @@ public interface IWeSopBaseService extends IService<WeSopBase> {
      * @param weSopBase
      * @param executeGroups
      * @param isCreateOrUpdate
+     * @param buildXkSopPlan
      */
-    void builderExecuteGroupSopPlan(WeSopBase weSopBase, Map<String, List<LinkGroupChatListVo>> executeGroups, boolean isCreateOrUpdate);
+    void builderExecuteGroupSopPlan(WeSopBase weSopBase, Map<String, List<LinkGroupChatListVo>> executeGroups, boolean isCreateOrUpdate,boolean buildXkSopPlan);
 
 
 
