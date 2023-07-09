@@ -1,6 +1,5 @@
 package com.linkwechat.wecom.controller;
 
-import com.dtflys.forest.annotation.JSONBody;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
@@ -33,7 +32,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
-import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -477,7 +476,7 @@ public class QwCustomerController {
      * @return
      */
     @PostMapping("/addWeGroupMsg")
-    public AjaxResult<WeGroupMsgVo>  addWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+    public AjaxResult<WeGroupMsgTplVo>  addWeGroupMsg(@RequestBody WeGroupMsgQuery query){
 
 
         return AjaxResult.success(

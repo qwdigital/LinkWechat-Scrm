@@ -34,7 +34,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
-import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -192,7 +192,7 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
     }
 
     @Override
-    public AjaxResult<WeGroupMsgVo> addWeGroupMsg(WeGroupMsgQuery query) {
+    public AjaxResult<WeGroupMsgTplVo> addWeGroupMsg(WeGroupMsgQuery query) {
         return null;
     }
 

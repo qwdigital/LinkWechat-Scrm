@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeGroupCodeRangeMapper">
+
+    <resultMap type="com.linkwechat.domain.WeGroupCodeRange" id="WeGroupCodeRangeResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="codeId" column="code_id" jdbcType="INTEGER"/>
+                <result property="chatId" column="chat_id" jdbcType="VARCHAR"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            </resultMap>
+
+    <sql id="selectWeGroupCodeRangeVo">
+        select id, code_id, chat_id, del_flag, create_by, create_by_id, create_time, update_by, update_by_id, update_time from we_group_code_range
+    </sql>
+
+</mapper>

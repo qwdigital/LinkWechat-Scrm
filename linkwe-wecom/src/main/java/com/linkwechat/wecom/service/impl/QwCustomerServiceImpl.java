@@ -1,6 +1,5 @@
 package com.linkwechat.wecom.service.impl;
 
-import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
@@ -33,7 +32,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
-import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -258,7 +257,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     }
 
     @Override
-    public WeGroupMsgVo addWeGroupMsg(WeGroupMsgQuery query) {
+    public WeGroupMsgTplVo addWeGroupMsg(WeGroupMsgQuery query) {
         return weGroupWelcomeTplClient.addWeGroupMsg(query);
     }
 
