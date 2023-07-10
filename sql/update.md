@@ -36,7 +36,7 @@ KEY `cha_id_index` (`code_id`,`chat_id`)
 ---
 ### ● 日期：2023.07.9
   ```
-  ALTER TABLE `we_allocate_customer` ADD COLUMN `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称' AFTER `external_userid`;
+ ALTER TABLE `we_allocate_customer` ADD COLUMN `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称' AFTER `external_userid`;
 
 ALTER TABLE `we_allocate_customer` ADD COLUMN `takeover_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '接替成员名称' AFTER `customer_name`;
 
@@ -238,6 +238,9 @@ ALTER TABLE `we_qi_rule_msg` MODIFY COLUMN `room_id` varchar(64) CHARACTER SET u
 
 DROP TABLE IF EXISTS `we_moments`;
 
+ALTER TABLE `we_allocate_customer` ADD COLUMN `leave_user_id` bigint(20) NULL DEFAULT NULL COMMENT '离职表主键 ' AFTER `id`;
+
+ALTER TABLE `we_allocate_group` ADD COLUMN `leave_user_id` bigint(20) NULL DEFAULT NULL COMMENT '离职表主键' AFTER `id`;
 
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2451, '朋友圈管理', 2198, 1, 'list', 'friendCircle/list', 1, 'C', '0', '0', 'friendCircle:list', '#', 'admin', NULL, '2023-07-05 15:27:18', NULL, NULL, NULL, '');
 
