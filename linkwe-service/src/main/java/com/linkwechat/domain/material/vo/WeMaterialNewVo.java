@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+//@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeMaterialNewVo extends WeMaterial {
@@ -15,4 +16,10 @@ public class WeMaterialNewVo extends WeMaterial {
     private Integer sendNum;
     private Integer viewNum;
     private Integer viewByNum;
+    //如果素材为表单类型则有该字段
+//    private Long formSurveyId;
+//    //为表单类型当前字段为表单名称
+//    private String formSurveyName;
+//   //为表单类型当前字段为表单名称
+//    private String fromChannelsName;
 }

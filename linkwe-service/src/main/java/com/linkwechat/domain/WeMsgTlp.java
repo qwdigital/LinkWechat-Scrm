@@ -74,6 +74,12 @@ public class WeMsgTlp extends BaseEntity {
 
 
     /**
+     * 模版id
+     */
+    private String templateId;
+
+
+    /**
      * 是否删除:0有效,1删除
      */
     @ApiModelProperty(value = "是否删除:0有效,1删除")

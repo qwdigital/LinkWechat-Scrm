@@ -21,11 +21,16 @@
         create_by,
         create_by_id,
         update_by,
-        update_by_id
+        update_by_id,
+        customer_name,
+        takeover_name,
+        takeover_dept_name,
+        leave_user_id
         ) values
         <foreach collection="weAllocateCustomers" item="item" index="index" separator=",">
             (#{item.id},#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason}
-            ,#{item.extentType},#{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById})
+            ,#{item.extentType},#{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById}
+            ,#{item.customerName},#{item.takeoverName},#{item.takeoverDeptName},#{item.leaveUserId})
         </foreach>
         ON DUPLICATE KEY UPDATE
             takeover_userid=IFNULL(VALUES(takeover_userid),we_allocate_customer.takeover_userid),
@@ -36,6 +41,9 @@
             extent_type=IFNULL(VALUES(extent_type),we_allocate_customer.extent_type),
             update_time=IFNULL(VALUES(update_time),we_allocate_customer.update_time),
             update_by=IFNULL(VALUES(update_by),we_allocate_customer.update_by),
+            customer_name=IFNULL(VALUES(update_by),we_allocate_customer.customer_name),
+            takeover_name=IFNULL(VALUES(update_by),we_allocate_customer.takeover_name),
+            takeover_dept_name=IFNULL(VALUES(takeover_dept_name),we_allocate_customer.takeover_dept_name),
             update_by_id=IFNULL(VALUES(update_by_id),we_allocate_customer.update_by_id);
     </insert>
 

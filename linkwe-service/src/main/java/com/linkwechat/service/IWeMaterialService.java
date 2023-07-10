@@ -167,6 +167,14 @@ public interface IWeMaterialService extends IService<WeMaterial> {
     List<WeMessageTemplate> msgTplToMediaId(List<WeMessageTemplate> messageTemplates);
 
 
+    /**
+     * 消息模版图片转化获取MediaId(根据CategoryMediaType中的类型)
+     * @param messageTemplates
+     * @return
+     */
+    List<WeMessageTemplate> msgTplToMediaIdByCategoryMediaType(List<WeMessageTemplate> messageTemplates);
+
+
     List<WeMaterial> getWeMaterialListByTalkId(Long talkId);
 
 

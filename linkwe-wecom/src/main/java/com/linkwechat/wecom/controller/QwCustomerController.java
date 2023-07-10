@@ -14,6 +14,7 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
@@ -31,6 +32,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -466,6 +468,58 @@ public class QwCustomerController {
                 qwCustomerService.editCorpTag(query)
         );
     }
+
+
+    /**
+     * 添加入群欢迎语素材
+     * @param query
+     * @return
+     */
+    @PostMapping("/addWeGroupMsg")
+    public AjaxResult<WeGroupMsgTplVo>  addWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.addWeGroupMsg(query)
+        );
+
+    }
+
+
+    /**
+     * 编辑入群欢迎语素材
+     * @param query
+     * @return
+     */
+    @PostMapping("/updateWeGroupMsg")
+    public AjaxResult<WeResultVo>  updateWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.updateWeGroupMsg(query)
+        );
+
+    }
+
+
+    /**
+     *  删除入群欢迎语素材
+     * @param query
+     * @return
+     */
+    @PostMapping("/delWeGroupMsg")
+    public AjaxResult<WeResultVo> delWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.delWeGroupMsg(query)
+        );
+
+    }
+
+
+
+
 
 
 }

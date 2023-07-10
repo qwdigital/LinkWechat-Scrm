@@ -10,6 +10,7 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeChatContactMsg;
+import com.linkwechat.domain.msgaudit.query.WeChatContactMsgQuery;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.service.IWeChatContactMsgService;
 import io.swagger.annotations.Api;
@@ -122,9 +123,9 @@ public class WeChatContactMsgController extends BaseController {
     @ApiOperation("全文检索 会话列表")
     @Log(title = "全文检索 会话列表" , businessType = BusinessType.OTHER)
     @GetMapping("/selectFullSearchChatList" )
-    public TableDataInfo<List<WeChatContactMsgVo>> selectFullSearchChatList(WeChatContactMsg weChatContactMsg) {
+    public TableDataInfo<List<WeChatContactMsgVo>> selectFullSearchChatList(WeChatContactMsgQuery query) {
         startPage();
-        List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg);
+        List<WeChatContactMsgVo> list = iWeChatContactMsgService.selectFullSearchChatList(query);
         return getDataTable(list);
     }
 
@@ -134,9 +135,9 @@ public class WeChatContactMsgController extends BaseController {
      */
     @ApiOperation("全文检索 导出列表")
     @GetMapping("/selectFullSearchChatList/export")
-    public void fullSearchChatListExport(WeChatContactMsg weChatContactMsg) {
+    public void fullSearchChatListExport(WeChatContactMsgQuery query) {
         LwExcelUtil.exprotForWeb(
-                ServletUtils.getResponse(), WeChatContactMsgVo.class, iWeChatContactMsgService.selectFullSearchChatList(weChatContactMsg),"全文检索"
+                ServletUtils.getResponse(), WeChatContactMsgVo.class, iWeChatContactMsgService.selectFullSearchChatList(query),"全文检索"
         );
     }
 }

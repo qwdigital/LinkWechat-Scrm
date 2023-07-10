@@ -102,6 +102,10 @@ public class QwDataSyncListener {
         }
     }
 
+
+
+
+
     /*@RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.user-depart:Qu_UserDepart}")
     public void weUserAndDepartSubscribe(String msg, Channel channel, Message message) {

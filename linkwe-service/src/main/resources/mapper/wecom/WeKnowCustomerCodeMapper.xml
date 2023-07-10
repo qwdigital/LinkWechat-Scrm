@@ -10,8 +10,8 @@
             wkcc.*,
             wkcc.create_time as createAddTime,
             wkcc.create_by as createName,
-            (SELECT count(*) FROM we_know_customer_code_count wkccc WHERE wkccc.know_customer_id=wkcc.id and to_days(wkccc.create_time) = to_days(now())) as tdScanCodeNumber,
-            (SELECT count(*) FROM we_know_customer_code_count wkccc WHERE wkccc.know_customer_id=wkcc.id) as totalScanCodeNumber
+            (SELECT count(DISTINCT wkccc.unionid) FROM we_know_customer_code_count wkccc WHERE wkccc.know_customer_id=wkcc.id and to_days(wkccc.create_time) = to_days(now())) as tdScanCodeNumber,
+            (SELECT count(DISTINCT wkccc.unionid) FROM we_know_customer_code_count wkccc WHERE wkccc.know_customer_id=wkcc.id) as totalScanCodeNumber
         FROM
             we_know_customer_code wkcc
         where

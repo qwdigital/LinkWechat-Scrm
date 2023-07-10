@@ -51,6 +51,9 @@ public class QwAppMsgListener {
                     case AGENT:
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAgentMsg(appMsgBody);
                         break;
+                    case QI_RULE:
+                        SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);
+                        break;
                     default: //默认通用发送
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);
                         break;
@@ -108,9 +111,6 @@ public class QwAppMsgListener {
                 switch (qwAppMsgBusinessTypeEnum) {
                     case AGENT:
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAgentMsg(appMsgBody);
-                        break;
-                    case QI_RULE:
-                        SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);
                         break;
                     default: //默认通用发送
                         SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractAppMsgService.class).sendAppMsg(appMsgBody);

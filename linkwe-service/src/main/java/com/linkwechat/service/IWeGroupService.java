@@ -62,6 +62,13 @@ public interface IWeGroupService extends IService<WeGroup> {
     List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery);
 
 
+
+    public List<WeGroup> findGroupInfoFromWechat(WeGroupChatListQuery chatListQuery);
+
+
+
+
+
     /**
      * 从企业微信端获取的群信息
      * @param groupChatList

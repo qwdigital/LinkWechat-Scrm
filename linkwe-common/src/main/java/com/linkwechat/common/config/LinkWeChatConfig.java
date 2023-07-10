@@ -192,6 +192,7 @@ public class LinkWeChatConfig {
     private String guideGroupUrl;
 
 
+
     /**
      * 裂变url
      */
@@ -213,9 +214,10 @@ public class LinkWeChatConfig {
     private String lxQrCodeUrl;
 
     /**
-     * 短链推广-应用消息详情
+     * 短链推广-应用消息页面
      */
     private String appMsgUrl;
+
 
     /**
      * 素材中心素材详情

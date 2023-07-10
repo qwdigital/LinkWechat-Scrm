@@ -1,5 +1,6 @@
 package com.linkwechat.domain.sop;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
@@ -70,5 +71,12 @@ public class WeSopExecuteTarget extends BaseEntity {
      * 删除标识 0 有效 1删除
      */
     private Integer delFlag;
+
+
+    /**
+     * 群创建时间
+     */
+    @TableField(exist = false)
+    private Date addTime;
 
 }

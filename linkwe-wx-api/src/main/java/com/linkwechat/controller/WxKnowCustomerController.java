@@ -2,6 +2,7 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
@@ -62,15 +63,17 @@ public class WxKnowCustomerController {
 
         if(weKnowCustomerCode != null){
             List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                    .eq(WeCustomer::getUnionid, unionid));
+                    .eq(WeCustomer::getUnionid, unionid)
+                    .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE));
             WeKnowCustomerCodeCount weKnowCustomerCodeCount = WeKnowCustomerCodeCount.builder()
                     .knowCustomerId(knowCustomerId)
                     .unionid(unionid)
                     .build();
 
             if(CollectionUtil.isNotEmpty(weCustomers)){//老客新客
-                weKnowCustomerCodeCount.setNewOrOld(1);
+
                 if(weKnowCustomerCode.getIsAddAllUser().equals(new Integer(1))){//已添加任意成员
+                    weKnowCustomerCodeCount.setNewOrOld(1);
                     weKnowCustomerCode.setNewOrOldWeCustomer(false);
                 }else{//已添加指定成员
                     String weUserIds=null;String deptIds=null;String positions=null;
@@ -104,6 +107,7 @@ public class WxKnowCustomerController {
                         List<String> appointWeUserIds = listAjaxResult.getData();
                         if(CollectionUtil.isNotEmpty( weCustomers.stream().filter(weCustomer
                                 -> appointWeUserIds.contains(weCustomer.getAddUserId())).collect(Collectors.toList()))){
+                            weKnowCustomerCodeCount.setNewOrOld(1);
                             weKnowCustomerCode.setNewOrOldWeCustomer(false);
                         }
                     }

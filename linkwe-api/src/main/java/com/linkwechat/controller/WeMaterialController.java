@@ -14,6 +14,7 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -360,19 +361,22 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/material/media/type")
     public AjaxResult getMaterialMediaType() {
 
-        //素材类型：需要参考 CategoryMediaType类中的定义
-        //由于枚举类定义了很多不属于素材中的类型，所以需要把用到的素材类型挑选出来
-        List<MaterialMediaTypeVO> result = new ArrayList<>();
-        result.add(MaterialMediaTypeVO.builder().type(4).name("文本").sort(1).build());
-        result.add(MaterialMediaTypeVO.builder().type(0).name("图片").sort(2).build());
-        result.add(MaterialMediaTypeVO.builder().type(9).name("图文").sort(3).build());
-        result.add(MaterialMediaTypeVO.builder().type(11).name("小程序").sort(4).build());
-        result.add(MaterialMediaTypeVO.builder().type(12).name("文章").sort(5).build());
-        result.add(MaterialMediaTypeVO.builder().type(2).name("视频").sort(6).build());
-        result.add(MaterialMediaTypeVO.builder().type(3).name("文件").sort(7).build());
-        result.add(MaterialMediaTypeVO.builder().type(5).name("海报").sort(8).build());
-        result = result.stream().sorted(Comparator.comparing(MaterialMediaTypeVO::getSort)).collect(Collectors.toList());
-        return AjaxResult.success(result);
+//        //素材类型：需要参考 CategoryMediaType类中的定义
+//        //由于枚举类定义了很多不属于素材中的类型，所以需要把用到的素材类型挑选出来
+//        List<MaterialMediaTypeVO> result = new ArrayList<>();
+//        result.add(MaterialMediaTypeVO.builder().type(4).name("文本").sort(1).build());
+//        result.add(MaterialMediaTypeVO.builder().type(0).name("图片").sort(2).build());
+//        result.add(MaterialMediaTypeVO.builder().type(9).name("图文").sort(3).build());
+//        result.add(MaterialMediaTypeVO.builder().type(11).name("小程序").sort(4).build());
+//        result.add(MaterialMediaTypeVO.builder().type(12).name("文章").sort(5).build());
+//        result.add(MaterialMediaTypeVO.builder().type(2).name("视频").sort(6).build());
+//        result.add(MaterialMediaTypeVO.builder().type(3).name("文件").sort(7).build());
+//        result.add(MaterialMediaTypeVO.builder().type(5).name("海报").sort(8).build());
+//        result.add(MaterialMediaTypeVO.builder().type(18).name("智能表单").sort(9).build());
+//        result = result.stream().sorted(Comparator.comparing(MaterialMediaTypeVO::getSort)).collect(Collectors.toList());
+        return AjaxResult.success(
+                CategoryMediaType.sideMaterialType()
+        );
     }
 
 

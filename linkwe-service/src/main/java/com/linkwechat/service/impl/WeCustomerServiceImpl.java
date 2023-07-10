@@ -125,6 +125,41 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
+    public List<WeCustomersVo>  findWeCustomerInfoFromWechat(List<String> externalUserids){
+        List<WeCustomersVo> weCustomersVos=new ArrayList<>();
+
+
+        if(CollectionUtil.isNotEmpty(externalUserids)) {
+
+            List<WeCustomer> weCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
+                    .in(WeCustomer::getExternalUserid, externalUserids));
+
+
+            externalUserids.stream().forEach(k -> {
+                WeCustomersVo weCustomersVo = new WeCustomersVo();
+                weCustomersVo.setCustomerName("@微信客户");
+                if (CollectionUtil.isNotEmpty(weCustomers)) {
+                    List<WeCustomer> weCustomerss
+                            = weCustomers.stream().filter(item -> item.getExternalUserid().equals(k)).collect(Collectors.toList());
+                    if (CollectionUtil.isNotEmpty(weCustomerss)) {
+
+                        weCustomersVo.setCustomerName( weCustomerss.stream().findFirst().get().getCustomerName());
+                    }
+                }
+
+
+                weCustomersVo.setExternalUserid(k);
+                weCustomersVos.add(weCustomersVo);
+            });
+
+
+        }
+
+
+        return weCustomersVos;
+    }
+
+    @Override
     public TableDataInfo<List<WeCustomersVo>> findWeCustomerListByApp(WeCustomersQuery weCustomersQuery, PageDomain pageDomain) {
 
         TableDataInfo<List<WeCustomersVo>> tableDataInfo = new TableDataInfo<>();
@@ -1069,6 +1104,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
+
+                iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .eq(WeFlowerCustomerTagRel::getExternalUserid,externalContact.getExternalUserId())
+                        .eq(WeFlowerCustomerTagRel::getUserId,followUserEntity.getUserId()));
+
                 if (CollectionUtil.isNotEmpty(tags)) {
                     List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
                             .id(SnowFlakeUtil.nextId())
@@ -1079,6 +1119,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+
+                    List<WeTag> addTag = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                            .eq(WeTag::getTagId, tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId).collect(Collectors.toList())));
+
+                    if (CollectionUtil.isNotEmpty(addTag)) {
+                        iWeCustomerTrajectoryService.createEditTrajectory(externalContact.getExternalUserId(),
+                                followUserEntity.getUserId(),
+                                TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType(),
+                                String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                        );
+                    }
                 }
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
@@ -1341,6 +1392,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Override
     public Integer totalScanCodeNumber(String state) {
         return this.baseMapper.totalScanCodeNumber(state);
+    }
+
+    @Override
+    public List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds) {
+        return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
     }
 
 
