@@ -282,8 +282,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
 
                     if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
+
                         weSopListsVo.setExecuteUser(
-                                listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.joining(","))
+                                listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
+                                        .stream().collect(Collectors.joining(","))
                         );
                     }
                 }else{//查询成员，或者部门岗位
@@ -300,7 +302,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                         if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
 
                             sb.append(
-                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.joining(","))
+                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
+                                            .stream().collect(Collectors.joining(","))
                             );
                         }
 
