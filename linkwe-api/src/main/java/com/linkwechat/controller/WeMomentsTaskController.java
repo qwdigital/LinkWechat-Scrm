@@ -1,12 +1,12 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.moments.query.*;
@@ -216,5 +216,20 @@ public class WeMomentsTaskController extends BaseController {
     public AjaxResult mobileGet(@PathVariable("weMomentsTaskId") Long weMomentsTaskId) {
         WeMomentsTaskMobileVO vo = weMomentsUserService.mobileGet(weMomentsTaskId);
         return AjaxResult.success(vo);
+    }
+
+    /**
+     * 个人朋友圈互动数据同步
+     * <p>
+     * 在客户中心-企业客户-查看详情-客户轨迹-同步功能的时候调用
+     *
+     * @param userIds
+     * @return
+     */
+    @ApiOperation("个人朋友圈互动数据同步")
+    @GetMapping("/synchMomentsInteracte/{userIds}")
+    public AjaxResult syncMomentsInteract(@PathVariable String[] userIds) {
+        weMomentsTaskService.syncMomentsInteract(CollectionUtil.newArrayList(userIds));
+        return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 }

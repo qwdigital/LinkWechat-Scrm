@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.material.query.WeContentViewRecordQuery;
 import com.linkwechat.domain.material.query.WeMaterialMobileAddViewRequest;
-import com.linkwechat.service.IWeContentTalkService;
 import com.linkwechat.service.IWeContentViewRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,6 +52,7 @@ public class WeMaterialWebSocketServer implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         Object payload = message.getPayload();
         WeMaterialMobileAddViewRequest request = JSONObject.parseObject(payload.toString(), WeMaterialMobileAddViewRequest.class);
+        request.setViewStartTime(new Date());
         weSocketMap.put(session.getId(), request);
         log.info("接收到消息：{}", JSONObject.toJSONString(request));
     }

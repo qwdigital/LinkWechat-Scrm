@@ -141,7 +141,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 //            result.add(contentDataDetailVo);
 //        });
 //        result.sort(Comparator.comparing(ContentDataDetailVo::getViewTime).reversed());
-        List<ContentDataDetailVo> contentDataDetailVos = this.baseMapper.findContentDataDetailVos(contentDetailQuery.getContentId()
+        List<ContentDataDetailVo> contentDataDetailVos = this.baseMapper.findContentDataDetailVos(String.valueOf(contentDetailQuery.getContentId())
                 , contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
 
         if(CollectionUtil.isNotEmpty(contentDataDetailVos)){
@@ -266,6 +266,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         Object object = result.getData();
         String s = JSONObject.toJSONString(object);
         SysUser data = JSONObject.parseObject(s, SysUser.class);
+
 
         //获取员工对应的企业信息
 //        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
@@ -410,8 +411,8 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //标题
             weCustomerTrajectory.setTitle(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //文案内容,整体内容
-            String format = String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
-            weCustomerTrajectory.setContent(format);
+            String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
+            weCustomerTrajectory.setContent(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //
             weCustomerTrajectory.setMaterialId(weMaterial.getId());
             weCustomerTrajectoryMapper.insert(weCustomerTrajectory);
