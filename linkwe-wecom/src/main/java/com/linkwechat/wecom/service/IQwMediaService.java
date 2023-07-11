@@ -38,7 +38,7 @@ public interface IQwMediaService {
 
 
     /**
-     * 获取零时素材
+     * 获取临时素材
      * @param query
      * @return
      */

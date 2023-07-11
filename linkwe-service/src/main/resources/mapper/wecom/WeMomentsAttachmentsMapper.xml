@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeMomentsAttachmentsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.moments.entity.WeMomentsAttachments">
+        <id column="id" property="id"/>
+        <result column="moment_task_id" property="momentsTaskId"/>
+        <result column="is_material" property="isMaterial"/>
+        <result column="msg_type" property="msgType"/>
+        <result column="media_id" property="mediaId"/>
+        <result column="media_id_expire" property="mediaIdExpire"/>
+        <result column="media_id_url" property="mediaIdUrl"/>
+        <result column="thumb_media_id" property="thumbMediaId"/>
+        <result column="thumb_media_id_expire" property="thumbMediaIdExpire"/>
+        <result column="thumb_media_id_url" property="thumbMediaIdUrl"/>
+        <result column="link_title" property="linkTitle"/>
+        <result column="link_url" property="linkUrl"/>
+        <result column="location_latitude" property="locationLatitude"/>
+        <result column="location_longitude" property="locationLongitude"/>
+        <result column="location_name" property="locationName"/>
+        <result column="material_id" property="materialId"/>
+        <result column="real_type" property="realType"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        moment_task_id,
+        is_material,
+        msg_type,
+        media_id,
+        media_id_expire,
+        media_id_url,
+        thumb_media_id,
+        thumb_media_id_expire,
+        thumb_media_id_url,
+        link_title,
+        link_url,
+        location_latitude,
+        location_longitude,
+        location_name,
+        material_id,
+        real_type
+    </sql>
+
+</mapper>

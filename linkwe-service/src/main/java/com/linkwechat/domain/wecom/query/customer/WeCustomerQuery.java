@@ -1,8 +1,7 @@
 package com.linkwechat.domain.wecom.query.customer;
 
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * @author danmo
@@ -11,6 +10,9 @@ import lombok.EqualsAndHashCode;
  **/
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeCustomerQuery extends WeBaseQuery {
     /**
      * 外部联系人的userid

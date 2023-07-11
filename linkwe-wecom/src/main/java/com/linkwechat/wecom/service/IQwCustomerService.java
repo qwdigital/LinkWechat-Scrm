@@ -1,15 +1,12 @@
 package com.linkwechat.wecom.service;
 
 
+
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
@@ -18,10 +15,10 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.customer.UnionidToExternalUserIdVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
@@ -36,6 +33,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -139,6 +137,7 @@ public interface IQwCustomerService {
 
     /**
      * 创建企业群发
+     *
      * @param query
      * @return
      */
@@ -146,6 +145,7 @@ public interface IQwCustomerService {
 
     /**
      * 获取群发记录列表
+     *
      * @param query
      * @return
      */
@@ -153,6 +153,7 @@ public interface IQwCustomerService {
 
     /**
      * 获取群发成员发送任务列表
+     *
      * @param query
      * @return
      */
@@ -160,20 +161,31 @@ public interface IQwCustomerService {
 
     /**
      * 获取企业群发成员执行结果
+     *
      * @param query
      * @return
      */
     WeGroupMsgListVo getGroupMsgSendResult(WeGetGroupMsgListQuery query);
 
     /**
+     * 停止企业群发
+     *
+     * @param query
+     * @return
+     */
+    WeResultVo cancelGroupMsgSend(WeCancelGroupMsgSendQuery query);
+
+    /**
      * 发送新客户欢迎语
+     *
      * @param query
      * @return
      */
     WeResultVo sendWelcomeMsg(WeWelcomeMsgQuery query);
 
     /**
-     *  编辑客户标签
+     * 编辑客户标签
+     *
      * @param weMarkTagQuery
      * @return
      */
@@ -182,6 +194,7 @@ public interface IQwCustomerService {
 
     /**
      * 分配在职成员的客户
+     *
      * @param query
      * @return
      */
@@ -190,6 +203,7 @@ public interface IQwCustomerService {
 
     /**
      * 查询客户接替状态
+     *
      * @param query
      * @return
      */
@@ -198,6 +212,7 @@ public interface IQwCustomerService {
 
     /**
      * 批量获取客户详情
+     *
      * @param query
      * @return
      */
@@ -205,6 +220,7 @@ public interface IQwCustomerService {
 
     /**
      * 获取客户详情
+     *
      * @param query
      * @return
      */
@@ -212,6 +228,7 @@ public interface IQwCustomerService {
 
     /**
      * 联系客户统计
+     *
      * @param query 入参
      * @return WeUserBehaviorDataVo
      */
@@ -219,6 +236,7 @@ public interface IQwCustomerService {
 
     /**
      * 群聊数据统计（按群主聚合的方式）
+     *
      * @param query 入参
      * @return WeGroupChatStatisticVo
      */
@@ -226,13 +244,15 @@ public interface IQwCustomerService {
 
     /**
      * 群聊数据统计（按日期聚合的方式）
+     *
      * @param query
      * @return
      */
     WeGroupChatStatisticVo getGroupChatStatisticByDay(WeGroupChatStatisticQuery query);
 
     /**
-     *  配置客户群进群方式
+     * 配置客户群进群方式
+     *
      * @param joinWayQuery
      * @return
      */
@@ -241,6 +261,7 @@ public interface IQwCustomerService {
 
     /**
      * 获取客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -249,6 +270,7 @@ public interface IQwCustomerService {
 
     /**
      * 删除客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -256,7 +278,8 @@ public interface IQwCustomerService {
 
 
     /**
-     *  分配离职成员的客户
+     * 分配离职成员的客户
+     *
      * @param query
      * @return
      */
@@ -274,6 +297,7 @@ public interface IQwCustomerService {
 
     /**
      * 更新客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -281,8 +305,36 @@ public interface IQwCustomerService {
 
     /**
      * 编辑标签或标签组名称
+     *
      * @param query
      * @return
      */
     WeResultVo editCorpTag(WeUpdateCorpTagQuery query);
+
+
+
+
+    /**
+     * 添加入群欢迎语素材
+     * @param query
+     * @return
+     */
+    WeGroupMsgTplVo addWeGroupMsg(WeGroupMsgQuery query);
+
+
+    /**
+     * 编辑入群欢迎语素材
+     * @param query
+     * @return
+     */
+    WeResultVo updateWeGroupMsg(WeGroupMsgQuery query);
+
+
+
+    /**
+     * 编辑入群欢迎语素材
+     * @param query
+     * @return
+     */
+    WeResultVo delWeGroupMsg(WeGroupMsgQuery query);
 }

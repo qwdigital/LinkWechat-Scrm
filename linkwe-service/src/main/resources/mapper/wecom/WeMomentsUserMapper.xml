@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeMomentsUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.moments.entity.WeMomentsUser">
+        <id column="id" property="id"/>
+        <result column="moment_task_id" property="momentsTaskId"/>
+        <result column="moments_id" property="momentsId"/>
+        <result column="user_id" property="userId"/>
+        <result column="we_user_id" property="weUserId"/>
+        <result column="user_name" property="userName"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="execute_status" property="executeStatus"/>
+        <result column="execute_count" property="executeCount"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        moment_task_id,
+        moments_id,
+        user_id,
+        we_user_id,
+        user_name,
+        dept_id,
+        dept_name,
+        execute_status,
+        execute_count,
+        create_by,
+        update_by,
+        update_by_id,
+        create_by_id,
+        create_time,
+        update_time,
+        del_flag
+    </sql>
+
+
+    <resultMap id="MobileResult" type="com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO">
+        <result column="id" property="weMomentsTaskId"/>
+        <result column="moments_id" property="momentsId"/>
+        <result column="name" property="name"/>
+        <result column="create_by" property="createBy"/>
+        <result column="execute_time" property="executeTime"/>
+        <result column="execute_end_time" property="executeEndTime"/>
+        <result column="content" property="content"/>
+        <result column="customer_tag" property="customerTag"/>
+        <result column="execute_status" property="executeStatus"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+
+    <select id="mobileList" resultMap="MobileResult">
+        SELECT ifnull(t4.execute_status, 0) AS execute_status,
+               t4.moments_id,
+               t3.id,
+               t3.NAME,
+               t3.create_by,
+               t3.execute_time,
+               t3.execute_end_time,
+               t3.content,
+               t3.customer_tag,
+               t3.STATUS
+        FROM we_moments_task t3
+                 JOIN (
+            SELECT t1.moments_task_id,
+                   t1.we_user_id,
+                   t1.execute_status,
+                   t2.moments_id
+            FROM we_moments_estimate_user t1
+                     LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+                AND t1.we_user_id = t2.we_user_id
+        ) AS t4 ON t3.id = t4.moments_task_id
+        WHERE t3.del_flag = 0
+          AND t3.send_type = 2
+          AND t3.status = #{status}
+          AND t4.we_user_id = #{weUserId}
+        ORDER BY t3.create_time DESC
+    </select>
+
+
+    <select id="mobileGet" resultType="com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO">
+        SELECT ifnull(t4.execute_status, 0) AS execute_status,
+               t3.id as weMomentsTaskId,
+               t3.NAME,
+               t3.create_by,
+               t3.execute_time,
+               t3.execute_end_time,
+               t3.content,
+               t3.customer_tag,
+               t3.STATUS
+        FROM we_moments_task t3
+                 JOIN (
+            SELECT t1.moments_task_id,
+                   t1.we_user_id,
+                   t1.execute_status,
+                   t2.moments_id
+            FROM we_moments_estimate_user t1
+                     LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+                AND t1.we_user_id = t2.we_user_id
+        ) AS t4 ON t3.id = t4.moments_task_id
+        WHERE t3.del_flag = 0
+          AND t4.we_user_id = #{weUserId}
+          AND t3.id = #{weMomentsTaskId}
+    </select>
+
+
+    <select id="count" resultType="java.lang.Integer">
+        SELECT count(t3.id)
+        FROM we_moments_task t3
+                 JOIN (
+            SELECT t1.moments_task_id,
+                   t1.we_user_id,
+                   t2.execute_status
+            FROM we_moments_estimate_user t1
+                     LEFT JOIN we_moments_user t2 ON t1.moments_task_id = t2.moments_task_id
+                AND t1.we_user_id = t2.we_user_id
+        ) AS t4 ON t3.id = t4.moments_task_id
+        WHERE t3.del_flag = 0
+          AND t3.send_type = 2
+          AND t3.status = #{status}
+          AND t4.we_user_id = #{weUserId}
+    </select>
+
+
+</mapper>

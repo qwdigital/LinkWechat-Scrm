@@ -20,6 +20,7 @@ import com.linkwechat.web.service.SysLoginService;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -58,35 +59,34 @@ public class SysLoginController {
 
     /**
      * 获取登陆相关参数
+     *
      * @return
      */
     @GetMapping("/findLoginParam")
-    public AjaxResult findLoginParam(){
+    public AjaxResult findLoginParam() {
         WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-        if(Objects.isNull(weCorpAccount)){
-            return AjaxResult.error(HttpStatus.NOT_TO_CONFIG,"请使用超管账号登陆系统做相关配置");
+        if (Objects.isNull(weCorpAccount)) {
+            return AjaxResult.error(HttpStatus.NOT_TO_CONFIG, "请使用超管账号登陆系统做相关配置");
         }
 
 
+        String joinCorpQr = "";
 
-        String joinCorpQr="";
-
-        if(!linkWeChatConfig.isDemoEnviron()){
+        if (!linkWeChatConfig.isDemoEnviron()) {
             joinCorpQr = redisService.getCacheObject(WeConstans.JOINCORPQR);
-            if(StringUtils.isEmpty(joinCorpQr)){
-                joinCorpQr=qwUserClient.getJoinQrcode(new WeCorpQrQuery()).getData().getJoinQrcode();
-                redisService.setCacheObject(WeConstans.JOINCORPQR,joinCorpQr, WeConstans.JOINCORPQR_EFFETC_TIME , TimeUnit.SECONDS);
+            if (StringUtils.isEmpty(joinCorpQr)) {
+                joinCorpQr = qwUserClient.getJoinQrcode(new WeCorpQrQuery()).getData().getJoinQrcode();
+                redisService.setCacheObject(WeConstans.JOINCORPQR, joinCorpQr, WeConstans.JOINCORPQR_EFFETC_TIME, TimeUnit.SECONDS);
             }
-        }else{
-            joinCorpQr=linkWeChatConfig.getCustomerServiceQrUrl();
+        } else {
+            joinCorpQr = linkWeChatConfig.getCustomerServiceQrUrl();
         }
-
 
 
         return AjaxResult.success(
                 LoginParamVo.builder().loginQr(MessageFormat.format(linkWeChatConfig.getWecomeLoginUrl(),
-                                weCorpAccount.getCorpId(),
-                                weCorpAccount.getAgentId()))
+                        weCorpAccount.getCorpId(),
+                        weCorpAccount.getAgentId()))
                         .joinCorpQr(
                                 joinCorpQr
                         )
@@ -112,18 +112,13 @@ public class SysLoginController {
     /**
      * 账号密码登陆
      *
-     * @param loginBody 登录信息ALL_PERMISSION
+     * @param loginBody 登录信息 ALL_PERMISSION
      * @return 结果
      */
     @PostMapping("/accountLogin")
     public AjaxResult<Map<String, Object>> login(@RequestBody LoginBody loginBody) {
-
-        return AjaxResult.success(
-                sysLoginService.login(loginBody.getUsername(),loginBody.getPassword())
-        );
+        return AjaxResult.success(sysLoginService.login(loginBody.getUsername(), loginBody.getPassword()));
     }
-
-
 
 
 }

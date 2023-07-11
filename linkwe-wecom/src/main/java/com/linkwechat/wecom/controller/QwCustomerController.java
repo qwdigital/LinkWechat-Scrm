@@ -2,14 +2,10 @@ package com.linkwechat.wecom.controller;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
@@ -18,10 +14,10 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.customer.UnionidToExternalUserIdVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
@@ -36,6 +32,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -314,6 +311,18 @@ public class QwCustomerController {
     }
 
     /**
+     * 停止企业群发
+     *
+     * @param query
+     * @return
+     */
+    @PostMapping("/group/msg/cancelGroupMsgSend")
+    public AjaxResult<WeResultVo> cancelGroupMsgSend(@RequestBody WeCancelGroupMsgSendQuery query) {
+        return AjaxResult.success(qwCustomerService.cancelGroupMsgSend(query));
+    }
+
+
+    /**
      * 发送新客户欢迎语
      *
      * @param query
@@ -434,11 +443,12 @@ public class QwCustomerController {
 
     /**
      * 更新客户群进群方式配置
+     *
      * @param query
      * @return
      */
     @PostMapping("/updateJoinWayForGroupChat")
-    public AjaxResult<WeResultVo> updateJoinWayForGroupChat(@RequestBody WeGroupChatUpdateJoinWayQuery query){
+    public AjaxResult<WeResultVo> updateJoinWayForGroupChat(@RequestBody WeGroupChatUpdateJoinWayQuery query) {
 
         return AjaxResult.success(
                 qwCustomerService.updateJoinWayForGroupChat(query)
@@ -447,15 +457,64 @@ public class QwCustomerController {
 
     /**
      * 编辑标签或标签组名称
+     *
      * @param query
      * @return
      */
     @PostMapping("/editCorpTag")
-    public AjaxResult<WeResultVo> editCorpTag(@RequestBody WeUpdateCorpTagQuery query){
+    public AjaxResult<WeResultVo> editCorpTag(@RequestBody WeUpdateCorpTagQuery query) {
 
         return AjaxResult.success(
                 qwCustomerService.editCorpTag(query)
         );
+    }
+
+
+    /**
+     * 添加入群欢迎语素材
+     * @param query
+     * @return
+     */
+    @PostMapping("/addWeGroupMsg")
+    public AjaxResult<WeGroupMsgTplVo>  addWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.addWeGroupMsg(query)
+        );
+
+    }
+
+
+    /**
+     * 编辑入群欢迎语素材
+     * @param query
+     * @return
+     */
+    @PostMapping("/updateWeGroupMsg")
+    public AjaxResult<WeResultVo>  updateWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.updateWeGroupMsg(query)
+        );
+
+    }
+
+
+    /**
+     *  删除入群欢迎语素材
+     * @param query
+     * @return
+     */
+    @PostMapping("/delWeGroupMsg")
+    public AjaxResult<WeResultVo> delWeGroupMsg(@RequestBody WeGroupMsgQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.delWeGroupMsg(query)
+        );
+
     }
 
 

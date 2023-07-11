@@ -1,5 +1,6 @@
 package com.linkwechat.domain.material.ao;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,19 @@ public class PurePoster {
 
     @ApiModelProperty(value = "海报背景高度")
     private Integer height;
+
+    /**
+     * 像素大小
+     */
+    @TableField(value = "pixel_size")
+    private Long pixelSize;
+
+    /**
+     * 内存大小
+     */
+    @TableField(value = "memory_size")
+    private Long memorySize;
+
     /**
      * 海报组件数组
      */

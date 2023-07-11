@@ -31,6 +31,11 @@ public class WeSynchRecord extends BaseEntity {
     @TableField("id")
     private Long id;
 
+    /**
+     * 同步类型
+     *
+     * @see com.linkwechat.common.constant.SynchRecordConstants
+     */
     @ApiModelProperty("同步类型:1:客户模块同步 2-客群")
     private Integer synchType;
 

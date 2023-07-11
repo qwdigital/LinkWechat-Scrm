@@ -1,8 +1,8 @@
 package com.linkwechat.wecom.controller;
 
-import com.dtflys.forest.annotation.PostRequest;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.moments.dto.*;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.service.IQwMomentsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,4 +90,33 @@ public class QwMomentsController {
     public AjaxResult<MomentsResultDto> get_moment_customer_list(@RequestBody MomentsParamDto momentsParamDto) {
         return AjaxResult.success(qwMomentsService.getMomentCustomerList(momentsParamDto));
     }
+
+    /**
+     * 停止朋友圈任务
+     *
+     * @param momentsCancelDTO 停止朋友圈任务参数
+     * @return {@link AjaxResult< WeResultVo>}
+     * @author WangYX
+     * @date 2023/06/12 10:33
+     */
+    @PostMapping("/cancel_moment_task")
+    public AjaxResult<WeResultVo> cancel_moment_task(@RequestBody MomentsCancelDTO momentsCancelDTO) {
+        return AjaxResult.success(qwMomentsService.cancelMomentTask(momentsCancelDTO));
+    }
+
+
+    /**
+     * 获取客户朋友圈发表后的可见客户列表
+     *
+     * @param momentsSendResultDTO 获取客户朋友圈发表后的可见客户列表
+     * @return {@link AjaxResult< WeResultVo>}
+     * @author WangYX
+     * @date 2023/06/12 10:33
+     */
+    @PostMapping("/get_moment_send_result")
+    public AjaxResult<WeResultVo> get_moment_send_result(@RequestBody MomentsSendResultDTO momentsSendResultDTO) {
+        return AjaxResult.success(qwMomentsService.getMomentSendResult(momentsSendResultDTO));
+    }
+
+
 }

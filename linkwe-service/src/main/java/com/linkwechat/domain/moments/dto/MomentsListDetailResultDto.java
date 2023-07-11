@@ -24,8 +24,8 @@ public class MomentsListDetailResultDto extends WeResultVo {
         private String moment_id;
         //朋友圈创建者userid,企业发表内容到客户的朋友圈接口创建的朋友圈不再返回该字段
         private String creator;
-        //创建时间
-        private Date create_time;
+        //创建时间,秒数
+        private Long create_time;
         //朋友圈创建来源。0：企业 1：个人
         private Integer create_type;
         //可见范围类型。0：部分可见 1：公开

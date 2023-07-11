@@ -67,42 +67,40 @@
     <select id="getAllocateCustomers" parameterType="com.linkwechat.domain.WeAllocateCustomer"
             resultType="com.linkwechat.domain.WeAllocateCustomer">
         SELECT
-            wc.customer_name,
-            wu.user_name as takeUserName,
+            wac.customer_name,
+            wac.takeover_name as takeUserName,
             wac.allocate_time,
-            wc.external_userid as externalUserid,
-            wc.add_user_id as firstUserId,
-            (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department
-            FROM
-            we_allocate_customer wac
-        LEFT JOIN we_customer wc ON wac.external_userid=wc.external_userid
-        LEFT JOIN sys_user wu ON wu.we_user_id=wac.takeover_userid
-        WHERE wc.del_flag=1
-        <if test="handoverUserid != null and handoverUserid !=''">and wc.add_user_id=#{handoverUserId}</if>
-        <if test="handoverUserid != null and handoverUserid !=''">and wac.handover_userid=#{handoverUserId}</if>
-        <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-            DATE_FORMAT(wu.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
-        </if>
+            wac.external_userid as externalUserid,
+            wac.takeover_dept_name as department
+        FROM
+        we_allocate_customer wac
+        <where>
+            <if test="leaveUserId != null">
+                wac.leave_user_id=#{leaveUserId}
+            </if>
+            <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
+                DATE_FORMAT(wac.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+            </if>
+        </where>
     </select>
 
 
     <select id="getAllocateGroups" parameterType="com.linkwechat.domain.WeAllocateGroups"
             resultType="com.linkwechat.domain.WeAllocateGroups">
         SELECT
-            wu.user_name as newOwnerName,
-            wg.chat_id,
-            IF(wg.group_name,wg.group_name,"群聊")  as group_name,
-            (SELECT count(*) FROM we_group_member wgm WHERE wgm.chat_id=wg.chat_id) as memberNum,
-            (SELECT GROUP_CONCAT(wd.dept_name) FROM sys_dept wd WHERE wd.dept_id=wu.dept_id) as department,
+            wag.takeover_name as newOwnerName,
+            wag.chat_id,
+            wag.chat_name  as group_name,
+            wag.takeover_dept_name as department,
             wag.allocate_time
         FROM
         we_allocate_group wag
-        LEFT JOIN we_group wg ON wag.chat_id=wg.chat_id
-        LEFT JOIN sys_user wu ON wu.user_id=wag.new_owner
         <where>
-            <if test="oldOwner != null and oldOwner !=''">and wag.old_owner=#{oldOwner}</if>
+            <if test="leaveUserId != null">
+                AND wag.leave_user_id=#{leaveUserId}
+            </if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-                DATE_FORMAT(wu.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+                 DATE_FORMAT(wag.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
         </where>
     </select>
