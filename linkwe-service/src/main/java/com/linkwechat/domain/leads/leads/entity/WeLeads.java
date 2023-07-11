@@ -6,8 +6,6 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
 /**
  * 线索
  *
@@ -31,94 +29,16 @@ public class WeLeads extends BaseEntity {
      */
     private String name;
 
-
-    /**
-     * 备注
-     */
-    private String notes;
-
-    /**
-     * 初诊时间
-     */
-    private String firstVisit;
-
-    /**
-     * 预约时间
-     */
-    private Date appointmentTime;
-
     /**
      * 电话号码
      */
     private String phone;
 
     /**
-     * 留电时间
-     */
-    private Date leavePhoneTime;
-
-    /**
-     * 链接
-     */
-    private String link;
-
-    /**
-     * 一级渠道
-     */
-    private Long primaryChannel;
-
-    /**
-     * 二级渠道
-     */
-    private Long secondaryChannel;
-
-    /**
-     * 三级渠道
-     */
-    private Long threeLevelChannel;
-
-    /**
-     * 主题
-     */
-    private String subject;
-
-    /**
-     * 线索状态(0待分配，1跟进中，2已上门，3已退回，4线索转移)
+     * @see com.linkwechat.common.enums.leads.leads.LeadsStatusEnum
+     * 线索状态(0待分配，1跟进中，2已上门，3已退回)
      */
     private Integer leadsStatus;
-
-    /**
-     * 线索跟进中的子状态。从we_leads_pending_status表中取值
-     */
-    private String leadsPendingStatus;
-
-    /**
-     * 亲属关系
-     */
-    private String kinship;
-
-    /**
-     * 次级关系
-     */
-    @Deprecated
-    private String secondaryRelation;
-
-    /**
-     * 就近院区
-     */
-    private Long nearbyArea;
-
-    /**
-     * 引流员工工号
-     */
-    private String userJobNumber;
-
-    /**
-     * 引流员工姓名
-     */
-    private String userJobName;
-
-
 
     /**
      * 备注标签
@@ -126,29 +46,14 @@ public class WeLeads extends BaseEntity {
     private String labelsIds;
 
     /**
-     * 微信状态（0验证中，1不存在，2加微信已通过）
+     * 自定义属性
      */
-    private Integer weixinStatus;
-
-    /**
-     * 客户微信号
-     */
-    private String weixinId;
-
-    /**
-     * 咨询项目
-     */
-    private String consult;
+    private String properties;
 
     /**
      * 所属公海
      */
     private Long seaId;
-
-    /**
-     * 自定义属性
-     */
-    private String properties;
 
     /**
      * 删除标识

@@ -16,7 +16,7 @@ public enum LeadsStatusEnum {
 
     WAIT_FOR_DISTRIBUTION(0, "waitForDistribution", "待分配"),
     BE_FOLLOWING_UP(1, "beFollowingUp", "跟进中"),
-    VISIT(2, "visit", "已上门"),
+    VISIT(2, "visit", "已转化"),
     RETURNED(3, "returned", "已退回");
 
     private final Integer code;

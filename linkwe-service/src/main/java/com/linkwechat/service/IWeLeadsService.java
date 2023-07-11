@@ -4,12 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
 
 /**
- * <p>
  * 线索 服务类
- * </p>
  *
  * @author WangYX
- * @since 2023-04-04
+ * @version 1.0.0
+ * @date 2023/07/11 14:43
  */
 public interface IWeLeadsService extends IService<WeLeads> {
 }

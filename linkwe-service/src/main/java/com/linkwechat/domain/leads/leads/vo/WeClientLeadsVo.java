@@ -1,17 +1,16 @@
 package com.linkwechat.domain.leads.leads.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**
  * 线索
  *
  * @author WangYX
- * @since 2023-04-04
+ * @version 1.0.0
+ * @date 2023/07/11 15:09
  */
 @Data
 public class WeClientLeadsVo implements Serializable {
@@ -35,136 +34,55 @@ public class WeClientLeadsVo implements Serializable {
     private String phone;
 
     /**
-     * 年龄
-     */
-    private String age;
-
-    /**
-     * 症状
-     */
-    private String symptom;
-
-    /**
-     *
-     * @see com.linkwechat.common.enums.SexEnums
-     *
-     * 患者性别代码, 0 = 未知, 1 = 男, 2 = 女
-     */
-    private Integer sex;
-
-    /**
-     * 备注
-     */
-    private String notes;
-
-    /**
-     * 患者id
-     */
-    private Long patientId;
-
-    /**
-     * 预约时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date appointmentTime;
-
-    /**
-     * 留电时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date leavePhoneTime;
-
-    /**
-     * 链接
-     */
-    private String link;
-
-    /**
-     * 一级渠道
-     */
-    private Long primaryChannel;
-
-    /**
-     * 一级渠道名称
-     */
-    private String primaryChannelName;
-
-    /**
-     * 二级渠道
-     */
-    private Long secondaryChannel;
-
-    /**
-     * 二级渠道名称
-     */
-    private String secondaryChannelName;
-
-    /**
-     * 三级渠道
-     */
-    private Long threeLevelChannel;
-
-    /**
-     * 三级渠道名称
-     */
-    private String threeLevelChannelName;
-
-    /**
-     * 主题
-     */
-    private String subject;
-
-    /**
-     * 线索状态(0待分配，1跟进中，2以上门，3已退回)
+     * @see com.linkwechat.common.enums.leads.leads.LeadsStatusEnum
+     * 线索状态(0待分配，1跟进中，2已上门，3已退回)
      */
     private Integer leadsStatus;
 
     /**
-     * 线索状态(0待分配，1跟进中，2以上门，3已退回，4批量线索转移，5个人线索转移)
-     * 供前端判断线索状态使用
+     * 备注标签
      */
-    private Integer state;
-
+    private String labelsIds;
 
     /**
-     * 线索跟进中的子状态。从we_leads_pending_status表中取值
+     * 备注标签名称
      */
-    private String leadsPendingStatus;
+    private String labelsNames;
 
     /**
-     * 线索跟进中的子状态。从we_leads_pending_status表中取值
+     * 自定义属性
      */
-    private String leadsPendingStatusName;
+    private String properties;
 
     /**
-     * 亲属关系
+     * 所属公海
      */
-    private String kinship;
+    private Long seaId;
 
     /**
-     * 次级关系
+     * 删除标识
      */
-    private String secondaryRelation;
+    private Boolean delFlag;
 
     /**
-     * 就近院区
+     * 当前跟进人Id
      */
-    private Long nearbyArea;
+    private Long followerId;
 
     /**
-     * 就近院区名称
+     * 当前跟进人Id
      */
-    private String nearbyAreaName;
+    private String weUserId;
 
     /**
-     * 引流员工工号
+     * 跟进人
      */
-    private String userJobNumber;
+    private String followerName;
 
     /**
-     * 引流员工姓名
+     * 当前跟进人部门Id
      */
-    private String userJobName;
+    private String deptId;
 
     /**
      * 回收次数
@@ -177,46 +95,20 @@ public class WeClientLeadsVo implements Serializable {
     private String returnReason;
 
     /**
-     * 备注标签
+     * 线索来源 0excel导入
      */
-    private String labelsIds;
+    private Integer source;
 
     /**
-     * 标签备注名
+     * @see com.linkwechat.common.enums.SexEnums
+     * <p>
+     * 性别, 0 = 未知, 1 = 男, 2 = 女
      */
-    private String labelsNames;
-
-    /**
-     * 微信状态（0验证中，1不存在，2加微信已通过）
-     */
-    private Integer weixinStatus;
-
-    /**
-     * 客户微信号
-     */
-    private String weixinId;
-
-    /**
-     * 咨询项目
-     */
-    private String consult;
-
-    /**
-     * 所属公海
-     */
-    private Long seaId;
+    private Integer sex;
 
     /**
      * 自定义属性
      */
-    private List<OutProperties> propertiesList;
-
-    /**
-     * 对外自定义属性值
-     */
-    @Data
-    public static final class OutProperties extends com.linkwechat.domain.leads.leads.vo.WeClientLeadsListVo.Properties {
-        private String name;
-    }
+    private List<Properties> propertiesList;
 
 }
