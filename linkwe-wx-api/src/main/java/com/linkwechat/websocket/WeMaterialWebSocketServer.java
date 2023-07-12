@@ -52,9 +52,13 @@ public class WeMaterialWebSocketServer implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         Object payload = message.getPayload();
         WeMaterialMobileAddViewRequest request = JSONObject.parseObject(payload.toString(), WeMaterialMobileAddViewRequest.class);
-        request.setViewStartTime(new Date());
-        weSocketMap.put(session.getId(), request);
-        log.info("接收到消息：{}", JSONObject.toJSONString(request));
+        if (request.getType().equals(0)) {
+            log.info("接收到心跳：sessionId为{}", session.getId());
+        } else if (request.getType().equals(1)) {
+            request.setViewStartTime(new Date());
+            weSocketMap.put(session.getId(), request);
+            log.info("接收到消息：{}", JSONObject.toJSONString(request));
+        }
     }
 
     @Override
