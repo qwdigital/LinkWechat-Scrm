@@ -37,5 +37,9 @@ public class WeMaterialMobileAddViewRequest {
      */
     private Date viewStartTime;
 
+    /**
+     * 数据类型 0心跳 1数据
+     */
+    private Integer type;
 
 }
