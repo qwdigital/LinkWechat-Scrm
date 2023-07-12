@@ -58,7 +58,7 @@ public class WeLeads extends BaseEntity {
     /**
      * 删除标识
      */
-    private Boolean delFlag;
+    private Integer delFlag;
 
     /**
      * 当前跟进人Id

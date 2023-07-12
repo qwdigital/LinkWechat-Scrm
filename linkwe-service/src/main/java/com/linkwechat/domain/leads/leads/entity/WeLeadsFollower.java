@@ -100,5 +100,8 @@ public class WeLeadsFollower {
      */
     private Integer isCurrentFollower;
 
-
+    /**
+     * 跟进时线索所处的公海Id
+     */
+    private Long seaId;
 }

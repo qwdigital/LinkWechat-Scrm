@@ -69,6 +69,7 @@
         <wechatpay-httpclient.version>0.4.9</wechatpay-httpclient.version>
         <combiner.version>2.6.3</combiner.version>
         <orika.version>1.5.2</orika.version>
+        <redisson.version>3.20.0</redisson.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -508,6 +509,12 @@
                 <groupId>ma.glasnost.orika</groupId>
                 <artifactId>orika-core</artifactId>
                 <version>${orika.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>
