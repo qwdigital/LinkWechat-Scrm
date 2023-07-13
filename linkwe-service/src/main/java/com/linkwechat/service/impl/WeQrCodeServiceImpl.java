@@ -266,7 +266,11 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
         if (CollectionUtil.isNotEmpty(customerList)) {
             scanCountVo.setTotal(customerList.size());
-            long count = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
+            long count = customerList.stream().filter(item ->
+                            DateUtils.getDate().equals(
+                                    DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())
+                            )).count();
+//            long count = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
             scanCountVo.setToday(Long.valueOf(count).intValue());
             Map<String, List<WeCustomer>> listMap = customerList.stream().collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())));
             customerMap.putAll(listMap);
