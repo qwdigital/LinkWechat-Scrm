@@ -221,4 +221,23 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
     Integer totalScanCodeNumber(@Param("state") String state);
 
 
+    /**
+     * 根据渠道时间统计客户(目前用于活码统计相关)
+     * @param state
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<WeCustomerChannelCountVo> countCustomerChannel(@Param("state") String state,
+                                                        @Param("startTime") String startTime,@Param("endTime") String endTime,
+                                                        @Param("delFlag") Integer delFlag);
+
+    /**
+     * 统计指定渠道下累计次数
+     * @param state
+     * @return
+     */
+    Integer totalScanCodeNumber(@Param("state") String state);
+
+
 }

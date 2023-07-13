@@ -298,6 +298,26 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
     /**
+     * 根据渠道统计相关客户数
+     * @param state
+     * @param startTime
+     * @param endTime
+     * @param delFlag
+     * @return
+     */
+    List<WeCustomerChannelCountVo> countCustomerChannel(String state,
+                                                        String startTime, String endTime,
+                                                        Integer delFlag);
+
+    /**
+     * 统计指定渠道下累计次数
+     * @param state
+     * @return
+     */
+    Integer totalScanCodeNumber(String state);
+
+
+    /**
      * 前端公共组件客户筛选封装
      * @param executeUserOrGroup
      * @return
