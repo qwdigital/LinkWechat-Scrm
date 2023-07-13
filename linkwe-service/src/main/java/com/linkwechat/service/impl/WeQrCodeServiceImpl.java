@@ -29,6 +29,7 @@ import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
 import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
+import com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.WeQrCode;
@@ -259,31 +260,51 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         List<String> xAxis = new ArrayList<>();
         List<Integer> yAxis = new ArrayList<>();
         Long qrId = qrCodeListQuery.getQrId();
-        Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getBeginTime());
-        Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getEndTime());
+//        Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getBeginTime());
+//        Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getEndTime());
         WeQrCode weQrCode = getById(qrId);
         Map<String, List<WeCustomer>> customerMap = new HashMap<>();
-        List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
-        if (CollectionUtil.isNotEmpty(customerList)) {
-            scanCountVo.setTotal(customerList.size());
-            long count = customerList.stream().filter(item ->
-                            DateUtils.getDate().equals(
-                                    DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())
-                            )).count();
-//            long count = customerList.stream().filter(item -> ObjectUtil.equal(DateUtils.getDate(), DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime()))).count();
-            scanCountVo.setToday(Long.valueOf(count).intValue());
-            Map<String, List<WeCustomer>> listMap = customerList.stream().collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())));
-            customerMap.putAll(listMap);
+
+//        List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
+//        if (CollectionUtil.isNotEmpty(customerList)) {
+        //累计扫码次数
+        scanCountVo.setTotal(
+                weCustomerService.totalScanCodeNumber(weQrCode.getState())
+        );
+        //今日扫码次数
+        List<WeCustomerChannelCountVo> weCustomerChannelCountVos
+                = weCustomerService.countCustomerChannel(weQrCode.getState(), DateUtils.getDate(), DateUtils.getDate(), null);
+        if(CollectionUtil.isNotEmpty(weCustomerChannelCountVos)){
+            scanCountVo.setToday(
+                    weCustomerChannelCountVos.stream().findFirst().get().getCustomerNumber()
+            );
+        }else{
+            scanCountVo.setToday(0);
         }
-        DateUtils.findDates(beginTime, endTime).stream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
-                .forEach(date -> {
-                    xAxis.add(date);
-                    if (CollectionUtil.isNotEmpty(customerMap.get(date))) {
-                        yAxis.add(customerMap.get(date).size());
-                    } else {
-                        yAxis.add(0);
-                    }
+
+
+        weCustomerService
+                .countCustomerChannel(weQrCode.getState(), qrCodeListQuery.getBeginTime(),
+                        qrCodeListQuery.getEndTime(), null).stream().forEach(k->{
+                    xAxis.add(k.getDate());
+                    yAxis.add(k.getCustomerNumber());
                 });
+
+
+
+
+//            Map<String, List<WeCustomer>> listMap = customerList.stream().collect(Collectors.groupingBy(item -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, item.getAddTime())));
+//            customerMap.putAll(listMap);
+//        }
+//        DateUtils.findDates(beginTime, endTime).stream().map(d -> DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, d))
+//                .forEach(date -> {
+//                    xAxis.add(date);
+//                    if (CollectionUtil.isNotEmpty(customerMap.get(date))) {
+//                        yAxis.add(customerMap.get(date).size());
+//                    } else {
+//                        yAxis.add(0);
+//                    }
+//                });
         scanCountVo.setXAxis(xAxis);
         scanCountVo.setYAxis(yAxis);
         return scanCountVo;
