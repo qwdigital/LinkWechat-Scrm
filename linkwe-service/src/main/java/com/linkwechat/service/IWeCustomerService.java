@@ -325,25 +325,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeCustomersVo> findWeCustomersForCommonAssembly( WeGroupMessageExecuteUsertipVo executeUserOrGroup );
 
 
-    /**
-     * 根据渠道统计相关客户数
-     * @param state
-     * @param startTime
-     * @param endTime
-     * @param delFlag
-     * @return
-     */
-    List<WeCustomerChannelCountVo> countCustomerChannel(String state,
-                                                       String startTime,String endTime,
-                                                       Integer delFlag);
 
-
-    /**
-     * 统计指定渠道下累计次数
-     * @param state
-     * @return
-     */
-    Integer totalScanCodeNumber(String state);
     /**
      * 通过eid查询客户简单信息
      * @param externalUserIds
