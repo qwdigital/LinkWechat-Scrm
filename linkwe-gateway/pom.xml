@@ -94,7 +94,6 @@
         <dependency>
             <groupId>com.linkwechat</groupId>
             <artifactId>linkwe-common</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <dependency>
