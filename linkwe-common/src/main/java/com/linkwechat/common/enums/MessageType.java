@@ -73,6 +73,12 @@ public enum MessageType {
      */
     MINIPROGRAM("12", "miniprogram", "小程序"),
 
+
+    /**
+     * 海报
+     */
+    POSTERS("13","posters","海报")
+
     ;
     /**
      * 媒体类型
