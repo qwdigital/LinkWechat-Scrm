@@ -4,15 +4,15 @@
 
     <select id="getSceneCustomerAnalysis" resultType="com.linkwechat.domain.kf.vo.WeKfSceneAnalysisVo">
         select
-            (select count(1) from we_kf_event_msg where event_type = 'enter_session' ) visit_cnt,
+            (select count(1) from we_kf_pool ) visit_cnt,
             (select count(1) from we_kf_pool where session_start_time is not null ) as consult_cnt,
             (select count(1) from we_kf_pool where user_id is not null ) as reception_cnt,
-            (select count(1) from we_kf_event_msg where event_type = 'enter_session' and  date_format(send_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_visit_cnt,
-            (select count(1) from we_kf_event_msg where event_type = 'enter_session' and  date_format(send_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_visit_cnt,
-            (select count(1) from we_kf_pool where date_format(session_start_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_consult_cnt,
-            (select count(1) from we_kf_pool where date_format(session_start_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_consult_cnt,
-            (select count(1) from we_kf_pool where user_id is not null and date_format(reception_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')) as td_reception_cnt,
-            (select count(1) from we_kf_pool where user_id is not null and date_format(reception_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_reception_cnt
+            (select count(1) from we_kf_pool where date_format(create_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_visit_cnt,
+            (select count(1) from we_kf_pool where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_visit_cnt,
+            (select count(1) from we_kf_pool where session_start_time is not null and date_format(create_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_consult_cnt,
+            (select count(1) from we_kf_pool where session_start_time is not null and date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_consult_cnt,
+            (select count(1) from we_kf_pool where user_id is not null and date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')) as td_reception_cnt,
+            (select count(1) from we_kf_pool where user_id is not null and date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_reception_cnt
     </select>
 
     <select id="getSceneCustomerRealCnt" resultType="com.linkwechat.domain.kf.vo.WeKfSceneRealCntVo">
@@ -85,8 +85,7 @@
                     #{userId}
                 </foreach>
             </if>
-            and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;
-            DATE_FORMAT(#{beginTime}, '%Y-%m-%d'))
+            and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime}, '%Y-%m-%d'))
         </where>
         ),
         (SELECT
@@ -110,8 +109,7 @@
                 #{userId}
             </foreach>
         </if>
-        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;
-        DATE_FORMAT(#{beginTime}, '%Y-%m-%d'))),
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;  DATE_FORMAT(#{beginTime}, '%Y-%m-%d'))),
         (SELECT @reception_total := (SELECT count(1)
         FROM we_kf_pool wkp where wkp.user_id is not null
         <if test="scenes != null and scenes.size() > 0">
@@ -132,8 +130,7 @@
                 #{userId}
             </foreach>
         </if>
-        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;
-        DATE_FORMAT(#{beginTime}, '%Y-%m-%d')))) AS real_data
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime}, '%Y-%m-%d')))) AS real_data
         ON date_list.`date` = real_data.day) AS RESULT
         ORDER BY x_time asc
     </select>
@@ -233,8 +230,7 @@
                 #{userId}
             </foreach>
         </if>
-        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;=
-            DATE_FORMAT(#{endTime}, '%Y-%m-%d'))),
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d'))),
         (SELECT @reception_total := (SELECT count(1)
         FROM we_kf_pool wkp where wkp.user_id is not null
         <if test="scenes != null and scenes.size() > 0">
@@ -255,8 +251,7 @@
                 #{userId}
             </foreach>
         </if>
-        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;=
-            DATE_FORMAT(#{endTime}, '%Y-%m-%d')))) AS real_data
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d')))) AS real_data
         ON date_list.`date` = real_data.day) AS RESULT
         ORDER BY x_time desc
     </select>
@@ -264,16 +259,18 @@
     <select id="getSceneCustomerVisitRank" resultType="com.linkwechat.domain.kf.vo.WeKfSceneRankCntVo">
         select
             count(1) as total,
-            wkem.scene,
-            ifnull((select wks.name from we_kf_scenes wks where wks.scenes = wkem.scene limit 1),'未知来源') scene_name
-        from we_kf_event_msg wkem where wkem.event_type='enter_session'
-        <if test="beginTime != null">
-            and DATE_FORMAT(wkem.send_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
-        </if>
-        <if test="endTime != null">
-            and DATE_FORMAT(wkem.send_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
-        </if>
-        group by wkem.scene
+            wkp.scene ,
+            ifnull((select wks.name from we_kf_scenes wks where wks.scenes = wkp.scene limit 1),'未知来源') scene_name
+        from we_kf_pool wkp
+        <where>
+            <if test="beginTime != null">
+                and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and DATE_FORMAT(wkem.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        group by wkp.scene
         order by total desc limit 5
     </select>
 

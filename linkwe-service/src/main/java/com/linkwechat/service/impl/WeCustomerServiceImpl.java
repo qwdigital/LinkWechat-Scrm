@@ -1337,6 +1337,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
     }
 
+
     @Override
     public List<WeCustomersVo> findWeCustomersForCommonAssembly(WeGroupMessageExecuteUsertipVo executeUserOrGroup) {
 
