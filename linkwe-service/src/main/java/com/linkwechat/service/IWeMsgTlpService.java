@@ -59,4 +59,11 @@ public interface IWeMsgTlpService extends IService<WeMsgTlp> {
      * @param weMsgTlpDto
      */
     void addOrUpdate(WeMsgTlpDto weMsgTlpDto);
+
+
+    /**
+     * 群欢迎语同步至企业微信
+     * @param weMsgTlpDto
+     */
+    void synchGroupWelcomMsg(WeMsgTlpDto weMsgTlpDto,Long tlpId);
 }

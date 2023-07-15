@@ -1,7 +1,9 @@
 package com.linkwechat.domain.material.entity;
 
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.material.ao.WeMaterialImgAo;
@@ -56,7 +58,7 @@ public class WeMaterial extends BaseEntity {
     /**
      * 文本内容、图片文案
      */
-    @Excel(name ="文本内容")
+    @Excel(name = "文本内容")
     private String content;
 
     /**
@@ -86,12 +88,12 @@ public class WeMaterial extends BaseEntity {
     private Long type;
 
     /**
-     * 海报背景宽度
+     * 图片宽度
      */
     private Integer width;
 
     /**
-     * 海报背景高度
+     * 图片高度
      */
     private Integer height;
 
@@ -139,6 +141,24 @@ public class WeMaterial extends BaseEntity {
      */
     @TableField(value = "subassembly")
     private String posterSubassembly;
+
+    /**
+     * 海报二维码组件类型：海报二维码组件类型：3占位码 4员工活码 5客群活码 6门店活码 7识客活码 8拉新活码
+     */
+    @TableField(value = "poster_qr_type")
+    private Integer posterQrType;
+
+    /**
+     * 像素大小
+     */
+    @TableField(value = "pixel_size")
+    private Long pixelSize;
+
+    /**
+     * 内存大小
+     */
+    @TableField(value = "memory_size")
+    private Long memorySize;
 
     @TableField(exist = false)
     private List<WeMaterialImgAo> weMaterialImgAoList;

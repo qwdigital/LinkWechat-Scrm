@@ -6,11 +6,7 @@ import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
-import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
@@ -19,6 +15,7 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
@@ -30,7 +27,6 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
-import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -38,6 +34,7 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
@@ -130,6 +127,11 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
     }
 
     @Override
+    public AjaxResult<WeResultVo> cancelGroupMsgSend(WeCancelGroupMsgSendQuery query) {
+        return null;
+    }
+
+    @Override
     public AjaxResult<WeResultVo> sendWelcomeMsg(WeWelcomeMsgQuery query) {
         return null;
     }
@@ -190,17 +192,17 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
     }
 
     @Override
-    public AjaxResult<WeLinkCustomerVo> createCustomerLink(WeLinkCustomerQuery query) {
+    public AjaxResult<WeGroupMsgTplVo> addWeGroupMsg(WeGroupMsgQuery query) {
         return null;
     }
 
     @Override
-    public AjaxResult<WeLinkCustomerVo> updateCustomerLink(WeLinkCustomerQuery query) {
+    public AjaxResult<WeResultVo> updateWeGroupMsg(WeGroupMsgQuery query) {
         return null;
     }
 
     @Override
-    public AjaxResult<WeResultVo> deleteCustomerLink(WeLinkCustomerQuery query) {
+    public AjaxResult<WeResultVo> delWeGroupMsg(WeGroupMsgQuery query) {
         return null;
     }
 

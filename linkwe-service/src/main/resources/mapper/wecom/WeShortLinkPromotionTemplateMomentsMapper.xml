@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeShortLinkPromotionTemplateMomentsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.WeShortLinkPromotionTemplateMoments">
+        <id column="id" property="id" />
+        <result column="promotion_id" property="promotionId" />
+        <result column="scope_type" property="scopeType" />
+        <result column="user_ids" property="userIds" />
+        <result column="sex" property="sex" />
+        <result column="add_begin_time" property="addBeginTime" />
+        <result column="add_end_time" property="addEndTime" />
+        <result column="label_ids" property="labelIds" />
+        <result column="track_state" property="trackState" />
+        <result column="content" property="content" />
+        <result column="send_type" property="sendType" />
+        <result column="task_send_time" property="taskSendTime" />
+        <result column="task_end_time" property="taskEndTime" />
+        <result column="create_by" property="createBy" />
+        <result column="create_by_id" property="createById" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_by_id" property="updateById" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, promotion_id, scope_type, user_ids, sex, add_begin_time, add_end_time, label_ids, track_state, content, send_type, task_send_time, task_end_time, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag
+    </sql>
+
+</mapper>

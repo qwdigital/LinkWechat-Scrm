@@ -11,10 +11,7 @@ import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeAddMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentResultQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.strategy.WeAddCustomerStrategyQuery;
@@ -449,6 +446,16 @@ public interface WeCustomerClient {
     WeGroupMsgListVo getGroupMsgSendResult(@JSONBody WeGetGroupMsgListQuery query);
 
     /**
+     * 停止企业群发
+     *
+     * @param query
+     * @return
+     */
+    @Request(url = "/externalcontact/cancel_groupmsg_send", type = "POST")
+    WeResultVo cancelGroupMsgSend(@JSONBody WeCancelGroupMsgSendQuery query);
+
+
+    /**
      * 发送新客户欢迎语
      *
      * @param query
@@ -486,6 +493,7 @@ public interface WeCustomerClient {
 
     /**
      * 编辑客户标签
+     *
      * @return
      */
     @Request(url = "/externalcontact/mark_tag",
@@ -495,7 +503,8 @@ public interface WeCustomerClient {
 
 
     /**
-     *  配置客户群进群方式
+     * 配置客户群进群方式
+     *
      * @param joinWayQuery
      * @return
      */
@@ -505,6 +514,7 @@ public interface WeCustomerClient {
 
     /**
      * 获取客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -514,6 +524,7 @@ public interface WeCustomerClient {
 
     /**
      * 删除客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -523,6 +534,7 @@ public interface WeCustomerClient {
 
     /**
      * 更新客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -531,6 +543,7 @@ public interface WeCustomerClient {
 
     /**
      * 创建商品图册
+     *
      * @param query
      * @return
      */
@@ -539,6 +552,7 @@ public interface WeCustomerClient {
 
     /**
      * 编辑商品图册
+     *
      * @param query
      * @return
      */
@@ -547,6 +561,7 @@ public interface WeCustomerClient {
 
     /**
      * 删除商品图册
+     *
      * @param query
      * @return
      */
@@ -555,6 +570,7 @@ public interface WeCustomerClient {
 
     /**
      * 获取商品图册
+     *
      * @param query
      * @return
      */
@@ -563,6 +579,7 @@ public interface WeCustomerClient {
 
     /**
      * 获取商品图册列表
+     *
      * @param query
      * @return
      */

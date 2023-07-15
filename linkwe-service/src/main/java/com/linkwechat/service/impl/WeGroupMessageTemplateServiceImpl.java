@@ -107,9 +107,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         if (weGroupMessageTemplate.getStatus() != null) {
             lqw.eq(WeGroupMessageTemplate::getStatus, weGroupMessageTemplate.getStatus());
         }
-        if(CollectionUtil.isNotEmpty(weGroupMessageTemplate.getParams()) && ObjectUtil.isNotNull(weGroupMessageTemplate.getParams().get("dataScope"))){
+        if (CollectionUtil.isNotEmpty(weGroupMessageTemplate.getParams()) && ObjectUtil.isNotNull(weGroupMessageTemplate.getParams().get("dataScope"))) {
             String dataScope = String.valueOf(weGroupMessageTemplate.getParams().get("dataScope"));
-            if(StringUtils.isNotEmpty(dataScope)){
+            if (StringUtils.isNotEmpty(dataScope)) {
                 lqw.apply(dataScope);
             }
         }
@@ -130,7 +130,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         List<WeGroupMessageAttachments> attachmentsList = attachmentsService.lambdaQuery().eq(WeGroupMessageAttachments::getMsgTemplateId, id).list();
         detailVo.setAttachments(attachmentsList);
         List<WeGroupMessageTask> taskList = messageTaskService.lambdaQuery().eq(WeGroupMessageTask::getMsgTemplateId, id).list();
-        if(CollectionUtil.isNotEmpty(taskList)){
+        if (CollectionUtil.isNotEmpty(taskList)) {
             //待发送人员列表
             Long toBeSent = taskList.stream().filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
             detailVo.setToBeSendNum(toBeSent.intValue());
@@ -139,7 +139,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             detailVo.setAlreadySendNum(alreadySent.intValue());
         }
         List<WeGroupMessageSendResult> resultList = messageSendResultService.lambdaQuery().eq(WeGroupMessageSendResult::getMsgTemplateId, id).list();
-        if(CollectionUtil.isNotEmpty(resultList)){
+        if (CollectionUtil.isNotEmpty(resultList)) {
             //未发送客户数
             Long toBeCustomerNum = resultList.stream().filter(item -> ObjectUtil.equal(0, item.getStatus())).count();
             detailVo.setToBeSendCustomerNum(toBeCustomerNum.intValue());
@@ -160,10 +160,10 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         checkSenderList(query, senderList);
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
-        if(query.getSendTime() == null){
+        if (query.getSendTime() == null) {
             weGroupMessageTemplate.setSendTime(new Date());
         }
-        if(StringUtils.isEmpty(query.getContent()) && CollectionUtil.isNotEmpty(query.getAttachmentsList())){
+        if (StringUtils.isEmpty(query.getContent()) && CollectionUtil.isNotEmpty(query.getAttachmentsList())) {
             String msgContent = query.getAttachmentsList().stream().map(item -> MessageType.messageTypeOf(item.getMsgType()).getName()).collect(Collectors.joining(","));
             weGroupMessageTemplate.setContent(msgContent);
         }
@@ -184,12 +184,12 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             List<WeGroupMessageList> weGroupMessageLists = new ArrayList<>();
             List<WeGroupMessageTask> messageTaskList = new ArrayList<>();
             List<WeGroupMessageSendResult> sendResultList = new ArrayList<>();
-            for (WeAddGroupMessageQuery.SenderInfo senderInfo :senderList ) {
+            for (WeAddGroupMessageQuery.SenderInfo senderInfo : senderList) {
                 WeGroupMessageList weGroupMessageList = new WeGroupMessageList();
                 weGroupMessageList.setMsgTemplateId(weGroupMessageTemplate.getId());
-                if(query.getChatType() == 1){
+                if (query.getChatType() == 1) {
                     weGroupMessageList.setChatType("single");
-                }else {
+                } else {
                     weGroupMessageList.setChatType("group");
                 }
                 weGroupMessageList.setUserId(senderInfo.getUserId());
@@ -200,17 +200,17 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 messageTask.setUserId(senderInfo.getUserId());
                 messageTaskList.add(messageTask);
 
-                if(CollectionUtil.isNotEmpty(senderInfo.getCustomerList())){
+                if (CollectionUtil.isNotEmpty(senderInfo.getCustomerList())) {
                     List<WeGroupMessageSendResult> messageSendResults = senderInfo.getCustomerList().stream().map(eid -> {
-                                WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
-                                messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
-                                messageSendResult.setUserId(senderInfo.getUserId());
-                                messageSendResult.setExternalUserid(eid);
-                                return messageSendResult;
-                            }).collect(Collectors.toList());
+                        WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
+                        messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
+                        messageSendResult.setUserId(senderInfo.getUserId());
+                        messageSendResult.setExternalUserid(eid);
+                        return messageSendResult;
+                    }).collect(Collectors.toList());
                     sendResultList.addAll(messageSendResults);
                 }
-                if(CollectionUtil.isNotEmpty(senderInfo.getChatList())){
+                if (CollectionUtil.isNotEmpty(senderInfo.getChatList())) {
                     List<WeGroupMessageSendResult> messageSendResults = senderInfo.getChatList().stream().map(chatId -> {
                         WeGroupMessageSendResult messageSendResult = new WeGroupMessageSendResult();
                         messageSendResult.setMsgTemplateId(weGroupMessageTemplate.getId());
@@ -231,58 +231,58 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
             if (ObjectUtil.equal(0, query.getIsTask()) && query.getSendTime() == null) {
                 //todo 立即发送
-                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(),rabbitMQSettingConfig.getWeGroupMsgRk(),JSONObject.toJSONString(query));
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeGroupMsgRk(), JSONObject.toJSONString(query));
             } else {
                 //todo 延时发送
                 long diffTime = DateUtils.diffTime(query.getSendTime(), new Date());
-                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(),rabbitMQSettingConfig.getWeDelayGroupMsgRk(),JSONObject.toJSONString(query),message -> {
-                            //注意这里时间可使用long类型,毫秒单位，设置header
-                            message.getMessageProperties().setHeader("x-delay", diffTime);
-                            return message;
-                        });
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeDelayGroupMsgRk(), JSONObject.toJSONString(query), message -> {
+                    //注意这里时间可使用long类型,毫秒单位，设置header
+                    message.getMessageProperties().setHeader("x-delay", diffTime);
+                    return message;
+                });
             }
 
         }
     }
 
     private void checkSenderList(WeAddGroupMessageQuery query, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
-        if(query.getIsAll() && CollectionUtil.isEmpty(senderList)){
-            if(query.getChatType() == 1){
+        if (query.getIsAll() && CollectionUtil.isEmpty(senderList)) {
+            if (query.getChatType() == 1) {
                 List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                        .select(WeCustomer::getExternalUserid,WeCustomer::getAddUserId)
-                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid,WeCustomer::getAddUserId));
-                if(CollectionUtil.isNotEmpty(customerList)){
+                        .select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId)
+                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid, WeCustomer::getAddUserId));
+                if (CollectionUtil.isNotEmpty(customerList)) {
                     Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
-                    customerMap.forEach((userId, customers) ->{
+                    customerMap.forEach((userId, customers) -> {
                         List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
                         WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
                         senderInfo.setCustomerList(eids);
                         senderInfo.setUserId(userId);
                         senderList.add(senderInfo);
                     });
-                }else {
+                } else {
                     throw new WeComException("暂无客户可发送");
                 }
-            }else {
+            } else {
                 List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getDelFlag, 0));
-                if(CollectionUtil.isNotEmpty(groupList)){
+                if (CollectionUtil.isNotEmpty(groupList)) {
                     Map<String, List<String>> ownerToChatIdMap = groupList.stream().collect(Collectors.groupingBy(WeGroup::getOwner, Collectors.mapping(WeGroup::getChatId, Collectors.toList())));
-                    ownerToChatIdMap.forEach((userId,chatIds) ->{
+                    ownerToChatIdMap.forEach((userId, chatIds) -> {
                         WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
                         senderInfo.setUserId(userId);
                         senderInfo.setChatList(chatIds);
                         senderList.add(senderInfo);
                     });
-                }else {
+                } else {
                     throw new WeComException("暂无客户群可发送");
                 }
             }
-        }else if(!query.getIsAll() && CollectionUtil.isEmpty(senderList)){
+        } else if (!query.getIsAll() && CollectionUtil.isEmpty(senderList)) {
             throw new WeComException("无指定接收消息的成员及对应客户列表");
-        }else if(!query.getIsAll() && CollectionUtil.isNotEmpty(senderList) && query.getChatType() == 2){
+        } else if (!query.getIsAll() && CollectionUtil.isNotEmpty(senderList) && query.getChatType() == 2) {
             List<String> userIds = senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.toList());
-            List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().in(WeGroup::getOwner,userIds).eq(WeGroup::getDelFlag, 0));
-            if(CollectionUtil.isNotEmpty(groupList)){
+            List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().in(WeGroup::getOwner, userIds).eq(WeGroup::getDelFlag, 0));
+            if (CollectionUtil.isNotEmpty(groupList)) {
                 Map<String, List<String>> ownerToChatIdMap = groupList.stream().collect(Collectors.groupingBy(WeGroup::getOwner, Collectors.mapping(WeGroup::getChatId, Collectors.toList())));
                 for (WeAddGroupMessageQuery.SenderInfo senderInfo : senderList) {
                     List<String> chatIds = ownerToChatIdMap.get(senderInfo.getUserId());
@@ -296,7 +296,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     public void cancelByIds(List<Long> asList) {
         WeGroupMessageTemplate template = new WeGroupMessageTemplate();
         template.setStatus(2);
-        update(template,new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId,asList));
+        update(template, new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId, asList));
     }
 
     @Async
@@ -304,13 +304,13 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     public void syncGroupMsgSendResultByIds(List<Long> asList) {
         WeGroupMessageTemplate template = new WeGroupMessageTemplate();
         template.setRefreshTime(new Date());
-        this.update(template,new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId,asList));
+        this.update(template, new LambdaQueryWrapper<WeGroupMessageTemplate>().in(WeGroupMessageTemplate::getId, asList));
         List<WeGroupMessageList> weGroupMessageLists = weGroupMessageListService.list(new LambdaQueryWrapper<WeGroupMessageList>()
                 .in(WeGroupMessageList::getMsgTemplateId, asList)
-                .eq(WeGroupMessageList::getDelFlag,0));
+                .eq(WeGroupMessageList::getDelFlag, 0));
         List<WeGroupMessageTask> taskList = new ArrayList<>();
         List<WeGroupMessageSendResult> sendResultlist = new ArrayList<>();
-        if(CollectionUtil.isNotEmpty(weGroupMessageLists)){
+        if (CollectionUtil.isNotEmpty(weGroupMessageLists)) {
             weGroupMessageLists.forEach(weGroupMessageList -> {
                 WeGetGroupMsgListQuery weGetGroupMsgListQuery = new WeGetGroupMsgListQuery();
                 weGetGroupMsgListQuery.setMsgid(weGroupMessageList.getMsgId());
@@ -319,7 +319,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     WeGroupMessageTask messageTask = new WeGroupMessageTask();
                     messageTask.setMsgId(weGroupMessageList.getMsgId());
                     messageTask.setUserId(msgTask.getUserId());
-                    if(msgTask.getSendTime() != null){
+                    if (msgTask.getSendTime() != null) {
                         messageTask.setSendTime(new Date(msgTask.getSendTime() * 1000));
                     }
                     messageTask.setMsgTemplateId(weGroupMessageList.getMsgTemplateId());
@@ -334,7 +334,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                         messageSendResult.setUserId(msgTask.getUserId());
                         messageSendResult.setChatId(sendResult.getChatId());
                         messageSendResult.setExternalUserid(sendResult.getExternalUserId());
-                        if(sendResult.getSendTime() != null){
+                        if (sendResult.getSendTime() != null) {
                             messageSendResult.setSendTime(new Date(sendResult.getSendTime() * 1000));
                         }
                         messageSendResult.setStatus(sendResult.getStatus());
@@ -352,7 +352,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Override
     public void syncGroupMsgSendResultByBids(List<Long> businessIds, Integer source) {
         List<WeGroupMessageTemplate> groupMsgTemplatList = getGroupMsgTemplateByBid(businessIds, source);
-        if(CollectionUtil.isNotEmpty(groupMsgTemplatList)){
+        if (CollectionUtil.isNotEmpty(groupMsgTemplatList)) {
             List<Long> ids = groupMsgTemplatList.parallelStream().map(WeGroupMessageTemplate::getId).collect(Collectors.toList());
             syncGroupMsgSendResultByIds(ids);
         }
@@ -373,56 +373,53 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Override
     public void groupMessageTaskHandler(WeAddGroupMessageQuery query) {
 
-        if(query.getMsgSource().equals(new Integer(2))){//sop
-
+        if (query.getMsgSource().equals(new Integer(2))) {//sop
             //sop消息群发逻辑
-            SpringUtils.getBean("sopGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(
-                    query
-            );
-        }else if(query.getMsgSource().equals(new Integer(3))){//直播
+            SpringUtils.getBean("sopGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
+
+        } else if (query.getMsgSource().equals(new Integer(3))) {//直播
             //直播消息群发逻辑
-            SpringUtils.getBean("liveGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(
-                    query
-            );
+            SpringUtils.getBean("liveGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
 
-        }else{
+        } else if (query.getMsgSource().equals(new Integer(5))) {
+            //短链推广群发逻辑
+            SpringUtils.getBean("shortLinkPromotionGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
+
+        } else {
             //公共消息群发逻辑
-            SpringUtils.getBean("commonGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(
-                    query
-            );
-
+            SpringUtils.getBean("commonGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
         }
 
     }
 
     @Override
     public List<WeGroupMessageTemplate> getGroupMsgTemplateByBid(List<Long> businessIds, int source) {
-        return  list(new LambdaQueryWrapper<WeGroupMessageTemplate>()
+        return list(new LambdaQueryWrapper<WeGroupMessageTemplate>()
                 .in(WeGroupMessageTemplate::getBusinessId, businessIds)
                 .eq(WeGroupMessageTemplate::getSource, source));
     }
 
     @Override
-    public Map<Long,List<WeGroupMessageSendResult>> getGroupMsgSendResultByBid(List<Long> businessIds, Integer source) {
-        Map<Long,List<WeGroupMessageSendResult>> resultMap = new HashMap<>();
-        if(CollectionUtil.isEmpty(businessIds)){
+    public Map<Long, List<WeGroupMessageSendResult>> getGroupMsgSendResultByBid(List<Long> businessIds, Integer source) {
+        Map<Long, List<WeGroupMessageSendResult>> resultMap = new HashMap<>();
+        if (CollectionUtil.isEmpty(businessIds)) {
             return resultMap;
         }
-        List<WeGroupMessageTemplate> templateList = getGroupMsgTemplateByBid(businessIds,source);
-        if(CollectionUtil.isNotEmpty(templateList)){
+        List<WeGroupMessageTemplate> templateList = getGroupMsgTemplateByBid(businessIds, source);
+        if (CollectionUtil.isNotEmpty(templateList)) {
             Map<Long, Set<Long>> bidAndTidMap = templateList.parallelStream().collect(Collectors.groupingBy(WeGroupMessageTemplate::getBusinessId,
                     Collectors.mapping(WeGroupMessageTemplate::getId, Collectors.toSet())));
             List<Long> templateIds = bidAndTidMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-            if(CollectionUtil.isNotEmpty(templateIds)){
+            if (CollectionUtil.isNotEmpty(templateIds)) {
                 WeGroupMessageSendResult result = new WeGroupMessageSendResult();
                 result.setMsgTemplateIds(templateIds);
                 List<WeGroupMessageSendResult> sendResults = groupMsgSendResultList(result);
-                if(CollectionUtil.isNotEmpty(sendResults)){
-                    bidAndTidMap.forEach((businessId, tids) ->{
+                if (CollectionUtil.isNotEmpty(sendResults)) {
+                    bidAndTidMap.forEach((businessId, tids) -> {
                         List<WeGroupMessageSendResult> tempResult = sendResults.stream()
                                 .filter(sendResultItem -> tids.contains(sendResultItem.getMsgTemplateId()))
                                 .collect(Collectors.toList());
-                        resultMap.put(businessId,tempResult);
+                        resultMap.put(businessId, tempResult);
                     });
                 }
 
@@ -434,8 +431,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     @Override
     public List<WeGroupMessageAttachments> getGroupMsgAttachmentsByBid(Long businessId, Integer source) {
         List<WeGroupMessageAttachments> attachmentsList = new LinkedList<>();
-        List<WeGroupMessageTemplate> templateList = getGroupMsgTemplateByBid(Collections.singletonList(businessId),source);
-        if(CollectionUtil.isNotEmpty(templateList)){
+        List<WeGroupMessageTemplate> templateList = getGroupMsgTemplateByBid(Collections.singletonList(businessId), source);
+        if (CollectionUtil.isNotEmpty(templateList)) {
             WeGroupMessageTemplate weGroupMessageTemplate = templateList.get(0);
             List<WeGroupMessageAttachments> attachments = attachmentsService.list(new LambdaQueryWrapper<WeGroupMessageAttachments>()
                     .eq(WeGroupMessageAttachments::getMsgTemplateId, weGroupMessageTemplate.getId()));

@@ -13,7 +13,7 @@
             COUNT(IF(add_state=0,true,NULL)) AS waitAddCustomerNum,
             COUNT(IF(add_state=3,true,NULL)) AS waitPassCustomerNum
         FROM
-            we_customer_seas
+            we_customer_seas where del_flag=0
     </select>
 
     <select id="findSeasRecord" resultType="com.linkwechat.domain.wecom.vo.customer.seas.CustomerSeasRecordVo">
@@ -27,7 +27,7 @@
         COUNT(IF(add_state=3,true,NULL)) AS waitPassCustomerNum,
         IFNULL(ROUND(COUNT(IF(add_state=1,true,NULL))/COUNT(*)*100,2),0) AS completionRate
         FROM
-        we_customer_seas
+        we_customer_seas where del_flag=0
         GROUP BY
         <choose>
             <when test="groupByType==1">

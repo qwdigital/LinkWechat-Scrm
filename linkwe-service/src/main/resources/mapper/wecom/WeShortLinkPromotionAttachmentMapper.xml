@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeShortLinkPromotionAttachmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.WeShortLinkPromotionAttachment">
+        <id column="id" property="id"/>
+        <result column="template_type" property="templateType"/>
+        <result column="template_id" property="templateId"/>
+        <result column="msg_type" property="msgType"/>
+        <result column="content" property="content"/>
+        <result column="media_id" property="mediaId"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="file_url" property="fileUrl"/>
+        <result column="link_url" property="linkUrl"/>
+        <result column="pic_url" property="picUrl"/>
+        <result column="app_id" property="appId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="material_id" property="materialId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , template_type, template_id, msg_type, content, media_id, title, description, file_url,
+        link_url, pic_url, app_id, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag,
+        material_id
+    </sql>
+
+</mapper>

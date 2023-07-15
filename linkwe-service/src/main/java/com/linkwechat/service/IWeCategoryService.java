@@ -5,6 +5,7 @@ import com.linkwechat.common.core.domain.Tree;
 import com.linkwechat.domain.material.entity.WeCategory;
 import com.linkwechat.domain.material.vo.WeCategoryNewVo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -33,9 +34,9 @@ public interface IWeCategoryService extends IService<WeCategory> {
      * 通过类型查询对应类目的分类信息列表
      *
      * @param mediaType 类型
-     * @return {@link WeCategory}s
+     * @return {@link WeCategory}
      */
-    List<? extends Tree<?>> findWeCategoryByMediaType(@Param("mediaType") String mediaType);
+    List<? extends Tree<?>> findWeCategoryByMediaType(@Param("mediaType") String mediaType, @RequestParam(value = "scene", required = false) Integer scene);
 
     void deleteWeCategoryById(Long[] ids);
 

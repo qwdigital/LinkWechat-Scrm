@@ -1,31 +1,24 @@
 package com.linkwechat.scheduler.task;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeMoments;
-import com.linkwechat.domain.moments.dto.MomentsCreateResultDto;
 import com.linkwechat.domain.moments.dto.MomentsListDetailParamDto;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.fegin.QwMomentsClient;
-import com.linkwechat.service.IWeMomentsService;
-import com.xxl.job.core.biz.model.ReturnT;
+import com.linkwechat.service.IWeMomentsTaskService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 朋友圈相关定时任务
@@ -33,17 +26,14 @@ import java.util.Objects;
  * @author danmo
  * @date 2023/04/18 11:22
  **/
-
 @Component
 @Slf4j
 public class WeMomentTask {
 
-
     @Resource
-    private QwMomentsClient qwMomentsClient;
-
-    @Autowired
-    private IWeMomentsService weMomentsService;
+    private IWeMomentsTaskService weMomentsTaskService;
+    @Resource
+    private RedisService redisService;
 
     /**
      * 同步30天数据
@@ -61,57 +51,10 @@ public class WeMomentTask {
     public final Integer PARAMS_TYPE_CUSTOMIZE = 3;
 
     /**
-     * 获取任务创建结果
-     *
-     */
-    @XxlJob("weMomentResultTask")
-    public void weMomentResultHandle() {
-
-        //获取页面传递的参数
-        String params = XxlJobHelper.getJobParam();
-
-        XxlJobHelper.log("朋友圈获取任务创建结果>>>>>>>>>>>>>>>>>>> params:{}", params);
-
-        ArrayList<Integer> status = ListUtil.toList(1, 2);
-
-        //查询未创建及创建中的任务
-        List<WeMoments> weMoments = weMomentsService.list(new LambdaQueryWrapper<WeMoments>().in(WeMoments::getStatus, status).eq(WeMoments::getDelFlag, 0));
-
-        if (CollectionUtil.isNotEmpty(weMoments)) {
-            for (WeMoments weMoment : weMoments) {
-                if (Objects.isNull(weMoment.getJobId())) {
-                    continue;
-                }
-                try {
-                    MomentsCreateResultDto momentsCreateResult = qwMomentsClient.getMomentTaskResult(weMoment.getJobId()).getData();
-                    if (Objects.nonNull(momentsCreateResult) && ObjectUtil.equal(momentsCreateResult.getErrCode(), 0)) {
-                        weMoment.setStatus(momentsCreateResult.getStatus());
-                        if (ObjectUtil.equal(3, momentsCreateResult.getStatus())) {
-                            weMoment.setMomentId(momentsCreateResult.getResult().getMomentId());
-                            //无效员工列表
-                            MomentsCreateResultDto.WeMomentSendVo invalidSenderList = momentsCreateResult.getResult().getInvalidSenderList();
-                            log.info("朋友圈获取任务创建结果>>>>>>>>>>>> 无效员工列表 senderList:{}", JSONObject.toJSONString(invalidSenderList));
-                            //无效标签列表
-                            MomentsCreateResultDto.WeMomentCustomerVo invalidExternalContactList = momentsCreateResult.getResult().getInvalidExternalContactList();
-                            log.info("朋友圈获取任务创建结果>>>>>>>>>>>> 无效标签列表 tagList:{}", JSONObject.toJSONString(invalidExternalContactList));
-                            weMomentsService.updateById(weMoment);
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error("朋友圈获取任务创建结果>>>>>>>>>>>> 调用企微接口失败：jobId:{}", weMoment.getJobId(), e);
-                }
-            }
-        }
-    }
-
-
-    /**
      * 朋友圈定时拉取任务
-     *
      */
     @XxlJob("weMomentPullTask")
     public void weMomentPullHandle() {
-
         //获取页面传递的参数
         String params = XxlJobHelper.getJobParam();
 
@@ -136,10 +79,20 @@ public class WeMomentTask {
             endTime = query.getEndTime();
         }
 
-        List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
-        MomentsListDetailParamDto detailParamDto = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).build();
-        weMomentsService.getByMoment(null, moments, detailParamDto);
-        weMomentsService.syncMentsDataHandle(moments);
+        //加锁，防止并发处理
+        String key = "momentsSyncKey";
+        String value = "lock";
+        Boolean b = redisService.tryLock(key, value, 60 * 60L);
+        if (b) {
+            try {
+                List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
+                MomentsListDetailParamDto detailParamDto = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).build();
+                weMomentsTaskService.getMoment(null, moments, detailParamDto);
+                weMomentsTaskService.syncMomentsDataHandle(moments);
+            } finally {
+                redisService.unLock(key, value);
+            }
+        }
     }
 
     @Data

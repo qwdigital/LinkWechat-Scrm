@@ -5,11 +5,7 @@ import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
-import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
@@ -18,6 +14,7 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeUpdateCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferGroupChatQuery;
+import com.linkwechat.domain.wecom.query.groupmsg.WeGroupMsgQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
@@ -28,7 +25,6 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
-import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -36,10 +32,12 @@ import com.linkwechat.domain.wecom.vo.customer.state.WeUserBehaviorDataVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
+import com.linkwechat.domain.wecom.vo.goupmsg.WeGroupMsgTplVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
 import com.linkwechat.wecom.client.WeCustomerClient;
+import com.linkwechat.wecom.client.WeGroupWelcomeTplClient;
 import com.linkwechat.wecom.service.IQwCustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +54,9 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
 
     @Autowired
     private WeCustomerClient weCustomerClient;
+
+    @Autowired
+    private WeGroupWelcomeTplClient weGroupWelcomeTplClient;
 
 
     @Override
@@ -91,7 +92,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeGroupChatListVo getGroupChatList(WeGroupChatListQuery query) {
         WeGroupChatListVo groupChatList = weCustomerClient.getGroupChatList(query);
-        if(groupChatList != null && groupChatList.getNextCursor() != null){
+        if (groupChatList != null && groupChatList.getNextCursor() != null) {
             query.setCursor(groupChatList.getNextCursor());
             WeGroupChatListVo groupChatChildList = getGroupChatList(query);
             groupChatList.getGroupChatList().addAll(groupChatChildList.getGroupChatList());
@@ -127,7 +128,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeGroupMsgListVo getGroupMsgList(WeGroupMsgListQuery query) {
         WeGroupMsgListVo groupMsgList = weCustomerClient.getGroupMsgList(query);
-        if(groupMsgList != null && StringUtils.isNotEmpty(groupMsgList.getNextCursor())){
+        if (groupMsgList != null && StringUtils.isNotEmpty(groupMsgList.getNextCursor())) {
             query.setCursor(groupMsgList.getNextCursor());
             WeGroupMsgListVo groupMsgListChild = getGroupMsgList(query);
             groupMsgList.getGroupMsgList().addAll(groupMsgListChild.getGroupMsgList());
@@ -138,7 +139,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeGroupMsgListVo getGroupMsgTask(WeGetGroupMsgListQuery query) {
         WeGroupMsgListVo groupMsgTask = weCustomerClient.getGroupMsgTask(query);
-        if(groupMsgTask != null && StringUtils.isNotEmpty(groupMsgTask.getNextCursor())){
+        if (groupMsgTask != null && StringUtils.isNotEmpty(groupMsgTask.getNextCursor())) {
             query.setCursor(groupMsgTask.getNextCursor());
             WeGroupMsgListVo groupMsgTaskChild = getGroupMsgTask(query);
             groupMsgTask.getTaskList().addAll(groupMsgTaskChild.getTaskList());
@@ -149,12 +150,17 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeGroupMsgListVo getGroupMsgSendResult(WeGetGroupMsgListQuery query) {
         WeGroupMsgListVo groupMsgSendResult = weCustomerClient.getGroupMsgSendResult(query);
-        if(groupMsgSendResult != null && StringUtils.isNotEmpty(groupMsgSendResult.getNextCursor())){
+        if (groupMsgSendResult != null && StringUtils.isNotEmpty(groupMsgSendResult.getNextCursor())) {
             query.setCursor(groupMsgSendResult.getNextCursor());
             WeGroupMsgListVo groupMsgSendResultChild = getGroupMsgSendResult(query);
             groupMsgSendResult.getSendList().addAll(groupMsgSendResultChild.getSendList());
         }
         return groupMsgSendResult;
+    }
+
+    @Override
+    public WeResultVo cancelGroupMsgSend(WeCancelGroupMsgSendQuery query) {
+        return weCustomerClient.cancelGroupMsgSend(query);
     }
 
     @Override
@@ -179,9 +185,9 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     }
 
     @Override
-    public WeBatchCustomerDetailVo  getBatchCustomerDetail(WeBatchCustomerQuery query) {
+    public WeBatchCustomerDetailVo getBatchCustomerDetail(WeBatchCustomerQuery query) {
         WeBatchCustomerDetailVo customerDetail = weCustomerClient.getBatchCustomerDetail(query);
-        if(customerDetail != null && StringUtils.isNotEmpty(customerDetail.getNextCursor())){
+        if (customerDetail != null && StringUtils.isNotEmpty(customerDetail.getNextCursor())) {
             query.setCursor(customerDetail.getNextCursor());
             WeBatchCustomerDetailVo customerDetailChild = weCustomerClient.getBatchCustomerDetail(query);
             customerDetail.getExternalContactList().addAll(customerDetailChild.getExternalContactList());
@@ -192,7 +198,7 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeCustomerDetailVo getCustomerDetail(WeCustomerQuery query) {
         WeCustomerDetailVo customerDetail = weCustomerClient.getCustomerDetail(query);
-        if(customerDetail != null && StringUtils.isNotEmpty(customerDetail.getNextCursor())){
+        if (customerDetail != null && StringUtils.isNotEmpty(customerDetail.getNextCursor())) {
             query.setCursor(customerDetail.getNextCursor());
             WeCustomerDetailVo customerDetailChild = weCustomerClient.getCustomerDetail(query);
             customerDetail.getFollowUser().addAll(customerDetailChild.getFollowUser());
@@ -251,18 +257,18 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     }
 
     @Override
-    public WeLinkCustomerVo createCustomerLink(WeLinkCustomerQuery query) {
-        return weCustomerClient.createCustomerLink(query);
+    public WeGroupMsgTplVo addWeGroupMsg(WeGroupMsgQuery query) {
+        return weGroupWelcomeTplClient.addWeGroupMsg(query);
     }
 
     @Override
-    public WeResultVo updateCustomerLink(WeLinkCustomerQuery query) {
-        return weCustomerClient.updateCustomerLink(query);
+    public WeResultVo updateWeGroupMsg(WeGroupMsgQuery query) {
+        return weGroupWelcomeTplClient.updateWeGroupMsg(query);
     }
 
     @Override
-    public WeResultVo deleteCustomerLink(WeLinkCustomerQuery query) {
-        return weCustomerClient.deleteCustomerLink(query);
+    public WeResultVo delWeGroupMsg(WeGroupMsgQuery query) {
+        return weGroupWelcomeTplClient.delWeGroupMsg(query);
     }
 
 

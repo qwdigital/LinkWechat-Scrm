@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeMomentsEstimateCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.moments.entity.WeMomentsEstimateCustomer">
+        <id column="id" property="id"/>
+        <result column="moments_task_id" property="momentsTaskId"/>
+        <result column="user_id" property="userId"/>
+        <result column="we_user_id" property="weUserId"/>
+        <result column="user_name" property="userName"/>
+        <result column="external_userid" property="externalUserid"/>
+        <result column="customer_name" property="customerName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, moments_task_id, user_id, we_user_id, user_name, external_userid, customer_name
+    </sql>
+
+    <select id="getEstimateCustomer"
+            resultType="com.linkwechat.domain.moments.vo.WeMomentsEstimateCustomerVO">
+        SELECT t1.id,
+        t1.moments_task_id,
+        t1.user_id,
+        t1.we_user_id,
+        (SELECT user_name FROM sys_user t3 WHERE t1.we_user_id = t3.we_user_id) AS user_name,
+        t1.customer_name,
+        IFNULL(t2.delivery_status, 1) AS delivery_status
+        FROM we_moments_estimate_customer t1
+        LEFT JOIN we_moments_customer t2 ON t1.moments_task_id = t2.moments_task_id AND t1.we_user_id = t2.we_user_id
+        AND t1.external_userid = t2.external_userid
+        WHERE t1.moments_task_id = #{weMomentsTaskId}
+        <if test="weUserIds!=null and weUserIds!=''">
+            AND t1.we_user_id in
+            <foreach collection="weUserIds.split(',')" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deliveryStatus!=null">
+            <choose>
+                <when test="deliveryStatus == 0">
+                    AND t2.delivery_status = #{deliveryStatus}
+                </when>
+                <when test="deliveryStatus == 1">
+                    AND (t2.delivery_status = #{deliveryStatus} or t2.delivery_status is null)
+                </when>
+                <when test="deliveryStatus == 2">
+                    AND (t2.delivery_status = #{deliveryStatus})
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

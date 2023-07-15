@@ -80,6 +80,15 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.exchange.sop-ex:Ex_Sop}")
     private String sopEx;
+
+
+
+    /**
+     * 客户群新增成员通知交换机
+     */
+    @Value("${wecom.mq.exchange.group-add-user:Ex_GroupAddUser}")
+    private String groupAddUserEx;
+
     /**
      * -------------------路由------------------------------------
      */
@@ -109,20 +118,41 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.group-tag:Rk_GroupTag}")
     private String weGroupTagRk;
 
-
     //员工与部门同步路由
     @Value("${wecom.mq.route.sync.user-depart:Rk_UserDepart}")
     private String userDepartRk;
 
-
-    //朋友圈同步路由
+    /**
+     * 朋友圈同步路由
+     */
     @Value("${wecom.mq.route.sync.we-moments:Rk_Moments}")
     private String weMomentsRk;
-
-
-    //朋友圈互动同步路由
+    /**
+     * 朋友圈互动同步路由
+     */
     @Value("${wecom.mq.route.sync.we-hd-moments:Rk_Hd_Moments}")
     private String weHdMomentsRk;
+    /**
+     * 朋友圈定时执行路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Delay_Execute}")
+    private String weMomentsDelayExecuteRk;
+    /**
+     * 朋友圈定时取消路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Delay_Cancel}")
+    private String weMomentsDelayCancelRk;
+    /**
+     * 朋友圈JobId换取MomentId路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_JobId_To_MomentsId}")
+    private String weMomentsDelayJobIdToMomentsIdRK;
+    /**
+     * 获取成员群发执行结果路由
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Get_Group_Send_Result}")
+    private String weMomentsDelayGetGroupSendResultRK;
+
 
     //客服账号同步路由
     @Value("${wecom.mq.route.sync.kf-account:Rk_KfAccount}")
@@ -132,13 +162,30 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.delay-group-msg:Rk_DelayGroupMsg}")
     private String weDelayGroupMsgRk;
 
+    //群发消息结束路由-短链推广
+    @Value("${wecom.mq.route.delay-group-msg-end:Rk_DelayGroupMsgEnd}")
+    private String weDelayGroupMsgEndRk;
+
+    //企微朋友圈延迟路由
+    @Value("${wecom.mq.route.delay-moment-msg:Rk_DelayMomentMsg}")
+    private String weDelayMomentMsgRk;
+
     //群发消息路由
     @Value("${wecom.mq.route.group-msg:Rk_GroupMsg}")
     private String weGroupMsgRk;
 
+    //企微朋友圈路由
+    @Value("${wecom.mq.route.moment-msg:Rk_MomentMsg}")
+    private String weMomentMsgRk;
+
+
     //应用消息通知路由
     @Value("${wecom.mq.route.app-msg:Rk_AppMsg}")
     private String weAppMsgRk;
+
+    //延迟应用消息通知路由
+    @Value("${wecom.mq.route.delay_app-msg:Rk_Delay_AppMsg}")
+    private String weDelayAppMsgRk;
 
     //客户欢迎语路由
     @Value("${wecom.mq.route.customer-welcome-msg:Rk_CustomerWelcomeMsg}")
@@ -206,6 +253,12 @@ public class RabbitMQSettingConfig {
     private String weProductOrderRk;
 
     /**
+     * 客户群新增成员群活码业务路由
+     */
+    @Value("${wecom.mq.route.group-add-user-code:Rk_GroupAddUserCode}")
+    private String groupAddUserCodeRk;
+
+    /**
      * -------------------队列------------------------------------
      */
     //自建回调队列
@@ -235,6 +288,10 @@ public class RabbitMQSettingConfig {
     //应用通知消息消费队列
     @Value("${wecom.mq.queue.app-msg:Qu_AppMsg}")
     private String weAppMsgQu;
+
+    //应用通知消息延迟消费队列
+    @Value("${wecom.mq.queue.delay_app-msg:Qu_Delay_AppMsg}")
+    private String weDelayAppMsgQu;
 
     //客户欢迎语消费队列
     @Value("${wecom.mq.queue.customer-welcome-msg:Qu_CustomerWelcomeMsg}")
@@ -280,15 +337,36 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.sync.grouptag:Qu_GroupTag}")
     private String grouptagQu;
 
-
-    //朋友圈队列
+    /**
+     * 朋友圈同步队列
+     */
     @Value("${wecom.mq.queue.sync.we-moments:Qu_Moments}")
     private String weMomentsQu;
-
-
-    //朋友圈互动队列
+    /**
+     * 朋友圈互动同步队列
+     */
     @Value("${wecom.mq.queue.sync.we-hd-moments:Qu_Hd_Moments}")
     private String weHdMomentsQu;
+    /**
+     * 朋友圈定时发送队列
+     */
+    @Value("${wecom.mq.queue.delay.we-moments:Qu_Moments_Delay_Execute}")
+    private String weMomentsDelayExecuteQu;
+    /**
+     * 朋友圈定时取消队列
+     */
+    @Value("${wecom.mq.queue.delay.we-moments:Qu_Moments_Delay_Cancel}")
+    private String weMomentsDelayCancelQu;
+    /**
+     * 朋友圈JobId换取MomentId队列
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_JobId_To_MomentsId}")
+    private String weMomentsDelayJobIdToMomentsIdQu;
+    /**
+     * 获取成员群发执行结果队列
+     */
+    @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_Get_Group_Send_Result}")
+    private String weMomentsDelayGetGroupSendResultQu;
 
 
     //员工与部门同步队列
@@ -337,6 +415,27 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.leaveUser:Qu_LeaveUser}")
     private String leaveAllocateUserQu;
 
+    /**
+     * 朋友圈消息队列
+     */
+    @Value("${wecom.mq.queue.moments-msg:Qu_MomentsMsg}")
+    private String MomentsMsgQu;
 
+    /**
+     * 朋友圈消息延迟队列
+     */
+    @Value("${wecom.mq.queue.delay-moments-msg:Qu_DelayMomentsMsg}")
+    private String momentsDelayQu;
+
+    /**
+     * 群发消息结束队列-短链推广
+     */
+    @Value("${wecom.mq.queue.delay-group-msg-end:Qu_DelayGroupMsgEnd}")
+    private String groupMsgEndDelayQu;
+    /**
+     * 客户群新增成员群活码业务队列
+     */
+    @Value("${wecom.mq.queue.group-add-user-code:Qu_GroupAddUserCode}")
+    private String groupAddUserCodeQu;
 
 }
