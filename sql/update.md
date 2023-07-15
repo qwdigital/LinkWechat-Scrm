@@ -11,8 +11,10 @@
 ---
 ### ● 密码重置，重制完以后为123456
   ```
-  UPDATE sys_user set PASSWORD='Q4JLD0EN11Anoekx+Iz8AQZX0vWNhVeU106MP8J7gKTUc3gOcEw1othO4xaJth7LwebyDt35o71uPU+jLdskmg==' WHERE user_name='admin'
-```
+UPDATE sys_user 
+SET PASSWORD = 'jTk6muJjbpIDarA1fKPulLHvjwjF+Yv1IrUeJOkU0CEAbfPowtswo0akbokVTl6DMoH8OhDQtXwOAxqrsaAT8A==' 
+WHERE
+	user_name = 'admin'
 
 ---
 

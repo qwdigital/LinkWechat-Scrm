@@ -7,6 +7,7 @@ import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeAddMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentResultQuery;
@@ -34,6 +35,7 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.*;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.moment.*;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
@@ -583,5 +585,40 @@ public interface WeCustomerClient {
      */
     @Post("/externalcontact/get_product_album_list")
     QwProductListVo getProductAlbumList(@JSONBody QwProductListQuery query);
+
+
+    /**
+     * 创建获客链接
+     * @param query
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/create_link")
+    WeLinkCustomerVo createCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 编辑获客链接
+     * @param query
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/update_link")
+    WeResultVo updateCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 删除获客链接
+     * @param query
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/delete_link")
+    WeResultVo deleteCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+
+
 
 }

@@ -991,6 +991,15 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                         , MessageType.IMAGE.getMessageType()
                         , FileUtil.getName(messageTemplate.getPicUrl()));
                 messageTemplate.setMediaId(weMedia.getMediaId());
+            }else if(ObjectUtil.equal(MessageType.POSTERS.getMessageType(), messageTemplate.getMsgType())){
+
+
+                WeMediaVo weMedia = this.uploadTemporaryMaterial(messageTemplate.getPicUrl()
+                        , MessageType.IMAGE.getMessageType()
+                        , FileUtil.getName(messageTemplate.getPicUrl()));
+                messageTemplate.setPicUrl(weMedia.getMediaId());
+
+
             }
 //            else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
 ////                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
