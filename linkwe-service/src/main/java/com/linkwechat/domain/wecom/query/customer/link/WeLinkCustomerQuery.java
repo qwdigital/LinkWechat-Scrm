@@ -31,7 +31,7 @@ public class WeLinkCustomerQuery extends WeBaseQuery {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Range{
+    public static class Range{
 
         //此获客链接关联的userid列表，最多可关联100个
         private String[] user_list;

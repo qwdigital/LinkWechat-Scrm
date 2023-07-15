@@ -5,6 +5,7 @@ import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
@@ -25,6 +26,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -269,6 +271,21 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeResultVo delWeGroupMsg(WeGroupMsgQuery query) {
         return weGroupWelcomeTplClient.delWeGroupMsg(query);
+    }
+
+    @Override
+    public WeLinkCustomerVo createCustomerLink(WeLinkCustomerQuery query) {
+        return weCustomerClient.createCustomerLink(query);
+    }
+
+    @Override
+    public WeResultVo updateCustomerLink(WeLinkCustomerQuery query) {
+        return weCustomerClient.updateCustomerLink(query);
+    }
+
+    @Override
+    public WeResultVo deleteCustomerLink(WeLinkCustomerQuery query) {
+        return weCustomerClient.deleteCustomerLink(query);
     }
 
 
