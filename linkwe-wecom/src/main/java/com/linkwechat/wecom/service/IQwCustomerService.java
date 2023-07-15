@@ -6,6 +6,7 @@ import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
@@ -26,6 +27,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -337,4 +339,31 @@ public interface IQwCustomerService {
      * @return
      */
     WeResultVo delWeGroupMsg(WeGroupMsgQuery query);
+
+    /**
+     * 创建获客链接
+     * @param query
+     * @return
+     */
+    WeLinkCustomerVo createCustomerLink(WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 编辑获客链接
+     * @param query
+     * @return
+     */
+    WeResultVo updateCustomerLink(WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 删除获客链接
+     * @param query
+     * @return
+     */
+    WeResultVo deleteCustomerLink(WeLinkCustomerQuery query);
 }
