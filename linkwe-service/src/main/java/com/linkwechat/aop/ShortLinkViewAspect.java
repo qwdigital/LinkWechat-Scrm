@@ -1,5 +1,6 @@
 package com.linkwechat.aop;
 
+import cn.hutool.core.util.StrUtil;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.ip.IpUtils;
@@ -49,18 +50,27 @@ public class ShortLinkViewAspect {
         Object proceed = joinPoint.proceed();
         try {
             Object[] object = joinPoint.getArgs();
-            HttpServletResponse resp =(HttpServletResponse) object[1];
+            HttpServletResponse resp = (HttpServletResponse) object[1];
             String shortUrl = (String) object[2];
-            log.info("shortLinkView shortUrl：{}， 请求返回状态：RESPONSE : {} ",shortUrl, Objects.nonNull(resp) ? resp.getStatus() : "");
+            String shortPromotionId = (String) object[3];
+            log.info("shortLinkView shortUrl：{}， 请求返回状态：RESPONSE : {} ", shortUrl, Objects.nonNull(resp) ? resp.getStatus() : "");
             if (HttpServletResponse.SC_OK != resp.getStatus()) {
                 return proceed;
             }
             // 缓存 PV
-            redisService.increment(WeConstans.WE_SHORT_LINK_KEY  + WeConstans.PV + shortUrl);
+            redisService.increment(WeConstans.WE_SHORT_LINK_KEY + WeConstans.PV + shortUrl);
             // 缓存 UV
             redisService.hyperLogLogAdd(WeConstans.WE_SHORT_LINK_KEY + WeConstans.UV + shortUrl, IpUtils.getIpAddr(servletRequest()));
+
+            //短链推广统计
+            if (StrUtil.isNotBlank(shortPromotionId)) {
+                // 缓存 PV
+                redisService.increment(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.PV + shortPromotionId);
+                // 缓存 UV
+                redisService.hyperLogLogAdd(WeConstans.WE_SHORT_LINK_PROMOTION_KEY + WeConstans.UV + shortPromotionId, IpUtils.getIpAddr(servletRequest()));
+            }
         } catch (Exception e) {
-            log.error("shortLinkViewAspect 切面异常：",e);
+            log.error("shortLinkViewAspect 切面异常：", e);
         }
         return proceed;
     }

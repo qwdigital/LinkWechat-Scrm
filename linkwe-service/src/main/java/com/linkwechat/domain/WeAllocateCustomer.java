@@ -34,8 +34,21 @@ public class WeAllocateCustomer extends BaseEntity
     /** 接替成员的userid */
     private String takeoverUserid;
 
+    /**离职成员主键*/
+    private Long leaveUserId;
+
     /** 被分配的客户id */
     private String externalUserid;
+
+
+    /**客户名称*/
+    private String customerName;
+
+    /**接替成员名称*/
+    private String takeoverName;
+
+    /**接替成员部门名称*/
+    private String takeoverDeptName;
 
     /** 分配时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -63,8 +76,8 @@ public class WeAllocateCustomer extends BaseEntity
     @TableField(exist = false)
     private String takeUserName;
 
-    @TableField(exist = false)
-    private String customerName;
+//    @TableField(exist = false)
+//    private String customerName;
 
     @TableField(exist = false)
     private String department;

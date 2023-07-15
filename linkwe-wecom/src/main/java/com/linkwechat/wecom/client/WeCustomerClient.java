@@ -7,13 +7,11 @@ import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeAddMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentResultQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.strategy.WeAddCustomerStrategyQuery;
@@ -37,6 +35,7 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.*;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.moment.*;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
@@ -447,6 +446,16 @@ public interface WeCustomerClient {
     WeGroupMsgListVo getGroupMsgSendResult(@JSONBody WeGetGroupMsgListQuery query);
 
     /**
+     * 停止企业群发
+     *
+     * @param query
+     * @return
+     */
+    @Request(url = "/externalcontact/cancel_groupmsg_send", type = "POST")
+    WeResultVo cancelGroupMsgSend(@JSONBody WeCancelGroupMsgSendQuery query);
+
+
+    /**
      * 发送新客户欢迎语
      *
      * @param query
@@ -484,6 +493,7 @@ public interface WeCustomerClient {
 
     /**
      * 编辑客户标签
+     *
      * @return
      */
     @Request(url = "/externalcontact/mark_tag",
@@ -493,7 +503,8 @@ public interface WeCustomerClient {
 
 
     /**
-     *  配置客户群进群方式
+     * 配置客户群进群方式
+     *
      * @param joinWayQuery
      * @return
      */
@@ -503,6 +514,7 @@ public interface WeCustomerClient {
 
     /**
      * 获取客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -512,6 +524,7 @@ public interface WeCustomerClient {
 
     /**
      * 删除客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -521,6 +534,7 @@ public interface WeCustomerClient {
 
     /**
      * 更新客户群进群方式配置
+     *
      * @param joinWayQuery
      * @return
      */
@@ -529,6 +543,7 @@ public interface WeCustomerClient {
 
     /**
      * 创建商品图册
+     *
      * @param query
      * @return
      */
@@ -537,6 +552,7 @@ public interface WeCustomerClient {
 
     /**
      * 编辑商品图册
+     *
      * @param query
      * @return
      */
@@ -545,6 +561,7 @@ public interface WeCustomerClient {
 
     /**
      * 删除商品图册
+     *
      * @param query
      * @return
      */
@@ -553,6 +570,7 @@ public interface WeCustomerClient {
 
     /**
      * 获取商品图册
+     *
      * @param query
      * @return
      */
@@ -561,10 +579,46 @@ public interface WeCustomerClient {
 
     /**
      * 获取商品图册列表
+     *
      * @param query
      * @return
      */
     @Post("/externalcontact/get_product_album_list")
     QwProductListVo getProductAlbumList(@JSONBody QwProductListQuery query);
+
+
+    /**
+     * 创建获客链接
+     * @param query
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/create_link")
+    WeLinkCustomerVo createCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 编辑获客链接
+     * @param query
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/update_link")
+    WeResultVo updateCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+
+
+    /**
+     * 删除获客链接
+     * @param query
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/delete_link")
+    WeResultVo deleteCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+
+
 
 }

@@ -3,7 +3,6 @@ package com.linkwechat.controller;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.domain.material.entity.WeCategory;
 import com.linkwechat.domain.material.vo.WeCategoryNewVo;
@@ -30,12 +29,19 @@ public class WeCategoryController extends BaseController {
     @Resource
     private IWeCategoryService weCategoryService;
 
-
+    /**
+     * 类目树
+     *
+     * @param mediaType 媒体类型 {@link com.linkwechat.common.enums.CategoryMediaType}
+     * @param scene     应用场景 默认值-1, 1朋友圈
+     * @return {@link AjaxResult< WeCategoryVo>}
+     * @author WangYX
+     * @date 2023/06/27 16:17
+     */
     @GetMapping("/list")
     @ApiOperation("类目树")
-    public AjaxResult<WeCategoryVo> list(@RequestParam("mediaType") String mediaType) {
-
-        return AjaxResult.success(weCategoryService.findWeCategoryByMediaType(mediaType));
+    public AjaxResult<WeCategoryVo> list(@RequestParam("mediaType") String mediaType, @RequestParam(value = "scene", required = false, defaultValue = "-1") Integer scene) {
+        return AjaxResult.success(weCategoryService.findWeCategoryByMediaType(mediaType, scene));
     }
 
     /**

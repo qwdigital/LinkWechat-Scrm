@@ -2,9 +2,8 @@ package com.linkwechat.config.mybatis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.linkwechat.domain.moments.dto.CustomerMessagePushDto;
-import com.linkwechat.domain.WeMoments;
 import com.linkwechat.domain.WeMsgTlp;
+import com.linkwechat.domain.moments.dto.CustomerMessagePushDto;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
@@ -21,8 +20,7 @@ import java.sql.SQLException;
  * @param <T>
  */
 @SuppressWarnings("all")
-@MappedTypes(value = {JSONObject.class, CustomerMessagePushDto.class,
-        WeMoments.OtherContent.class, WeMsgTlp.Applet.class, WeMsgTlp.ImageText.class})
+@MappedTypes(value = {JSONObject.class, CustomerMessagePushDto.class, WeMsgTlp.Applet.class, WeMsgTlp.ImageText.class})
 @MappedJdbcTypes(value = {JdbcType.VARCHAR}, includeNullJdbcType = true)
 public class GenericTypeHandler<T extends Object> extends BaseTypeHandler<T> {
 

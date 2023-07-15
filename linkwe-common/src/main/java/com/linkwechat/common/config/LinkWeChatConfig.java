@@ -192,7 +192,6 @@ public class LinkWeChatConfig {
     private String guideGroupUrl;
 
 
-
     /**
      * 裂变url
      */
@@ -212,6 +211,21 @@ public class LinkWeChatConfig {
      * 拉新活码H5地址
      */
     private String lxQrCodeUrl;
+
+    /**
+     * 短链推广-应用消息详情
+     */
+    private String appMsgUrl;
+
+    /**
+     * 素材中心素材详情
+     */
+    private String materialDetailUrl;
+
+    /**
+     * 朋友圈移动端列表页
+     */
+    private String momentsUrl;
 
 
     public String getName() {

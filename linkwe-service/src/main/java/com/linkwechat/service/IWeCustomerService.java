@@ -10,10 +10,7 @@ import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
-import com.linkwechat.domain.customer.vo.WeCustomerAddUserVo;
-import com.linkwechat.domain.customer.vo.WeCustomerDetailInfoVo;
-import com.linkwechat.domain.customer.vo.WeCustomerPortraitVo;
-import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.customer.vo.*;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 
 import java.util.List;
@@ -27,6 +24,14 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @return
      */
     List<WeCustomersVo> findWeCustomerList(WeCustomersQuery weCustomersQuery, PageDomain pageDomain);
+
+
+    /**
+     * 获取客户相关信息，直接从企业微信获取
+     * @param externalUserids
+     * @return
+     */
+    List<WeCustomersVo>  findWeCustomerInfoFromWechat(List<String> externalUserids);
 
 
     /**
@@ -266,6 +271,26 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param makeCustomerTags
      */
     void batchMakeLabel(WeBacthMakeCustomerTag makeCustomerTags);
+
+
+    /**
+     * 根据渠道统计相关客户数
+     * @param state
+     * @param startTime
+     * @param endTime
+     * @param delFlag
+     * @return
+     */
+    List<WeCustomerChannelCountVo> countCustomerChannel(String state,
+                                                        String startTime, String endTime,
+                                                        Integer delFlag);
+
+    /**
+     * 统计指定渠道下累计次数
+     * @param state
+     * @return
+     */
+    Integer totalScanCodeNumber(String state);
 
 
     /**

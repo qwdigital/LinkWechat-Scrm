@@ -66,6 +66,9 @@ public interface IWeGroupService extends IService<WeGroup> {
     public List<WeGroup> findGroupInfoFromWechat(WeGroupChatListQuery chatListQuery);
 
 
+
+
+
     /**
      * 从企业微信端获取的群信息
      * @param groupChatList

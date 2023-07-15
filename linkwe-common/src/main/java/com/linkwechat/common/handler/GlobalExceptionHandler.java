@@ -13,6 +13,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -85,15 +86,6 @@ public class GlobalExceptionHandler {
         return AjaxResult.error(msg);
     }
 
-    /**
-     * 系统异常
-     */
-    @ExceptionHandler(Exception.class)
-    public AjaxResult handleException(Exception e, HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生系统异常.", requestURI, e);
-        return AjaxResult.error(e.getMessage());
-    }
 
     /**
      * 自定义验证异常
@@ -157,10 +149,38 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 数据库操作异常
+     *
+     * @param e 异常
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/06/09 14:29
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public AjaxResult handleDataAccessException(DataAccessException e) {
+        e.printStackTrace();
+        log.error("数据库操作异常：{}", e.getMessage());
+        return AjaxResult.error("数据库操作异常，请联系管理员！");
+    }
+
+
+    /**
      * 自定义异常
      */
     @ExceptionHandler(CustomException.class)
     public AjaxResult handleCustomException(CustomException e) {
         return AjaxResult.error(e.getCode(), e.getMessage());
     }
+
+
+    /**
+     * 系统异常
+     */
+    @ExceptionHandler(Exception.class)
+    public AjaxResult handleException(Exception e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生系统异常.", requestURI, e);
+        return AjaxResult.error(e.getMessage());
+    }
+
 }

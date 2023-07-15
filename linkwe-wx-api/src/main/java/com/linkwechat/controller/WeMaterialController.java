@@ -40,7 +40,13 @@ public class WeMaterialController {
     @Resource
     private IWeContentTalkService weContentTalkService;
 
-
+    /**
+     * 方法舍弃，采用WebSocket来统计
+     *
+     * @param request
+     * @return
+     */
+    @Deprecated
     @ApiOperation("保存查看详情")
     @PostMapping("/action/addView")
     public AjaxResult addView(HttpServletRequest request) {

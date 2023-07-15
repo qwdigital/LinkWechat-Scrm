@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
@@ -69,19 +70,32 @@ public class FileController {
      * @return
      */
     @GetMapping("getVideoFirstImg")
-    public AjaxResult<FileEntity> upload(@RequestParam("url") String url) {
+    public AjaxResult<Map<String, Object>> upload(@RequestParam("url") String url) {
         RenderedImage renderedImage = VideoFirstFrameUtils.getFirstFrameRenderedImageByUrl(url);
         try {
+
+            int height = renderedImage.getHeight();
+            int width = renderedImage.getWidth();
+
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ImageIO.write(renderedImage, "png", os);
             InputStream inputStream = new ByteArrayInputStream(os.toByteArray());
 
             MultipartFile multipartFile = new MockMultipartFile("1.png", "2.png", MediaType.IMAGE_PNG_VALUE, inputStream);
+            //以字节为单位返回文件的大小,如果为空则为0
+            long size = multipartFile.getSize();
+
             String resultUrl = fileService.uploadFile(multipartFile);
-            FileEntity sysFile = new FileEntity();
-            sysFile.setName(FileUtils.getName(url));
-            sysFile.setUrl(resultUrl);
-            return AjaxResult.success(sysFile);
+
+            Map<String, Object> result = new HashMap<>(6);
+            result.put("name", FileUtils.getName(url));
+            result.put("url", resultUrl);
+            result.put("height", height);
+            result.put("width", width);
+            result.put("memorySize", size);
+            result.put("pixelSize", height * width);
+
+            return AjaxResult.success(result);
         } catch (Exception e) {
             log.error("上传文件失败", e);
             return AjaxResult.error(e.getMessage());
@@ -105,7 +119,7 @@ public class FileController {
 
         CosConfig cos = linkWeChatConfig.getFile().getCos();
         Map<String, String> result = new HashMap<>(5);
-        result.put("fileObject",aes.encryptBase64(linkWeChatConfig.getFile().getObject()));
+        result.put("fileObject", aes.encryptBase64(linkWeChatConfig.getFile().getObject()));
         result.put("secretId", aes.encryptBase64(cos.getSecretId()));
         result.put("secretKey", aes.encryptBase64(cos.getSecretKey()));
         result.put("region", aes.encryptBase64(cos.getRegion()));
@@ -115,8 +129,6 @@ public class FileController {
 
         return AjaxResult.success(result);
     }
-
-
 
 
 }

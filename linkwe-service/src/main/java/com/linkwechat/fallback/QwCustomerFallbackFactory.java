@@ -6,10 +6,7 @@ import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeGroupMsgListQuery;
-import com.linkwechat.domain.wecom.query.customer.msg.WeWelcomeMsgQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
@@ -126,6 +123,11 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
 
     @Override
     public AjaxResult<WeGroupMsgListVo> getGroupMsgSendResult(WeGetGroupMsgListQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> cancelGroupMsgSend(WeCancelGroupMsgSendQuery query) {
         return null;
     }
 
