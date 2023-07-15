@@ -362,6 +362,13 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
             //构建离职员工数据
             if(CollectionUtil.isNotEmpty(sysLeaveUsers)){
+
+                //删除员工列表中的数据
+                this.baseMapper.leaveSysUser(
+                        sysLeaveUsers.stream().map(SysLeaveUser::getWeUserId).collect(Collectors.toList())
+                );
+
+
                 this.baseMapper.batchAddOrUpdate(
                         sysLeaveUsers
                 );
