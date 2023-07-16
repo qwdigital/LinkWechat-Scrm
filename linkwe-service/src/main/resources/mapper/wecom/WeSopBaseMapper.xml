@@ -139,7 +139,7 @@
         <if test="executeWeUserId !='' and executeWeUserId !=null ">
             and wc.add_user_id=#{executeWeUserId}
         </if>
-        WHERE wset.execute_state=1 and
+        WHERE
         wsb.del_flag=0
         <if test="!checkAll">
             and  to_days(wseca.push_start_time) = to_days(now()) and  wsb.send_type=2
@@ -152,6 +152,9 @@
         </if>
         <if test="executeSubState != null">
             and wseca.execute_state=#{executeSubState}
+        </if>
+        <if test="executeSubState == 0">
+            and wset.execute_state=1
         </if>
         <if test="sopBaseId !=null">
             and wset.sop_base_id=#{sopBaseId}
