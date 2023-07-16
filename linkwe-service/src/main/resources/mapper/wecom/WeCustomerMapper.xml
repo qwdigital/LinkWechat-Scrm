@@ -429,7 +429,11 @@
             wu.user_name,
             wc.add_user_id as userId,
             wu.avatar as headImageUrl,
-            wc.add_time as createTime
+            wc.add_time as createTime,
+            wc.add_method as addMethod,
+            wc.add_time as firstAddTime,
+            wc.track_state as trackState,
+            wc.track_time as trackTime
         FROM
             we_customer wc
                 INNER JOIN sys_user wu ON wc.add_user_id = wu.we_user_id

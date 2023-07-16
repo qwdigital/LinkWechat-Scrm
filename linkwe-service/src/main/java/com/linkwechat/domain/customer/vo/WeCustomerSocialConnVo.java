@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class WeCustomerSocialConnVo {
     /**添加员工数*/
-    private  Integer addEmployeNum;
+    private  long addEmployeNum;
     /**添加群聊数*/
-    private Integer addGroupNum;
+    private long addGroupNum;
     /**共同群聊数*/
-    private Integer commonGroupNum;
+    private long commonGroupNum;
 }

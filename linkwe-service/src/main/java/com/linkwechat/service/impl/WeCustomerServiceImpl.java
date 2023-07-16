@@ -595,6 +595,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public WeCustomerDetailInfoVo findWeCustomerDetail(String externalUserid, String userId, Integer delFlag) {
         WeCustomerDetailInfoVo weCustomerDetailInfoVo = new WeCustomerDetailInfoVo();
 
+
         List<WeCustomersVo> weCustomersVos = this.findWeCustomerList(
                 WeCustomersQuery.builder()
                         .externalUserid(externalUserid)
@@ -611,23 +612,61 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
             List<WeCustomerDetailInfoVo.TrackUser> trackUsers = new ArrayList<>();
 
-            weCustomersVos.stream().forEach(k -> {
-                trackUsers.add(WeCustomerDetailInfoVo.TrackUser.builder()
-                        .addMethod(k.getAddMethod())
-                        .trackUserId(k.getFirstUserId())
-                        .firstAddTime(k.getFirstAddTime())
-                        .trackState(k.getTrackState())
-                        .trackTime(k.getTrackTime())
-                        .userName(k.getUserName())
-                        .build());
-            });
-            weCustomerDetailInfoVo.setTrackUsers(
-                    trackUsers
-            );
 
-            weCustomerDetailInfoVo.setGroups(
-                    this.baseMapper.findWecustomerGroups(externalUserid)
-            );
+            //共同员工
+            List<WeCustomerAddUserVo> weCustomerAddUserVos
+                    = this.findWeUserByCustomerId(externalUserid);
+
+            if(CollectionUtil.isNotEmpty(weCustomerAddUserVos)){
+                weCustomerAddUserVos.stream().forEach(k->{
+
+                    trackUsers.add(WeCustomerDetailInfoVo.TrackUser.builder()
+                            .addMethod(k.getAddMethod())
+                            .trackUserId(k.getUserId())
+                            .firstAddTime(k.getFirstAddTime())
+                            .trackState(k.getTrackState())
+                            .trackTime(k.getTrackTime())
+                            .userName(k.getUserName())
+                            .build());
+                });
+
+                weCustomerDetailInfoVo.setTrackUsers(
+                        trackUsers
+                );
+
+            }
+
+            List<WeCustomerAddGroupVo> weGroupByCustomer
+                    = iWeGroupService.findWeGroupByCustomer(userId, externalUserid);
+            if(CollectionUtil.isNotEmpty(weGroupByCustomer)){
+                List<WeCustomerDetailInfoVo.Groups> wecustomerGroups=new ArrayList<>();
+
+                weGroupByCustomer.stream().forEach(k->{
+
+
+                    wecustomerGroups.add(
+                            WeCustomerDetailInfoVo.Groups.builder()
+                                    .chatId(k.getChatId())
+                                    .groupName(k.getGroupName())
+                                    .joinTime(k.getJoinTime())
+                                    .leaderName(k.getOwnerName())
+                                    .joinScene(k.getJoinScene())
+                                    .build()
+
+                    );
+
+                });
+
+                weCustomerDetailInfoVo.setGroups(
+                        wecustomerGroups
+                );
+            }
+
+
+//            List<WeCustomerDetailInfoVo.Groups> wecustomerGroups = this.baseMapper.findWecustomerGroups(externalUserid);
+
+
+
 
 
         }
@@ -731,7 +770,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             BeanUtils.copyBeanProp(weCustomerDetail, weCustomer);
         }
 
-        List<WeCustomerAddGroupVo> groups
+
+
+            List<WeCustomerAddGroupVo> groups
                 = iWeGroupService.findWeGroupByCustomer(userId, externalUserid);
         if (CollectionUtil.isNotEmpty(groups)) {
             List<WeCustomerAddGroupVo> commonGroup
@@ -771,9 +812,31 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomerPortrait.setAge(DateUtils.getAge(weCustomerPortrait.getBirthday()));
             }
 
+
+            WeCustomerSocialConnVo weCustomerSocialConnVo=new WeCustomerSocialConnVo();
+
+            List<WeCustomerAddUserVo> weCustomerAddUserVos
+                    = this.findWeUserByCustomerId(externalUserid);
+
+            if(CollectionUtil.isNotEmpty(weCustomerAddUserVos)){
+                weCustomerSocialConnVo.setAddEmployeNum(weCustomerAddUserVos.size());
+            }
+
+            List<WeCustomerAddGroupVo> weGroupByCustomer
+                    = iWeGroupService.findWeGroupByCustomer(userid, externalUserid);
+            if(CollectionUtil.isNotEmpty(weGroupByCustomer)){
+
+                weCustomerSocialConnVo.setAddGroupNum(
+                        weGroupByCustomer.size()
+                );
+                weCustomerSocialConnVo.setCommonGroupNum(
+                        weGroupByCustomer.stream().filter(item->new Integer(1).equals(item.getCommonGroup())).count()
+                );
+            }
+
             //客户社交关系
             weCustomerPortrait.setSocialConn(
-                    this.baseMapper.countSocialConn(externalUserid, userid)
+                    weCustomerSocialConnVo
             );
 
             //客户当前客户拓展字段
@@ -826,6 +889,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public List<WeCustomerAddUserVo> findWeUserByCustomerId(String externalUserid) {
+
+
+
+
         return this.baseMapper.findWeUserByCutomerId(externalUserid);
     }
 
