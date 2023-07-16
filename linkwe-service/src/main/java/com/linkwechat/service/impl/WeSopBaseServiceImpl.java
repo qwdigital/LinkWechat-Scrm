@@ -386,7 +386,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             customerExecuteContent.stream()
-                    .collect(Collectors.groupingBy(WeCustomerSopBaseContentVo::getPushTimePre))
+                    .collect(Collectors.groupingBy(WeCustomerSopBaseContentVo::getPushStartTime))
                     .forEach((k,v)->{
                         WeCustomerSopContentVo weCustomerSopContentVo=new WeCustomerSopContentVo();
                         v.stream().forEach(vv->{
