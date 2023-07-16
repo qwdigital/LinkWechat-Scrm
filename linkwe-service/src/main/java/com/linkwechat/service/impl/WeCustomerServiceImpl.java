@@ -770,9 +770,36 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             BeanUtils.copyBeanProp(weCustomerDetail, weCustomer);
         }
 
+        //共同员工
+        List<WeCustomerAddUserVo> weCustomerAddUserVos
+                = this.findWeUserByCustomerId(externalUserid);
+
+        if(CollectionUtil.isNotEmpty(weCustomerAddUserVos)){
+            List<WeCustomerDetailInfoVo.TrackUser> trackUsers = new ArrayList<>();
+
+            weCustomerAddUserVos.stream().forEach(k->{
+
+                if(k.getUserId().equals(userId)){
+                    trackUsers.add(WeCustomerDetailInfoVo.TrackUser.builder()
+                            .addMethod(k.getAddMethod())
+                            .trackUserId(k.getUserId())
+                            .firstAddTime(k.getFirstAddTime())
+                            .trackState(k.getTrackState())
+                            .trackTime(k.getTrackTime())
+                            .userName(k.getUserName())
+                            .build());
+                }
+
+            });
+
+            weCustomerDetail.setTrackUsers(
+                    trackUsers
+            );
+
+        }
 
 
-            List<WeCustomerAddGroupVo> groups
+        List<WeCustomerAddGroupVo> groups
                 = iWeGroupService.findWeGroupByCustomer(userId, externalUserid);
         if (CollectionUtil.isNotEmpty(groups)) {
             List<WeCustomerAddGroupVo> commonGroup
@@ -830,7 +857,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         weGroupByCustomer.size()
                 );
                 weCustomerSocialConnVo.setCommonGroupNum(
-                        weGroupByCustomer.stream().filter(item->new Integer(1).equals(item.getCommonGroup())).count()
+                        weGroupByCustomer.stream().filter(item->new Integer(0).equals(item.getCommonGroup())).count()
                 );
             }
 
