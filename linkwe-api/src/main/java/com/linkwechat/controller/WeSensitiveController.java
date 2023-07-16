@@ -102,4 +102,16 @@ public class WeSensitiveController extends BaseController {
         startPage();
         return getDataTable(weSensitiveService.getHitSensitiveList(query));
     }
+
+
+    /**
+     * 启用或者关闭敏感词
+     * @param weSensitive
+     * @return
+     */
+    @PostMapping("/startOrClose")
+    public AjaxResult startOrClose(@RequestBody WeSensitive weSensitive){
+        weSensitiveService.updateById(weSensitive);
+        return AjaxResult.success();
+    }
 }
