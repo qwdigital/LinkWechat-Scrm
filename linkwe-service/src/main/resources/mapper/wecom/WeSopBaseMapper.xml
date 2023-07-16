@@ -139,7 +139,7 @@
         <if test="executeWeUserId !='' and executeWeUserId !=null ">
             and wc.add_user_id=#{executeWeUserId}
         </if>
-        WHERE
+        WHERE wset.execute_state=1 and
         wsb.del_flag=0
         <if test="!checkAll">
             and  to_days(wseca.push_start_time) = to_days(now()) and  wsb.send_type=2
