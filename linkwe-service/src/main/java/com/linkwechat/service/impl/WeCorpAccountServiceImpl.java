@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -70,10 +71,21 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
 
     @Override
     public String getCustomerChurnNoticeSwitch() {
-        WeCorpAccount validWeCorpAccount = this.getCorpAccountByCorpId(SecurityUtils.getCorpId());
-        String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
-                .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
-        return noticeSwitch;
+
+        if(StringUtils.isNotEmpty(SecurityUtils.getCorpId())){
+            List<WeCorpAccount> weCorpAccounts = this.list(new LambdaQueryWrapper<WeCorpAccount>()
+                    .eq(WeCorpAccount::getCorpId, SecurityUtils.getCorpId()));
+            if(CollectionUtil.isNotEmpty(weCorpAccounts)){
+                WeCorpAccount validWeCorpAccount =weCorpAccounts.stream().findFirst().get();
+                String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
+                        .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
+                return noticeSwitch;
+            }
+
+        }
+
+
+        return WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE;
     }
 
     @Override
