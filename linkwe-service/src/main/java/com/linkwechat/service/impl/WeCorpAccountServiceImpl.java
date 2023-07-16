@@ -77,9 +77,15 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
                     .eq(WeCorpAccount::getCorpId, SecurityUtils.getCorpId()));
             if(CollectionUtil.isNotEmpty(weCorpAccounts)){
                 WeCorpAccount validWeCorpAccount =weCorpAccounts.stream().findFirst().get();
-                String noticeSwitch = Optional.ofNullable(validWeCorpAccount).map(WeCorpAccount::getCustomerChurnNoticeSwitch)
-                        .orElse(WeConstans.DEL_FOLLOW_USER_SWITCH_CLOSE);
-                return noticeSwitch;
+                return validWeCorpAccount.getCustomerChurnNoticeSwitch();
+            }
+
+        }else{
+            List<WeCorpAccount> weCorpAccounts = this.list();
+
+            if(CollectionUtil.isNotEmpty(weCorpAccounts)){
+                WeCorpAccount validWeCorpAccount =weCorpAccounts.stream().findFirst().get();
+                return validWeCorpAccount.getCustomerChurnNoticeSwitch();
             }
 
         }
