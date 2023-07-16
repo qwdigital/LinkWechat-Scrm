@@ -1121,7 +1121,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
 
                     List<WeTag> addTag = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                            .eq(WeTag::getTagId, tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId).collect(Collectors.toList())));
+                            .in(WeTag::getTagId, tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId).collect(Collectors.toList())));
 
                     if (CollectionUtil.isNotEmpty(addTag)) {
                         iWeCustomerTrajectoryService.createEditTrajectory(externalContact.getExternalUserId(),
@@ -1131,12 +1131,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         );
                     }
                 }
+            }else{
+
+                //生成轨迹
+                iWeCustomerTrajectoryService.createEditTrajectory(
+                        weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
+                );
+
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
-            //生成轨迹
-            iWeCustomerTrajectoryService.createEditTrajectory(
-                    weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
-            );
+
         }
 
         return weCustomer;

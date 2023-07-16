@@ -153,6 +153,9 @@
         <if test="executeSubState != null">
             and wseca.execute_state=#{executeSubState}
         </if>
+        <if test="executeSubState == 0">
+            and wset.execute_state=1
+        </if>
         <if test="sopBaseId !=null">
             and wset.sop_base_id=#{sopBaseId}
         </if>

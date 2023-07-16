@@ -117,15 +117,15 @@ public class WeChatMsgQiRuleNoticeTask {
                     .eq(WeCustomer::getExternalUserid, weQiRuleMsg.getFromId())
                     .eq(WeCustomer::getAddUserId, weQiRuleMsg.getReceiveId())
                     .eq(WeCustomer::getDelFlag, 0).last("limit 1"));
-            description = StringUtils.format(description, weCustomer.getCustomerName(), "客户");
+            template.setDescription(StringUtils.format(description, weCustomer.getCustomerName(), "客户"));
         } else {
             WeGroupMember weGroupMember = weGroupMemberService.getOne(new LambdaQueryWrapper<WeGroupMember>()
                     .select(WeGroupMember::getName)
                     .eq(WeGroupMember::getUserId, weQiRuleMsg.getFromId())
                     .eq(WeGroupMember::getDelFlag, 0).last("limit 1"));
-            description = StringUtils.format(description, weGroupMember.getName(), "客群");
+            template.setDescription(StringUtils.format(description, weGroupMember.getName(), "客群"));
         }
-        template.setDescription(description);
+
         template.setLinkUrl(StringUtils.format(linkUrl, weQiRuleMsg.getId(),1));
         template.setBtntxt(userBtnTxt);
 
@@ -151,24 +151,25 @@ public class WeChatMsgQiRuleNoticeTask {
         }
         qwAppMsgBody.setCorpUserIds(Arrays.stream(qiRule.getManageUser().split(",")).collect(Collectors.toList()));
 
+        //设置消息模板
+        WeMessageTemplate template = new WeMessageTemplate();
+
         String receiveId = weQiRuleMsg.getReceiveId();
         SysUserQuery userQuery = new SysUserQuery();
         userQuery.setWeUserIds(Collections.singletonList(receiveId));
         List<SysUserVo> userVos = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
         if(CollectionUtil.isNotEmpty(userVos)){
             if (ObjectUtil.equal(1, weQiRuleMsg.getChatType())) {
-                manageDescription = StringUtils.format(manageDescription, userVos.get(0).getUserName(),"客户");
+                template.setDescription(StringUtils.format(manageDescription, userVos.get(0).getUserName(),"客户"));
             }else {
-                manageDescription = StringUtils.format(manageDescription, userVos.get(0).getUserName(), "客群");
+                template.setDescription(StringUtils.format(manageDescription, userVos.get(0).getUserName(), "客群"));
             }
-
         }
 
-        //设置消息模板
-        WeMessageTemplate template = new WeMessageTemplate();
+
         template.setMsgType(MessageType.TEXTCARD.getMessageType());
         template.setTitle(title);
-        template.setDescription(manageDescription);
+
         template.setLinkUrl(StringUtils.format(linkUrl, weQiRuleMsg.getId(),2));
         template.setBtntxt(manageBtnTxt);
 

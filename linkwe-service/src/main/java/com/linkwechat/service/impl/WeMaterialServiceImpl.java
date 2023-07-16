@@ -343,6 +343,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
     }
 
+
+
     @Override
     public FileEntity builderPoster(PurePoster purePoster) throws Exception {
 
