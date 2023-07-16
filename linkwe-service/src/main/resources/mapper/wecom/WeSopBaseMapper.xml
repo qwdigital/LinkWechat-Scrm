@@ -273,7 +273,6 @@
         <if test="targetId">
             and wset.target_id=#{targetId}
         </if>
-        GROUP BY wset.id
     </select>
 
 
