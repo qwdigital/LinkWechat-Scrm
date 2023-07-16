@@ -90,7 +90,9 @@ public class QwChatMsgCheckListener {
             objectString.append(jsonObject.getString("info"));
         }
         //获取所有的敏感词规则
-        List<WeSensitive> allSensitiveRules = weSensitiveService.selectWeSensitiveList(new WeSensitive());
+        List<WeSensitive> allSensitiveRules = weSensitiveService.selectWeSensitiveList(WeSensitive.builder()
+                        .alertFlag(1)
+                .build());
         //根据规则过滤命中
         if (CollectionUtils.isNotEmpty(allSensitiveRules)) {
             String finalContent = objectString.toString();

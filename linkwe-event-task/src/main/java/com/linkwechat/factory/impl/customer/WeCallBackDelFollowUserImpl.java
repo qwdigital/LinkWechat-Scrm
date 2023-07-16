@@ -63,16 +63,14 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
             iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(weCustomer.getExternalUserid(),weCustomer.getAddUserId(),false,
                     true);
 
+            String customerChurnNoticeSwitch = weCorpAccountService.getCustomerChurnNoticeSwitch();
 
-            WeCorpAccount validWeCorpAccount = weCorpAccountService.getCorpAccountByCorpId(customerInfo.getToUserName());
-            Optional.ofNullable(validWeCorpAccount).ifPresent(weCorpAccount -> {
-                String customerChurnNoticeSwitch = weCorpAccount.getCustomerChurnNoticeSwitch();
-                if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
-                    iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(customerInfo.getUserID()),"【客户动态】<br/> <br/> 客户@" + weCustomer.getCustomerName() + "刚刚删除了您",
-                            MessageNoticeType.DELETEWEUSER.getType(),true);
+            if (WeConstans.DEL_FOLLOW_USER_SWITCH_OPEN.equals(customerChurnNoticeSwitch)) {
+                iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(customerInfo.getUserID()),"【客户动态】<br/> <br/> 客户@" + weCustomer.getCustomerName() + "刚刚删除了您",
+                        MessageNoticeType.DELETEWEUSER.getType(),true);
 
-                }
-            });
+            }
+
         }
     }
 }
