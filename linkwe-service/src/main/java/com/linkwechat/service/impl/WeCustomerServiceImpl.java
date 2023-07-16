@@ -498,15 +498,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //                    List<WeTag> weTags = iWeTagService.listByIds(
 //                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
 //                    );
-                if (CollectionUtil.isNotEmpty(addTag)) {
-                    iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
-                            weMakeCustomerTag.getUserId(),
-                            weMakeCustomerTag.getIsCompanyTag() ?
-                                    TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType() :
-                                    TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
-                            String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
-                    );
+
+                if(weMakeCustomerTag.isSource()){
+                    if (CollectionUtil.isNotEmpty(addTag)) {
+                        iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
+                                weMakeCustomerTag.getUserId(),
+                                weMakeCustomerTag.getIsCompanyTag() ?
+                                        TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType() :
+                                        TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
+                                String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                        );
+                    }
+
                 }
+
 //                }
 
 
