@@ -166,10 +166,18 @@
                 and  wqr.name like concat('%', #{name}, '%')
             </if>
             <if test="chatType != null and chatType.size() > 0">
-                and  wqr.chat_type in
-                <foreach item="item" collection="chatType" index="index" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
+                <choose>
+                    <when test="chatType.contains(1)">
+
+                    </when>
+                    <otherwise>
+                        and  wqr.chat_type in
+                        <foreach item="item" collection="chatType" index="index" open="(" separator="," close=")">
+                            #{item}
+                        </foreach>
+                    </otherwise>
+                </choose>
+
             </if>
             <if test="manageUserId != null and manageUserId != ''">
                 and find_in_set(#{manageUserId},wqr.manage_user)

@@ -193,57 +193,60 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
     @Override
     public PageInfo<WeQiRuleListVo> getQiRulePageList(WeQiRuleListQuery query) {
+        List<WeQiRuleListVo> weQiRuleList = new LinkedList<>();
         List<Long> weQiRuleIdList = this.baseMapper.getQiIdsByQuery(query);
-        WeQiRuleListQuery ruleListQuery = new WeQiRuleListQuery();
-        ruleListQuery.setQiRuleIds(weQiRuleIdList);
-        List<WeQiRuleListVo> weQiRuleList = getQiRuleList(ruleListQuery);
-        Set<String> userIds = new HashSet<>();
-        if (CollectionUtil.isNotEmpty(weQiRuleList)) {
-            for (WeQiRuleListVo weQiRuleListVo : weQiRuleList) {
-                if (StringUtils.isNotBlank(weQiRuleListVo.getManageUser())) {
-                    CollectionUtil.addAll(userIds, weQiRuleListVo.getManageUser().split(","));
-                }
-                if (CollectionUtil.isNotEmpty(weQiRuleListVo.getQiRuleScope())) {
-                    List<String> scopeWeUserIds = weQiRuleListVo.getQiRuleScope().stream().map(WeQiRuleUserVo::getUserId).collect(Collectors.toList());
-                    userIds.addAll(scopeWeUserIds);
-                }
-            }
-
-            Map<String, String> userMap = new HashMap<>();
-            if (CollectionUtil.isNotEmpty(userIds)) {
-                SysUserQuery userQuery = new SysUserQuery();
-                userQuery.setWeUserIds(new ArrayList<>(userIds));
-                List<SysUserVo> userList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
-                if (CollectionUtil.isNotEmpty(userList)) {
-                    userMap = userList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
-                }
-            }
-
-            for (WeQiRuleListVo weQiRuleListVo : weQiRuleList) {
-                Map<String, String> finalUserMap = userMap;
-                String manageUser = weQiRuleListVo.getManageUser();
-                if (StringUtils.isNotBlank(manageUser)) {
-
-                    List<WeQiRuleUserVo> manageUserInfoList = Arrays.stream(manageUser.split(",")).map(weManageUserId -> {
-                        WeQiRuleUserVo manageUserInfo = new WeQiRuleUserVo();
-                        manageUserInfo.setUserId(weManageUserId);
-                        if (finalUserMap.containsKey(weManageUserId)) {
-                            manageUserInfo.setUserName(finalUserMap.get(weManageUserId));
-                        }
-                        return manageUserInfo;
-                    }).collect(Collectors.toList());
-                    weQiRuleListVo.setManageUserInfo(manageUserInfoList);
+        if(CollectionUtil.isNotEmpty(weQiRuleIdList)){
+            WeQiRuleListQuery ruleListQuery = new WeQiRuleListQuery();
+            ruleListQuery.setQiRuleIds(weQiRuleIdList);
+            weQiRuleList = getQiRuleList(ruleListQuery);
+            Set<String> userIds = new HashSet<>();
+            if (CollectionUtil.isNotEmpty(weQiRuleList)) {
+                for (WeQiRuleListVo weQiRuleListVo : weQiRuleList) {
+                    if (StringUtils.isNotBlank(weQiRuleListVo.getManageUser())) {
+                        CollectionUtil.addAll(userIds, weQiRuleListVo.getManageUser().split(","));
+                    }
+                    if (CollectionUtil.isNotEmpty(weQiRuleListVo.getQiRuleScope())) {
+                        List<String> scopeWeUserIds = weQiRuleListVo.getQiRuleScope().stream().map(WeQiRuleUserVo::getUserId).collect(Collectors.toList());
+                        userIds.addAll(scopeWeUserIds);
+                    }
                 }
 
-                if (CollectionUtil.isNotEmpty(weQiRuleListVo.getQiRuleScope())) {
-                    for (WeQiRuleUserVo weQiRuleUserVo : weQiRuleListVo.getQiRuleScope()) {
-                        if (finalUserMap.containsKey(weQiRuleUserVo.getUserId())) {
-                            weQiRuleUserVo.setUserName(finalUserMap.get(weQiRuleUserVo.getUserId()));
+                Map<String, String> userMap = new HashMap<>();
+                if (CollectionUtil.isNotEmpty(userIds)) {
+                    SysUserQuery userQuery = new SysUserQuery();
+                    userQuery.setWeUserIds(new ArrayList<>(userIds));
+                    List<SysUserVo> userList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+                    if (CollectionUtil.isNotEmpty(userList)) {
+                        userMap = userList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
+                    }
+                }
+
+                for (WeQiRuleListVo weQiRuleListVo : weQiRuleList) {
+                    Map<String, String> finalUserMap = userMap;
+                    String manageUser = weQiRuleListVo.getManageUser();
+                    if (StringUtils.isNotBlank(manageUser)) {
+
+                        List<WeQiRuleUserVo> manageUserInfoList = Arrays.stream(manageUser.split(",")).map(weManageUserId -> {
+                            WeQiRuleUserVo manageUserInfo = new WeQiRuleUserVo();
+                            manageUserInfo.setUserId(weManageUserId);
+                            if (finalUserMap.containsKey(weManageUserId)) {
+                                manageUserInfo.setUserName(finalUserMap.get(weManageUserId));
+                            }
+                            return manageUserInfo;
+                        }).collect(Collectors.toList());
+                        weQiRuleListVo.setManageUserInfo(manageUserInfoList);
+                    }
+
+                    if (CollectionUtil.isNotEmpty(weQiRuleListVo.getQiRuleScope())) {
+                        for (WeQiRuleUserVo weQiRuleUserVo : weQiRuleListVo.getQiRuleScope()) {
+                            if (finalUserMap.containsKey(weQiRuleUserVo.getUserId())) {
+                                weQiRuleUserVo.setUserName(finalUserMap.get(weQiRuleUserVo.getUserId()));
+                            }
                         }
                     }
                 }
-            }
 
+            }
         }
         PageInfo<Long> pageIdInfo = new PageInfo<>(weQiRuleIdList);
         PageInfo<WeQiRuleListVo> pageInfo = new PageInfo<>(weQiRuleList);
