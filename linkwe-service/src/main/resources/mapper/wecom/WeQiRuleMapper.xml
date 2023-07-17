@@ -69,6 +69,12 @@
         from we_qi_rule wqr
         left join we_qi_rule_scope wqrs on wqr.id = wqrs.qi_id and wqrs.del_flag = 0
         <where>
+            <if test="qiRuleIds != null and qiRuleIds != ''">
+                and  wqr.id in
+                <foreach item="item" index="index" collection="qiRuleIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="name != null and name != ''">
                 and  wqr.name like concat('%', #{name}, '%')
             </if>
@@ -82,10 +88,10 @@
                 and find_in_set(#{manageUserId},wqr.manage_user)
             </if>
             <if test="beginTime != null "><!-- 开始时间检索 -->
-                and date_format(wqr.create_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
+                and date_format(wqr.update_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
             </if>
             <if test="endTime != null "><!-- 结束时间检索 -->
-                and date_format(wqr.create_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+                and date_format(wqr.update_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
             </if>
             <if test="userIds != null and userIds != ''">
                 and  wqrs.user_id in
@@ -98,7 +104,7 @@
             </if>
             and wqr.del_flag = 0
         </where>
-        order by wqr.create_time desc
+        order by wqr.update_time desc
     </select>
 
     <select id="getQiRuleListByUserId" resultMap="WeQiRuleListResult">
@@ -148,6 +154,44 @@
             </if>
             and wqr.del_flag = 0
         </where>
+    </select>
+
+    <select id="getQiIdsByQuery" resultType="java.lang.Long">
+        select
+            distinct wqr.id
+        from we_qi_rule wqr
+        left join we_qi_rule_scope wqrs on wqr.id = wqrs.qi_id and wqrs.del_flag = 0
+        <where>
+            <if test="name != null and name != ''">
+                and  wqr.name like concat('%', #{name}, '%')
+            </if>
+            <if test="chatType != null and chatType.size() > 0">
+                and  wqr.chat_type in
+                <foreach item="item" collection="chatType" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="manageUserId != null and manageUserId != ''">
+                and find_in_set(#{manageUserId},wqr.manage_user)
+            </if>
+            <if test="beginTime != null "><!-- 开始时间检索 -->
+                and date_format(wqr.update_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
+            </if>
+            <if test="endTime != null "><!-- 结束时间检索 -->
+                and date_format(wqr.update_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+            </if>
+            <if test="userIds != null and userIds != ''">
+                and  wqrs.user_id in
+                <foreach item="item" index="index" collection="userIds.split(',')" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="workCycle != null">
+                and find_in_set(dayofweek(curdate())-1,wqrs.work_cycle)
+            </if>
+            and wqr.del_flag = 0
+        </where>
+        order by wqr.update_time desc
     </select>
 
 </mapper>

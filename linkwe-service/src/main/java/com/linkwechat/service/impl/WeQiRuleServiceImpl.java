@@ -4,12 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
@@ -192,10 +192,13 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     }
 
     @Override
-    public List<WeQiRuleListVo> getQiRuleList(WeQiRuleListQuery query) {
-        List<WeQiRuleListVo> weQiRuleList = this.baseMapper.getQiRuleList(query);
+    public PageInfo<WeQiRuleListVo> getQiRulePageList(WeQiRuleListQuery query) {
+        List<Long> weQiRuleIdList = this.baseMapper.getQiIdsByQuery(query);
+        WeQiRuleListQuery ruleListQuery = new WeQiRuleListQuery();
+        ruleListQuery.setQiRuleIds(weQiRuleIdList);
+        List<WeQiRuleListVo> weQiRuleList = getQiRuleList(ruleListQuery);
         Set<String> userIds = new HashSet<>();
-        if (CollectionUtil.isNotEmpty(weQiRuleList) && query.getIsShow()) {
+        if (CollectionUtil.isNotEmpty(weQiRuleList)) {
             for (WeQiRuleListVo weQiRuleListVo : weQiRuleList) {
                 if (StringUtils.isNotBlank(weQiRuleListVo.getManageUser())) {
                     CollectionUtil.addAll(userIds, weQiRuleListVo.getManageUser().split(","));
@@ -242,7 +245,17 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
             }
 
         }
-        return weQiRuleList;
+        PageInfo<Long> pageIdInfo = new PageInfo<>(weQiRuleIdList);
+        PageInfo<WeQiRuleListVo> pageInfo = new PageInfo<>(weQiRuleList);
+        pageInfo.setTotal(pageIdInfo.getTotal());
+        pageInfo.setPageNum(pageIdInfo.getPageNum());
+        pageInfo.setPageSize(pageIdInfo.getPageSize());
+        return pageInfo;
+    }
+
+    @Override
+    public List<WeQiRuleListVo> getQiRuleList(WeQiRuleListQuery query) {
+        return this.baseMapper.getQiRuleList(query);
     }
 
     @Override
@@ -263,7 +276,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         WeQiRuleStatisticsViewVo viewVo = new WeQiRuleStatisticsViewVo();
         List<WeQiRuleMsg> ruleMsgList = weQiRuleMsgService.list(new LambdaQueryWrapper<WeQiRuleMsg>().eq(WeQiRuleMsg::getRuleId, id).eq(WeQiRuleMsg::getDelFlag, 0));
         if (CollectionUtil.isNotEmpty(ruleMsgList)) {
-            List<WeQiRuleMsg> outTimeMsgList = ruleMsgList.stream().filter(ruleMsg -> ObjectUtil.notEqual(0,ruleMsg.getStatus())).collect(Collectors.toList());
+            List<WeQiRuleMsg> outTimeMsgList = ruleMsgList.stream().filter(ruleMsg -> ObjectUtil.notEqual(0, ruleMsg.getStatus())).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(outTimeMsgList)) {
                 viewVo.setTimeOutTotalNum(outTimeMsgList.size());
                 BigDecimal timeOutTotalRate = new BigDecimal(outTimeMsgList.size() / ruleMsgList.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -279,9 +292,9 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                     long todayTimeOutUserNum = todayOutTimeMsgList.stream().map(WeQiRuleMsg::getReceiveId).distinct().count();
                     viewVo.setTodayTimeOutUserNum(todayTimeOutUserNum);
                     viewVo.setTodayTimeOutNum(todayOutTimeMsgList.size());
-                    if(todayMsgNum == 0L){
+                    if (todayMsgNum == 0L) {
                         viewVo.setTodayTimeOutRate("100");
-                    }else {
+                    } else {
                         BigDecimal todayTimeOutTotalRate = new BigDecimal(todayOutTimeMsgList.size() / todayMsgNum).setScale(2, BigDecimal.ROUND_HALF_UP);
                         viewVo.setTodayTimeOutRate(todayTimeOutTotalRate.toString());
                     }
@@ -345,7 +358,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
             if (StringUtils.isEmpty(currentMsg.getRoomId())) {
 
                 if (ObjectUtil.equal(0, query.getPageType())) {
-                    if(StringUtils.isEmpty(query.getMsgType()) || query.getMsgType().contains(currentMsg.getMsgType())){
+                    if (StringUtils.isEmpty(query.getMsgType()) || query.getMsgType().contains(currentMsg.getMsgType())) {
                         allChatMsgList.add(currentMsg);
                     }
                     List<WeChatContactMsg> beforeMsgList = getCustomerBeforeMsgList(query, currentMsg);
@@ -398,7 +411,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
                 }
             } else {
                 if (ObjectUtil.equal(0, query.getPageType())) {
-                    if(StringUtils.isEmpty(query.getMsgType()) || query.getMsgType().contains(currentMsg.getMsgType())){
+                    if (StringUtils.isEmpty(query.getMsgType()) || query.getMsgType().contains(currentMsg.getMsgType())) {
                         allChatMsgList.add(currentMsg);
                     }
                     List<WeChatContactMsg> beforeMsgList = getRoomBeforeMsgList(query, currentMsg);
@@ -443,11 +456,11 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     @Override
     public List<WeQiRuleNoticeListVo> getNoticeList(WeQiRuleNoticeListQuery query) {
         List<WeQiRuleNoticeListVo> noticeList = weQiRuleMsgNoticeService.getNoticeList(query);
-        if(CollectionUtil.isNotEmpty(noticeList)){
+        if (CollectionUtil.isNotEmpty(noticeList)) {
             Map<String, WeCustomer> customerMap = new HashMap<>();
             Map<String, String> groupMemberMap = new HashMap<>();
             Set<String> customerIds = noticeList.stream().filter(notice -> ObjectUtil.equal(1, notice.getChatType())).map(WeQiRuleNoticeListVo::getFromId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            if(CollectionUtil.isNotEmpty(customerIds)){
+            if (CollectionUtil.isNotEmpty(customerIds)) {
 
 
                 List<WeCustomer> customerList = weCustomerService.list(new QueryWrapper<WeCustomer>()
@@ -458,20 +471,20 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
 
 
             Set<String> groupUserIds = noticeList.stream().filter(notice -> ObjectUtil.equal(2, notice.getChatType())).map(WeQiRuleNoticeListVo::getFromId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
-            if(CollectionUtil.isNotEmpty(groupUserIds)){
-                List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().select(WeGroupMember::getUserId, WeGroupMember::getName).in(WeGroupMember::getUserId, groupUserIds).eq(WeGroupMember::getDelFlag,0).groupBy(WeGroupMember::getUserId, WeGroupMember::getName));
-                groupMemberMap = Optional.ofNullable(groupMemberList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeGroupMember::getUserId,WeGroupMember::getName,(key1, key2) -> key1));
+            if (CollectionUtil.isNotEmpty(groupUserIds)) {
+                List<WeGroupMember> groupMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().select(WeGroupMember::getUserId, WeGroupMember::getName).in(WeGroupMember::getUserId, groupUserIds).eq(WeGroupMember::getDelFlag, 0).groupBy(WeGroupMember::getUserId, WeGroupMember::getName));
+                groupMemberMap = Optional.ofNullable(groupMemberList).orElseGet(ArrayList::new).stream().collect(Collectors.toMap(WeGroupMember::getUserId, WeGroupMember::getName, (key1, key2) -> key1));
             }
 
 
             for (WeQiRuleNoticeListVo noticeVo : noticeList) {
-                if(CollectionUtil.isNotEmpty(customerMap) && ObjectUtil.equal(1, noticeVo.getChatType()) && customerMap.containsKey(noticeVo.getFromId())){
+                if (CollectionUtil.isNotEmpty(customerMap) && ObjectUtil.equal(1, noticeVo.getChatType()) && customerMap.containsKey(noticeVo.getFromId())) {
                     WeCustomer weCustomer = customerMap.get(noticeVo.getFromId());
                     noticeVo.setFromAvatar(weCustomer.getAvatar());
                     noticeVo.setFromName(weCustomer.getCustomerName());
                     noticeVo.setFromGender(weCustomer.getGender());
                 }
-                if(CollectionUtil.isNotEmpty(groupMemberMap) && ObjectUtil.equal(2, noticeVo.getChatType()) && groupMemberMap.containsKey(noticeVo.getFromId())){
+                if (CollectionUtil.isNotEmpty(groupMemberMap) && ObjectUtil.equal(2, noticeVo.getChatType()) && groupMemberMap.containsKey(noticeVo.getFromId())) {
                     String name = groupMemberMap.get(noticeVo.getFromId());
                     noticeVo.setFromName(name);
                 }
@@ -500,7 +513,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
             }
         }
         List<WeQiRuleWeeklyListVo> weeklyList = weQiRuleManageStatisticsService.getWeeklyList(query);
-        if(CollectionUtil.isNotEmpty(weeklyList)){
+        if (CollectionUtil.isNotEmpty(weeklyList)) {
             List<String> weUserIds = weeklyList.stream().map(WeQiRuleWeeklyListVo::getUserId).collect(Collectors.toList());
             SysUserQuery userQuery = new SysUserQuery();
             userQuery.setWeUserIds(weUserIds);
@@ -544,7 +557,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
             if (CollectionUtil.isNotEmpty(userVoList)) {
                 Set<String> sysUserIds = userVoList.stream().map(SysUserVo::getWeUserId).collect(Collectors.toSet());
                 query.setUserIds(new ArrayList<>(sysUserIds));
-            }else {
+            } else {
                 return new LinkedList<>();
             }
         }
@@ -577,7 +590,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     private List<WeChatContactMsg> getRoomAfterMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .eq(WeChatContactMsg::getRoomId, query.getRoomId())
-                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
+                .in(StringUtils.isNotEmpty(query.getMsgType()), WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByAsc(WeChatContactMsg::getSeq)
@@ -588,7 +601,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
     private List<WeChatContactMsg> getRoomBeforeMsgList(WeQiRuleStatisticsTableMsgQuery query, WeChatContactMsg currentMsg) {
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .eq(WeChatContactMsg::getRoomId, query.getRoomId())
-                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
+                .in(StringUtils.isNotEmpty(query.getMsgType()), WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByDesc(WeChatContactMsg::getSeq)
@@ -599,7 +612,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
-                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
+                .in(StringUtils.isNotEmpty(query.getMsgType()), WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .gt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByAsc(WeChatContactMsg::getSeq)
@@ -611,7 +624,7 @@ public class WeQiRuleServiceImpl extends ServiceImpl<WeQiRuleMapper, WeQiRule> i
         return weChatContactMsgService.list(new LambdaQueryWrapper<WeChatContactMsg>()
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getFromId()).or().eq(WeChatContactMsg::getToList, query.getFromId()))
                 .and(item -> item.eq(WeChatContactMsg::getFromId, query.getReceiveId()).or().eq(WeChatContactMsg::getToList, query.getReceiveId()))
-                .in(StringUtils.isNotEmpty(query.getMsgType()),WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
+                .in(StringUtils.isNotEmpty(query.getMsgType()), WeChatContactMsg::getMsgType, Arrays.stream(query.getMsgType().split(",")).collect(Collectors.toList()))
                 .lt(WeChatContactMsg::getSeq, currentMsg.getSeq())
                 .last("limit " + query.getNumber())
                 .orderByDesc(WeChatContactMsg::getSeq)

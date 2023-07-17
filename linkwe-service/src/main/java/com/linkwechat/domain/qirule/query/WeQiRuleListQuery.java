@@ -14,12 +14,15 @@ import java.util.List;
 
 /**
  * @author danmo
- * @description 活码列表入参
+ * @description 质检列表入参
  * @date 2021/11/9 13:58
  **/
 @ApiModel
 @Data
 public class WeQiRuleListQuery {
+
+    @ApiModelProperty(value = "质检ID",hidden = true)
+    private List<Long> qiRuleIds;
 
     @ApiModelProperty("规则名称")
     private String name;
