@@ -68,7 +68,7 @@ public class WeMsgAuditNotifyImpl implements WeCallBackEventFactory {
         }
         FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
         financeService.setRedisService(redisService);
-        financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), data.toJSONString()));
+        financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(),"" ,data.toJSONString()));
         log.info("会话存档定时任务执行完成----------------->");
     }
 
