@@ -3,6 +3,7 @@ package com.linkwechat.controller;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
@@ -66,7 +67,7 @@ public class WeQiRuleController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<WeQiRuleListVo> getQiRuleList(WeQiRuleListQuery query) {
         startPage();
-        List<WeQiRuleListVo> qrCodeList = weQiRuleService.getQiRuleList(query);
+        PageInfo<WeQiRuleListVo> qrCodeList = weQiRuleService.getQiRulePageList(query);
         return getDataTable(qrCodeList);
     }
 

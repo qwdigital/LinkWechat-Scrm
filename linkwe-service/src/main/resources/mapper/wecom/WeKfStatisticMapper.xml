@@ -267,7 +267,7 @@
                 and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
             </if>
             <if test="endTime != null">
-                and DATE_FORMAT(wkem.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+                and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
             </if>
         </where>
         group by wkp.scene
