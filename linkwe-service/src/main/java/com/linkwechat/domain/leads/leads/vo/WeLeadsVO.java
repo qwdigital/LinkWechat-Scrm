@@ -1,8 +1,11 @@
 package com.linkwechat.domain.leads.leads.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,8 +16,7 @@ import java.util.List;
  * @date 2023/07/11 15:09
  */
 @Data
-public class WeClientLeadsVo implements Serializable {
-
+public class WeLeadsVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -107,8 +109,37 @@ public class WeClientLeadsVo implements Serializable {
     private Integer sex;
 
     /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
+
+    /**
      * 自定义属性
      */
     private List<Properties> propertiesList;
+
+    /**
+     * 前跟进人姓名
+     */
+    private String preFollowerName;
+
+    /**
+     * 客户Id
+     */
+    private Long customerId;
+
+    /**
+     * 客户外部联系人Id
+     */
+    @TableField(value = "external_userid")
+    private String externalUserid;
+
 
 }

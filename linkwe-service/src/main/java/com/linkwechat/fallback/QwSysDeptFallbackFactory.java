@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class QwSysDeptFallbackFactory implements QwSysDeptClient {
     @Override
-    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds")String deptIds) {
+    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds") String deptIds) {
         return null;
     }
 
@@ -37,6 +37,11 @@ public class QwSysDeptFallbackFactory implements QwSysDeptClient {
 
     @Override
     public AjaxResult updateDept(SysDeptQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<List<SysDept>> getListWithOutPermission(SysDept query) {
         return null;
     }
 }

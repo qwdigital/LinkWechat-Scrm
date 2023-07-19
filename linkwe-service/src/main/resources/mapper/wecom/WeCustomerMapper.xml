@@ -35,6 +35,9 @@
             <if test="weCustomerList.delFlag != null">
                 AND wcr.del_flag = #{weCustomerList.delFlag}
             </if>
+            <if test="weCustomerList.phone != null and weCustomerList.phone !=''">
+               AND wcr.phone = #{weCustomerList.phone,jdbcType=VARCHAR}
+            </if>
             <if test="weCustomerList.name != null and weCustomerList.name !=''">
                 AND  CONCAT( IFNULL(wcr.customer_name,''))
                 LIKE CONCAT('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')

@@ -1,9 +1,7 @@
 package com.linkwechat.domain.leads.record.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -41,7 +39,7 @@ public class WeLeadsFollowRecord implements Serializable {
     private Long seaId;
 
     /**
-     * 跟进人激励表id
+     * 跟进人记录表id
      */
     private Long followUserId;
 

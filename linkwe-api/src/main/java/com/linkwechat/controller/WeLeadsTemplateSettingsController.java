@@ -22,8 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,19 +113,6 @@ public class WeLeadsTemplateSettingsController {
     }
 
     /**
-     * 导出模版表格
-     *
-     * @param response
-     * @author WangYX
-     * @date 2023/07/07 10:59
-     */
-    @ApiOperation(value = "导出模版表格")
-    @GetMapping(value = "/outPut/template/excel")
-    public void outPutTemplateExcel(HttpServletResponse response) throws IOException {
-        weSeaLeadsTemplateSettingsService.outPutTemplateExcel(response);
-    }
-
-    /**
      * 自动生成UUId
      *
      * @return {@link AjaxResult<String>}
@@ -167,36 +152,5 @@ public class WeLeadsTemplateSettingsController {
         }).collect(Collectors.toList());
         return AjaxResult.success(result);
     }
-
-
-    //--------------------------------------------------------------------------------------//
-    //下面为创略具体的业务，后面参考时候需要，不需要时移除
-
-
-    @ApiOperation(value = "获取咨询项目列表")
-    @GetMapping(value = "/getConsultSelectItem")
-    public AjaxResult<List<String>> getConsultSelectItem() {
-        List<WeLeadsTemplateTableEntryContent> consultSelectItem = weSeaLeadsTemplateSettingsService.getConsultSelectItem();
-        List<String> consultList = consultSelectItem.stream().map(WeLeadsTemplateTableEntryContent::getContent).collect(Collectors.toList());
-        return AjaxResult.success(consultList);
-    }
-
-    @ApiOperation(value = "获取年龄下拉框列表")
-    @GetMapping(value = "/getAgeSelectItem")
-    public AjaxResult<List<String>> getAgeSelectItem() {
-        List<WeLeadsTemplateTableEntryContent> ageSelectItem = weSeaLeadsTemplateSettingsService.getAgeSelectItem();
-        List<String> ageSelectList = ageSelectItem.stream().map(WeLeadsTemplateTableEntryContent::getContent).collect(Collectors.toList());
-        return AjaxResult.success(ageSelectList);
-    }
-
-    @ApiOperation(value = "获取亲属关系的枚举值")
-    @GetMapping(value = "/getKinshipSelectItem")
-    public AjaxResult<List<String>> getKinshipSelectItem() {
-        List<WeLeadsTemplateTableEntryContent> kinshipSelectItem = weSeaLeadsTemplateSettingsService.getKinshipSelectItem();
-        List<String> kinshipList = kinshipSelectItem.stream().map(WeLeadsTemplateTableEntryContent::getContent).collect(Collectors.toList());
-        return AjaxResult.success(kinshipList);
-    }
-
-
 }
 

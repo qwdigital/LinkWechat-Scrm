@@ -2,17 +2,18 @@ package com.linkwechat.domain.leads.leads.query;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * 成员主动退回
+ * 线索更新请求参数
  *
  * @author WangYX
  * @version 1.0.0
- * @date 2023/04/19 15:02
+ * @date 2023/07/18 14:30
  */
 @Data
-public class WeClientLeadsUserReturnParam {
+public class WeLeadsUpdateRequest {
 
     /**
      * 线索Id
@@ -21,14 +22,9 @@ public class WeClientLeadsUserReturnParam {
     private Long leadsId;
 
     /**
-     * 退回原因
+     * 线索标签
      */
-    @NotNull(message = "退回原因必填")
-    private String reason;
-
-    /**
-     * 退回备注
-     */
-    private String remark;
+    @NotBlank(message = "线索标签必填")
+    private String labelsIds;
 
 }

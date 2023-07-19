@@ -60,55 +60,11 @@ public interface IWeLeadsTemplateSettingsService extends IService<WeLeadsTemplat
     boolean reRank(List<WeTemplateSettingsReRankRequest> paramList);
 
     /**
-     * 导出模版表格
-     *
-     * @param response 输出流
-     * @throws IOException io异常
-     */
-    void outPutTemplateExcel(HttpServletResponse response) throws IOException;
-
-    /**
      * 自动生成表项ID
      *
      * @return 返回一个自动生成的表项id
      */
     String autoGenerate();
 
-
-
-    /**
-     * 获取咨询项目的枚举值
-     *
-     * @return 咨询项目的枚举
-     */
-    List<WeLeadsTemplateTableEntryContent> getConsultSelectItem();
-
-    /**
-     * 同步亲属关系
-     */
-    void syncKinship(List<String> values);
-
-
-    /**
-     * 获取亲属关系的枚举值
-     *
-     * @return 咨询项目的枚举
-     */
-    List<WeLeadsTemplateTableEntryContent> getKinshipSelectItem();
-
-    /**
-     * 根据表项id查询模版表项
-     *
-     * @param tableEntryId 表项id
-     * @return 表项id对应的模版表项
-     */
-    WeLeadsTemplateSettings queryByTableEntryId(String tableEntryId);
-
-    /**
-     * 获取年龄的枚举值
-     *
-     * @return 年龄的枚举值
-     */
-    List<WeLeadsTemplateTableEntryContent> getAgeSelectItem();
 }
 

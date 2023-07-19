@@ -267,6 +267,7 @@ public class SysUserController extends BaseController {
     /**
      * 重置密码
      */
+    @Deprecated
     @PutMapping("/resetPwd")
     public AjaxResult resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
@@ -445,11 +446,7 @@ public class SysUserController extends BaseController {
      */
     @GetMapping("/findAllSysUser")
     public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions,String deptIds){
-
-        return AjaxResult.success(
-                userService.findAllSysUser(weUserIds,positions,deptIds)
-        );
-
+        return AjaxResult.success(userService.findAllSysUser(weUserIds,positions,deptIds));
     }
 
     /**

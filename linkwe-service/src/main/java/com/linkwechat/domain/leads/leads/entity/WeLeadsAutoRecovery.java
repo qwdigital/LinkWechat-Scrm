@@ -56,6 +56,11 @@ public class WeLeadsAutoRecovery extends BaseEntity {
     private Integer executingState;
 
     /**
+     * 回收原因
+     */
+    private Integer recoveryReason;
+
+    /**
      * 删除标识
      */
     private Integer delFlag;

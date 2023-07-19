@@ -3,48 +3,43 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.common.enums.UserTypes;
-import com.linkwechat.common.enums.leads.template.CanEditEnum;
-import com.linkwechat.common.enums.leads.template.DataAttrEnum;
-import com.linkwechat.common.enums.leads.template.DatetimeTypeEnum;
 import com.linkwechat.common.exception.ServiceException;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
-import com.linkwechat.domain.leads.leads.query.WeLeadsBaseRequest;
+import com.linkwechat.domain.leads.leads.query.*;
 import com.linkwechat.domain.leads.leads.vo.Properties;
-import com.linkwechat.domain.leads.leads.vo.WeClientLeadsVo;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsImportResultVO;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsVO;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
-import com.linkwechat.domain.leads.template.entity.WeLeadsTemplateSettings;
 import com.linkwechat.service.IWeLeadsSeaService;
 import com.linkwechat.service.IWeLeadsService;
 import com.linkwechat.service.IWeLeadsTemplateSettingsService;
 import com.linkwechat.service.IWeTagService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -66,8 +61,6 @@ public class WeLeadsController extends BaseController {
     private IWeLeadsService weLeadsService;
     @Resource
     private IWeTagService weTagService;
-    @Resource
-    private IWeLeadsTemplateSettingsService weLeadsTemplateSettingsService;
 
     /**
      * 线索列表
@@ -78,13 +71,14 @@ public class WeLeadsController extends BaseController {
      * @date 2023/07/11 15:17
      */
     @ApiOperation(value = "线索列表")
-    @GetMapping("/list")
-    public TableDataInfo managerList(WeLeadsBaseRequest request) {
+    @GetMapping("/manager/list")
+    public TableDataInfo list(WeLeadsBaseRequest request) {
         //检查公海是否存在
         checkExistSea(request.getSeaId());
         //获取列表
         startPage();
         LambdaQueryWrapper<WeLeads> wrapper = Wrappers.lambdaQuery();
+        wrapper.select(WeLeads::getId, WeLeads::getSeaId, WeLeads::getName, WeLeads::getPhone, WeLeads::getSource, WeLeads::getLeadsStatus);
         wrapper.eq(WeLeads::getSeaId, request.getSeaId());
         wrapper.eq(request.getLeadsStatus() != null, WeLeads::getLeadsStatus, request.getLeadsStatus());
         wrapper.like(StrUtil.isNotBlank(request.getName()), WeLeads::getName, request.getName());
@@ -93,10 +87,125 @@ public class WeLeadsController extends BaseController {
         List<WeLeads> list = weLeadsService.list(wrapper);
 
         TableDataInfo dataTable = getDataTable(list);
-        List<WeClientLeadsVo> vos = BeanUtil.copyToList(list, WeClientLeadsVo.class);
+        List<WeLeadsVO> vos = BeanUtil.copyToList(list, WeLeadsVO.class);
+        vos.forEach(i -> {
+            //手机号脱敏
+            i.setPhone(this.phoneDesensitization(i.getPhone()));
+        });
         dataTable.setRows(vos);
 
         return dataTable;
+    }
+
+    /**
+     * 获取线索数据
+     *
+     * @param id 线索Id
+     * @return {@link AjaxResult<   WeLeadsVO  >}
+     * @author WangYX
+     * @date 2023/07/11 15:17
+     */
+    @GetMapping("/get/{id}")
+    public AjaxResult<WeLeadsVO> get(@PathVariable("id") Long id) {
+        WeLeads weLeads = weLeadsService.getById(id);
+        if (BeanUtil.isEmpty(weLeads)) {
+            throw new ServiceException("线索不存在！");
+        }
+        WeLeadsVO result = BeanUtil.copyProperties(weLeads, WeLeadsVO.class);
+
+        //标签处理
+        String labelsIds = result.getLabelsIds();
+        String labelNames = labelsHandler(labelsIds);
+        if (StrUtil.isNotBlank(labelNames)) {
+            result.setLabelsNames(labelNames);
+        }
+        //可修改的模板属性
+//        LambdaQueryWrapper<WeLeadsTemplateSettings> wrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
+//        wrapper.eq(WeLeadsTemplateSettings::getCanEdit, CanEditEnum.ALLOW.getCode());
+//        wrapper.eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE);
+//        List<WeLeadsTemplateSettings> list = weLeadsTemplateSettingsService.list(wrapper);
+        //自定义数据处理
+        String properties = result.getProperties();
+        if (StrUtil.isNotBlank(properties)) {
+            List<Properties> propertiesList = new ArrayList<>();
+            List<Properties> tempList = JSONObject.parseArray(properties, Properties.class);
+            result.setPropertiesList(tempList);
+        }
+        return AjaxResult.success(result);
+    }
+
+    /**
+     * 领取线索
+     *
+     * @param leadsId 线索Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/12 14:28
+     */
+    @RepeatSubmit
+    @GetMapping("/receive")
+    public AjaxResult receiveLeads(Long leadsId) {
+        weLeadsService.receiveLeads(leadsId);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 线索分配
+     *
+     * @param request 线索分配请求参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/13 11:25
+     */
+    @RepeatSubmit
+    @PostMapping("/allocation")
+    public AjaxResult allocation(@RequestBody WeLeadsAllocationRequest request) {
+        String result = weLeadsService.allocation(request);
+        return AjaxResult.success(result);
+    }
+
+    /**
+     * 线索导出
+     *
+     * @param request 导出请求参数
+     * @author WangYX
+     * @date 2023/07/13 11:31
+     */
+    @ApiOperation(value = "线索导出")
+    @PostMapping("/manager/list/output")
+    public void export(@RequestBody WeLeadsExportRequest request) {
+        weLeadsService.export(request);
+    }
+
+    /**
+     * 线索导入模板
+     *
+     * @author WangYX
+     * @date 2023/07/13 15:33
+     */
+    @ApiOperation(value = "线索导入模板")
+    @GetMapping("/import/template")
+    public void importTemplate() {
+        weLeadsService.importTemplate();
+    }
+
+    /**
+     * 线索导入
+     *
+     * @param file  excel文件
+     * @param seaId 公海Id
+     * @author WangYX
+     * @date 2023/07/14 11:19
+     */
+    @RepeatSubmit(interval = 1000)
+    @ApiOperation(value = "excel批量导入")
+    @PostMapping("/import/record/excel")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", value = "文件流对象,接收数组格式", required = true, dataType = "__File"),
+            @ApiImplicitParam(name = "seaId", value = "公海id", required = true)
+    })
+    public AjaxResult<WeLeadsImportResultVO> importLeads(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "seaId") Long seaId) throws IOException {
+        return AjaxResult.success(weLeadsService.batchImportFromExcel(file, seaId));
     }
 
     /**
@@ -121,67 +230,6 @@ public class WeLeadsController extends BaseController {
         return weLeadsSea;
     }
 
-
-    /**
-     * 获取线索数据
-     *
-     * @param id 线索Id
-     * @return {@link AjaxResult< WeClientLeadsVo>}
-     * @author WangYX
-     * @date 2023/07/11 15:17
-     */
-    @GetMapping("/get/{id}")
-    public AjaxResult<WeClientLeadsVo> get(@PathVariable("id") Long id) {
-        WeLeads weLeads = weLeadsService.getById(id);
-        if (BeanUtil.isEmpty(weLeads)) {
-            throw new ServiceException("线索不存在！");
-        }
-        WeClientLeadsVo result = BeanUtil.copyProperties(weLeads, WeClientLeadsVo.class);
-
-        //标签处理
-        String labelsIds = result.getLabelsIds();
-        String labelNames = labelsHandler(labelsIds);
-        if (StrUtil.isNotBlank(labelNames)) {
-            result.setLabelsNames(labelNames);
-        }
-        //可修改的模板属性
-        LambdaQueryWrapper<WeLeadsTemplateSettings> wrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
-        wrapper.eq(WeLeadsTemplateSettings::getCanEdit, CanEditEnum.ALLOW.getCode());
-        wrapper.eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE);
-        List<WeLeadsTemplateSettings> list = weLeadsTemplateSettingsService.list(wrapper);
-        //自定义数据处理
-        String properties = result.getProperties();
-        if (StrUtil.isNotBlank(properties)) {
-            List<Properties> propertiesList = new ArrayList<>();
-            List<Properties> tempList = JSONObject.parseArray(properties, Properties.class);
-            for (WeLeadsTemplateSettings settings : list) {
-                Optional<Properties> first = tempList.stream().filter(i -> i.getId().equals(settings.getId())).findFirst();
-                if (first.isPresent()) {
-                    Properties item = first.get();
-                    //是否日期
-                    if (settings.getDataAttr().equals(DataAttrEnum.DATE.getCode())) {
-                        if (StrUtil.isNotBlank(item.getValue())) {
-                            if (settings.getDatetimeType().equals(DatetimeTypeEnum.DATE.getCode())) {
-                                //日期
-                                String format = DateUtil.format(DateUtil.date(Long.valueOf(item.getValue())), DatetimeTypeEnum.DATE.getFormat());
-                                item.setValue(format);
-                            } else if (settings.getDatetimeType().equals(DatetimeTypeEnum.DATETIME.getCode())) {
-                                //日期+时间
-                                String format = DateUtil.format(DateUtil.date(Long.valueOf(item.getValue())), DatetimeTypeEnum.DATETIME.getFormat());
-                                item.setValue(format);
-                            }
-                        }
-                    }
-                    item.setName(settings.getTableEntryName());
-                    propertiesList.add(item);
-                }
-            }
-            result.setPropertiesList(propertiesList);
-        }
-        return AjaxResult.success(result);
-    }
-
-
     /**
      * 根据标签Id获取标签信息
      *
@@ -202,6 +250,135 @@ public class WeLeadsController extends BaseController {
             }
         }
         return labelNames;
+    }
+
+    /**
+     * 手机号脱敏
+     *
+     * @param phone 手机号
+     */
+    private String phoneDesensitization(String phone) {
+        if (StrUtil.isNotBlank(phone)) {
+            phone = phone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+        }
+        return phone;
+    }
+
+    /**
+     * 移动端-我的跟进
+     *
+     * @param name   客户名称
+     * @param status 线索状态 (0待分配，1跟进中，2已上门，3已退回)
+     * @return {@link TableDataInfo}
+     * @author WangYX
+     * @date 2023/07/17 18:18
+     */
+    @ApiOperation(value = "移动端-我的跟进")
+    @GetMapping("/my/follow")
+    public TableDataInfo myFollowList(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "status") Integer status) {
+        startPage();
+        List<WeLeads> weLeads = weLeadsService.myFollowList(name, status);
+        TableDataInfo dataTable = getDataTable(weLeads);
+        List<WeLeadsVO> weLeadsVOS = BeanUtil.copyToList(weLeads, WeLeadsVO.class);
+        getTagName(weLeadsVOS);
+        dataTable.setRows(weLeadsVOS);
+        return dataTable;
+    }
+
+    /**
+     * 移动端-公海线索（默认为待分配和已退回的状态的线索）
+     *
+     * @param name  线索名称
+     * @param seaId 公海Id
+     * @return {@link TableDataInfo}
+     * @author WangYX
+     * @date 2023/07/18 9:56
+     */
+    @ApiOperation(value = "移动端-公海线索")
+    @GetMapping("/sea/list")
+    public TableDataInfo seaLeadsList(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "seaId") Long seaId) {
+        startPage();
+        List<WeLeadsVO> weLeadsVOS = weLeadsService.seaLeadsList(name, seaId);
+        TableDataInfo dataTable = getDataTable(weLeadsVOS);
+        getTagName(weLeadsVOS);
+        return dataTable;
+    }
+
+    /**
+     * 获取标签Id对应的标签名称
+     *
+     * @param weLeadsVOS 线索数据
+     * @return
+     * @author WangYX
+     * @date 2023/07/18 10:51
+     */
+    private void getTagName(List<WeLeadsVO> weLeadsVOS) {
+        List<WeTag> list = weTagService.list(Wrappers.lambdaQuery(WeTag.class).eq(WeTag::getDelFlag, Constants.COMMON_STATE));
+        if (CollectionUtil.isNotEmpty(list)) {
+            Map<String, String> weTagsMap = list.stream().collect(Collectors.toMap(WeTag::getTagId, WeTag::getName));
+            weLeadsVOS.forEach(i -> {
+                String labelsIds = i.getLabelsIds();
+                if (StrUtil.isNotBlank(labelsIds)) {
+                    StringBuffer labelName = new StringBuffer();
+                    for (String labelsId : labelsIds.split(",")) {
+                        if (StrUtil.isNotBlank(weTagsMap.get(labelsId))) {
+                            if (labelName.length() != 0) {
+                                labelName.append(",");
+                            }
+                            labelName.append(weTagsMap.get(labelsId));
+                        }
+                    }
+                    i.setLabelsNames(labelName.toString());
+                }
+            });
+        }
+    }
+
+
+    /**
+     * 移动端-线索主动退回
+     *
+     * @param request 退回请求参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/18 14:06
+     */
+    @RepeatSubmit
+    @ApiOperation(value = "移动端-线索主动退回")
+    @PostMapping("/user/return")
+    public AjaxResult userReturn(@RequestBody WeLeadsUserReturnRequest request) {
+        weLeadsService.userReturn(request);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 移动端-更新线索标签
+     *
+     * @param request 更新请求参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/18 14:33
+     */
+    @ApiOperation(value = "移动端-更新线索标签")
+    @PutMapping("/update")
+    public AjaxResult update(@Validated WeLeadsUpdateRequest request) {
+        weLeadsService.update(request);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 绑定客户
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/18 17:46
+     */
+    @ApiOperation(value = "移动端-绑定客户")
+    @PostMapping("/bind/customer")
+    public AjaxResult bindCustomer(@Validated @RequestBody WeLeadsBindCustomerRequest request) {
+        weLeadsService.bindCustomer(request);
+        return AjaxResult.success();
     }
 
 

@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,8 +70,15 @@ public class WeLeadsTemplateSettingsServiceImpl extends ServiceImpl<WeLeadsTempl
     @Override
     public boolean saveLeadsTemplateSettings(WeLeadsTemplateSettingsRequest param) {
         checkSaveParam(param);
+
+        LambdaQueryWrapper<WeLeadsTemplateSettings> queryWrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
+        queryWrapper.eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE);
+        int count = this.count(queryWrapper);
+
         WeLeadsTemplateSettings settings = mapperFactory.getMapperFacade().map(param, WeLeadsTemplateSettings.class);
         settings.setId(IdUtil.getSnowflake().nextId());
+        settings.setCanEdit(0);
+        settings.setRank(count + 1);
         boolean b = save(settings);
         Long settingsId = settings.getId();
         if (CollectionUtil.isNotEmpty(param.getTableEntryContent())) {
@@ -116,137 +124,8 @@ public class WeLeadsTemplateSettingsServiceImpl extends ServiceImpl<WeLeadsTempl
     }
 
     @Override
-    public void outPutTemplateExcel(HttpServletResponse response) throws IOException {
-        List<WeLeadsTemplateSettingsVO> settingsList = baseMapper.queryWithTableEntryContent();
-        settingsList.sort(Comparator.comparing(WeLeadsTemplateSettingsVO::getRank));
-        //CustomSheetWriteHandler customSheetWriteHandler = new CustomSheetWriteHandler();
-        //Map<Integer, List<String>> selectOptionMap = customSheetWriteHandler.getSelectOptionMap();
-        for (int i = 0; i < settingsList.size(); i++) {
-            WeLeadsTemplateSettingsVO leadsTemplateSettings = settingsList.get(i);
-            Integer tableEntryAttr = leadsTemplateSettings.getTableEntryAttr();
-            /*if (tableEntryAttr.intValue() == TableEntryAttrEnum.COMBOBOX.getCode()) {
-                List<WeLeadsTemplateTableEntryContent> tableEntryContent = leadsTemplateSettings.getTableEntryContent();
-                if (CollectionUtil.isNotEmpty(tableEntryContent)) {
-                    List<String> selectOptionList = tableEntryContent.stream().map(WeLeadsTemplateTableEntryContent::getContent).collect(Collectors.toList());
-                    // todo 简单的下拉框值超过20个就会报错，需要开一个隐藏的sheet引用值，后续再优化，暂时先用简单的下拉框
-                    if (selectOptionList.size() < 20) {
-                        selectOptionMap.put(i, selectOptionList);
-                    }
-                }
-            }*/
-        }
-
-        List<List<Object>> dataList = new ArrayList<>();
-        //这里只加一行数据
-        List<Object> oneRowList = new ArrayList<>();
-        //Random rand = new Random();
-        for (int i = 0; i < settingsList.size(); i++) {
-            WeLeadsTemplateSettingsVO leadsTemplateSettings = settingsList.get(i);
-            Integer tableEntryAttr = leadsTemplateSettings.getTableEntryAttr();
-            if (tableEntryAttr.intValue() == TableEntryAttrEnum.COMBOBOX.getCode()) {
-                /*List<String> optionList = selectOptionMap.get(i);
-                if (CollectionUtil.isEmpty(optionList)) {
-                    oneRowList.add(null);
-                } else {
-                    String randomElement = optionList.get(rand.nextInt(optionList.size()));
-                    oneRowList.add(randomElement);
-                }*/
-                oneRowList.add(null);
-            } else if (tableEntryAttr.intValue() == TableEntryAttrEnum.INPUT.getCode()) {
-                Integer dataAttr = leadsTemplateSettings.getDataAttr();
-                DataAttrEnum dataAttrEnum = DataAttrEnum.of(dataAttr);
-                if (DataAttrEnum.DATE == dataAttrEnum) {
-                    Integer datetimeType = leadsTemplateSettings.getDatetimeType();
-                    DatetimeTypeEnum datetimeTypeEnum = DatetimeTypeEnum.of(datetimeType);
-                    if (DatetimeTypeEnum.DATETIME == datetimeTypeEnum) {
-                        oneRowList.add(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-                    } else {
-                        oneRowList.add(DateUtils.datePath());
-                    }
-                } else if (DataAttrEnum.NUMBER == dataAttrEnum) {
-                    oneRowList.add(0);
-                } else {
-                    oneRowList.add(leadsTemplateSettings.getTableEntryName() + "的值");
-                }
-            } else {
-                oneRowList.add(null);
-            }
-        }
-        dataList.add(oneRowList);
-        String fileName = DateUtils.getTime() + " 线索导入模板.xlsx";
-        String encode = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-        log.debug("fileName = {}", fileName);
-        log.debug("encode = {}", encode);
-        /*解决axios无法获取响应头headers的Content-Disposition*/
-        response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename*=utf-8''" + encode);
-        response.setContentType(LeadsCenterConstants.XLSX_FILE_HEAD);
-        response.setCharacterEncoding("utf-8");
-        ServletOutputStream outputStream = response.getOutputStream();
-        List<String> head = settingsList.stream().map(WeLeadsTemplateSettingsVO::getTableEntryName).collect(Collectors.toList());
-        try {
-            EasyExcelUtils.simpleWrite(head, dataList, outputStream, false);
-        } catch (Exception e) {
-            // 重置response
-            response.reset();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().println(objectMapper.writeValueAsString(AjaxResult.error(e.getMessage())));
-        }
-    }
-
-    @Override
     public String autoGenerate() {
         return UUID.randomUUID().toString().replace("-", "");
-    }
-
-    @Override
-    public List<WeLeadsTemplateTableEntryContent> getConsultSelectItem() {
-        WeLeadsTemplateSettings weSeaLeadsTemplateSettings = getOne(Wrappers.<WeLeadsTemplateSettings>lambdaQuery()
-                //.eq(WeLeadsTemplateSettings::getTableEntryName, LeadsCenterConstants.CONSULT)
-                .eq(WeLeadsTemplateSettings::getTableEntryId, LeadsCenterConstants.CONSULT_EN)
-                .eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE)
-        );
-        Long settingsId = weSeaLeadsTemplateSettings.getId();
-        return weTableEntryContentService.getByLeadsTemplateSettingsId(settingsId);
-    }
-
-    @Override
-    public void syncKinship(List<String> values) {
-        WeLeadsTemplateSettings weSeaLeadsTemplateSettings = getOne(Wrappers.<WeLeadsTemplateSettings>lambdaQuery()
-                .eq(WeLeadsTemplateSettings::getTableEntryId, LeadsCenterConstants.KINSHIP_EN)
-                .eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE)
-        );
-        Long settingsId = weSeaLeadsTemplateSettings.getId();
-        weTableEntryContentService.saveBatchTableEntryContent(settingsId, values);
-    }
-
-    @Override
-    public List<WeLeadsTemplateTableEntryContent> getKinshipSelectItem() {
-        WeLeadsTemplateSettings weSeaLeadsTemplateSettings = getOne(Wrappers.<WeLeadsTemplateSettings>lambdaQuery()
-                .eq(WeLeadsTemplateSettings::getTableEntryId, LeadsCenterConstants.KINSHIP_EN)
-                .eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE)
-        );
-        Long settingsId = weSeaLeadsTemplateSettings.getId();
-        return weTableEntryContentService.getByLeadsTemplateSettingsId(settingsId);
-    }
-
-    @Override
-    public WeLeadsTemplateSettings queryByTableEntryId(String tableEntryId) {
-        return getOne(Wrappers.<WeLeadsTemplateSettings>lambdaQuery()
-                .eq(WeLeadsTemplateSettings::getTableEntryId, tableEntryId)
-                .eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE)
-        );
-    }
-
-    @Override
-    public List<WeLeadsTemplateTableEntryContent> getAgeSelectItem() {
-        WeLeadsTemplateSettings weSeaLeadsTemplateSettings = getOne(Wrappers.<WeLeadsTemplateSettings>lambdaQuery()
-                .eq(WeLeadsTemplateSettings::getTableEntryId, LeadsCenterConstants.AGE_EN)
-                .eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE)
-        );
-        Long settingsId = weSeaLeadsTemplateSettings.getId();
-        return weTableEntryContentService.getByLeadsTemplateSettingsId(settingsId);
     }
 
     /**

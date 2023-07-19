@@ -2,13 +2,21 @@ package com.linkwechat.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.HttpStatus;
+import com.linkwechat.common.constant.LeadsCenterConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -18,19 +26,21 @@ import com.linkwechat.domain.leads.sea.entity.WeLeadsSeaVisibleRange;
 import com.linkwechat.domain.leads.sea.query.VisibleRange;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaSaveRequest;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaUpdateRequest;
-import com.linkwechat.domain.leads.sea.vo.WeLeadsSeaListVo;
-import com.linkwechat.domain.leads.sea.vo.WeLeadsSeaVo;
+import com.linkwechat.domain.leads.sea.vo.*;
+import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.service.IWeLeadsSeaService;
 import com.linkwechat.service.IWeLeadsSeaVisibleRangeService;
 import com.linkwechat.service.IWeLeadsService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,9 +54,11 @@ import java.util.stream.Collectors;
 public class WeLeadsSeaController extends BaseController {
 
     @Resource
-    private IWeLeadsSeaService weLeadsSeaService;
-    @Resource
     private IWeLeadsService weLeadsService;
+    @Resource
+    private QwSysDeptClient qwSysDeptClient;
+    @Resource
+    private IWeLeadsSeaService weLeadsSeaService;
     @Resource
     private IWeLeadsSeaVisibleRangeService weLeadsSeaVisibleRangeService;
 
@@ -82,25 +94,33 @@ public class WeLeadsSeaController extends BaseController {
     /**
      * 删除
      *
-     * @param id
-     * @return
+     * @param id 线索Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/17 10:45
      */
     @DeleteMapping("/delete/{id}")
     public AjaxResult remove(@PathVariable("id") Long id) {
-        WeLeadsSea weLeadsSea = weLeadsSeaService.getById(id);
-        if (Optional.ofNullable(weLeadsSea).isPresent()) {
-            LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
-            queryWrapper.eq(WeLeads::getSeaId, weLeadsSea.getId());
-            queryWrapper.eq(WeLeads::getDelFlag, Constants.COMMON_STATE);
-            int count = weLeadsService.count(queryWrapper);
-            if (count > 0) {
-                throw new ServiceException("公海内存在线索，无法删除！");
-            }
-            LambdaUpdateWrapper<WeLeadsSea> updateWrapper = Wrappers.lambdaUpdate(WeLeadsSea.class);
-            updateWrapper.set(WeLeadsSea::getDelFlag, Constants.DELETE_STATE);
-            updateWrapper.eq(WeLeadsSea::getId, id);
-            weLeadsSeaService.update(updateWrapper);
+        if (id.equals(1L)) {
+            throw new ServiceException("默认公海，不可删除！");
         }
+        WeLeadsSea weLeadsSea = weLeadsSeaService.getById(id);
+        if (BeanUtil.isEmpty(weLeadsSea)) {
+            throw new ServiceException("公海不存在！");
+        }
+
+        LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
+        queryWrapper.eq(WeLeads::getSeaId, weLeadsSea.getId());
+        queryWrapper.eq(WeLeads::getDelFlag, Constants.COMMON_STATE);
+        int count = weLeadsService.count(queryWrapper);
+        if (count > 0) {
+            throw new ServiceException("公海内存在线索，无法删除！");
+        }
+        LambdaUpdateWrapper<WeLeadsSea> updateWrapper = Wrappers.lambdaUpdate(WeLeadsSea.class);
+        updateWrapper.set(WeLeadsSea::getDelFlag, Constants.DELETE_STATE);
+        updateWrapper.eq(WeLeadsSea::getId, id);
+        weLeadsSeaService.update(updateWrapper);
+
         return AjaxResult.success();
     }
 
@@ -120,9 +140,11 @@ public class WeLeadsSeaController extends BaseController {
     }
 
     /**
-     * 管理员视角公海-列表
+     * 公海列表
      *
-     * @return
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/17 10:25
      */
     @GetMapping("/manager/list")
     public AjaxResult managerList() {
@@ -140,6 +162,7 @@ public class WeLeadsSeaController extends BaseController {
             if (visibleRanges != null && visibleRanges.size() > 0) {
                 List<Long> seaIds = visibleRanges.stream().map(i -> i.getSeaId()).collect(Collectors.toList());
                 LambdaQueryWrapper<WeLeadsSea> queryWrapper = Wrappers.lambdaQuery(WeLeadsSea.class);
+                queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName);
                 queryWrapper.eq(WeLeadsSea::getDelFlag, Constants.COMMON_STATE);
                 queryWrapper.in(WeLeadsSea::getId, seaIds);
                 seaList = weLeadsSeaService.list(queryWrapper);
@@ -147,24 +170,26 @@ public class WeLeadsSeaController extends BaseController {
 
             //自己创建的公海，在分公海列表可见，产品确认过
             LambdaQueryWrapper<WeLeadsSea> queryWrapper = Wrappers.lambdaQuery(WeLeadsSea.class);
+            queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName);
             queryWrapper.eq(WeLeadsSea::getCreateById, SecurityUtils.getUserId());
             queryWrapper.eq(WeLeadsSea::getDelFlag, Constants.COMMON_STATE);
             List<WeLeadsSea> list = weLeadsSeaService.list(queryWrapper);
             seaList.addAll(list);
         }
-        seaList = seaList.stream().distinct().collect(Collectors.toList());
+        seaList = seaList.stream().distinct().sorted(Comparator.comparing(WeLeadsSea::getId)).collect(Collectors.toList());
+        List<WeLeadsSeaListVo> weLeadsSeaListVos = BeanUtil.copyToList(seaList, WeLeadsSeaListVo.class);
         //公海的可见范围
-        List<WeLeadsSeaListVo> weLeadsSeaListVos = seaList.stream().map(o -> {
-            WeLeadsSeaListVo weLeadsSeaListVo = BeanUtil.copyProperties(o, WeLeadsSeaListVo.class);
-            LambdaQueryWrapper<WeLeadsSeaVisibleRange> queryWrapper = Wrappers.lambdaQuery(WeLeadsSeaVisibleRange.class);
-            queryWrapper.eq(WeLeadsSeaVisibleRange::getSeaId, weLeadsSeaListVo.getId());
-            queryWrapper.eq(WeLeadsSeaVisibleRange::getDelFlag, Constants.COMMON_STATE);
-            List<WeLeadsSeaVisibleRange> ranges = weLeadsSeaVisibleRangeService.list(queryWrapper);
-            List<String> collect = ranges.stream().map(WeLeadsSeaVisibleRange::getDataName).collect(Collectors.toList());
-            weLeadsSeaListVo.setVisibleRange(collect);
-
-            return weLeadsSeaListVo;
-        }).collect(Collectors.toList());
+//        List<WeLeadsSeaListVo> weLeadsSeaListVos = seaList.stream().map(o -> {
+//            WeLeadsSeaListVo weLeadsSeaListVo = BeanUtil.copyProperties(o, WeLeadsSeaListVo.class);
+//            LambdaQueryWrapper<WeLeadsSeaVisibleRange> queryWrapper = Wrappers.lambdaQuery(WeLeadsSeaVisibleRange.class);
+//            queryWrapper.eq(WeLeadsSeaVisibleRange::getSeaId, weLeadsSeaListVo.getId());
+//            queryWrapper.eq(WeLeadsSeaVisibleRange::getDelFlag, Constants.COMMON_STATE);
+//            List<WeLeadsSeaVisibleRange> ranges = weLeadsSeaVisibleRangeService.list(queryWrapper);
+//            List<String> collect = ranges.stream().map(WeLeadsSeaVisibleRange::getDataName).collect(Collectors.toList());
+//            weLeadsSeaListVo.setVisibleRange(collect);
+//
+//            return weLeadsSeaListVo;
+//        }).collect(Collectors.toList());
         return AjaxResult.success(weLeadsSeaListVos);
     }
 
@@ -176,6 +201,7 @@ public class WeLeadsSeaController extends BaseController {
      */
     private List<WeLeadsSea> getSeaList() {
         LambdaQueryWrapper<WeLeadsSea> queryWrapper = Wrappers.lambdaQuery(WeLeadsSea.class);
+        queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName);
         queryWrapper.eq(WeLeadsSea::getDelFlag, Constants.COMMON_STATE);
         List<WeLeadsSea> list = weLeadsSeaService.list(queryWrapper);
         return list;
@@ -215,44 +241,155 @@ public class WeLeadsSeaController extends BaseController {
         WeLeadsSea weLeadsSea = weLeadsSeaService.getById(id);
         WeLeadsSeaVo weLeadsSeaVo = BeanUtil.copyProperties(weLeadsSea, WeLeadsSeaVo.class);
         Optional.ofNullable(weLeadsSeaVo).ifPresent(i -> {
-            //获取公海对应可见范围
-            LambdaQueryWrapper<WeLeadsSeaVisibleRange> queryWrapper = Wrappers.lambdaQuery(WeLeadsSeaVisibleRange.class);
-            queryWrapper.eq(WeLeadsSeaVisibleRange::getSeaId, i.getId());
-            queryWrapper.eq(WeLeadsSeaVisibleRange::getDelFlag, Constants.COMMON_STATE);
-            List<WeLeadsSeaVisibleRange> list = weLeadsSeaVisibleRangeService.list(queryWrapper);
-            Map<Integer, List<WeLeadsSeaVisibleRange>> collect = list.stream().collect(Collectors.groupingBy(WeLeadsSeaVisibleRange::getType));
+            //公海线索数量
+            i.setNum(weLeadsService.count(Wrappers.lambdaQuery(WeLeads.class).eq(WeLeads::getSeaId, weLeadsSeaVo.getId())));
+            //可见范围
+            if (weLeadsSeaVo.getId().equals(1L)) {
+                //默认公海，全部数据
+                AjaxResult<List<SysDept>> result = qwSysDeptClient.getListWithOutPermission(new SysDept());
+                if (result.getCode() == HttpStatus.SUCCESS) {
+                    List<Long> deptIds = result.getData().stream().map(SysDept::getDeptId).collect(Collectors.toList());
+                    VisibleRange.DeptRange deptRange = new VisibleRange.DeptRange();
+                    deptRange.setSelect(true);
+                    deptRange.setDeptIds(deptIds);
+                    i.setDeptRange(deptRange);
+                } else {
+                    throw new ServiceException("获取部门数据异常！");
+                }
+            } else {
+                //普通公海
+                //获取公海对应可见范围
+                LambdaQueryWrapper<WeLeadsSeaVisibleRange> queryWrapper = Wrappers.lambdaQuery(WeLeadsSeaVisibleRange.class);
+                queryWrapper.eq(WeLeadsSeaVisibleRange::getSeaId, i.getId());
+                queryWrapper.eq(WeLeadsSeaVisibleRange::getDelFlag, Constants.COMMON_STATE);
+                List<WeLeadsSeaVisibleRange> list = weLeadsSeaVisibleRangeService.list(queryWrapper);
+                Map<Integer, List<WeLeadsSeaVisibleRange>> collect = list.stream().collect(Collectors.groupingBy(WeLeadsSeaVisibleRange::getType));
 
-            //部门
-            List<WeLeadsSeaVisibleRange> deptVisibleRanges = collect.get(VisibleRange.dept);
-            Optional.ofNullable(deptVisibleRanges).ifPresent(o -> {
-                List<Long> deptIds = o.stream().map(j -> Long.valueOf(j.getDataId())).collect(Collectors.toList());
-                VisibleRange.DeptRange deptRange = new VisibleRange.DeptRange();
-                deptRange.setSelect(true);
-                deptRange.setDeptIds(deptIds);
-                i.setDeptRange(deptRange);
-            });
+                //部门
+                List<WeLeadsSeaVisibleRange> deptVisibleRanges = collect.get(VisibleRange.dept);
+                Optional.ofNullable(deptVisibleRanges).ifPresent(o -> {
+                    List<Long> deptIds = o.stream().map(j -> Long.valueOf(j.getDataId())).collect(Collectors.toList());
+                    VisibleRange.DeptRange deptRange = new VisibleRange.DeptRange();
+                    deptRange.setSelect(true);
+                    deptRange.setDeptIds(deptIds);
+                    i.setDeptRange(deptRange);
+                });
 
-            //岗位
-            List<WeLeadsSeaVisibleRange> postVisibleRanges = collect.get(VisibleRange.post);
-            Optional.ofNullable(postVisibleRanges).ifPresent(o -> {
-                List<String> posts = o.stream().map(WeLeadsSeaVisibleRange::getDataName).collect(Collectors.toList());
-                VisibleRange.PostRange postRange = new VisibleRange.PostRange();
-                postRange.setSelect(true);
-                postRange.setPosts(posts);
-                i.setPostRange(postRange);
-            });
+                //岗位
+                List<WeLeadsSeaVisibleRange> postVisibleRanges = collect.get(VisibleRange.post);
+                Optional.ofNullable(postVisibleRanges).ifPresent(o -> {
+                    List<String> posts = o.stream().map(WeLeadsSeaVisibleRange::getDataName).collect(Collectors.toList());
+                    VisibleRange.PostRange postRange = new VisibleRange.PostRange();
+                    postRange.setSelect(true);
+                    postRange.setPosts(posts);
+                    i.setPostRange(postRange);
+                });
 
-            //用户
-            List<WeLeadsSeaVisibleRange> userVisibleRanges = collect.get(VisibleRange.user);
-            Optional.ofNullable(userVisibleRanges).ifPresent(o -> {
-                List<String> weUserIds = o.stream().map(WeLeadsSeaVisibleRange::getDataId).collect(Collectors.toList());
-                VisibleRange.UserRange userRange = new VisibleRange.UserRange();
-                userRange.setSelect(true);
-                userRange.setWeUserIds(weUserIds);
-                i.setUserRange(userRange);
-            });
+                //用户
+                List<WeLeadsSeaVisibleRange> userVisibleRanges = collect.get(VisibleRange.user);
+                Optional.ofNullable(userVisibleRanges).ifPresent(o -> {
+                    List<String> weUserIds = o.stream().map(WeLeadsSeaVisibleRange::getDataId).collect(Collectors.toList());
+                    VisibleRange.UserRange userRange = new VisibleRange.UserRange();
+                    userRange.setSelect(true);
+                    userRange.setWeUserIds(weUserIds);
+                    i.setUserRange(userRange);
+                });
+            }
         });
         return AjaxResult.success(weLeadsSeaVo);
+    }
+
+
+    /**
+     * 分公海-线索统计
+     *
+     * @param seaId 公海Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/17 14:01
+     */
+    @GetMapping("/getCounts/{seaId}")
+    public AjaxResult getCounts(@PathVariable("seaId") Long seaId) {
+        if (!weLeadsSeaService.checkSeaById(seaId)) {
+            AjaxResult.success();
+        }
+        return AjaxResult.success(weLeadsSeaService.getCounts(seaId));
+    }
+
+
+    /**
+     * 数据趋势
+     *
+     * @param seaId     公海Id
+     * @param beginTime 开始时间 yyyy-MM-dd
+     * @param endTime   结束时间 yyyy-MM-dd
+     * @param weUserId  企微员工Id
+     * @return
+     */
+    @GetMapping("/seaLeadsTrend")
+    public AjaxResult<List<WeLeadsSeaTrendVO>> findWeGroupCodeCountTrend(Long seaId, String beginTime, String endTime, String weUserId) {
+        return AjaxResult.success(weLeadsSeaService.seaLeadsTrend(seaId, beginTime, endTime, weUserId));
+    }
+
+    /**
+     * 跟进员工 TOP5
+     *
+     * @param seaId     公海Id
+     * @param beginTime 开始时间
+     * @param endTime   结束时间
+     * @return {@link AjaxResult<List<WeLeadsSeaEmployeeRankVO>>}
+     * @author WangYX
+     * @date 2023/07/17 15:35
+     */
+    @GetMapping("/seaEmployeeRank")
+    public AjaxResult<List<WeLeadsSeaEmployeeRankVO>> getCustomerRank(Long seaId, String beginTime, String endTime) {
+        return AjaxResult.success(weLeadsSeaService.getCustomerRank(seaId, beginTime, endTime));
+    }
+
+
+    /**
+     * 数据明细
+     *
+     * @param seaId     公海Id
+     * @param beginTime 开始时间
+     * @param endTime   结束时间
+     * @return {@link AjaxResult< List<WeLeadsSeaDataDetailVO>>}
+     * @author WangYX
+     * @date 2023/07/17 15:54
+     */
+    @GetMapping("/seaDataDetail")
+    public AjaxResult<List<WeLeadsSeaDataDetailVO>> getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId) {
+        return AjaxResult.success(weLeadsSeaService.getSeaDataDetail(seaId, beginTime, endTime, weUserId));
+    }
+
+
+    /**
+     * 数据明细-导出
+     *
+     * @param seaId     公海Id
+     * @param beginTime 开始时间
+     * @param endTime   结束时间
+     * @param weUserId  企微员工Id
+     * @author WangYX
+     * @date 2023/07/17 17:03
+     */
+    @GetMapping("/seaDataDetail/export")
+    public void SeaDataDetailExport(Long seaId, String beginTime, String endTime, String weUserId, HttpServletResponse response) throws IOException {
+        List<WeLeadsSeaDataDetailVO> customerRealCnt = weLeadsSeaService.getSeaDataDetail(seaId, beginTime, endTime, weUserId);
+
+        ServletOutputStream outputStream = response.getOutputStream();
+        String fileName = " 数据明细" + LeadsCenterConstants.XLSX_FILE_EXTENSION;
+        String encode = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename*=utf-8''" + encode);
+
+        ExcelWriterBuilder builder = EasyExcelFactory.write(outputStream, WeLeadsSeaDataDetailVO.class);
+        ExcelWriter excelWriter = builder.excelType(ExcelTypeEnum.XLSX).autoCloseStream(false).build();
+        WriteSheet sheet = new WriteSheet();
+        sheet.setSheetNo(0);
+        sheet.setSheetName("数据明细");
+        excelWriter.write(customerRealCnt, sheet);
+        excelWriter.finish();
     }
 
 

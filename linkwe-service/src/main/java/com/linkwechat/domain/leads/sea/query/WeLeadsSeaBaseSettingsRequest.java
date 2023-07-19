@@ -19,8 +19,11 @@ public class WeLeadsSeaBaseSettingsRequest {
      */
     private Long id;
 
+    /**
+     * 员工每日领取上限
+     */
     @Min(value = 1, message = "员工领取上限最小值为1")
-    @ApiModelProperty(value = "员工领取上限")
+    @ApiModelProperty(value = "员工每日领取上限")
     private Integer maxClaim;
 
     /**

@@ -12,7 +12,7 @@ public class LeadsCenterConstants {
 
     public final static String NAME = "姓名";
 
-    public final static String PHONE = "手机号";
+    public final static String PHONE = "电话号码";
 
     public final static String AGE = "年龄";
 

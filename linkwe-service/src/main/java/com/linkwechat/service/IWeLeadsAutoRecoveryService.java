@@ -24,4 +24,35 @@ public interface IWeLeadsAutoRecoveryService extends IService<WeLeadsAutoRecover
      */
     Long save(Long leadsId, Long followerId, Long seaId);
 
+    /**
+     * 取消自动回收
+     *
+     * @param leadsId    线索Id
+     * @param followerId 跟进人Id
+     * @author WangYX
+     * @date 2023/07/18 14:01
+     */
+    void cancel(Long leadsId, Long followerId);
+
+    /**
+     * 取消旧的自动回收，并添加新的
+     *
+     * @param leadsId    线索Id
+     * @param followerId 跟进人Id
+     * @param seaId      公海Id
+     * @return {@link Long}
+     * @author WangYX
+     * @date 2023/07/12 16:49
+     */
+    Long cancelAndSave(Long leadsId, Long followerId, Long seaId);
+
+    /**
+     * 执行自动回收
+     *
+     * @author WangYX
+     * @date 2023/07/12 13:40
+     */
+    void executeAutoRecovery();
+
+
 }

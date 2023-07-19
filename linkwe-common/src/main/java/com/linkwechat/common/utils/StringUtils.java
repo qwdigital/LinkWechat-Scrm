@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
-    private static final String REGEX_MOBILE ="((\\+86|0086)?\\s*)((134[0-8]\\d{7})|(((13([0-3]|[5-9]))|(14[5-9])|15([0-3]|[5-9])|(16(2|[5-7]))|17([0-3]|[5-8])|18[0-9]|19(1|[8-9]))\\d{8})|(14(0|1|4)0\\d{7})|(1740([0-5]|[6-9]|[10-12])\\d{7}))";
+    private static final String REGEX_MOBILE = "((\\+86|0086)?\\s*)((134[0-8]\\d{7})|(((13([0-3]|[5-9]))|(14[5-9])|15([0-3]|[5-9])|(16(2|[5-7]))|17([0-3]|[5-8])|18[0-9]|19(1|[8-9]))\\d{8})|(14(0|1|4)0\\d{7})|(1740([0-5]|[6-9]|[10-12])\\d{7}))";
 
     /**
      * 空字符串
@@ -484,11 +484,14 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     /**
      * 判断是否是手机号
+     *
      * @param tel 手机号
      * @return boolean true:是  false:否
      */
     public static boolean isMobile(String tel) {
-        if (StringUtils.isEmpty(tel)){ return false;}
+        if (StringUtils.isEmpty(tel)) {
+            return false;
+        }
         return Pattern.matches(REGEX_MOBILE, tel);
     }
 
@@ -500,28 +503,29 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     /**
      * 生成指定位数的随机字符串
+     *
      * @param length
      * @return
      */
-    public static String getRandomString(int length){
+    public static String getRandomString(int length) {
 
         //1. 定义一个字符串（A-Z，a-z，0-9）即62个数字字母；
 
-        String str="zxcvbnmlkjhgfdsaqwertyuiopQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+        String str = "zxcvbnmlkjhgfdsaqwertyuiopQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
 
         //2. 由Random生成随机数
 
-        Random random=new Random();
+        Random random = new Random();
 
-        StringBuffer sb=new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
         //3. 长度为几就循环几次
 
-        for(int i=0; i<length; ++i){
+        for (int i = 0; i < length; ++i) {
 
             //从62个的数字或字母中选择
 
-            int number=random.nextInt(62);
+            int number = random.nextInt(62);
 
             //将产生的数字通过length次承载到sb中
 
@@ -532,6 +536,25 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         //将承载的字符转换成字符串
 
         return sb.toString();
+
+    }
+
+
+    /**
+     * 转译特殊符号
+     *
+     * @param query
+     * @return
+     */
+    public static String queryReplace(String query) {
+        if (StringUtils.isBlank(query)) {
+            return query;
+        }
+        return query
+                .replace("%", "\\" + "%")
+                .replace("_", "\\" + "_")
+                .replace("'", "\\" + "'")
+                .replace("\"", "\\" + "\"");
 
     }
 }

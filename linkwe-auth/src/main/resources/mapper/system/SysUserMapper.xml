@@ -37,7 +37,8 @@
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
         <result property="userType" column="user_type"/>
-        <association property="dept" column="dept_id" javaType="com.linkwechat.common.core.domain.entity.SysDept" resultMap="deptResult"/>
+        <association property="dept" column="dept_id" javaType="com.linkwechat.common.core.domain.entity.SysDept"
+                     resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>
 
@@ -45,7 +46,7 @@
         <id property="userId" column="user_id"/>
         <result property="weUserId" column="we_user_id"/>
         <result property="scopeDept" column="scopeDept"/>
-        <result property="dataScope" column="data_scope" />
+        <result property="dataScope" column="data_scope"/>
         <result property="userName" column="user_name"/>
         <result property="position" column="position"/>
         <result property="phoneNumber" column="phone_number"/>
@@ -85,7 +86,7 @@
 
     <sql id="simpleUserVo">
         select user_id,
-               ifnull(data_scope,5) as data_scope,
+               ifnull(data_scope, 5) as data_scope,
                dept_id,
                user_name,
                user_type,
@@ -122,7 +123,7 @@
 
     <sql id="selectUserVo">
         select u.user_id,
-               ifnull(u.data_scope,5) as data_scope,
+               ifnull(u.data_scope, 5) as data_scope,
                u.we_user_id,
                u.dept_id,
                u.user_name,
@@ -156,13 +157,13 @@
                d.parent_id,
                d.dept_name,
                d.dept_en_name,
-               d.status as dept_status,
+               d.status                as dept_status,
                r.role_id,
                r.role_name,
                r.role_key,
                r.role_sort,
                r.data_scope,
-               r.status as role_status
+               r.status                as role_status
         from sys_user u
                  left join sys_dept d on u.dept_id = d.dept_id
                  left join sys_user_role ur on u.user_id = ur.user_id
@@ -236,7 +237,7 @@
 
     <select id="selectCountUserDeptList" parameterType="SysUser" resultType="int">
         select
-            count(DISTINCT u.we_user_id)
+        count(DISTINCT u.we_user_id)
         from sys_user u
         left join sys_user_dept ud on u.we_user_id = ud.we_user_id
         left join sys_dept d on ud.dept_id = d.dept_id
@@ -267,7 +268,8 @@
 
     </select>
 
-    <select id="selectUserList" parameterType="com.linkwechat.common.core.domain.entity.SysUser" resultMap="SysUserResult">
+    <select id="selectUserList" parameterType="com.linkwechat.common.core.domain.entity.SysUser"
+            resultMap="SysUserResult">
         select u.user_id,u.we_user_id,u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phone_number,
         u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
         d.dept_name, d.leader from sys_user u
@@ -308,21 +310,24 @@
         select count(1)
         from sys_user
         where user_name = #{userName}
-          and del_flag = '0' limit 1
+          and del_flag = '0'
+        limit 1
     </select>
 
     <select id="checkPhoneUnique" parameterType="String" resultMap="SysUserResult">
         select user_id, phone_number
         from sys_user
         where phone_number = #{phoneNumber}
-          and del_flag = '0' limit 1
+          and del_flag = '0'
+        limit 1
     </select>
 
     <select id="checkEmailUnique" parameterType="String" resultMap="SysUserResult">
         select user_id, email
         from sys_user
         where email = #{email}
-          and del_flag = '0' limit 1
+          and del_flag = '0'
+        limit 1
     </select>
 
     <select id="selectUserByWeUserId" resultMap="SysUserResult">
@@ -335,7 +340,8 @@
         </where>
     </select>
 
-    <insert id="insertUser" parameterType="com.linkwechat.common.core.domain.entity.SysUser" useGeneratedKeys="true" keyProperty="userId">
+    <insert id="insertUser" parameterType="com.linkwechat.common.core.domain.entity.SysUser" useGeneratedKeys="true"
+            keyProperty="userId">
         insert into sys_user(
         <if test="userId != null and userId != 0">user_id,</if>
         <if test="weUserId != null and weUserId != ''">we_user_id,</if>
@@ -461,17 +467,22 @@
 
     <update id="batchAddOrUpdate">
         insert into sys_user (user_id, dept_id, user_name, user_type, nick_name, email, phone_number, sex,
-                             avatar,password,status,login_ip,login_date,we_user_id,position, thumb_avatar,
-                             biz_mail, leader, telephone, ext_attr, we_user_status,qr_code, external_profile,
-                             external_position,address,open_userid,is_allocate,dimission_time,is_open_chat,
-                             create_by,create_by_id,create_time,update_by,update_by_id,update_time,remark)
+        avatar,password,status,login_ip,login_date,we_user_id,position, thumb_avatar,
+        biz_mail, leader, telephone, ext_attr, we_user_status,qr_code, external_profile,
+        external_position,address,open_userid,is_allocate,dimission_time,is_open_chat,
+        create_by,create_by_id,create_time,update_by,update_by_id,update_time,remark)
         values
         <foreach collection="weUserList" item="weUser" index="index" separator=",">
-         ( #{weUser.userId},#{weUser.deptId},#{weUser.userName},#{weUser.userType},#{weUser.nickName},#{weUser.email},#{weUser.phoneNumber},#{weUser.sex},
-            #{weUser.avatar}, #{weUser.password}, #{weUser.status}, #{weUser.loginIp}, #{weUser.loginDate}, #{weUser.weUserId}, #{weUser.position}, #{weUser.thumbAvatar},
-            #{weUser.bizMail}, #{weUser.leader}, #{weUser.telephone}, #{weUser.extAttr}, #{weUser.weUserStatus}, #{weUser.qrCode}, #{weUser.externalProfile},
-            #{weUser.externalPosition}, #{weUser.address}, #{weUser.openUserid}, #{weUser.isAllocate}, #{weUser.dimissionTime}, #{weUser.isOpenChat},
-            #{weUser.createBy}, #{weUser.createById}, #{weUser.createTime}, #{weUser.updateBy}, #{weUser.updateById}, #{weUser.updateTime}, #{weUser.remark}
+            (
+            #{weUser.userId},#{weUser.deptId},#{weUser.userName},#{weUser.userType},#{weUser.nickName},#{weUser.email},#{weUser.phoneNumber},#{weUser.sex},
+            #{weUser.avatar}, #{weUser.password}, #{weUser.status}, #{weUser.loginIp}, #{weUser.loginDate},
+            #{weUser.weUserId}, #{weUser.position}, #{weUser.thumbAvatar},
+            #{weUser.bizMail}, #{weUser.leader}, #{weUser.telephone}, #{weUser.extAttr}, #{weUser.weUserStatus},
+            #{weUser.qrCode}, #{weUser.externalProfile},
+            #{weUser.externalPosition}, #{weUser.address}, #{weUser.openUserid}, #{weUser.isAllocate},
+            #{weUser.dimissionTime}, #{weUser.isOpenChat},
+            #{weUser.createBy}, #{weUser.createById}, #{weUser.createTime}, #{weUser.updateBy}, #{weUser.updateById},
+            #{weUser.updateTime}, #{weUser.remark}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -513,32 +524,34 @@
     <select id="findAllSysUser" resultType="com.linkwechat.common.core.domain.entity.SysUser">
         SELECT
         su.*,
-        (SELECT GROUP_CONCAT(d.dept_name) FROM  sys_dept d WHERE sud.dept_id = d.dept_id) as dept_name
+        (SELECT GROUP_CONCAT(d.dept_name) FROM sys_dept d WHERE sud.dept_id = d.dept_id) as dept_name
         FROM
         sys_user su
         LEFT JOIN sys_user_dept sud on su.user_id=sud.user_id
         WHERE
         su.del_flag = 0
-        <if test="weUserIds !='' and weUserIds !=null">
-           and su.we_user_id in
-            <foreach collection="weUserIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        <if test="positions !='' and positions !=null">
-            and su.position in
-            <foreach collection="positions.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-
-        <if test="deptIds != null and deptIds != ''">
-            and sud.dept_id in
-            <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-
+        AND (
+        <trim prefixOverrides="OR">
+            <if test="weUserIds !='' and weUserIds !=null">
+                su.we_user_id IN
+                <foreach collection="weUserIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="positions !='' and positions !=null">
+                OR su.position IN
+                <foreach collection="positions.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="deptIds != null and deptIds != ''">
+                OR su.dept_id IN
+                <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </trim>
+        )
     </select>
 
 
@@ -546,7 +559,7 @@
         <result property="userId" column="user_id"/>
         <result property="weUserId" column="we_user_id"/>
         <result property="deptId" column="dept_id"/>
-        <result property="userName" column="user_name" />
+        <result property="userName" column="user_name"/>
         <result property="position" column="position"/>
         <result property="userType" column="user_type"/>
         <result property="nickName" column="nick_name"/>
@@ -602,43 +615,43 @@
                 and su.we_user_id = #{weUserId}
             </if>
             <if test="weUserIds != null and weUserIds.size() > 0">
-                and  su.we_user_id in
+                and su.we_user_id in
                 <foreach item="weUserId" collection="weUserIds" index="index" open="(" separator="," close=")">
                     #{weUserId}
                 </foreach>
             </if>
             <if test="deptIds != null and deptIds.size() > 0">
-                and  sud.dept_id in
+                and sud.dept_id in
                 <foreach item="deptId" collection="deptIds" index="index" open="(" separator="," close=")">
                     #{deptId}
                 </foreach>
             </if>
             <if test="roleIds != null and roleIds.size() > 0">
-                and  sr.role_id in
+                and sr.role_id in
                 <foreach item="roleId" collection="roleIds" index="index" open="(" separator="," close=")">
                     #{roleId}
                 </foreach>
             </if>
             <if test="positions != null and positions.size() > 0">
-                and  su.position in
+                and su.position in
                 <foreach item="position" collection="positions" index="index" open="(" separator="," close=")">
                     #{position}
                 </foreach>
             </if>
             <if test="weUserStatus != null">
-                and  su.we_user_status = #{weUserStatus}
+                and su.we_user_status = #{weUserStatus}
             </if>
             <if test="isAllocate != null">
-                and  su.is_allocate = #{isAllocate}
+                and su.is_allocate = #{isAllocate}
             </if>
             <if test="isOpenChat != null">
-                and  su.is_open_chat = #{isOpenChat}
+                and su.is_open_chat = #{isOpenChat}
             </if>
             <if test="kfStatus != null">
-                and  su.kf_status = #{kfStatus}
+                and su.kf_status = #{kfStatus}
             </if>
             <if test="sex != null">
-                and  su.sex = #{sex}
+                and su.sex = #{sex}
             </if>
         </where>
     </select>

@@ -1,9 +1,9 @@
 package com.linkwechat.domain.leads.leads.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.Date;
 
@@ -17,6 +17,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("we_leads_follower")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class WeLeadsFollower {
 
     /**
@@ -98,10 +101,17 @@ public class WeLeadsFollower {
     /**
      * 是否当前跟进人（0否，1是）
      */
+    @TableField(value = "is_current_follower")
     private Integer isCurrentFollower;
 
     /**
      * 跟进时线索所处的公海Id
      */
     private Long seaId;
+
+    /**
+     * 是否最新跟进人（0否，1是）
+     */
+    @TableField(value = "is_latest")
+    private Integer latest;
 }

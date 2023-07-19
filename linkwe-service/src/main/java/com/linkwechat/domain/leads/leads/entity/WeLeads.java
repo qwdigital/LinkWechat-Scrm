@@ -1,10 +1,13 @@
 package com.linkwechat.domain.leads.leads.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * 线索
@@ -87,11 +90,15 @@ public class WeLeads extends BaseEntity {
 
     /**
      * 末次回收原因
+     *
+     * @see com.linkwechat.common.enums.leads.record.FollowBackModeEnum
      */
-    private String returnReason;
+    private Integer returnReason;
 
     /**
-     * 线索来源 0excel导入
+     * 线索来源
+     *
+     * @see com.linkwechat.common.enums.leads.record.ImportSourceTypeEnum
      */
     private Integer source;
 
@@ -101,4 +108,27 @@ public class WeLeads extends BaseEntity {
      * 性别, 0 = 未知, 1 = 男, 2 = 女
      */
     private Integer sex;
+
+    /**
+     * 导入记录Id
+     */
+    private Long importRecordId;
+
+    /**
+     * 客户Id
+     */
+    private Long customerId;
+
+    /**
+     * 客户外部联系人Id
+     */
+    @TableField(value = "external_userid")
+    private String externalUserid;
+
+    /**
+     * 绑定客户时间
+     */
+    @TableField(value = "bind_customer_time")
+    private Date bindCustomerTime;
+
 }

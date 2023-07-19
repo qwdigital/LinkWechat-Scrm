@@ -57,7 +57,6 @@ public class TextMaterialImportDataListener implements ReadListener<TextMaterial
      * @param context
      */
     @Override
-
     public void invoke(TextMaterialExportVo data, AnalysisContext context) {
         log.info("解析到一条数据:{}", JSON.toJSONString(data));
         String title = data.getTitle();

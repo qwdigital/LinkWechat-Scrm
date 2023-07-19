@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Builder
-@TableName(value = "we_leads_follow_record_attachment")
+@TableName(value = "we_leads_record_attachment")
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeLeadsFollowRecordAttachment {
@@ -33,7 +33,7 @@ public class WeLeadsFollowRecordAttachment {
     private Long contentId;
 
     /**
-     * 附件类型（0视频，1图片，2文件）
+     * 附件类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)
      */
     private Integer type;
 
