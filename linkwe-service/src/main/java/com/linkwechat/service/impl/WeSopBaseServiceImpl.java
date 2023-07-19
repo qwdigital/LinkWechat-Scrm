@@ -386,7 +386,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             customerExecuteContent.stream()
-                    .collect(Collectors.groupingBy(WeCustomerSopBaseContentVo::getPushTimePre))
+                    .collect(Collectors.groupingBy(WeCustomerSopBaseContentVo::getPushStartTime))
                     .forEach((k,v)->{
                         WeCustomerSopContentVo weCustomerSopContentVo=new WeCustomerSopContentVo();
                         v.stream().forEach(vv->{
@@ -558,10 +558,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         }
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,false);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true);
 
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             List<WeSendGroupSopContentVo.WeGroupSop> weGroupSops =new ArrayList<>();
+
 
             groupExecuteContent.stream().collect(Collectors.groupingBy(WeGroupSopBaseContentVo::getSopBaseId))
                     .forEach((k,v)->{

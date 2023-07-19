@@ -76,6 +76,9 @@
             <if test="auditUserName != null and auditUserName != ''">and a.audit_user_name like concat('%',
                 #{auditUserName}, '%')
             </if>
+            <if test="alertFlag != null">
+                and a.alert_flag=#{alertFlag}
+            </if>
         order by a.update_time desc, a.create_time desc
     </select>
 

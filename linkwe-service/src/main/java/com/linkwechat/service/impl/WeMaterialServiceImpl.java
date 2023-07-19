@@ -343,6 +343,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
     }
 
+
+
     @Override
     public FileEntity builderPoster(PurePoster purePoster) throws Exception {
 
@@ -991,6 +993,15 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                         , MessageType.IMAGE.getMessageType()
                         , FileUtil.getName(messageTemplate.getPicUrl()));
                 messageTemplate.setMediaId(weMedia.getMediaId());
+            }else if(ObjectUtil.equal(MessageType.POSTERS.getMessageType(), messageTemplate.getMsgType())){
+
+
+//                WeMediaVo weMedia = this.uploadTemporaryMaterial(messageTemplate.getFileUrl()
+//                        , MessageType.IMAGE.getMessageType()
+//                        , FileUtil.getName(messageTemplate.getFileUrl()));
+                messageTemplate.setPicUrl(messageTemplate.getFileUrl());
+
+
             }
 //            else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
 ////                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()

@@ -89,7 +89,7 @@
         wset.create_time,
         wset.execute_end_time,
         wset.sop_base_id,
-        IFNULL(ROUND((SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id)/(SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id and execute_state=1)*100,0),0) as efficiency
+        IFNULL(ROUND((SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id  and execute_state=1)/(SELECT COUNT(*) FROM we_sop_execute_target_attachments wseta WHERE wseta.execute_target_id=wset.id)*100,0),0) as efficiency
         FROM
         we_sop_execute_target wset
         LEFT JOIN we_group wg ON wset.target_id=wg.chat_id
@@ -153,6 +153,9 @@
         <if test="executeSubState != null">
             and wseca.execute_state=#{executeSubState}
         </if>
+        <if test="executeSubState == 0">
+            and wset.execute_state=1
+        </if>
         <if test="sopBaseId !=null">
             and wset.sop_base_id=#{sopBaseId}
         </if>
@@ -192,6 +195,10 @@
         <if test="executeSubState != null">
             and wseca.execute_state=#{executeSubState}
         </if>
+
+        <if test="executeSubState == 0">
+            and wset.execute_state=1
+        </if>
         <if test="sopBaseId !=null">
             and wset.sop_base_id=#{sopBaseId}
         </if>
@@ -218,7 +225,7 @@
             and wsb.del_flag=0  and wsb.sop_state=1 and wsb.send_type=2
         <choose>
             <when test="isExpiringSoon">
-                AND   0&lt;=timestampdiff(MINUTE,NOW(),wseta.push_end_time)&lt;=10
+                AND   timestampdiff(MINUTE,NOW(),wseta.push_end_time) BETWEEN 0 AND 10
             </when>
             <otherwise>
                 AND to_days( wseta.push_start_time ) = to_days(now())
@@ -241,7 +248,7 @@
             wg.`owner` = #{weUserId} and wg.del_flag=0 and   wset.target_type = 2 and wsb.del_flag=0 and wsb.sop_state=1 and wsb.send_type=2
         <choose>
             <when test="isExpiringSoon">
-                AND   0&lt;=timestampdiff(MINUTE,NOW(),wseta.push_end_time)&lt;=10
+                AND   timestampdiff(MINUTE,NOW(),wseta.push_end_time) BETWEEN 0 AND 10
             </when>
             <otherwise>
                 AND to_days( wseta.push_start_time ) = to_days(now())
@@ -270,7 +277,6 @@
         <if test="targetId">
             and wset.target_id=#{targetId}
         </if>
-        GROUP BY wset.id
     </select>
 
 

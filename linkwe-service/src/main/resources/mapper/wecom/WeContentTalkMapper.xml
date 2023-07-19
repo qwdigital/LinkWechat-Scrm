@@ -17,7 +17,7 @@
             <if test="talkType != null ">and t.talk_type = #{talkType}</if>
             <if test="categoryId != null ">and t.category_id = #{categoryId}</if>
         </where>
-        order by t.create_time
+        order by t.update_time
     </select>
 
 

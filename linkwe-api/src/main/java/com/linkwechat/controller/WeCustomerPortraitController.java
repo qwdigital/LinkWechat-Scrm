@@ -161,7 +161,7 @@ public class WeCustomerPortraitController extends BaseController {
     @PostMapping(value = "/updateWeCustomerPorTraitTag")
     public AjaxResult updateWeCustomerPorTraitTag(@RequestBody WeMakeCustomerTag weMakeCustomerTag) {
 
-
+        weMakeCustomerTag.setSource(false);
         weCustomerService.makeLabel(weMakeCustomerTag);
 
         return AjaxResult.success();

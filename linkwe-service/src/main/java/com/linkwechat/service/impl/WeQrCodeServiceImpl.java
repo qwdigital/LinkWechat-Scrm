@@ -273,7 +273,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
             );
             //今日扫码次数
             List<WeCustomerChannelCountVo> weCustomerChannelCountVos
-                    = weCustomerService.countCustomerChannel(weQrCode.getState(), DateUtils.dateTime(), DateUtils.dateTime(), null);
+                    = weCustomerService.countCustomerChannel(weQrCode.getState(), DateUtils.getDate(), DateUtils.getDate(), null);
             if(CollectionUtil.isNotEmpty(weCustomerChannelCountVos)){
                 scanCountVo.setToday(
                         weCustomerChannelCountVos.stream().findFirst().get().getCustomerNumber()

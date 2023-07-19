@@ -432,7 +432,11 @@
             wu.user_name,
             wc.add_user_id as userId,
             wu.avatar as headImageUrl,
-            wc.add_time as createTime
+            wc.add_time as createTime,
+            wc.add_method as addMethod,
+            wc.add_time as firstAddTime,
+            wc.track_state as trackState,
+            wc.track_time as trackTime
         FROM
             we_customer wc
                 INNER JOIN sys_user wu ON wc.add_user_id = wu.we_user_id
@@ -635,19 +639,20 @@
         group by external_userid,customer_name,avatar;
     </select>
 
+
     <select id="countCustomerChannel" resultType="com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo">
         SELECT
-            sdd.date,
-            (SELECT count(wc.id) from we_customer wc where date_format(wc.add_time,'%Y-%m-%d')=date_format(sdd.date,'%Y-%m-%d')
-                                                     <if test="state != null and state !=''">
-                                                         AND wc.state=#{state}
-                                                     </if>
-                                                     <if test="delFlag != null">
-                                                         and wc.del_flag=#{delFlag}
-                                                     </if>
-            ) as customerNumber
+        sdd.date,
+        (SELECT count(wc.id) from we_customer wc where date_format(wc.add_time,'%Y-%m-%d')=date_format(sdd.date,'%Y-%m-%d')
+        <if test="state != null and state !=''">
+            AND wc.state=#{state}
+        </if>
+        <if test="delFlag != null">
+            and wc.del_flag=#{delFlag}
+        </if>
+        ) as customerNumber
         FROM
-            sys_dim_date sdd
+        sys_dim_date sdd
         <where>
             <if test="startTime != null and startTime !='' and endTime != null and endTime !=''">
                 date_format(sdd.date,'%Y-%m-%d') BETWEEN #{startTime} AND #{endTime}
@@ -655,12 +660,13 @@
         </where>
     </select>
 
+
     <select id="totalScanCodeNumber" resultType="Integer">
         SELECT count(*) from we_customer
         <where>
-           <if test="state != null and state != ''">
-               state=#{state}
-           </if>
+            <if test="state != null and state != ''">
+                state=#{state}
+            </if>
         </where>
     </select>
 

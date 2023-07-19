@@ -5,6 +5,7 @@ import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
 import com.linkwechat.domain.wecom.query.customer.state.WeUserBehaviorDataQuery;
@@ -25,6 +26,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -516,6 +518,54 @@ public class QwCustomerController {
         );
 
     }
+
+
+    /**
+     * 创建获客链接
+     * @param query
+     * @return
+     */
+    @PostMapping("/createCustomerLink")
+    public AjaxResult<WeLinkCustomerVo> createCustomerLink(@RequestBody WeLinkCustomerQuery query){
+
+        return AjaxResult.success(
+                qwCustomerService.createCustomerLink(query)
+        );
+
+    }
+
+
+
+    /**
+     * 更新获客链接
+     * @param query
+     * @return
+     */
+    @PostMapping("/updateCustomerLink")
+    public AjaxResult<WeLinkCustomerVo> updateCustomerLink(@RequestBody WeLinkCustomerQuery query){
+
+        return AjaxResult.success(
+                qwCustomerService.updateCustomerLink(query)
+        );
+
+    }
+
+
+    /**
+     * 删除获客链接
+     * @param query
+     * @return
+     */
+    @PostMapping("/deleteCustomerLink")
+    public AjaxResult<WeResultVo>  deleteCustomerLink(@RequestBody WeLinkCustomerQuery query){
+
+
+        return AjaxResult.success(
+                qwCustomerService.deleteCustomerLink(query)
+        );
+
+    }
+
 
 
 

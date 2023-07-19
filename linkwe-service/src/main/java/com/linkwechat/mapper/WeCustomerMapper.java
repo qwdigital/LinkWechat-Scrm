@@ -202,6 +202,9 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      */
     List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(@Param("externalUserIds") List<String> externalUserIds);
 
+
+
+
     /**
      * 根据渠道时间统计客户(目前用于活码统计相关)
      * @param state
