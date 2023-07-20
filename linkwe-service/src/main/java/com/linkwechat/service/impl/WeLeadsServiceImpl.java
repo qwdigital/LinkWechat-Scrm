@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.LeadsCenterConstants;
+import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
@@ -29,6 +30,7 @@ import com.linkwechat.common.enums.leads.template.CanEditEnum;
 import com.linkwechat.common.enums.leads.template.DataAttrEnum;
 import com.linkwechat.common.enums.leads.template.DatetimeTypeEnum;
 import com.linkwechat.common.enums.leads.template.TableEntryAttrEnum;
+import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.*;
 import com.linkwechat.domain.WeCustomer;
@@ -84,33 +86,33 @@ import java.util.stream.Collectors;
 public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> implements IWeLeadsService {
 
     @Resource
-    private IWeLeadsSeaBaseSettingsService weLeadsSeaBaseSettingsService;
-    @Resource
-    private IWeLeadsFollowerService weLeadsFollowerService;
-    @Resource
-    private WeLeadsFollowRecordMapper weLeadsFollowRecordMapper;
-    @Resource
-    private IWeLeadsFollowRecordContentService weLeadsFollowRecordContentService;
-    @Resource
-    private IWeLeadsAutoRecoveryService weLeadsAutoRecoveryService;
+    private WeLeadsMapper weLeadsMapper;
     @Resource
     private RedissonClient redissonClient;
     @Resource
     private QwSysUserClient qwSysUserClient;
     @Resource
+    private WeCustomerMapper weCustomerMapper;
+    @Resource
     private WeLeadsSeaMapper weLeadsSeaMapper;
-    @Resource
-    private WeLeadsMapper weLeadsMapper;
-    @Resource
-    private WeLeadsTemplateSettingsMapper weLeadsTemplateSettingsMapper;
-    @Resource
-    private WeLeadsTemplateTableEntryContentMapper weLeadsTemplateTableEntryContentMapper;
-    @Resource
-    private IWeLeadsImportRecordService weLeadsImportRecordService;
     @Resource
     private WeLeadsFollowerMapper weLeadsFollowerMapper;
     @Resource
-    private WeCustomerMapper weCustomerMapper;
+    private IWeLeadsFollowerService weLeadsFollowerService;
+    @Resource
+    private WeLeadsFollowRecordMapper weLeadsFollowRecordMapper;
+    @Resource
+    private IWeLeadsAutoRecoveryService weLeadsAutoRecoveryService;
+    @Resource
+    private IWeLeadsImportRecordService weLeadsImportRecordService;
+    @Resource
+    private IWeMessageNotificationService weMessageNotificationService;
+    @Resource
+    private WeLeadsTemplateSettingsMapper weLeadsTemplateSettingsMapper;
+    @Resource
+    private IWeLeadsSeaBaseSettingsService weLeadsSeaBaseSettingsService;
+    @Resource
+    private IWeLeadsFollowRecordContentService weLeadsFollowRecordContentService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -439,20 +441,23 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
     private String executeAllocation(List<WeLeadsFollower> vos) {
         int success = 0, fail = 0;
         for (WeLeadsFollower vo : vos) {
+            WeLeads leads = null;
+            boolean flag = false;
             String key = LeadsCenterConstants.LEADS + vo.getLeadsId();
             RLock lock = redissonClient.getLock(key);
             try {
                 //尝试拿锁5秒后停止重试，未拿到锁返回false，拿到返回true，具有看门狗机制30s
                 boolean b = lock.tryLock(5, TimeUnit.SECONDS);
                 if (b) {
-                    //1.再次判断线索所属状态
-                    WeLeads leads = this.getById(vo.getLeadsId());
+                    //再次判断线索所属状态
+                    leads = this.getById(vo.getLeadsId());
                     if (leads.getLeadsStatus().equals(LeadsStatusEnum.BE_FOLLOWING_UP.getCode())
                             || leads.getLeadsStatus().equals(LeadsStatusEnum.VISIT.getCode())) {
                         fail++;
                         continue;
                     }
                     executeAllocation(vo);
+                    flag = true;
                     success++;
                 }
             } catch (InterruptedException e) {
@@ -463,6 +468,16 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
                 if (lock.isHeldByCurrentThread()) {
                     lock.unlock();
                 }
+            }
+            if (flag) {
+                //添加跟进记录
+                Long recordId = addFollowRecord(vo.getLeadsId(), vo.getSeaId(), vo.getId(), 0);
+                //添加跟进记录内容
+                weLeadsFollowRecordContentService.adminAllocation(recordId, SecurityUtils.getLoginUser().getSysUser().getUserName());
+                //自动回收
+                weLeadsAutoRecoveryService.save(vo.getId(), vo.getFollowerId(), vo.getSeaId());
+                //消息通知
+                weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), MessageConstants.LEADS_ALLOCATION, leads.getName());
             }
         }
         return "已成功分配 " + success + " 条线索，有 " + fail + " 条线索状态有更新未能成功分配";
@@ -476,7 +491,6 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
      * @date 2023/07/13 11:15
      */
     private void executeAllocation(WeLeadsFollower vo) {
-
         //修改线索状态和添加当前跟进人信息
         updateLeadsStatusAndAddCurrentFollower(vo.getLeadsId());
 
@@ -488,15 +502,6 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
             weLeadsFollowerService.updateById(one);
         }
         weLeadsFollowerService.save(vo);
-
-        //添加跟进记录
-        Long recordId = addFollowRecord(vo.getLeadsId(), vo.getSeaId(), vo.getId(), 0);
-
-        //添加跟进记录内容
-        weLeadsFollowRecordContentService.adminAllocation(recordId, SecurityUtils.getLoginUser().getSysUser().getUserName());
-
-        //自动回收
-        weLeadsAutoRecoveryService.save(vo.getId(), vo.getFollowerId(), vo.getSeaId());
     }
 
     /**

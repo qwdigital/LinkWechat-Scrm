@@ -1,4 +1,4 @@
-package com.linkwechat.domain.leads.leads.query;
+package com.linkwechat.domain.message.query;
 
 import com.linkwechat.common.enums.message.MessageTypeEnum;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @date 2023/04/11 16:53
  */
 @Data
-public class WeClientLeadsNewsMqParam implements Serializable {
+public class WeClientLeadsNewsMqRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

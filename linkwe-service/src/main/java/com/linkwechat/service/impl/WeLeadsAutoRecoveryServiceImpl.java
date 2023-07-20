@@ -10,8 +10,10 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.common.enums.leads.record.FollowBackModeEnum;
+import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
 import com.linkwechat.domain.leads.leads.entity.WeLeadsAutoRecovery;
 import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
@@ -20,6 +22,7 @@ import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.IWeLeadsAutoRecoveryService;
 import com.linkwechat.service.IWeLeadsFollowRecordContentService;
+import com.linkwechat.service.IWeMessageNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +51,8 @@ public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecov
     private WeLeadsFollowRecordMapper weLeadsFollowRecordMapper;
     @Resource
     private IWeLeadsFollowRecordContentService weLeadsFollowRecordContentService;
+    @Resource
+    private IWeMessageNotificationService weMessageNotificationService;
 
     @Override
     public Long save(Long leadsId, Long followerId, Long seaId) {
@@ -93,6 +98,7 @@ public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecov
 
     @Override
     public void executeAutoRecovery() {
+
         //获取未执行的跟进的线索
         DateTime dateTime = DateUtil.beginOfDay(DateUtil.date());
         LambdaQueryWrapper<WeLeadsAutoRecovery> wrapper = Wrappers.lambdaQuery();
@@ -152,6 +158,9 @@ public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecov
                 //自动回收状态修改
                 weLeadsAutoRecovery.setExecutingState(1);
                 this.baseMapper.updateById(weLeadsAutoRecovery);
+
+                //消息通知
+                weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), MessageConstants.LEADS_AUTO_RECOVERY, weLeads.getName());
             }
         }
     }

@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 /**
  * 线索中心-线索自动回收
  * <p>
- * 凌晨执行
+ * 凌晨执行  0 0 0 * * ?
  *
  * @author WangYX
  * @version 1.0.0

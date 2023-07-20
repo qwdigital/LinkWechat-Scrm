@@ -6,7 +6,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.SiteStasConstants;
 import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
@@ -64,9 +63,6 @@ public class WeFormSurveySiteStatsTask {
 
                 //总的站点数据统计
                 siteStas(weFormSurveyCatalogue);
-
-                //每天的站点数据统计
-                dayByDaySiteStas(weFormSurveyCatalogue);
             }
         }
     }
@@ -131,7 +127,7 @@ public class WeFormSurveySiteStatsTask {
             String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
             Integer pv = (Integer) redisTemplate.opsForValue().get(pvKey);
             //IP
-            String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
+            String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             Long uv = redisTemplate.opsForSet().size(ipKey) - 1;
 
             //之前总的统计数据
