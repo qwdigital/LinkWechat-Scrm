@@ -10,9 +10,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
+import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsConversionRateVO;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsDataTrendVO;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsUserFollowTop5VO;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord;
 import com.linkwechat.mapper.WeLeadsFollowRecordMapper;
+import com.linkwechat.mapper.WeLeadsFollowerMapper;
 import com.linkwechat.mapper.WeLeadsMapper;
 import com.linkwechat.service.IWeLeadsStatisticService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +42,9 @@ public class WeLeadsStatisticServiceImpl implements IWeLeadsStatisticService {
     private WeLeadsMapper weLeadsMapper;
     @Resource
     private WeLeadsFollowRecordMapper weLeadsFollowRecordMapper;
+    @Resource
+    private WeLeadsFollowerMapper weLeadsFollowerMapper;
+
 
     @Override
     public Map<String, Object> statistic() {
@@ -53,13 +57,13 @@ public class WeLeadsStatisticServiceImpl implements IWeLeadsStatisticService {
         //已添加客户数
         long customerNum = weLeads.stream().filter(i -> i.getCustomerId() != null).count();
 
-        //日跟进日数
+        //日跟进人数
         QueryWrapper<WeLeadsFollowRecord> query = Wrappers.query();
         query.eq("record_status", 1);
         query.eq("DATE_FORMAT(create_time, '%Y-%m-%d')", DateUtil.today());
         Integer followNum = weLeadsFollowRecordMapper.selectCount(query);
 
-        NumberFormat instance = NumberFormat.getCurrencyInstance();
+        NumberFormat instance = NumberFormat.getPercentInstance();
         instance.setMaximumFractionDigits(2);
 
         //线索转化率
@@ -72,13 +76,12 @@ public class WeLeadsStatisticServiceImpl implements IWeLeadsStatisticService {
 
         Map<String, Object> result = new HashMap<>(5);
         result.put("totalNum", totalNum);
-        result.put("customerNum", customerNum);
+        result.put("customerNum", (int) customerNum);
         result.put("followNum", followNum);
         result.put("conversionRate", conversionRate);
         result.put("returnRate", returnRate);
         return result;
     }
-
 
     @Override
     public List<WeLeadsDataTrendVO> dataTrend(String beginTime, String endTime) {
@@ -122,6 +125,53 @@ public class WeLeadsStatisticServiceImpl implements IWeLeadsStatisticService {
             //线索日跟进人数
             List<WeLeadsFollowRecord> records1 = recordsMap.get(dateStr);
             item.setFollowNum(CollectionUtil.isNotEmpty(records1) ? records1.size() : 0);
+            result.add(item);
+        }
+        return result;
+    }
+
+    @Override
+    public List<WeLeadsConversionRateVO> conversionTop5(String beginTime, String endTime) {
+        LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);
+        queryWrapper.between(WeLeadsFollower::getFollowerStartTime, DateUtil.parseDate(beginTime), DateUtil.offsetDay(DateUtil.parseDate(endTime), 1));
+        List<WeLeadsFollower> list = weLeadsFollowerMapper.selectList(queryWrapper);
+        Map<String, List<WeLeadsFollower>> map = list.stream().collect(Collectors.groupingBy(WeLeadsFollower::getFollowerName));
+        List<WeLeadsConversionRateVO> result = new ArrayList<>();
+        map.entrySet().forEach(i -> {
+            WeLeadsConversionRateVO vo = new WeLeadsConversionRateVO();
+            vo.setUserName(i.getKey());
+            List<WeLeadsFollower> value = i.getValue();
+
+            List<WeLeadsFollower> conversionList = value.stream().filter(j -> j.getFollowerStatus().equals(2)).collect(Collectors.toList());
+            NumberFormat instance = NumberFormat.getIntegerInstance();
+            String format = instance.format(conversionList.size() / Double.valueOf(value.size()) * 100);
+            vo.setRate(format);
+            result.add(vo);
+        });
+        result.sort(Comparator.comparing(WeLeadsConversionRateVO::getRate));
+        if (result.size() > 5) {
+            return CollectionUtil.sub(result, 0, 5);
+        }
+        return result;
+    }
+
+    @Override
+    public List<WeLeadsUserFollowTop5VO> userFollowTop5(String beginTime, String endTime) {
+        LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);
+        queryWrapper.eq(WeLeadsFollower::getFollowerStatus, LeadsStatusEnum.BE_FOLLOWING_UP.getCode());
+        queryWrapper.between(WeLeadsFollower::getFollowerStartTime, DateUtil.parseDate(beginTime), DateUtil.offsetDay(DateUtil.parseDate(endTime), 1));
+        List<WeLeadsFollower> list = weLeadsFollowerMapper.selectList(queryWrapper);
+        Map<String, List<WeLeadsFollower>> map = list.stream().collect(Collectors.groupingBy(WeLeadsFollower::getFollowerName));
+        List<WeLeadsUserFollowTop5VO> result = new ArrayList<>();
+        map.entrySet().forEach(i -> {
+            WeLeadsUserFollowTop5VO vo = new WeLeadsUserFollowTop5VO();
+            vo.setUserName(i.getKey());
+            vo.setFollowNum(i.getValue().size());
+            result.add(vo);
+        });
+        result.sort(Comparator.comparing(WeLeadsUserFollowTop5VO::getFollowNum));
+        if (result.size() > 5) {
+            return CollectionUtil.sub(result, 0, 5);
         }
         return result;
     }

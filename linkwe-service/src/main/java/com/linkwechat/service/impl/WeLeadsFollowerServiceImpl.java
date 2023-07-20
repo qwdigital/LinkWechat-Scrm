@@ -16,8 +16,11 @@ import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
 import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
+import com.linkwechat.domain.leads.leads.query.WeLeadsUserStatisticRequest;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerNumVO;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerVO;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsUserFollowTop5VO;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsUserStatisticVO;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordAttachment;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordContent;
@@ -91,8 +94,8 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
                     .id(i.getId())
                     .followUserName(i.getFollowerName())
                     .followUserDeptName(i.getDeptName())
-                    .followStatus(i.getFollowerStatus())
-                    .followStatusStr(LeadsStatusEnum.ofByCode(i.getFollowerStatus()).getStatusCn())
+                    .followerStatus(i.getFollowerStatus())
+                    .followerStatusStr(LeadsStatusEnum.ofByCode(i.getFollowerStatus()).getStatusCn())
                     .build();
             if (i.getReturnType() != null) {
                 build.setBackMode(i.getReturnType());
@@ -193,5 +196,10 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
     public void list(WeLeadsFollowRecordRequest request) {
 
 
+    }
+
+    @Override
+    public List<WeLeadsFollowerVO> userStatistic(List<Long> userIds) {
+        return this.baseMapper.userStatistic(userIds);
     }
 }

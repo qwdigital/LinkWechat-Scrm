@@ -17,4 +17,23 @@
         WHERE t1.follower_id = #{userId}
           AND t1.follower_status = 1
     </select>
+
+    <select id="userStatistic" resultType="com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerVO">
+        SELECT
+        t1.id,
+        t1.follower_id,
+        t1.follower_status,
+        t2.customer_id,
+        t2.bind_customer_time
+        FROM we_leads_follower t1
+        LEFT JOIN we_leads t2 ON t2.id = t1.leads_id AND t2.follower_id = t1.follower_id
+        <where>
+            <if test="userIds!=null and userIds.size()>0">
+                AND t1.follower_id in
+                <foreach collection="userIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

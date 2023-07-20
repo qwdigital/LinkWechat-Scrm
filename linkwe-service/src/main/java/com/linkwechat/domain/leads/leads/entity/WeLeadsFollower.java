@@ -64,7 +64,7 @@ public class WeLeadsFollower {
     private Integer getType;
 
     /**
-     * 跟进状态：0已领取，1跟进中，2已上门，3已退回
+     * 跟进状态：0已领取，1跟进中，2已转化，3已退回
      */
     private Integer followerStatus;
 

@@ -481,6 +481,12 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         updateLeadsStatusAndAddCurrentFollower(vo.getLeadsId());
 
         //添加线索跟进人
+        //更新上次最新跟进人为否
+        WeLeadsFollower one = weLeadsFollowerService.getOne(Wrappers.lambdaQuery(WeLeadsFollower.class).eq(WeLeadsFollower::getLeadsId, vo.getLeadsId()).eq(WeLeadsFollower::getLatest, 1));
+        if (BeanUtil.isNotEmpty(one)) {
+            one.setLatest(0);
+            weLeadsFollowerService.updateById(one);
+        }
         weLeadsFollowerService.save(vo);
 
         //添加跟进记录
@@ -492,7 +498,6 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         //自动回收
         weLeadsAutoRecoveryService.save(vo.getId(), vo.getFollowerId(), vo.getSeaId());
     }
-
 
     /**
      * 主动领取
@@ -506,11 +511,6 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         updateLeadsStatusAndAddCurrentFollower(weLeads.getId());
 
         //添加线索跟进人
-        WeLeadsFollower one = weLeadsFollowerService.getOne(Wrappers.lambdaQuery(WeLeadsFollower.class).eq(WeLeadsFollower::getLeadsId, weLeads.getId()).eq(WeLeadsFollower::getLatest, 1));
-        if (BeanUtil.isNotEmpty(one)) {
-            one.setLatest(0);
-            weLeadsFollowerService.updateById(one);
-        }
         WeLeadsFollower weLeadsFollower = addLeadsFollower(weLeads.getId());
 
         //添加跟进记录
@@ -859,6 +859,17 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         if (BeanUtil.isEmpty(weLeads)) {
             throw new ServiceException("线索不存在！");
         }
+
+        //判断用户是否线索的当前跟进人
+        LambdaQueryWrapper<WeLeadsFollower> lambdaQuery = Wrappers.lambdaQuery();
+        lambdaQuery.eq(WeLeadsFollower::getLeadsId, request.getLeadsId());
+        lambdaQuery.eq(WeLeadsFollower::getFollowerId, SecurityUtils.getLoginUser().getSysUser().getUserId());
+        lambdaQuery.eq(WeLeadsFollower::getIsCurrentFollower, 1);
+        WeLeadsFollower weLeadsFollower = weLeadsFollowerMapper.selectOne(lambdaQuery);
+        if (BeanUtil.isNotEmpty(weLeadsFollower)) {
+            throw new ServiceException("不是当前跟进人，无法绑定用户！");
+        }
+
         //更新线索信息
         LambdaUpdateWrapper<WeLeads> updateWrapper = Wrappers.lambdaUpdate(WeLeads.class);
         updateWrapper.eq(WeLeads::getId, request.getLeadsId());
@@ -868,14 +879,10 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         updateWrapper.set(WeLeads::getBindCustomerTime, new Date());
         weLeadsMapper.update(null, updateWrapper);
 
-        //添加已转化跟进记录
-        LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);
-        queryWrapper.eq(WeLeadsFollower::getLeadsId, request.getLeadsId());
-        queryWrapper.eq(WeLeadsFollower::getFollowerId, SecurityUtils.getLoginUser().getSysUser().getUserId());
-        WeLeadsFollower one = weLeadsFollowerService.getOne(queryWrapper);
-        if (BeanUtil.isNotEmpty(one)) {
-            throw new ServiceException("不是当前跟进人，无法绑定用户！");
-        }
+        //修改跟进人信息
+        weLeadsFollower.setFollowerStatus(LeadsStatusEnum.VISIT.getCode());
+        weLeadsFollower.setFollowerEndTime(new Date());
+        weLeadsFollowerMapper.updateById(weLeadsFollower);
 
         //添加跟进记录
         Long recordId = this.addFollowRecord(request.getLeadsId(), weLeads.getSeaId(), SecurityUtils.getLoginUser().getSysUser().getUserId(), 2);
@@ -884,5 +891,4 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         //取消自动回收
         weLeadsAutoRecoveryService.cancel(request.getLeadsId(), SecurityUtils.getLoginUser().getSysUser().getUserId());
     }
-
 }

@@ -2,6 +2,10 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
+import com.linkwechat.domain.leads.leads.query.WeLeadsUserStatisticRequest;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerVO;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsUserFollowTop5VO;
+import com.linkwechat.domain.leads.leads.vo.WeLeadsUserStatisticVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,5 +30,16 @@ public interface WeLeadsFollowerMapper extends BaseMapper<WeLeadsFollower> {
      * @date 2023/07/11 17:10
      */
     List<WeLeadsFollower> getLeadsFollower(@Param("userId") Long userId);
+
+
+    /**
+     * 员工统计
+     *
+     * @param userIds 员工Id集合
+     * @return {@link List<  WeLeadsUserFollowTop5VO >}
+     * @author WangYX
+     * @date 2023/07/19 17:58
+     */
+    List<WeLeadsFollowerVO> userStatistic(@Param("userIds") List<Long> userIds);
 
 }
