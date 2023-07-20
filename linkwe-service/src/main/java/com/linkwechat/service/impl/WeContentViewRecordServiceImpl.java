@@ -9,11 +9,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.enums.TrajectoryType;
+import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -60,6 +62,8 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
     private QwSysUserClient qwSysUserClient;
     @Resource
     private WeMaterialMapper weMaterialMapper;
+    @Resource
+    private IWeMessageNotificationService weMessageNotificationService;
 
 
     @Resource
@@ -144,11 +148,11 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         List<ContentDataDetailVo> contentDataDetailVos = this.baseMapper.findContentDataDetailVos(String.valueOf(contentDetailQuery.getContentId())
                 , contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
 
-        if(CollectionUtil.isNotEmpty(contentDataDetailVos)){
+        if (CollectionUtil.isNotEmpty(contentDataDetailVos)) {
             contentDataDetailVos.stream().forEach(contentDataDetailVo -> {
-                if(contentDataDetailVo.getViewDuration()!= null){
+                if (contentDataDetailVo.getViewDuration() != null) {
                     contentDataDetailVo.setViewDurationCpt(DateUtils.formatTime(
-                            contentDataDetailVo.getViewDuration().longValue()*1000
+                            contentDataDetailVo.getViewDuration().longValue() * 1000
                     ));
                 }
 
@@ -293,19 +297,17 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 
         //根据unionId获取客户
         WeCustomer weCustomer = null;
-        if(StringUtils
-                .isNotEmpty(weContentViewRecordQuery.getUnionid())){
+        if (StringUtils
+                .isNotEmpty(weContentViewRecordQuery.getUnionid())) {
 
 
             List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
                     .eq(WeCustomer::getUnionid, weContentViewRecordQuery.getUnionid()));
 
-            if(CollectionUtil.isNotEmpty(weCustomers)){
-                weCustomer=weCustomers.stream().findFirst().get();
+            if (CollectionUtil.isNotEmpty(weCustomers)) {
+                weCustomer = weCustomers.stream().findFirst().get();
             }
         }
-
-
 
 
         //3.添加查看数据
@@ -378,6 +380,9 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             weMessageTemplate.setContent("【客户动态】\r\n\r\n 客户 " + weCustomer.getCustomerName() + " 查看了您发送的素材 「" + weMaterial.getMaterialName() + "」" + sb.toString());
             qwAppMsgBody.setMessageTemplates(weMessageTemplate);
             qwAppSendMsgService.appMsgSend(qwAppMsgBody);
+
+            //添加消息通知
+            weMessageNotificationService.save(MessageTypeEnum.MATERIAL.getType(), MessageConstants.MATERIAL_LOOK, weCustomer.getCustomerName(), weMaterial.getMaterialName(), sb.toString());
         }
 
         //5.添加客户轨迹

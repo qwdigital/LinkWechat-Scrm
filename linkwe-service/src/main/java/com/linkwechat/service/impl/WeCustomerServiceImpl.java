@@ -11,10 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.SynchRecord;
-import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.HttpStatus;
-import com.linkwechat.common.constant.SynchRecordConstants;
-import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.constant.*;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
@@ -25,6 +22,7 @@ import com.linkwechat.common.enums.CustomerAddWay;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -62,6 +60,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -110,6 +109,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Autowired
     @Lazy
     private IWeFissionService iWeFissionService;
+
+    @Resource
+    private IWeMessageNotificationService weMessageNotificationService;
 
 
     @Override
@@ -1125,43 +1127,24 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                                         .build());
                                             }
                                         }
-
                                     }
-
-
                                 }
-
-
                             }
 
                             iWeFissionService.handleTaskFissionRecord(state,weCustomer);
-
 
                             //生成轨迹
                             iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId,userId,true,true);
                             //为被添加员工发送一条消息提醒
                             iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@"+weCustomer.getCustomerName()+"刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(),false);
 
+                            //添加消息通知
+                            weMessageNotificationService.save(MessageTypeEnum.CUSTOMER.getType(), MessageConstants.CUSTOMER_ADD,weCustomer.getCustomerName());
                         }
-
-
-
-
                         }
-
-
-
                     }
-
                 }
-
-
 //                WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
-
-
-
-
-
         }
     }
 

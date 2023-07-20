@@ -49,11 +49,11 @@ public class MessageConstants {
 
     /******************客群********************/
     /**
-     * 如：客户 @许十 刚刚加入了群聊【内部沟通群】
+     * 如：客户 @许十 刚刚进入群聊【内部沟通群】
      */
-    public static final String GROUP_ADD = "客户 @{} 刚刚加入了群聊【{}】";
+    public static final String GROUP_ADD = "客户 @{} 刚刚进入群聊【{}】";
     /**
-     * 如：客户 @江十一 刚刚退出了群聊【内部沟通群】
+     * 如：客户 @江十一 刚刚退出群聊【内部沟通群】
      */
-    public static final String GROUP_DELETE = "客户 @{} 刚刚退出了群聊【{}】";
+    public static final String GROUP_DELETE = "客户 @{} 刚刚退出群聊【{}】";
 }
