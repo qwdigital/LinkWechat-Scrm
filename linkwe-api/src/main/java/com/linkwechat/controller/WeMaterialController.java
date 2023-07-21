@@ -17,7 +17,9 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.domain.WeCustomer;
@@ -127,6 +129,11 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/material/temporaryMaterialMediaId")
     @ApiOperation("H5端发送获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(String url, String type, String name) {
+
+        if(StringUtils.isEmpty(name)){
+            name= SnowFlakeUtil.nextId().toString();
+        }
+
         WeMediaVo weMediaDto = materialService.uploadTemporaryMaterial(url, type,
                 name + "." + url.substring(url.lastIndexOf(".") + 1, url.length()));
         return AjaxResult.success(weMediaDto);
