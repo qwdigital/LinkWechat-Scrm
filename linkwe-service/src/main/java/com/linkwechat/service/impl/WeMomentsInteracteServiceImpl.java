@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
@@ -26,6 +27,7 @@ import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.IWeCustomerService;
+import com.linkwechat.service.IWeCustomerTrajectoryService;
 import com.linkwechat.service.IWeMomentsInteracteService;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +61,8 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
     private QwCustomerClient qwCustomerClient;
     @Resource
     private IWeCustomerService weCustomerService;
+    @Resource
+    private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
     @Override
     public void syncAddWeMomentsInteracte(Long momentsTaskId, String momentsId) {
@@ -69,6 +73,14 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
         queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
         List<WeMomentsUser> list = weMomentsUserMapper.selectList(queryWrapper);
         if (CollectionUtil.isNotEmpty(list)) {
+
+            //数据库旧的已存在的朋友圈互动数据
+            LambdaQueryWrapper<WeMomentsInteracte> wrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
+            wrapper.eq(WeMomentsInteracte::getMomentsTaskId, momentsTaskId);
+            wrapper.eq(WeMomentsInteracte::getMomentId, momentsId);
+            wrapper.eq(WeMomentsInteracte::getDelFlag, Constants.COMMON_STATE);
+            List<WeMomentsInteracte> oldData = this.list(wrapper);
+
             //2.删除同步之前的互动数据
             removeInteracte(momentsTaskId, momentsId);
             //3.同步互动数据
@@ -93,6 +105,8 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
                         this.saveBatch(result);
                         //打标签
                         this.interactTag(momentsTaskId, result);
+                        //添加客户轨迹
+                        this.addCustomerTrajectory(oldData, result);
                     }
                 }
             }
@@ -311,5 +325,57 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
         updateWrapper.eq(WeMomentsInteracte::getMomentsTaskId, momentsTaskId);
         updateWrapper.eq(WeMomentsInteracte::getMomentId, momentsId);
         this.remove(updateWrapper);
+    }
+
+
+    /**
+     * 添加互动数据
+     *
+     * @param oldData 数据库存在的旧互动数据
+     * @param newData 从企微拉下来的所有互动数据
+     * @return
+     * @author WangYX
+     * @date 2023/07/21 11:07
+     */
+    public void addCustomerTrajectory(List<WeMomentsInteracte> oldData, List<WeMomentsInteracte> newData) {
+        if (CollectionUtil.isEmpty(oldData) && CollectionUtil.isNotEmpty(newData)) {
+            //添加客户轨迹
+            newData.forEach(i -> addCustomerTrajectory(i));
+        } else if (CollectionUtil.isNotEmpty(oldData) && CollectionUtil.isNotEmpty(newData)) {
+            List<WeMomentsInteracte> repeatingData = new ArrayList<>();
+            for (WeMomentsInteracte oldDatum : oldData) {
+                for (WeMomentsInteracte newDatum : newData) {
+                    if (oldDatum.getWeUserId().equals(newDatum.getWeUserId())
+                            && oldDatum.getInteracteUserId().equals(newDatum.getInteracteUserId())
+                            && oldDatum.getInteracteType().equals(newDatum.getInteracteType())
+                            && oldDatum.getInteracteUserType().equals(newDatum.getInteracteUserType())) {
+                        repeatingData.add(newDatum);
+                    }
+                }
+            }
+            //移除重复的数据
+            newData.removeAll(repeatingData);
+            //添加客户轨迹
+            newData.forEach(i -> addCustomerTrajectory(i));
+        }
+    }
+
+    /**
+     * 添加朋友圈互动护具
+     *
+     * @param weMomentsInteracte 互动数据
+     * @return
+     * @author WangYX
+     * @date 2023/07/21 11:08
+     */
+    private void addCustomerTrajectory(WeMomentsInteracte weMomentsInteracte) {
+        //互动人员为客户
+        if (new Integer(1).equals(weMomentsInteracte.getInteracteUserType())) {
+            iWeCustomerTrajectoryService.createInteractionTrajectory(
+                    weMomentsInteracte.getInteracteUserId(),
+                    weMomentsInteracte.getWeUserId(),
+                    new Integer(1).equals(weMomentsInteracte.getInteracteType()) ? TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType() : TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType(),
+                    null);
+        }
     }
 }
