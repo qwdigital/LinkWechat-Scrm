@@ -34,7 +34,78 @@ public interface IWeTasksService extends IService<WeTasks> {
      */
     List<WeTasksVO> history();
 
-    void save();
+    /**
+     * 新增
+     *
+     * @param weTasks 代办任务
+     * @author WangYX
+     * @date 2023/07/21 14:31
+     */
+    void add(WeTasks weTasks);
+
+    /**
+     * 完成待办任务
+     *
+     * @param id 任务Id
+     * @author WangYX
+     * @date 2023/07/21 14:46
+     */
+    void finish(Long id);
+
+
+    /**
+     * 添加线索长时间未跟进
+     * <p>
+     * 线索领取后，线索分配后 调用
+     *
+     * @param leadsId  线索Id
+     * @param name     线索名称
+     * @param userId   用户Id
+     * @param weUserId 用户企微Id
+     * @param seaId    公海Id
+     * @author WangYX
+     * @date 2023/07/21 15:36
+     */
+    void addLeadsLongTimeNotFollowUp(Long leadsId, String name, Long userId, String weUserId, Long seaId);
+
+    /**
+     * 取消线索长时间未跟进
+     * <p>
+     * 线索转化后，线索回收后，线索退回后 调用
+     *
+     * @param leadsId 线索Id
+     * @param userId  用户Id
+     * @author WangYX
+     * @date 2023/07/21 16:13
+     */
+    void cancelLeadsLongTimeNotFollowUp(Long leadsId, Long userId);
+
+    /**
+     * 取消旧的并添加新的线索长时间未跟进
+     * <p>
+     * 线索跟进后 调用
+     *
+     * @param leadsId  线索Id
+     * @param name     线索名称
+     * @param userId   用户Id
+     * @param weUserId 用户企微Id
+     * @param seaId    公海Id
+     * @author WangYX
+     * @date 2023/07/21 15:36
+     */
+    void cancelAndAddLeadsLongTimeNotFollowUp(Long leadsId, String name, Long userId, String weUserId, Long seaId);
+
+    /**
+     * 处理线索长时间未跟进
+     * <p>
+     * 1.显示在待办任务中
+     * <P>
+     * 2.发送应用消息
+     *
+     * @author WangYX
+     * @date 2023/07/21 16:35
+     */
+    void handlerLeadsLongTimeNotFollowUp();
 
 
 }

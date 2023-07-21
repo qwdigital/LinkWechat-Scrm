@@ -13,5 +13,8 @@ import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordCooperateUse
 public interface IWeLeadsFollowRecordCooperateUserService extends IService<WeLeadsFollowRecordCooperateUser> {
 
 
+
+
+
 }
 

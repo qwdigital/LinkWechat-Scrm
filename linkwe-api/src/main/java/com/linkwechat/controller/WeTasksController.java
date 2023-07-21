@@ -2,17 +2,13 @@ package com.linkwechat.controller;
 
 
 import com.linkwechat.common.core.controller.BaseController;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.domain.task.vo.WeTasksVO;
 import com.linkwechat.service.IWeTasksService;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>
@@ -56,6 +52,21 @@ public class WeTasksController extends BaseController {
     public TableDataInfo history() {
         startPage();
         return getDataTable(weTasksService.history());
+    }
+
+    /**
+     * 完成代办任务
+     *
+     * @param id 任务Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/21 14:43
+     */
+    @ApiOperation("完成代办任务")
+    @PutMapping("/finish/{id}")
+    public AjaxResult finish(@PathVariable("id") Long id) {
+        weTasksService.finish(id);
+        return AjaxResult.success();
     }
 
 

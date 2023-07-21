@@ -164,8 +164,10 @@ public class WeLeadsFollowRecordController extends BaseController {
             List<WeLeadsFollowRecordContentVO> vos = new ArrayList<>();
 
             List<WeLeadsFollowRecordContent> contents = contentMap.get(row.getId());
+            if (CollectionUtil.isEmpty(contents)) {
+                continue;
+            }
             contents.sort(Comparator.comparing(WeLeadsFollowRecordContent::getRank));
-
             for (WeLeadsFollowRecordContent content : contents) {
                 WeLeadsFollowRecordContentVO vo = new WeLeadsFollowRecordContentVO();
                 vo.setId(content.getId());
@@ -214,6 +216,13 @@ public class WeLeadsFollowRecordController extends BaseController {
         result.setReplierToWeUserId(content.getReplierToWeUserId());
         result.setReplierTo(content.getReplierTo());
         return result;
+    }
+
+
+    public Object recordDetail() {
+        //TODO 跟进记录详情
+
+        return null;
     }
 
 

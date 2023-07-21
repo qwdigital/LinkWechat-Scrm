@@ -90,6 +90,8 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
     @Resource
     private RedissonClient redissonClient;
     @Resource
+    private IWeTasksService weTasksService;
+    @Resource
     private QwSysUserClient qwSysUserClient;
     @Resource
     private WeCustomerMapper weCustomerMapper;
@@ -130,6 +132,8 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         //检查领取数量是否超过基础配置
         checkReceiveNum(weLeads.getSeaId());
 
+        boolean flag = false;
+        WeLeadsFollower weLeadsFollower = null;
         String key = LeadsCenterConstants.LEADS + leadsId;
         RLock lock = redissonClient.getLock(key);
         try {
@@ -143,7 +147,8 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
                     throw new ServiceException("线索已分配", HttpStatus.CONFLICT);
                 }
                 //执行领取操作
-                receiveLeads(weLeads);
+                weLeadsFollower = receiveLeads(weLeads);
+                flag = true;
             }
         } catch (InterruptedException e) {
             log.error("领取线索时，尝试获取分布式锁失败！");
@@ -153,6 +158,36 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
                 lock.unlock();
             }
         }
+
+        if (flag) {
+            //添加跟进记录
+            Long recordId = addFollowRecord(weLeads.getId(), weLeads.getSeaId(), weLeadsFollower.getId(), 0);
+
+            //添加跟进记录内容
+            weLeadsFollowRecordContentService.memberToReceive(recordId, weLeads.getSeaId());
+
+            //自动回收
+            weLeadsAutoRecoveryService.save(weLeads.getId(), SecurityUtils.getLoginUser().getSysUser().getUserId(), weLeads.getSeaId());
+
+            //添加线索长时间待跟进
+            weTasksService.addLeadsLongTimeNotFollowUp(weLeads.getId(), weLeads.getName(), SecurityUtils.getLoginUser().getSysUser().getUserId(),
+                    SecurityUtils.getLoginUser().getSysUser().getWeUserId(), weLeads.getSeaId());
+        }
+    }
+
+    /**
+     * 主动领取
+     *
+     * @author WangYX
+     * @date 2023/07/12 11:18
+     * @version 1.0.0
+     */
+    private WeLeadsFollower receiveLeads(WeLeads weLeads) {
+        //修改线索状态和添加当前跟进人信息
+        updateLeadsStatusAndAddCurrentFollower(weLeads.getId());
+        //添加线索跟进人
+        WeLeadsFollower weLeadsFollower = addLeadsFollower(weLeads.getId());
+        return weLeadsFollower;
     }
 
     @Override
@@ -478,6 +513,8 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
                 weLeadsAutoRecoveryService.save(vo.getId(), vo.getFollowerId(), vo.getSeaId());
                 //消息通知
                 weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), MessageConstants.LEADS_ALLOCATION, leads.getName());
+                //添加线索长时间待跟进
+                weTasksService.addLeadsLongTimeNotFollowUp(leads.getId(), leads.getName(), vo.getFollowerId(), vo.getFollowerName(), leads.getSeaId());
             }
         }
         return "已成功分配 " + success + " 条线索，有 " + fail + " 条线索状态有更新未能成功分配";
@@ -504,29 +541,6 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         weLeadsFollowerService.save(vo);
     }
 
-    /**
-     * 主动领取
-     *
-     * @author WangYX
-     * @date 2023/07/12 11:18
-     * @version 1.0.0
-     */
-    private void receiveLeads(WeLeads weLeads) {
-        //修改线索状态和添加当前跟进人信息
-        updateLeadsStatusAndAddCurrentFollower(weLeads.getId());
-
-        //添加线索跟进人
-        WeLeadsFollower weLeadsFollower = addLeadsFollower(weLeads.getId());
-
-        //添加跟进记录
-        Long recordId = addFollowRecord(weLeads.getId(), weLeads.getSeaId(), weLeadsFollower.getId(), 0);
-
-        //添加跟进记录内容
-        weLeadsFollowRecordContentService.memberToReceive(recordId, weLeads.getSeaId());
-
-        //自动回收
-        weLeadsAutoRecoveryService.save(weLeads.getId(), SecurityUtils.getLoginUser().getSysUser().getUserId(), weLeads.getSeaId());
-    }
 
     /**
      * 添加线索跟进人
@@ -895,5 +909,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         weLeadsFollowRecordContentService.convertedCustomer(recordId, weCustomer.getCustomerName(), weCustomer.getCustomerType().toString(), weCustomer.getAvatar());
         //取消自动回收
         weLeadsAutoRecoveryService.cancel(request.getLeadsId(), SecurityUtils.getLoginUser().getSysUser().getUserId());
+        //取消线索长时间待跟任务
+        weTasksService.cancelLeadsLongTimeNotFollowUp(weLeads.getId(), SecurityUtils.getLoginUser().getSysUser().getUserId());
     }
 }

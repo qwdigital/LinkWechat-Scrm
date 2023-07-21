@@ -21,6 +21,15 @@ public class MessageConstants {
      */
     public static final String LEADS_AUTO_RECOVERY = "1个线索客户 @{} 超过期限未跟进已自动回收";
 
+    /**
+     * 如：
+     * <p>
+     * 2023年07月21日
+     * <p>
+     * 客户：张三
+     */
+    public static final String LEADS_LONG_TIME_NOT_FOLLOW_UP = "<div class=\"gray\">{}</div> <div class=\"normal\">客户：{}</div>";
+
 
     /******************客户********************/
     /**

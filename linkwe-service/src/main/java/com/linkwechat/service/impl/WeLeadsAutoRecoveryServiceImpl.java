@@ -23,6 +23,7 @@ import com.linkwechat.mapper.*;
 import com.linkwechat.service.IWeLeadsAutoRecoveryService;
 import com.linkwechat.service.IWeLeadsFollowRecordContentService;
 import com.linkwechat.service.IWeMessageNotificationService;
+import com.linkwechat.service.IWeTasksService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +41,12 @@ import java.util.List;
 @Slf4j
 @Service
 public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecoveryMapper, WeLeadsAutoRecovery> implements IWeLeadsAutoRecoveryService {
-
-    @Resource
-    private WeLeadsSeaMapper weLeadsSeaMapper;
     @Resource
     private WeLeadsMapper weLeadsMapper;
+    @Resource
+    private IWeTasksService weTasksService;
+    @Resource
+    private WeLeadsSeaMapper weLeadsSeaMapper;
     @Resource
     private WeLeadsFollowerMapper weLeadsFollowerMapper;
     @Resource
@@ -53,6 +55,7 @@ public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecov
     private IWeLeadsFollowRecordContentService weLeadsFollowRecordContentService;
     @Resource
     private IWeMessageNotificationService weMessageNotificationService;
+
 
     @Override
     public Long save(Long leadsId, Long followerId, Long seaId) {
@@ -158,6 +161,9 @@ public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecov
                 //自动回收状态修改
                 weLeadsAutoRecovery.setExecutingState(1);
                 this.baseMapper.updateById(weLeadsAutoRecovery);
+
+                //取消线索长时间待跟进任务
+                weTasksService.cancelLeadsLongTimeNotFollowUp(weLeads.getId(), weLeads.getFollowerId());
 
                 //消息通知
                 weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), MessageConstants.LEADS_AUTO_RECOVERY, weLeads.getName());

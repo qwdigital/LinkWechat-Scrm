@@ -33,12 +33,10 @@ import com.linkwechat.mapper.WeLeadsFollowRecordContentMapper;
 import com.linkwechat.mapper.WeLeadsFollowRecordMapper;
 import com.linkwechat.mapper.WeLeadsFollowerMapper;
 import com.linkwechat.mapper.WeLeadsMapper;
-import com.linkwechat.service.IWeLeadsAutoRecoveryService;
-import com.linkwechat.service.IWeLeadsFollowRecordAttachmentService;
-import com.linkwechat.service.IWeLeadsFollowRecordCooperateUserService;
-import com.linkwechat.service.IWeLeadsFollowerService;
+import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -56,21 +54,22 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMapper, WeLeadsFollower> implements IWeLeadsFollowerService {
-
+    @Resource
+    private WeLeadsMapper weLeadsMapper;
+    @Resource
+    private IWeTasksService weTasksService;
     @Resource
     private WeLeadsFollowerMapper weLeadsFollowerMapper;
     @Resource
     private WeLeadsFollowRecordMapper weLeadsFollowRecordMapper;
     @Resource
-    private WeLeadsMapper weLeadsMapper;
+    private IWeLeadsAutoRecoveryService weLeadsAutoRecoveryService;
     @Resource
     private WeLeadsFollowRecordContentMapper weLeadsFollowRecordContentMapper;
     @Resource
     private IWeLeadsFollowRecordAttachmentService weLeadsFollowRecordAttachmentService;
     @Resource
     private IWeLeadsFollowRecordCooperateUserService weLeadsFollowRecordCooperateUserService;
-    @Resource
-    private IWeLeadsAutoRecoveryService weLeadsAutoRecoveryService;
 
 
     @Override
@@ -107,6 +106,7 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addFollow(WeLeadsAddFollowRequest request) {
         //获取线索的当前跟进人
         LambdaQueryWrapper<WeLeadsFollower> wrapper = Wrappers.lambdaQuery();
@@ -127,7 +127,7 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
         //添加线索的跟进记录
         WeLeadsFollowRecord record = new WeLeadsFollowRecord();
         record.setId(IdUtil.getSnowflake().nextId());
-        record.setWeLeadsId(record.getWeLeadsId());
+        record.setWeLeadsId(request.getWeLeadsId());
         record.setSeaId(weLeads.getSeaId());
         record.setFollowUserId(weLeadsFollower.getId());
         record.setRecordStatus(1);
@@ -135,32 +135,12 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
         weLeadsFollowRecordMapper.insert(record);
 
         //添加线索的跟进记录内容
-        WeLeadsFollowRecordContent content1 = WeLeadsFollowRecordContent.builder()
-                .id(IdUtil.getSnowflake().nextId())
-                .recordId(record.getId())
-                .itemKey("跟进方式")
-                .itemValue(FollowModeEnum.of(request.getFollowMode()).getDesc())
-                .rank(0).attachment(0).visible(0).build();
-        weLeadsFollowRecordContentMapper.insert(content1);
-
+        addRecordContent(IdUtil.getSnowflake().nextId(), record.getId(), "跟进方式", FollowModeEnum.of(request.getFollowMode()).getDesc(), 0, 0L, 0);
         if (BeanUtil.isNotEmpty(request.getCooperateTime())) {
-            WeLeadsFollowRecordContent content2 = WeLeadsFollowRecordContent.builder()
-                    .id(IdUtil.getSnowflakeNextId())
-                    .recordId(record.getId())
-                    .itemKey("协定日期")
-                    .itemValue(DateUtil.format(request.getCooperateTime(), DatePattern.NORM_DATETIME_PATTERN))
-                    .rank(1).attachment(0).visible(0).build();
-            weLeadsFollowRecordContentMapper.insert(content2);
+            addRecordContent(IdUtil.getSnowflake().nextId(), record.getId(), "协定日期", DateUtil.format(request.getCooperateTime(), DatePattern.NORM_DATETIME_PATTERN), 1, 0L, 0);
         }
-
         long id = IdUtil.getSnowflake().nextId();
-        WeLeadsFollowRecordContent content3 = WeLeadsFollowRecordContent.builder()
-                .id(id).recordId(record.getId()).itemKey("跟进内容")
-                .itemValue(request.getRecordContent())
-                .rank(2).parentId(0L)
-                .attachment(request.getAttachmentList().size() > 0 ? 1 : 0)
-                .visible(0).build();
-        weLeadsFollowRecordContentMapper.insert(content3);
+        addRecordContent(id, record.getId(), "跟进内容", request.getRecordContent(), 2, 0L, CollectionUtil.isNotEmpty(request.getAttachmentList()) ? 1 : 0);
 
         //添加线索的跟进记录附件
         List<WeLeadsFollowRecordAttachmentRequest> attachmentList = request.getAttachmentList();
@@ -190,6 +170,10 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
 
         //取消并添加新的自动回收机制
         weLeadsAutoRecoveryService.cancelAndSave(record.getWeLeadsId(), weLeadsFollower.getFollowerId(), weLeads.getSeaId());
+
+        //取消并添加新的待办任务(线索长时间待跟进)
+        weTasksService.cancelAndAddLeadsLongTimeNotFollowUp(weLeads.getId(), weLeads.getName(), SecurityUtils.getLoginUser().getSysUser().getUserId(),
+                SecurityUtils.getLoginUser().getSysUser().getWeUserId(), weLeads.getSeaId());
     }
 
     @Override
@@ -201,5 +185,34 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
     @Override
     public List<WeLeadsFollowerVO> userStatistic(List<Long> userIds) {
         return this.baseMapper.userStatistic(userIds);
+    }
+
+    /**
+     * 添加跟进记录内容
+     *
+     * @param id         主键Id，不传时，自动生成
+     * @param recordId   跟进记录Id
+     * @param itemKey    记录项目名
+     * @param itemValue  记录项目值
+     * @param rank       排序
+     * @param parentId   父类Id，默认0L
+     * @param attachment 是否存在附件： 0否 1是 默认0
+     * @return
+     * @author WangYX
+     * @date 2023/07/21 18:25
+     */
+    private void addRecordContent(Long id, Long recordId, String itemKey, String itemValue, Integer rank, Long parentId, Integer attachment) {
+        WeLeadsFollowRecordContent content = WeLeadsFollowRecordContent.builder()
+                .id(id == null ? IdUtil.getSnowflakeNextId() : id)
+                .recordId(recordId)
+                .itemKey(itemKey)
+                .itemValue(itemValue)
+                .rank(rank)
+                .parentId(parentId == null ? 0L : parentId)
+                .attachment(attachment == null ? 0 : attachment)
+                .visible(0)
+                .createTime(new Date())
+                .build();
+        weLeadsFollowRecordContentMapper.insert(content);
     }
 }

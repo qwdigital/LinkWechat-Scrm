@@ -126,7 +126,6 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.sys-user:Rk_SysUser}")
     private String sysUserRk;
 
-
     //朋友圈同步路由
     /**
      * 朋友圈同步路由
@@ -158,6 +157,8 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Get_Group_Send_Result}")
     private String weMomentsDelayGetGroupSendResultRK;
+
+
 
 
     //客服账号同步路由
