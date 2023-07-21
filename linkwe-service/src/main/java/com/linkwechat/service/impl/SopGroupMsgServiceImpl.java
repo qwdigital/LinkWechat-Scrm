@@ -53,9 +53,9 @@ public class SopGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
     public void sendGroupMsg(WeAddGroupMessageQuery query) {
 
 
-        LoginUser loginUser = query.getLoginUser();
-        SecurityContextHolder.setUserName(loginUser.getUserName());
-        SecurityContextHolder.setCorpId(loginUser.getCorpId());
+//        LoginUser loginUser = query.getLoginUser();
+//        SecurityContextHolder.setUserName(loginUser.getUserName());
+//        SecurityContextHolder.setCorpId(loginUser.getCorpId());
 
         String businessIds = query.getBusinessIds();
 

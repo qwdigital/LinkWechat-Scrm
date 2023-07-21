@@ -483,6 +483,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         messageQuery.setLoginUser(SecurityUtils.getLoginUser());
                         messageQuery.setContent(weFission.getContent());
                         messageQuery.setBusinessIds(weFission.getId().toString());
+                        messageQuery.setSendTime(null);
 
                             WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
                             if(null != weMaterial){
