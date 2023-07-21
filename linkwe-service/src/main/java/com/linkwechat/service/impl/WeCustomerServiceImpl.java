@@ -499,19 +499,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
 //                    );
 
-                if(weMakeCustomerTag.isSource()){
-                    if (CollectionUtil.isNotEmpty(addTag)) {
-                        iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
-                                weMakeCustomerTag.getUserId(),
-                                weMakeCustomerTag.getIsCompanyTag() ?
-                                        TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType() :
-                                        TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
-                                String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
-                        );
-                    }
 
+                if (CollectionUtil.isNotEmpty(addTag) && weMakeCustomerTag.isRecord()) {
+                    iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
+                            weMakeCustomerTag.getUserId(),
+                            weMakeCustomerTag.getIsCompanyTag() ?
+                                    TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType() :
+                                    TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
+                            String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                    );
                 }
-
 //                }
 
 
@@ -600,7 +597,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public WeCustomerDetailInfoVo findWeCustomerDetail(String externalUserid, String userId, Integer delFlag) {
         WeCustomerDetailInfoVo weCustomerDetailInfoVo = new WeCustomerDetailInfoVo();
 
-
         List<WeCustomersVo> weCustomersVos = this.findWeCustomerList(
                 WeCustomersQuery.builder()
                         .externalUserid(externalUserid)
@@ -617,61 +613,23 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             );
             List<WeCustomerDetailInfoVo.TrackUser> trackUsers = new ArrayList<>();
 
+            weCustomersVos.stream().forEach(k -> {
+                trackUsers.add(WeCustomerDetailInfoVo.TrackUser.builder()
+                        .addMethod(k.getAddMethod())
+                        .trackUserId(k.getFirstUserId())
+                        .firstAddTime(k.getFirstAddTime())
+                        .trackState(k.getTrackState())
+                        .trackTime(k.getTrackTime())
+                        .userName(k.getUserName())
+                        .build());
+            });
+            weCustomerDetailInfoVo.setTrackUsers(
+                    trackUsers
+            );
 
-            //共同员工
-            List<WeCustomerAddUserVo> weCustomerAddUserVos
-                    = this.findWeUserByCustomerId(externalUserid);
-
-            if(CollectionUtil.isNotEmpty(weCustomerAddUserVos)){
-                weCustomerAddUserVos.stream().forEach(k->{
-
-                    trackUsers.add(WeCustomerDetailInfoVo.TrackUser.builder()
-                            .addMethod(k.getAddMethod())
-                            .trackUserId(k.getUserId())
-                            .firstAddTime(k.getFirstAddTime())
-                            .trackState(k.getTrackState())
-                            .trackTime(k.getTrackTime())
-                            .userName(k.getUserName())
-                            .build());
-                });
-
-                weCustomerDetailInfoVo.setTrackUsers(
-                        trackUsers
-                );
-
-            }
-
-            List<WeCustomerAddGroupVo> weGroupByCustomer
-                    = iWeGroupService.findWeGroupByCustomer(userId, externalUserid);
-            if(CollectionUtil.isNotEmpty(weGroupByCustomer)){
-                List<WeCustomerDetailInfoVo.Groups> wecustomerGroups=new ArrayList<>();
-
-                weGroupByCustomer.stream().forEach(k->{
-
-
-                    wecustomerGroups.add(
-                            WeCustomerDetailInfoVo.Groups.builder()
-                                    .chatId(k.getChatId())
-                                    .groupName(k.getGroupName())
-                                    .joinTime(k.getJoinTime())
-                                    .leaderName(k.getOwnerName())
-                                    .joinScene(k.getJoinScene())
-                                    .build()
-
-                    );
-
-                });
-
-                weCustomerDetailInfoVo.setGroups(
-                        wecustomerGroups
-                );
-            }
-
-
-//            List<WeCustomerDetailInfoVo.Groups> wecustomerGroups = this.baseMapper.findWecustomerGroups(externalUserid);
-
-
-
+            weCustomerDetailInfoVo.setGroups(
+                    this.baseMapper.findWecustomerGroups(externalUserid)
+            );
 
 
         }
@@ -775,35 +733,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             BeanUtils.copyBeanProp(weCustomerDetail, weCustomer);
         }
 
-        //共同员工
-        List<WeCustomerAddUserVo> weCustomerAddUserVos
-                = this.findWeUserByCustomerId(externalUserid);
-
-        if(CollectionUtil.isNotEmpty(weCustomerAddUserVos)){
-            List<WeCustomerDetailInfoVo.TrackUser> trackUsers = new ArrayList<>();
-
-            weCustomerAddUserVos.stream().forEach(k->{
-
-                if(k.getUserId().equals(userId)){
-                    trackUsers.add(WeCustomerDetailInfoVo.TrackUser.builder()
-                            .addMethod(k.getAddMethod())
-                            .trackUserId(k.getUserId())
-                            .firstAddTime(k.getFirstAddTime())
-                            .trackState(k.getTrackState())
-                            .trackTime(k.getTrackTime())
-                            .userName(k.getUserName())
-                            .build());
-                }
-
-            });
-
-            weCustomerDetail.setTrackUsers(
-                    trackUsers
-            );
-
-        }
-
-
         List<WeCustomerAddGroupVo> groups
                 = iWeGroupService.findWeGroupByCustomer(userId, externalUserid);
         if (CollectionUtil.isNotEmpty(groups)) {
@@ -844,31 +773,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomerPortrait.setAge(DateUtils.getAge(weCustomerPortrait.getBirthday()));
             }
 
-
-            WeCustomerSocialConnVo weCustomerSocialConnVo=new WeCustomerSocialConnVo();
-
-            List<WeCustomerAddUserVo> weCustomerAddUserVos
-                    = this.findWeUserByCustomerId(externalUserid);
-
-            if(CollectionUtil.isNotEmpty(weCustomerAddUserVos)){
-                weCustomerSocialConnVo.setAddEmployeNum(weCustomerAddUserVos.size());
-            }
-
-            List<WeCustomerAddGroupVo> weGroupByCustomer
-                    = iWeGroupService.findWeGroupByCustomer(userid, externalUserid);
-            if(CollectionUtil.isNotEmpty(weGroupByCustomer)){
-
-                weCustomerSocialConnVo.setAddGroupNum(
-                        weGroupByCustomer.size()
-                );
-                weCustomerSocialConnVo.setCommonGroupNum(
-                        weGroupByCustomer.stream().filter(item->new Integer(0).equals(item.getCommonGroup())).count()
-                );
-            }
-
             //客户社交关系
             weCustomerPortrait.setSocialConn(
-                    weCustomerSocialConnVo
+                    this.baseMapper.countSocialConn(externalUserid, userid)
             );
 
             //客户当前客户拓展字段
@@ -921,10 +828,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public List<WeCustomerAddUserVo> findWeUserByCustomerId(String externalUserid) {
-
-
-
-
         return this.baseMapper.findWeUserByCutomerId(externalUserid);
     }
 
@@ -1038,128 +941,96 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             List<WeCustomerFollowUserEntity> followUserList = weCustomerDetail.getFollowUser();
             if (CollectionUtil.isNotEmpty(followUserList)) {
-                Map<String, List<WeCustomerFollowUserEntity>> followUserEntityMap
-                        = followUserList.stream().collect(Collectors.groupingBy(WeCustomerFollowUserEntity::getUserId));
+                WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
+
+                weCustomer.setState(state);
+                weCustomer.setAddTime(new Date(followUserEntity.getCreateTime() * 1000L));
+                weCustomer.setAddMethod(followUserEntity.getAddWay());
+                //如果添加方式为管理员分配,则属于在职继承客户新增回掉，删除当前客户上一级的继承人对应的数据
+                if (CustomerAddWay.ADD_WAY_GLYFP.getKey().equals(followUserEntity.getAddWay())) {
+                    this.remove(new LambdaQueryWrapper<WeCustomer>()
+                            .eq(WeCustomer::getExternalUserid, externalUserId)
+                            .eq(WeCustomer::getTakeoverUserId, userId));
+                }
+
+                weCustomer.setCorpName(followUserEntity.getRemarkCompany());
+                weCustomer.setRemarkName(followUserEntity.getRemark());
+                weCustomer.setOtherDescr(followUserEntity.getDescription());
+                weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
+
+                Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+
+                if (CollectionUtil.isNotEmpty(currentTenantSysUser)) {
+                    SysUser sysUser = currentTenantSysUser.get(followUserEntity.getUserId());
+
+                    if (null != sysUser) {
+                        weCustomer.setCreateBy(sysUser.getUserName());
+                        weCustomer.setCreateById(sysUser.getUserId());
+                        weCustomer.setUpdateBy(sysUser.getUserName());
+                        weCustomer.setUpdateById(sysUser.getUserId());
+                    }
+                }
+
+                //设置标签
+                List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
+                if (CollectionUtil.isNotEmpty(tags)) {
+                    List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
+                            .id(SnowFlakeUtil.nextId())
+                            .externalUserid(externalContact.getExternalUserId())
+                            .tagId(tagInfo.getTagId())
+                            .userId(followUserEntity.getUserId())
+                            .isCompanyTag(true)
+                            .delFlag(0)
+                            .build()).collect(Collectors.toList());
+                    iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+                    weCustomer.setTagIds(
+                            String.join(", ",
+                                    tagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toSet()))
+                    );
+                }
+            }
+            this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
 
 
-                if(CollectionUtil.isNotEmpty(followUserEntityMap)){
-                    List<WeCustomerFollowUserEntity> weCustomerFollowUserEntities = followUserEntityMap.get(userId);
+            if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {//添加方式为手机号搜索,更新客户公海中对应的状态
 
-                    if(CollectionUtil.isNotEmpty(weCustomerFollowUserEntities)){
-                        WeCustomerFollowUserEntity followUserEntity
-                                = weCustomerFollowUserEntities.stream().findFirst().get();
-
-                        if(null != followUserEntity){
-
-                            weCustomer.setState(state);
-                            weCustomer.setAddTime(new Date(followUserEntity.getCreateTime() * 1000L));
-                            weCustomer.setAddMethod(followUserEntity.getAddWay());
-                            //如果添加方式为管理员分配,则属于在职继承客户新增回掉，删除当前客户上一级的继承人对应的数据
-                            if (CustomerAddWay.ADD_WAY_GLYFP.getKey().equals(followUserEntity.getAddWay())) {
-                                this.remove(new LambdaQueryWrapper<WeCustomer>()
-                                        .eq(WeCustomer::getExternalUserid, externalUserId)
-                                        .eq(WeCustomer::getTakeoverUserId, userId));
-                            }
-
-                            weCustomer.setCorpName(followUserEntity.getRemarkCompany());
-                            weCustomer.setRemarkName(followUserEntity.getRemark());
-                            weCustomer.setOtherDescr(followUserEntity.getDescription());
-                            weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
-
-                            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
-
-                            if (CollectionUtil.isNotEmpty(currentTenantSysUser)) {
-                                SysUser sysUser = currentTenantSysUser.get(followUserEntity.getUserId());
-
-                                if (null != sysUser) {
-                                    weCustomer.setCreateBy(sysUser.getUserName());
-                                    weCustomer.setCreateById(sysUser.getUserId());
-                                    weCustomer.setUpdateBy(sysUser.getUserName());
-                                    weCustomer.setUpdateById(sysUser.getUserId());
-                                }
-                            }
-
-                            //设置标签
-                            List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
-                            if (CollectionUtil.isNotEmpty(tags)) {
-                                List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
-                                        .id(SnowFlakeUtil.nextId())
-                                        .externalUserid(externalContact.getExternalUserId())
-                                        .tagId(tagInfo.getTagId())
-                                        .userId(followUserEntity.getUserId())
+                if (StringUtils.isNotEmpty(weCustomer.getPhone())) {
+                    List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
+                            .eq(WeCustomerSeas::getAddUserId, weCustomer.getAddUserId())
+                            .eq(WeCustomerSeas::getPhone, weCustomer.getPhone()));
+                    if (CollectionUtil.isNotEmpty(weCustomerSeasList)) {
+                        weCustomerSeasList.stream().forEach(k -> k.setAddState(1));
+                        iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
+                        //更新用户标签
+                        WeCustomerSeas weCustomerSeas = weCustomerSeasList.stream().findFirst().get();
+                        if (StringUtils.isNotEmpty(weCustomerSeas.getTagIds())) {
+                            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                    .in(WeTag::getTagId, ListUtil.toList(weCustomerSeas.getTagIds().split(","))));
+                            if (CollectionUtil.isNotEmpty(weTags)) {
+                                makeLabel(WeMakeCustomerTag.builder()
+                                        .userId(weCustomerSeas.getAddUserId())
                                         .isCompanyTag(true)
-                                        .delFlag(0)
-                                        .build()).collect(Collectors.toList());
-                                iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
-                                weCustomer.setTagIds(
-                                        String.join(", ",
-                                                tagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toSet()))
-                                );
+                                        .externalUserid(externalUserId)
+                                        .addTag(weTags)
+                                        .build());
                             }
-
-
-
-                            this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
-
-
-                            if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {//添加方式为手机号搜索,更新客户公海中对应的状态
-
-                                if (StringUtils.isNotEmpty(weCustomer.getPhone())) {
-                                    List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
-                                            .eq(WeCustomerSeas::getAddUserId, weCustomer.getAddUserId())
-                                            .eq(WeCustomerSeas::getPhone, weCustomer.getPhone()));
-                                    if (CollectionUtil.isNotEmpty(weCustomerSeasList)) {
-                                        weCustomerSeasList.stream().forEach(k -> k.setAddState(1));
-                                        iWeCustomerSeasService.updateBatchById(weCustomerSeasList);
-                                        //更新用户标签
-                                        WeCustomerSeas weCustomerSeas = weCustomerSeasList.stream().findFirst().get();
-                                        if (StringUtils.isNotEmpty(weCustomerSeas.getTagIds())) {
-                                            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                                                    .in(WeTag::getTagId, ListUtil.toList(weCustomerSeas.getTagIds().split(","))));
-                                            if (CollectionUtil.isNotEmpty(weTags)) {
-                                                makeLabel(WeMakeCustomerTag.builder()
-                                                        .userId(weCustomerSeas.getAddUserId())
-                                                        .isCompanyTag(true)
-                                                        .externalUserid(externalUserId)
-                                                        .addTag(weTags)
-                                                        .build());
-                                            }
-                                        }
-
-                                    }
-
-
-                                }
-
-
-                            }
-
-                            iWeFissionService.handleTaskFissionRecord(state,weCustomer);
-
-
-                            //生成轨迹
-                            iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId,userId,true,true);
-                            //为被添加员工发送一条消息提醒
-                            iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@"+weCustomer.getCustomerName()+"刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(),false);
-
                         }
-
-
-
-
-                        }
-
-
 
                     }
+
 
                 }
 
 
-//                WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
+            }
+
+            iWeFissionService.handleTaskFissionRecord(state, weCustomer);
 
 
-
+            //生成轨迹
+            iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId, userId, true, true);
+            //为被添加员工发送一条消息提醒
+            iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@" + weCustomer.getCustomerName() + "刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(), false);
 
 
         }
@@ -1203,11 +1074,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
-
-                iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                        .eq(WeFlowerCustomerTagRel::getExternalUserid,externalContact.getExternalUserId())
-                        .eq(WeFlowerCustomerTagRel::getUserId,followUserEntity.getUserId()));
-
                 if (CollectionUtil.isNotEmpty(tags)) {
                     List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
                             .id(SnowFlakeUtil.nextId())
@@ -1218,28 +1084,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
-
-                    List<WeTag> addTag = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                            .in(WeTag::getTagId, tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId).collect(Collectors.toList())));
-
-                    if (CollectionUtil.isNotEmpty(addTag)) {
-                        iWeCustomerTrajectoryService.createEditTrajectory(externalContact.getExternalUserId(),
-                                followUserEntity.getUserId(),
-                                TrajectorySceneType.TRAJECTORY_TITLE_GXQYBQ.getType(),
-                                String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
-                        );
-                    }
                 }
-            }else{
-
-                //生成轨迹
-                iWeCustomerTrajectoryService.createEditTrajectory(
-                        weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
-                );
-
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
-
+            //生成轨迹
+            iWeCustomerTrajectoryService.createEditTrajectory(
+                    weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
+            );
         }
 
         return weCustomer;
@@ -1442,6 +1293,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
+    public List<WeCustomerChannelCountVo> countCustomerChannel(String state, String startTime, String endTime, Integer delFlag) {
+        return this.baseMapper.countCustomerChannel(state,startTime,endTime,delFlag);
+    }
+
+    @Override
+    public Integer totalScanCodeNumber(String state) {
+        return this.baseMapper.totalScanCodeNumber(state);
+    }
+
+    @Override
     public List<WeCustomersVo> findWeCustomersForCommonAssembly(WeGroupMessageExecuteUsertipVo executeUserOrGroup) {
 
 
@@ -1486,16 +1347,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomersQuery, null
         );
 
-    }
-
-    @Override
-    public List<WeCustomerChannelCountVo> countCustomerChannel(String state, String startTime, String endTime, Integer delFlag) {
-        return this.baseMapper.countCustomerChannel(state,startTime,endTime,delFlag);
-    }
-
-    @Override
-    public Integer totalScanCodeNumber(String state) {
-        return this.baseMapper.totalScanCodeNumber(state);
     }
 
     @Override
