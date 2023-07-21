@@ -132,7 +132,7 @@ public class WeCustomerController extends BaseController {
     @Log(title = "客户打标签", businessType = BusinessType.UPDATE)
     @PostMapping("/makeLabel")
     public AjaxResult makeLabel(@RequestBody WeMakeCustomerTag weMakeCustomerTag) {
-
+        weMakeCustomerTag.setRecord(false);
         weCustomerService.makeLabel(weMakeCustomerTag);
 
         return AjaxResult.success();
