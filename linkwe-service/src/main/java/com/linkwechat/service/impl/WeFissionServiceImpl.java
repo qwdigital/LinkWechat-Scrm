@@ -476,13 +476,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         //发送通知逻辑
                         if(weFission.getIsTip().equals(new Integer(2))){
 
-                            WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-                            messageQuery.setIsAll(false);
-                            messageQuery.setMsgSource(5);
-                            messageQuery.setIsTask(0);
-                            messageQuery.setLoginUser(SecurityUtils.getLoginUser());
-                            messageQuery.setContent(weFission.getContent());
-                            messageQuery.setBusinessIds(weFission.getId().toString());
+                        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+                        messageQuery.setIsAll(false);
+                        messageQuery.setMsgSource(2);
+                        messageQuery.setIsTask(0);
+                        messageQuery.setLoginUser(SecurityUtils.getLoginUser());
+                        messageQuery.setContent(weFission.getContent());
+                        messageQuery.setBusinessIds(weFission.getId().toString());
 
                             WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
                             if(null != weMaterial){
@@ -595,7 +595,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
         }
-
 
 
 
