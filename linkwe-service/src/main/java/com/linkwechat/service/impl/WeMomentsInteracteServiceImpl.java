@@ -122,6 +122,14 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
         queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
         List<WeMomentsUser> list = weMomentsUserMapper.selectList(queryWrapper);
         if (BeanUtil.isNotEmpty(list)) {
+
+            //数据库旧的已存在的朋友圈互动数据
+            LambdaQueryWrapper<WeMomentsInteracte> wrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
+            wrapper.eq(WeMomentsInteracte::getMomentsTaskId, momentsTaskId);
+            wrapper.eq(WeMomentsInteracte::getMomentId, momentsId);
+            wrapper.eq(WeMomentsInteracte::getDelFlag, Constants.COMMON_STATE);
+            List<WeMomentsInteracte> oldData = this.list(wrapper);
+
             //2.删除同步之前的互动数据
             removeInteracte(momentsTaskId, momentsId);
             //3.同步互动数据
@@ -146,6 +154,8 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
                         this.saveBatch(result);
                         //打标签
                         this.interactTag(momentsTaskId, result);
+                        //添加客户轨迹
+                        this.addCustomerTrajectory(oldData, result);
                     }
                 }
             }

@@ -703,7 +703,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             MomentsParamDto.Link build = new MomentsParamDto.Link();
             //移动端素材详情地址
             String materialDetailUrl = linkWeChatConfig.getMaterialDetailUrl();
-            String url = String.format(materialDetailUrl, weMaterial.getId());
+            String url = StringUtils.format(materialDetailUrl, weMaterial.getId());
             build.setUrl(url);
             build.setMedia_id(media_id);
             build.setTitle(truncationStr(weMaterial.getMaterialName(), 64));
