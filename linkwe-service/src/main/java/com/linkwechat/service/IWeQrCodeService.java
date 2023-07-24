@@ -1,6 +1,7 @@
 package com.linkwechat.service;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.qr.WeQrCode;
@@ -8,6 +9,7 @@ import com.linkwechat.domain.qr.query.WeQrAddQuery;
 import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
 import com.linkwechat.domain.qr.vo.WeQrCodeDetailVo;
 import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.domain.qr.vo.WeQrScopeVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 
@@ -107,4 +109,13 @@ public interface IWeQrCodeService extends IService<WeQrCode> {
      * @param state  渠道,当前用户通过哪个活码添加
      */
     void updateQrMultiplePeople(String state);
+
+    JSONObject getShort2LongUrl(String shortUrl);
+
+
+    WeQrCodeScanCountVo getWeQrCodeScanTotalCount(WeQrCodeListQuery qrCodeListQuery);
+
+    List<WeQrCodeScanLineCountVo> getWeQrCodeScanLineCount(WeQrCodeListQuery qrCodeListQuery);
+
+    List<WeQrCodeScanLineCountVo> getWeQrCodeScanSheetCount(WeQrCodeListQuery qrCodeListQuery);
 }

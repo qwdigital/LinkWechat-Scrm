@@ -31,6 +31,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -56,7 +57,7 @@ public class QwChatMsgAuditListener {
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.chat-msg-audit:Qu_ChatMsgAudit}")
-    public void subscribe(String msg, Channel channel, Message message) {
+    public void subscribe(String msg, Channel channel, Message message) throws IOException {
         try {
             log.info("会话存档消息监听：msg:{}",msg);
 
@@ -65,6 +66,7 @@ public class QwChatMsgAuditListener {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         } catch (Exception e) {
             log.error("会话存档消息监听-消息处理失败 msg:{},error:{}",msg,e);
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), true, true);
         }
     }
 

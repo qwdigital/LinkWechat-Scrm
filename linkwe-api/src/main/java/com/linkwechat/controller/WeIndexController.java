@@ -46,6 +46,9 @@ public class WeIndexController {
     @Autowired
     private IWeShortLinkService weShortLinkService;
 
+    @Autowired
+    private IWeQrCodeService weQrCodeService;
+
 
     @Autowired
     private RedisService redisService;
@@ -110,6 +113,52 @@ public class WeIndexController {
             if (lock) {
                 short2LongUrl = weShortLinkService.getShort2LongUrl(shortUrl, promotionKey);
                 log.info("短链换取长链的数据：{}", short2LongUrl.toJSONString());
+                if (StringUtils.isNotEmpty(short2LongUrl.getString("errorMsg"))) {
+                    redisService.setCacheObject(key, short2LongUrl, 5, TimeUnit.MINUTES);
+                } else {
+                    redisService.setCacheObject(key, short2LongUrl, 1, TimeUnit.DAYS);
+                }
+                //释放锁
+                redisService.unLock(key, "lock");
+            } else {
+                throw new WeComException("操作过于频繁，请稍后再试");
+            }
+        }
+        String result = ResourceUtil.readUtf8Str("templates/jump.html");
+        resp.setHeader("Content-Type", "text/html; charset=utf-8");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter writer = resp.getWriter();
+        writer.write(StringUtils.format(result, short2LongUrl.toJSONString()).toCharArray());
+        writer.close();
+    }
+
+
+    @ShortLinkView(prefix = "qr:")
+    @ApiOperation(value = "活码短链换取长链", httpMethod = "GET")
+    @GetMapping(value = "/qr/{shortUrl}")
+    public void getQrShort2LongUrl(HttpServletRequest request,
+                                 HttpServletResponse resp,
+                                 @PathVariable("shortUrl") String shortUrl) throws IOException {
+        log.info("短链换取长链 shortUrl:{}", shortUrl);
+
+        if (StringUtils.isEmpty(shortUrl)) {
+            return;
+        }
+        String ipAddr = IpUtils.getIpAddr(request);
+
+        String key = "we:qr:shortUrl:" + ipAddr + ":" + shortUrl;
+
+        JSONObject short2LongUrl = new JSONObject();
+        //判断键是否存在
+        Boolean hasKey = redisService.hasKey(key);
+        if (hasKey) {
+            short2LongUrl = (JSONObject) redisService.getCacheObject(key);
+        } else {
+            //尝试加锁
+            Boolean lock = redisService.tryLock(key, "lock", 2L);
+            if (lock) {
+                short2LongUrl = weQrCodeService.getShort2LongUrl(shortUrl);
+                log.info("活码短链换取长链的数据：{}", short2LongUrl.toJSONString());
                 if (StringUtils.isNotEmpty(short2LongUrl.getString("errorMsg"))) {
                     redisService.setCacheObject(key, short2LongUrl, 5, TimeUnit.MINUTES);
                 } else {

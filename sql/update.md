@@ -9,21 +9,17 @@ SET PASSWORD = 'jTk6muJjbpIDarA1fKPulLHvjwjF+Yv1IrUeJOkU0CEAbfPowtswo0akbokVTl6D
 WHERE
 	user_name = 'admin'
 
----
-
----
+  ```
   ### ● 日期：2023.06.09
   ```
-  alter table we_qr_code add rule_mode tinyint default 1 null comment '排班方式 1：轮询 2：顺序 3：随机' after rule_type;
+alter table we_qr_code add rule_mode tinyint default 1 null comment '排班方式 1：轮询 2：顺序 3：随机' after rule_type;
 alter table we_qr_code add open_spare_user tinyint default 0 null comment '开启备用员工 0：否 1：是' after rule_mode;
 alter table we_qr_scope add scheduling_num int default 0 null comment '排班次数' after status;
 alter table we_qr_scope add is_spare_user tinyint default 0 null comment '是否备用员工 0：否 1：是' after scheduling_num;
 alter table we_qr_code add is_exclusive tinyint default 0 null comment '是否开启同一外部企业客户只能添加同一个员工，开启后，同一个企业的客户会优先添加到同一个跟进人  0-不开启 1-开启' after qr_code;
-```
 
----
 
----
+ ```
 ### ● 日期：2023.06.26
  ```
 CREATE TABLE `we_group_code_range` (
@@ -40,12 +36,12 @@ CREATE TABLE `we_group_code_range` (
 PRIMARY KEY (`id`),
 KEY `cha_id_index` (`code_id`,`chat_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客户群活码范围';
-```
----
 
----
+
+```
 ### ● 日期：2023.07.9
-  ```
+ ```
+
  ALTER TABLE `we_allocate_customer` ADD COLUMN `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称' AFTER `external_userid`;
 
 ALTER TABLE `we_allocate_customer` ADD COLUMN `takeover_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '接替成员名称' AFTER `customer_name`;
@@ -276,8 +272,34 @@ UPDATE `sys_menu` SET `menu_name` = '商城中心', `parent_id` = 0, `order_num`
 
 UPDATE `sys_menu` SET `menu_name` = '{新增}', `parent_id` = 2443, `order_num` = 2, `path` = 'add', `component` = 'conversation/quality/add', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-05-26 10:08:42', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-07-07 14:58:00', `remark` = '' WHERE `menu_id` = 2445;
 
+
 ```
+### ● 日期：2023.06.26
+ ```
+alter table we_qr_code
+add qr_welcome_open tinyint default 2 null comment '欢迎语开关 1-不发送欢迎语，2-发送欢迎语' after is_exclusive;
 
+alter table we_qr_code
+add qr_priority_user_welcome tinyint default 0 null comment '是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）' after qr_welcome_open;
 
+create table we_common_link_stat
+(
+    id           bigint auto_increment comment '主键ID'
+        primary key,
+    short_id     bigint                             not null comment '短链ID',
+    date_time    datetime                        not null comment '日期',
+    type         varchar(20)                        not null comment '链接渠道',
+    pv_num       int      default 0                 null comment 'PV数量',
+    uv_num       int      default 0                 null comment 'UV数量',
+    open_num     int      default 0                 null comment '打开小程序数量',
+    remark       varchar(200)                       null comment '备用',
+    create_by    varchar(255)                       null comment '创建人',
+    create_by_id bigint                             null comment '创建人ID',
+    create_time  datetime default CURRENT_TIMESTAMP null comment '创建时间',
+    update_by    varchar(255)                       null comment '更新人',
+    update_by_id bigint                             null comment '更新人id',
+    update_time  datetime                           null comment '更新时间',
+    del_flag     tinyint  default 0                 null comment '删除标识 0 有效 1 删除'
+)
+    comment '短链通用统计表' DEFAULT CHARSET=utf8mb4;
 
----

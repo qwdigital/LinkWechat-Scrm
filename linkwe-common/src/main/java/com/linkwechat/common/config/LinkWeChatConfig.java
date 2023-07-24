@@ -227,6 +227,11 @@ public class LinkWeChatConfig {
      */
     private String momentsUrl;
 
+    /**
+     * 活码短链域名
+     */
+    private String qrShortLinkDomainName;
+
 
     public String getName() {
         return name;

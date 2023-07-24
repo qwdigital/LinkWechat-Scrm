@@ -1,6 +1,9 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
@@ -9,17 +12,18 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.domain.qirule.vo.WeQiRuleWeeklyDetailListVo;
 import com.linkwechat.domain.qr.query.WeQrAddQuery;
 import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
-import com.linkwechat.domain.qr.vo.WeQrCodeDetailVo;
-import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
-import com.linkwechat.domain.qr.vo.WeQrScopeUserVo;
-import com.linkwechat.domain.qr.vo.WeQrScopeVo;
+import com.linkwechat.domain.qr.vo.*;
+import com.linkwechat.handler.WeQiRuleWeeklyUserDetailWriteHandler;
 import com.linkwechat.service.IWeQrCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,7 +40,7 @@ import java.util.stream.Collectors;
  * @description 活码管理
  * @date 2021/11/12 18:22
  **/
-
+@Slf4j
 @RestController
 @RequestMapping(value = "qr")
 @Api(tags = "活码管理")
@@ -96,6 +101,10 @@ public class WeQrCodeController extends BaseController {
         WeQrCodeScanCountVo weQrCodeScanCount = weQrCodeService.getWeQrCodeScanCount(qrCodeListQuery);
         return AjaxResult.success(weQrCodeScanCount);
     }
+
+
+
+
 
     /**
      * 员工活码批量下载
@@ -158,5 +167,44 @@ public class WeQrCodeController extends BaseController {
     public AjaxResult updateQrMultiplePeople(@RequestParam("state") String state) {
         weQrCodeService.updateQrMultiplePeople(state);
         return AjaxResult.success();
+    }
+
+
+    @ApiOperation(value = "获取活码总数统计", httpMethod = "GET")
+    @GetMapping("/scan/total")
+    public AjaxResult<WeQrCodeScanCountVo> getWeQrCodeScanTotalCount(WeQrCodeListQuery qrCodeListQuery) {
+        WeQrCodeScanCountVo weQrCodeScanCount = weQrCodeService.getWeQrCodeScanTotalCount(qrCodeListQuery);
+        return AjaxResult.success(weQrCodeScanCount);
+    }
+
+    @ApiOperation(value = "获取活码折线图统计", httpMethod = "GET")
+    @GetMapping("/scan/line")
+    public AjaxResult<List<WeQrCodeScanLineCountVo>> getWeQrCodeScanLineCount(WeQrCodeListQuery qrCodeListQuery) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCount = weQrCodeService.getWeQrCodeScanLineCount(qrCodeListQuery);
+        return AjaxResult.success(weQrCodeScanCount);
+    }
+
+    @ApiOperation(value = "获取活码表格统计", httpMethod = "GET")
+    @GetMapping("/scan/sheet")
+    public AjaxResult<List<WeQrCodeScanLineCountVo>> getWeQrCodeScanSheetCount(WeQrCodeListQuery qrCodeListQuery) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCount = weQrCodeService.getWeQrCodeScanSheetCount(qrCodeListQuery);
+        return AjaxResult.success(weQrCodeScanCount);
+    }
+
+    @ApiOperation(value = "获取活码表格统计导出", httpMethod = "GET")
+    @GetMapping("/scan/sheet/export")
+    public void getWeQrCodeScanSheetExport(WeQrCodeListQuery qrCodeListQuery) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCount = weQrCodeService.getWeQrCodeScanSheetCount(qrCodeListQuery);
+        try {
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("活码数据报表", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            ExcelWriterBuilder write = EasyExcel.write(response.getOutputStream(), WeQrCodeScanLineCountVo.class);
+            write.sheet("数据明细").doWrite(weQrCodeScanCount);
+        } catch (IOException e) {
+            log.error("获取活码表格统计导出异常：query:{}", JSONObject.toJSONString(qrCodeListQuery), e);
+        }
     }
 }

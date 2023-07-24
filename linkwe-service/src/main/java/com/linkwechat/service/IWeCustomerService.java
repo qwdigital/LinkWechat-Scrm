@@ -13,6 +13,7 @@ import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.*;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -301,6 +302,5 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeCustomersVo> findWeCustomersForCommonAssembly( WeGroupMessageExecuteUsertipVo executeUserOrGroup );
 
 
-
-
+    List<WeCustomerChannelCountVo> getCustomerNumByState(String state, Date startTime, Date endTime);
 }
