@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.linkwechat.common.annotation.ShortLinkView;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.ip.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -55,7 +56,16 @@ public class ShortLinkViewAspect {
             Object[] object = joinPoint.getArgs();
             HttpServletResponse resp = (HttpServletResponse) object[1];
             String shortUrl = (String) object[2];
-            String shortPromotionId = (String) object[3];
+
+            if(StringUtils.isEmpty(shortUrl) || Objects.equals("undefined",shortUrl)){
+                return proceed;
+            }
+
+            String shortPromotionId = null;
+            if(object.length >= 4){
+                shortPromotionId = (String) object[3];
+            }
+
             log.info("shortLinkView shortUrl：{}， 请求返回状态：RESPONSE : {} ", shortUrl, Objects.nonNull(resp) ? resp.getStatus() : "");
             if (HttpServletResponse.SC_OK != resp.getStatus()) {
                 return proceed;

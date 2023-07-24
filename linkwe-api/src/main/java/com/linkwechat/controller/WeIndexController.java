@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -141,7 +142,7 @@ public class WeIndexController {
                                  @PathVariable("shortUrl") String shortUrl) throws IOException {
         log.info("短链换取长链 shortUrl:{}", shortUrl);
 
-        if (StringUtils.isEmpty(shortUrl)) {
+        if (StringUtils.isEmpty(shortUrl) || Objects.equals("undefined",shortUrl)) {
             return;
         }
         String ipAddr = IpUtils.getIpAddr(request);
