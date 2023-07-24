@@ -2,6 +2,7 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.task.entity.WeTasks;
+import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.domain.task.vo.WeTasksVO;
 
 import java.util.List;
@@ -99,7 +100,7 @@ public interface IWeTasksService extends IService<WeTasks> {
      * 处理线索长时间未跟进
      * <p>
      * 1.显示在待办任务中
-     * <P>
+     * <p>
      * 2.发送应用消息
      *
      * @author WangYX
@@ -107,5 +108,24 @@ public interface IWeTasksService extends IService<WeTasks> {
      */
     void handlerLeadsLongTimeNotFollowUp();
 
+    /**
+     * 线索约定事项待跟进
+     * <p>
+     * 1.发送mq消息到RabbitMq，异步解耦处理
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/07/24 9:57
+     */
+    void appointItemWaitFollowUp(WeTasksRequest request);
+
+    /**
+     * 处理约定事项待跟进
+     *
+     * @param
+     * @author WangYX
+     * @date 2023/07/24 10:00
+     */
+    void handlerAppointItemWaitFollowUp();
 
 }

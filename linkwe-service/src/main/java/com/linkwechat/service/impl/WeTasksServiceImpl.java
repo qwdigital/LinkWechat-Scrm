@@ -17,19 +17,20 @@ import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.enums.task.WeTasksTitleEnum;
-import com.linkwechat.common.enums.task.WeTasksTypeEnum;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.task.entity.WeTasks;
+import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.domain.task.vo.WeTasksVO;
 import com.linkwechat.mapper.WeLeadsSeaMapper;
 import com.linkwechat.mapper.WeTasksMapper;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeTasksService;
 import com.linkwechat.service.QwAppSendMsgService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -52,9 +53,12 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     @Resource
     private WeLeadsSeaMapper weLeadsSeaMapper;
     @Resource
+    private QwAppSendMsgService qwAppSendMsgService;
+    @Resource
     private IWeCorpAccountService weCorpAccountService;
     @Resource
-    private QwAppSendMsgService qwAppSendMsgService;
+    private RabbitTemplate rabbitTemplate;
+
 
     @Override
     public List<WeTasksVO> myList() {
@@ -187,8 +191,15 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
             body.setMessageTemplates(messageTemplate);
             qwAppSendMsgService.appMsgSend(body);
         }
+    }
+
+    @Override
+    public void appointItemWaitFollowUp(WeTasksRequest request) {
 
     }
 
+    @Override
+    public void handlerAppointItemWaitFollowUp() {
 
+    }
 }

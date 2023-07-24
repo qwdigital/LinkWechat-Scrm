@@ -158,7 +158,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.delay.we-moments:Rk_Moments_Get_Group_Send_Result}")
     private String weMomentsDelayGetGroupSendResultRK;
 
-
+    /**
+     *
+     */
+    private String weTasksRk;
 
 
     //客服账号同步路由

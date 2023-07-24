@@ -43,14 +43,14 @@ public class WeTasks extends BaseEntity {
     /**
      * 任务类型
      *
-     * @see com.linkwechat.common.enums.task.WeTasksTypeEnum
+     * @see com.linkwechat.common.enums.task.WeTasksTitleEnum
      */
     private Integer type;
 
     /**
      * 任务标题
      *
-     * @see com.linkwechat.common.enums.task.WeTasksTypeEnum
+     * @see com.linkwechat.common.enums.task.WeTasksTitleEnum
      */
     private String title;
 
