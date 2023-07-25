@@ -92,5 +92,10 @@ public class WeLeadsFollowRecordContentVO {
          */
         private String replierTo;
 
+        /**
+         * 子类数量
+         */
+        private Integer subNum;
+
     }
 }

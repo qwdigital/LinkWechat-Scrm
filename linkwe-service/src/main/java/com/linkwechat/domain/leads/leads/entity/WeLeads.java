@@ -103,9 +103,9 @@ public class WeLeads extends BaseEntity {
     private Integer source;
 
     /**
+     * 性别 0 = 未知, 1 = 男, 2 = 女
+     *
      * @see com.linkwechat.common.enums.SexEnums
-     * <p>
-     * 性别, 0 = 未知, 1 = 男, 2 = 女
      */
     private Integer sex;
 

@@ -16,11 +16,8 @@ import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
 import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
-import com.linkwechat.domain.leads.leads.query.WeLeadsUserStatisticRequest;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerNumVO;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerVO;
-import com.linkwechat.domain.leads.leads.vo.WeLeadsUserFollowTop5VO;
-import com.linkwechat.domain.leads.leads.vo.WeLeadsUserStatisticVO;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordAttachment;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordContent;
@@ -29,6 +26,7 @@ import com.linkwechat.domain.leads.record.query.WeLeadsAddFollowRequest;
 import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordAttachmentRequest;
 import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordCooperateUserRequest;
 import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordRequest;
+import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.mapper.WeLeadsFollowRecordContentMapper;
 import com.linkwechat.mapper.WeLeadsFollowRecordMapper;
 import com.linkwechat.mapper.WeLeadsFollowerMapper;
@@ -174,6 +172,38 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
         //取消并添加新的待办任务(线索长时间待跟进)
         weTasksService.cancelAndAddLeadsLongTimeNotFollowUp(weLeads.getId(), weLeads.getName(), SecurityUtils.getLoginUser().getSysUser().getUserId(),
                 SecurityUtils.getLoginUser().getSysUser().getWeUserId(), weLeads.getSeaId());
+
+        //待办任务
+        if (BeanUtil.isNotEmpty(request.getCooperateTime())) {
+            //线索约定事项待跟进
+            WeTasksRequest build = WeTasksRequest.builder()
+                    .userId(SecurityUtils.getLoginUser().getSysUser().getUserId())
+                    .weUserId(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
+                    .leadsId(request.getWeLeadsId())
+                    .recordId(record.getId())
+                    .cooperateTime(request.getCooperateTime())
+                    .build();
+            weTasksService.appointItemWaitFollowUp(build);
+
+            //成员的线索约定事项待处理
+            if (CollectionUtil.isNotEmpty(cooperateUsers)) {
+                build.setCooperateUsers(cooperateUsers);
+                weTasksService.userAppointItemWaitFollowUp(build);
+            }
+        }
+
+        if (CollectionUtil.isNotEmpty(cooperateUsers)) {
+            //有成员的线索跟进@了你
+            WeTasksRequest build = WeTasksRequest.builder()
+                    .userId(SecurityUtils.getLoginUser().getSysUser().getUserId())
+                    .weUserId(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
+                    .userName(SecurityUtils.getLoginUser().getSysUser().getUserName())
+                    .leadsId(request.getWeLeadsId())
+                    .recordId(record.getId())
+                    .cooperateTime(request.getCooperateTime())
+                    .cooperateUsers(cooperateUsers).build();
+            weTasksService.userFollowUp2You(build);
+        }
     }
 
     @Override

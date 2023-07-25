@@ -10,23 +10,24 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.common.enums.leads.record.FollowModeEnum;
+import com.linkwechat.common.exception.ServiceException;
+import com.linkwechat.domain.leads.leads.entity.WeLeads;
 import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerVO;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordAttachment;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecordContent;
 import com.linkwechat.domain.leads.record.query.WeLeadsAddFollowRequest;
+import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordReplyRequest;
 import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordRequest;
 import com.linkwechat.domain.leads.record.vo.WeLeadsFollowRecordAttachmentVO;
 import com.linkwechat.domain.leads.record.vo.WeLeadsFollowRecordContentVO;
 import com.linkwechat.domain.leads.record.vo.WeLeadsFollowRecordContentVO.Content;
 import com.linkwechat.domain.leads.record.vo.WeLeadsFollowRecordVO;
-import com.linkwechat.service.IWeLeadsFollowRecordAttachmentService;
-import com.linkwechat.service.IWeLeadsFollowRecordContentService;
-import com.linkwechat.service.IWeLeadsFollowRecordService;
-import com.linkwechat.service.IWeLeadsFollowerService;
+import com.linkwechat.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +46,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/leads/follow/record")
 public class WeLeadsFollowRecordController extends BaseController {
-
+    @Resource
+    private IWeLeadsService weLeadsService;
     @Resource
     private IWeLeadsFollowerService weLeadsFollowerService;
     @Resource
@@ -138,7 +140,7 @@ public class WeLeadsFollowRecordController extends BaseController {
     /**
      * 构建跟进记录内容
      *
-     * @param rows
+     * @param rows 列表返回记录
      * @author WangYX
      * @date 2023/07/18 17:01
      */
@@ -218,11 +220,90 @@ public class WeLeadsFollowRecordController extends BaseController {
         return result;
     }
 
+    /**
+     * 跟进记录详情
+     *
+     * @param recordId 跟进记录Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/24 14:31
+     */
+    @ApiOperation(value = "跟进记录详情")
+    @GetMapping("/{recordId}")
+    public AjaxResult detail(@PathVariable("recordId") Long recordId) {
+        return AjaxResult.success(weLeadsFollowRecordService.detail(recordId));
+    }
 
-    public Object recordDetail() {
-        //TODO 跟进记录详情
+    /**
+     * 通过内容Id获取跟进记录详情
+     *
+     * @param contentId 内容Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/24 18:21
+     */
+    @ApiOperation(value = "通过内容Id获取跟进记录详情")
+    @GetMapping("/content/{contentId}")
+    public AjaxResult detailByContentId(@PathVariable("contentId") Long contentId) {
+        WeLeadsFollowRecordContent content = weLeadsFollowRecordContentService.getById(contentId);
+        if (BeanUtil.isEmpty(content)) {
+            throw new ServiceException("内容Id不存在");
+        }
+        return AjaxResult.success(weLeadsFollowRecordService.detail(content.getRecordId()));
+    }
 
-        return null;
+    /**
+     * 获取回复目标
+     *
+     * @param contentId 跟进记录内容Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/24 18:43
+     */
+    @ApiOperation(value = "获取回复目标")
+    @GetMapping("/replay/target")
+    public AjaxResult getReplyTarget(Long contentId) {
+        WeLeadsFollowRecordContent content = weLeadsFollowRecordContentService.getById(contentId);
+        if (content.getParentId().equals(0L)) {
+            Long recordId = content.getRecordId();
+            WeLeadsFollowRecord weLeadsFollowRecord = weLeadsFollowRecordService.getById(recordId);
+            WeLeads weLeads = weLeadsService.getById(weLeadsFollowRecord.getWeLeadsId());
+            if (BeanUtil.isNotEmpty(weLeads)) {
+                Map<String, Object> map = new HashedMap(3);
+                map.put("userId", weLeads.getFollowerId());
+                map.put("weUserId", weLeads.getWeUserId());
+                map.put("userName", weLeads.getFollowerName());
+                return AjaxResult.success(Arrays.asList(map));
+            }
+            return AjaxResult.success(CollectionUtil.newArrayList());
+        }
+
+        LambdaQueryWrapper<WeLeadsFollowRecordContent> wrapper = Wrappers.lambdaQuery(WeLeadsFollowRecordContent.class);
+        wrapper.eq(WeLeadsFollowRecordContent::getParentId, content.getParentId());
+        List<WeLeadsFollowRecordContent> list = weLeadsFollowRecordContentService.list(wrapper);
+        List<Map<String, Object>> collect = list.stream().map(i -> {
+            Map<String, Object> map = new HashedMap(3);
+            map.put("userId", i.getReplierFromId());
+            map.put("weUserId", i.getReplierFromWeUserId());
+            map.put("userName", i.getReplierFrom());
+            return map;
+        }).collect(Collectors.toList());
+        return AjaxResult.success(collect);
+    }
+
+    /**
+     * 回复
+     *
+     * @param request 回复请求参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/25 10:14
+     */
+    @ApiOperation(value = "回复")
+    @PostMapping("/reply")
+    public AjaxResult reply(@RequestBody WeLeadsFollowRecordReplyRequest request) {
+        weLeadsFollowRecordService.reply(request);
+        return AjaxResult.success();
     }
 
 

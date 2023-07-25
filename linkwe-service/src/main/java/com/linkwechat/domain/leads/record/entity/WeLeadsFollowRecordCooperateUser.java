@@ -40,7 +40,7 @@ public class WeLeadsFollowRecordCooperateUser {
     /**
      * 用户企微Id
      */
-    private Long weUserId;
+    private String weUserId;
 
     /**
      * 用户名称

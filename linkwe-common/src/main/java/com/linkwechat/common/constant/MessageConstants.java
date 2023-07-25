@@ -22,6 +22,8 @@ public class MessageConstants {
     public static final String LEADS_AUTO_RECOVERY = "1个线索客户 @{} 超过期限未跟进已自动回收";
 
     /**
+     * 线索长时间待跟进-文本卡片消息内容
+     * <p>
      * 如：
      * <p>
      * 2023年07月21日
@@ -30,6 +32,44 @@ public class MessageConstants {
      */
     public static final String LEADS_LONG_TIME_NOT_FOLLOW_UP = "<div class=\"gray\">{}</div> <div class=\"normal\">客户：{}</div>";
 
+    /**
+     * 线索约定事项待跟进-文本卡片消息内容
+     * <p>
+     * 如：
+     * <p>
+     * 2023年07月21日
+     * <p>
+     * 客户：张三
+     */
+    public static final String LEADS_COVENANT_WAIT_FOLLOW_UP = "<div class=\"gray\">{}</div> <div class=\"normal\">客户：{}</div>";
+
+    /**
+     * 成员线索跟进@了你-文本卡片消息内容
+     * <p>
+     * 如：
+     * <p>
+     * 客户：张三
+     * </p>
+     * <p>
+     * 员工：赵四
+     * </p>
+     * </p>
+     */
+    public static final String LEADS_USER_FOLLOW_UP_2_YOU = "<div class=\"gray\">{}</div> <div class=\"normal\">客户：{}</div> <div class=\"normal\">成员：{}</div>";
+
+    /**
+     * 有协助跟进的成员回复了你
+     * <p>
+     * 如：
+     * <p>
+     * 2023年07月25日
+     * </p>
+     * <p>
+     * 成员：张三
+     * </p>
+     * </p>
+     */
+    public static final String LEADS_ASSIST_USER_FOLLOW_UP_REPLY_YOU = "<div class=\"gray\">{}</div> <div class=\"normal\">成员：{}</div>";
 
     /******************客户********************/
     /**

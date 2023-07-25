@@ -205,7 +205,7 @@ public class WeLeadsStatisticController extends BaseController {
         getImportRecordData(records);
         try {
             HttpServletResponse response = ServletUtils.getResponse();
-            String fileName = DateUtil.today() + "-员工统计" + LeadsCenterConstants.XLSX_FILE_EXTENSION;
+            String fileName = DateUtil.today() + "-导入记录" + LeadsCenterConstants.XLSX_FILE_EXTENSION;
             String encode = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
             response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
             response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename*=utf-8''" + encode);

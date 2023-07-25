@@ -89,4 +89,9 @@ public class WeTasks extends BaseEntity {
      * 线索中心-线索Id
      */
     private Long leadsId;
+
+    /**
+     * 线索中心-跟进记录Id
+     */
+    private Long recordId;
 }

@@ -112,6 +112,7 @@ public interface IWeTasksService extends IService<WeTasks> {
      * 线索约定事项待跟进
      * <p>
      * 1.发送mq消息到RabbitMq，异步解耦处理
+     * </p>
      *
      * @param request 请求参数
      * @author WangYX
@@ -120,12 +121,33 @@ public interface IWeTasksService extends IService<WeTasks> {
     void appointItemWaitFollowUp(WeTasksRequest request);
 
     /**
-     * 处理约定事项待跟进
+     * 成员的线索约定事项待跟进
+     * <p>
+     * 1.发送mq消息到RabbitMq，异步解耦处理
+     * </p>
      *
-     * @param
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/07/24 15:51
+     */
+    void userAppointItemWaitFollowUp(WeTasksRequest request);
+
+    /**
+     * 成员的线索跟进@了你
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/07/24 17:10
+     */
+    void userFollowUp2You(WeTasksRequest request);
+
+    /**
+     * 处理待办任务
+     *
+     * @param request 请求参数
      * @author WangYX
      * @date 2023/07/24 10:00
      */
-    void handlerAppointItemWaitFollowUp();
+    void handlerWeTasks(WeTasksRequest request);
 
 }

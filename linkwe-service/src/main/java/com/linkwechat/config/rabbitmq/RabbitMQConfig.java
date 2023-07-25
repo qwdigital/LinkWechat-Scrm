@@ -873,8 +873,6 @@ public class RabbitMQConfig {
     }
 
 
-
-
     /**
      * 客户群新增成员广播交换机
      */
@@ -905,6 +903,30 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quGroupAddUserCode()).to(weGroupAddUserFanoutEx()).with(rabbitMQSettingConfig.getGroupAddUserCodeRk()).noargs();
 
     }
+
+    /**
+     * 待办任务
+     *
+     * @return {@link Queue}
+     * @author WangYX
+     * @date 2023/07/24 11:19
+     */
+    @Bean
+    public Queue quWeTasksDelay() {
+        return new Queue(rabbitMQSettingConfig.getWeTasksDelayQu());
+    }
+    /**
+     * 待办任务绑定延迟交换机
+     *
+     * @return {@link Binding}
+     * @author WangYX
+     * @date 2023/07/24 11:22
+     */
+    @Bean
+    public Binding bindingWeTasksDelay() {
+        return BindingBuilder.bind(quWeTasksDelay()).to(delayEx()).with(rabbitMQSettingConfig.getWeTasksDelayRk()).noargs();
+    }
+
 
 }
 

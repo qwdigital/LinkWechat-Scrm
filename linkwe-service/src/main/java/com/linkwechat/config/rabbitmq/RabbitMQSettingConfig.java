@@ -82,7 +82,6 @@ public class RabbitMQSettingConfig {
     private String sopEx;
 
 
-
     /**
      * 客户群新增成员通知交换机
      */
@@ -159,10 +158,10 @@ public class RabbitMQSettingConfig {
     private String weMomentsDelayGetGroupSendResultRK;
 
     /**
-     *
+     * 待办任务路由
      */
-    private String weTasksRk;
-
+    @Value("${wecom.mq.route.delay.we-tasks:Rk_Tasks}")
+    private String weTasksDelayRk;
 
     //客服账号同步路由
     @Value("${wecom.mq.route.sync.kf-account:Rk_KfAccount}")
@@ -378,6 +377,11 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.delay.we-moments:Qu_Moments_Get_Group_Send_Result}")
     private String weMomentsDelayGetGroupSendResultQu;
 
+    /**
+     * 待办任务队列
+     */
+    @Value("${wecom.mq.queue.delay.we-tasks:Qu_Tasks}")
+    private String weTasksDelayQu;
 
     //员工与部门同步队列
     @Value("${wecom.mq.queue.sync.user-depart:Qu_UserDepart}")

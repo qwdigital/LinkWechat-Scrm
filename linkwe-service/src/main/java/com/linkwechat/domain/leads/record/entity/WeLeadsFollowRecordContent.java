@@ -86,6 +86,11 @@ public class WeLeadsFollowRecordContent {
     private String replierFrom;
 
     /**
+     * 回复者头像
+     */
+    private String replierFromAvatar;
+
+    /**
      * 回复对象id
      */
     private Long replierToId;
@@ -101,9 +106,19 @@ public class WeLeadsFollowRecordContent {
     private String replierTo;
 
     /**
+     * 回复对象头像
+     */
+    private String replierToAvatar;
+
+    /**
      * 创建时间
      */
     @TableField(value = "create_time")
     private Date createTime;
+
+    /**
+     * 子类数量
+     */
+    private Integer subNum;
 }
 
