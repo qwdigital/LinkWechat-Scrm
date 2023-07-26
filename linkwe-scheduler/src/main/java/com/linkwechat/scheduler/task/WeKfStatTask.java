@@ -115,9 +115,9 @@ public class WeKfStatTask {
                 for (WeKfPool weKfPool : poolList) {
                     WeKfUserStat stat = new WeKfUserStat();
                     WeKfInfo weKfInfo = weKfInfoService.getOne(new LambdaQueryWrapper<WeKfInfo>().eq(WeKfInfo::getCorpId,weCorpAccount.getCorpId()).eq(WeKfInfo::getOpenKfId,weKfPool.getOpenKfId()).last("limit 1"));
-                    Integer timeOutNotice = weKfInfo.getTimeOutNotice();
-                    Integer timeOutType = weKfInfo.getTimeOutType();
-                    Integer timeOut = weKfInfo.getTimeOut();
+                    Integer kfTimeOutNotice = weKfInfo.getKfTimeOutNotice();
+                    Integer kfTimeOutType = weKfInfo.getKfTimeOutType();
+                    Integer kfTimeOut = weKfInfo.getKfTimeOut();
 
                     List<WeKfMsg> weKfMsgList = weKfMsgService.list(new LambdaQueryWrapper<WeKfMsg>()
                             .eq(WeKfMsg::getOpenKfId, weKfPool.getOpenKfId())
@@ -137,12 +137,12 @@ public class WeKfStatTask {
                             if (Objects.equals(WeKfOriginEnum.CUSTOMER_SEND.getType(), weKfMsgList.get(i).getOrigin())
                                     && Objects.equals(WeKfOriginEnum.SERVICER_SEND.getType(), weKfMsgList.get(j).getOrigin())) {
                                 long duration = 0;
-                                if (ObjectUtil.equal(1, timeOutType)) {
+                                if (ObjectUtil.equal(1, kfTimeOutType)) {
                                     duration = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.MINUTE);
                                 } else {
                                     duration = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.HOUR);
                                 }
-                                if (timeOut < duration) {
+                                if (kfTimeOut < duration) {
                                     outTimeCnt++;
                                     long minute = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.SECOND);
                                     durationCnt += minute;
