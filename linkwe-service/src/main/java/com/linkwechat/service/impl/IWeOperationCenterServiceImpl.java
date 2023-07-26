@@ -211,7 +211,7 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
         if (CollectionUtil.isNotEmpty(dayCountDataByTime)) {
             Map<String, List<WePageCountVo>> listMap = dayCountDataByTime.stream().collect(Collectors.groupingBy(WePageCountVo::getXTime));
             Map<String, Integer> lostCntMap = customerLostCnt.stream()
-                    .filter(item-> StringUtils.isNotEmpty(item.getXTime()))
+                    .filter(item -> StringUtils.isNotEmpty(item.getXTime()))
                     .collect(Collectors.groupingBy(WeCustomerRealCntVo::getXTime, Collectors.summingInt(WeCustomerRealCntVo::getLostCnt)));
             customerRealCnt.forEach(realCnt -> {
                 List<WePageCountVo> WePageCountVos = listMap.get(realCnt.getXTime());
@@ -221,7 +221,7 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
 
                 if (lostCntMap.containsKey(realCnt.getXTime())) {
                     realCnt.setLostCnt(lostCntMap.get(realCnt.getXTime()));
-                }else{
+                } else {
                     realCnt.setLostCnt(0);
 
                 }
@@ -236,8 +236,10 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
         //获取当前系统下所有可用员工
         List<SysUser> allSysUser = iWeCustomerService.findAllSysUser();
         if (CollectionUtil.isNotEmpty(allSysUser)) {
+            //过滤开启动态日报的员工并转化为企微Id集合
+            List<String> weUserIds = allSysUser.stream().filter(i -> i.getOpenDaily().equals(0)).map(SysUser::getWeUserId).collect(Collectors.toList());
             iWeMessagePushService.pushMessageSelfH5(
-                    allSysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList()),
+                    weUserIds,
                     PlaceholderResolver.getDefaultResolver().resolveByObject(customerRemindMsgTpl, weOperationCenterMapper.
                             findWeCustomerRemindAnalysis())
                             +
@@ -252,7 +254,6 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
     public List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query) {
         return this.weOperationCenterMapper.selectGroupMemberBrokenLine(query);
     }
-
 
 
 }

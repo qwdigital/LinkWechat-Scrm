@@ -24,7 +24,6 @@ import com.linkwechat.domain.leads.leads.vo.WeLeadsVO;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.service.IWeLeadsSeaService;
 import com.linkwechat.service.IWeLeadsService;
-import com.linkwechat.service.IWeLeadsTemplateSettingsService;
 import com.linkwechat.service.IWeTagService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -380,6 +379,8 @@ public class WeLeadsController extends BaseController {
         weLeadsService.bindCustomer(request);
         return AjaxResult.success();
     }
+
+
 
 
 }

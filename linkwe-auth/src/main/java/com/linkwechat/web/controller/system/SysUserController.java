@@ -4,7 +4,9 @@ import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dtflys.forest.annotation.Post;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.SynchRecordConstants;
@@ -50,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.WrappedPlainView;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -104,7 +107,6 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWeStrackStageService iWeStrackStageService;
-
 
 
     /**
@@ -227,10 +229,11 @@ public class SysUserController extends BaseController {
 
     /**
      * 编辑数据权限
+     *
      * @return
      */
     @PostMapping("/editDataScop")
-    public AjaxResult editDataScop(@RequestBody SysUserDTO user){
+    public AjaxResult editDataScop(@RequestBody SysUserDTO user) {
         userService.editDataScop(user);
         return AjaxResult.success();
     }
@@ -245,7 +248,6 @@ public class SysUserController extends BaseController {
         userService.leaveUser(ListUtil.toList(userIds));
         return AjaxResult.success();
     }
-
 
 
     /**
@@ -439,23 +441,25 @@ public class SysUserController extends BaseController {
 
     /**
      * 根据weUserIds，positions，deptIds批量查询
+     *
      * @param weUserIds
      * @param positions
      * @param deptIds
      * @return
      */
     @GetMapping("/findAllSysUser")
-    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions,String deptIds){
-        return AjaxResult.success(userService.findAllSysUser(weUserIds,positions,deptIds));
+    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions, String deptIds) {
+        return AjaxResult.success(userService.findAllSysUser(weUserIds, positions, deptIds));
     }
 
     /**
      * 根据weuserid获取员工，如果没有则从企业微信端同步
+     *
      * @param weuserId
      * @return
      */
     @GetMapping("/findOrSynchSysUser/{weuserId}")
-    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId){
+    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId) {
         return AjaxResult.success(
                 userService.findOrSynchSysUser(weuserId)
         );
@@ -515,40 +519,43 @@ public class SysUserController extends BaseController {
 
     /**
      * 更新员工开启会话存档状态
+     *
      * @param query
      * @return
      */
     @PutMapping("/update/chat/status")
-    public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query){
+    public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query) {
         userService.updateUserChatStatus(query);
         return AjaxResult.success();
     }
 
     /**
      * 通过企微员工ID获取员工信息
+     *
      * @param query
      * @return
      */
     @PostMapping("/getUserListByWeUserIds")
-    public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@Validated @RequestBody SysUserQuery query){
-        List<SysUserVo> sysUserList  = userService.getUserListByWeUserIds(query);
+    public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@Validated @RequestBody SysUserQuery query) {
+        List<SysUserVo> sysUserList = userService.getUserListByWeUserIds(query);
         return AjaxResult.success(sysUserList);
     }
 
 
     /**
      * 根据职位等条件筛选员工
+     *
      * @param weUserIds
      * @param deptIds
      * @param positions
      * @return
      */
     @GetMapping("/screenConditWeUser")
-    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds,String positions){
+    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds, String positions) {
 
 
         return AjaxResult.success(
-                userService.screenConditWeUser(weUserIds,deptIds,positions)
+                userService.screenConditWeUser(weUserIds, deptIds, positions)
         );
 
     }
@@ -556,17 +563,35 @@ public class SysUserController extends BaseController {
 
     /**
      * 批量构建离职员工
+     *
      * @param sysUsers
      * @return
      */
     @PostMapping("/builderLeaveSysUser")
-    public AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers){
+    public AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers) {
 
         userService.builderLeaveSysUser(sysUsers.getSysUsers());
 
 
         return AjaxResult.success();
 
+    }
+
+    /**
+     * 更新用户动态日报开启状态
+     *
+     * @param openDaily 0开启，1关闭
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/26 10:04
+     */
+    @PutMapping("/update/open/daily")
+    public AjaxResult updateOpenDaily(@Validated @RequestParam("openDaily") Integer openDaily) {
+        LambdaUpdateWrapper<SysUser> updateWrapper = Wrappers.lambdaUpdate(SysUser.class);
+        updateWrapper.eq(SysUser::getUserId, SecurityUtils.getLoginUser().getSysUser().getUserId());
+        updateWrapper.set(SysUser::getOpenDaily, openDaily);
+        userService.update(updateWrapper);
+        return AjaxResult.success();
     }
 
 

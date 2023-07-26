@@ -227,8 +227,6 @@ public class SysUser extends BaseEntity {
     private String jobNumber;
 
 
-
-
     /**
      * 用户类型（00管理员）(企微用户类型 1.创建者 2.内部系统管理员 3.外部系统管理员 4.分级管理员 5.成员)
      */
@@ -252,7 +250,7 @@ public class SysUser extends BaseEntity {
     /**
      * 离职时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dimissionTime;
 
 
@@ -334,8 +332,11 @@ public class SysUser extends BaseEntity {
     @TableField(exist = false)
     private String deptIds;
 
-
-
+    /**
+     * 是否开启动态日报 0开启，1关闭 默认开启0
+     */
+    @TableField("is_open_daily")
+    private Integer openDaily;
 
 
     public SysUser(Long userId) {

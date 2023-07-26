@@ -26,6 +26,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.common.enums.leads.record.FollowBackModeEnum;
+import com.linkwechat.common.enums.leads.record.ImportSourceTypeEnum;
 import com.linkwechat.common.enums.leads.template.CanEditEnum;
 import com.linkwechat.common.enums.leads.template.DataAttrEnum;
 import com.linkwechat.common.enums.leads.template.DatetimeTypeEnum;
@@ -911,5 +912,25 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         weLeadsAutoRecoveryService.cancel(request.getLeadsId(), SecurityUtils.getLoginUser().getSysUser().getUserId());
         //取消线索长时间待跟任务
         weTasksService.cancelLeadsLongTimeNotFollowUp(weLeads.getId(), SecurityUtils.getLoginUser().getSysUser().getUserId());
+    }
+
+    @Override
+    public Long manualAdd(WeLeadsAddRequest request) {
+        WeLeads weLeads = new WeLeads();
+        weLeads.setId(IdUtil.getSnowflakeNextId());
+        weLeads.setName(request.getName());
+        weLeads.setPhone(request.getPhone());
+        weLeads.setLeadsStatus(LeadsStatusEnum.WAIT_FOR_DISTRIBUTION.getCode());
+        if (CollectionUtil.isNotEmpty(request.getPropertiesList())) {
+            String jsonString = JSONObject.toJSONString(request.getPropertiesList());
+            weLeads.setProperties(jsonString);
+        }
+        weLeads.setSex(request.getSex());
+        weLeads.setSeaId(request.getSeaId() == null ? 1 : request.getSeaId());
+        weLeads.setDelFlag(Constants.COMMON_STATE);
+        weLeads.setSource(ImportSourceTypeEnum.MANUAL_ADD.getCode());
+        weLeads.setRecoveryTimes(0);
+        weLeadsMapper.insert(weLeads);
+        return weLeads.getId();
     }
 }

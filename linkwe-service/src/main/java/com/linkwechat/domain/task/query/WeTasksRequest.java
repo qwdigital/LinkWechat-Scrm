@@ -68,7 +68,15 @@ public class WeTasksRequest {
      */
     private Date cooperateTime;
 
+    /**
+     * 协作成员列表
+     */
     @ApiModelProperty(value = "协作成员列表")
     private List<WeLeadsFollowRecordCooperateUserRequest> cooperateUsers;
+
+    /**
+     * 员工Id集合，（标签建群任务使用）
+     */
+    private List<String> weUserIds;
 
 }

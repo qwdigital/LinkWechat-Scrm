@@ -142,6 +142,15 @@ public interface IWeTasksService extends IService<WeTasks> {
     void userFollowUp2You(WeTasksRequest request);
 
     /**
+     * 有1个标签建群任务待完成
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/07/25 15:33
+     */
+    void groupAddByLabel(WeTasksRequest request);
+
+    /**
      * 处理待办任务
      *
      * @param request 请求参数

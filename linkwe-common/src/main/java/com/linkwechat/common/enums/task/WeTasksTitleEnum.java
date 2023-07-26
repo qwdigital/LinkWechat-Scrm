@@ -16,7 +16,7 @@ public enum WeTasksTitleEnum {
     LEADS_ASSIST_USER_FOLLOW_UP_REPLY_YOU(4, "有协助跟进的成员回复了你"),
     LEADS_USER_COVENANT_WAIT_FOLLOW_UP(5, "成员的线索约定事项待跟进"),
     SOP_TODAY_WAIT_PUSH(6, "今日SOP待推送"),
-    GROUP_ADD(7, "有1个标签建群任务待完成");
+    GROUP_ADD_BY_LABEL(7, "有1个标签建群任务待完成");
 
     WeTasksTitleEnum(Integer code, String title) {
         this.code = code;

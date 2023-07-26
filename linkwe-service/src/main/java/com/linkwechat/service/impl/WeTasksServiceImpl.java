@@ -13,11 +13,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.MessageConstants;
+import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
 import com.linkwechat.common.enums.task.WeTasksTitleEnum;
+import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCorpAccount;
@@ -26,9 +31,12 @@ import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordCooperateUser
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.task.entity.WeTasks;
 import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.domain.task.vo.WeTasksVO;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeLeadsMapper;
 import com.linkwechat.mapper.WeLeadsSeaMapper;
 import com.linkwechat.mapper.WeTasksMapper;
@@ -39,7 +47,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -60,6 +70,8 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     @Resource
     private RabbitTemplate rabbitTemplate;
     @Resource
+    private QwSysUserClient qwSysUserClient;
+    @Resource
     private WeLeadsSeaMapper weLeadsSeaMapper;
     @Resource
     private QwAppSendMsgService qwAppSendMsgService;
@@ -67,7 +79,8 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     private IWeCorpAccountService weCorpAccountService;
     @Resource
     private RabbitMQSettingConfig rabbitMQSettingConfig;
-
+    @Resource
+    private LinkWeChatConfig linkWeChatConfig;
 
     @Override
     public List<WeTasksVO> myList() {
@@ -249,6 +262,16 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
         }
     }
 
+    @Override
+    public void groupAddByLabel(WeTasksRequest request) {
+        request.setType(WeTasksTitleEnum.GROUP_ADD_BY_LABEL.getCode());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeTasksDelayRk(), JSONObject.toJSONString(request), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", 5000L);
+            return message;
+        });
+    }
+
     /**
      * 线索约定事项待处理-发送mq
      *
@@ -307,6 +330,9 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
                 break;
             case 4:
                 this.handlerUserAppointItemWaitFollowUp(request);
+                break;
+            case 7:
+                this.handlerGroupAddByLabel(request);
                 break;
             default:
                 break;
@@ -377,8 +403,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     /**
      * 处理-有成员的线索跟进@了你
      *
-     * @param request
-     * @return
+     * @param request 请求参数
      * @author WangYX
      * @date 2023/07/24 17:16
      */
@@ -415,6 +440,46 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
         String desc = StrUtil.format(MessageConstants.LEADS_USER_FOLLOW_UP_2_YOU, DateUtil.date().toDateStr(), weLeads.getName(), request.getUserName());
         //TODO 链接URL等待前端给
         this.sendAppMsg(request.getWeUserId(), WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getTitle(), desc, null);
+    }
+
+    /**
+     * 处理-标签建群任务
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/07/25 15:37
+     */
+    public void handlerGroupAddByLabel(WeTasksRequest request) {
+        List<String> weUserIds = request.getWeUserIds();
+        SysUserQuery query = SysUserQuery.builder().weUserIds(weUserIds).build();
+        AjaxResult<List<SysUserVo>> result = qwSysUserClient.getUserListByWeUserIds(query);
+        if (result.getCode() != HttpStatus.SUCCESS) {
+            throw new ServiceException("获取员工数据异常：" + result.getMsg());
+        }
+        List<SysUserVo> data = result.getData();
+        WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+        String tagRedirectUrl = linkWeChatConfig.getTagRedirectUrl();
+        String url = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s", tagRedirectUrl, weCorpAccount.getCorpId(), weCorpAccount.getAgentId(), MessageNoticeType.TAG.getType()));
+        List<WeTasks> weTasksList = new ArrayList<>();
+        for (SysUserVo datum : data) {
+            String jsonString = JSONObject.toJSONString("请尽快处理");
+            WeTasks build = WeTasks.builder()
+                    .id(IdUtil.getSnowflakeNextId())
+                    .userId(datum.getUserId())
+                    .weUserId(datum.getWeUserId())
+                    .type(WeTasksTitleEnum.GROUP_ADD_BY_LABEL.getCode())
+                    .title(WeTasksTitleEnum.GROUP_ADD_BY_LABEL.getTitle())
+                    .content(jsonString)
+                    .url(url)
+                    .status(0)
+                    .delFlag(Constants.COMMON_STATE)
+                    .visible(1)
+                    .build();
+            weTasksList.add(build);
+        }
+        if (CollectionUtil.isNotEmpty(weTasksList)) {
+            this.saveBatch(weTasksList);
+        }
     }
 
     /**
