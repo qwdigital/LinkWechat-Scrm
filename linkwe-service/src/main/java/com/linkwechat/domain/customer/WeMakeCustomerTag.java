@@ -32,4 +32,5 @@ public class WeMakeCustomerTag {
     //false无需记录轨迹;true:记录轨迹
     private boolean source=true;
 
+
 }
