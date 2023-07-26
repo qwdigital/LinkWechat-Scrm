@@ -7,6 +7,7 @@ import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeAddMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentQuery;
@@ -36,6 +37,7 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.*;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.moment.*;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
@@ -616,6 +618,14 @@ public interface WeCustomerClient {
      */
     @Post("/externalcontact/customer_acquisition/delete_link")
     WeResultVo deleteCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+    /**
+     * 获取获客列表
+     * @return
+     */
+    @Post("/externalcontact/customer_acquisition/customer")
+    WeLinkWecustomerCountVo customerLinkCount(@JSONBody WeLinkCustomerCountQuery query);
 
 
 

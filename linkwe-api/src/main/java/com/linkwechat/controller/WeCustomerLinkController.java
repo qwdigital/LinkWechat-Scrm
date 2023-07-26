@@ -7,12 +7,12 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomerLink;
+import com.linkwechat.domain.WeCustomerLinkCount;
+import com.linkwechat.service.IWeCustomerLinkCountService;
 import com.linkwechat.service.IWeCustomerLinkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 /**
@@ -26,6 +26,10 @@ public class WeCustomerLinkController  extends BaseController {
 
     @Autowired
     private IWeCustomerLinkService iWeCustomerLinkService;
+
+
+    @Autowired
+    private IWeCustomerLinkCountService iWeCustomerLinkCountService;
 
 
     /**
@@ -103,6 +107,49 @@ public class WeCustomerLinkController  extends BaseController {
                 ListUtil.toList(ids)
         );
         return AjaxResult.success();
+    }
+
+
+    /**
+     *  获取链接统计折线图
+     * @param linkCount
+     * @return
+     */
+    @GetMapping("/selectLinkCountTrend")
+    public AjaxResult  selectLinkCountTrend(WeCustomerLinkCount linkCount){
+
+
+        return AjaxResult.success(
+                iWeCustomerLinkCountService.selectLinkCountTrend(linkCount.getLinkId(), linkCount.getBeginTime(), linkCount.getEndTime())
+        );
+    }
+
+
+    /**
+     * 获取链接统计tab
+     * @param linkId
+     * @return
+     */
+    @GetMapping("/selectLinkCountTab/{linkId}")
+    public AjaxResult selectLinkCountTab(@PathVariable String linkId){
+
+        return AjaxResult.success(
+                iWeCustomerLinkCountService.selectLinkCountTab(linkId)
+        );
+    }
+
+
+    /**
+     * 获取统计分页列表
+     * @return
+     */
+    @GetMapping("/selectLinkCountTable")
+    public TableDataInfo selectLinkCountTable(WeCustomerLinkCount linkCount){
+        startPage();
+        return getDataTable(
+                iWeCustomerLinkCountService.selectLinkCountTable(linkCount.getLinkId(), linkCount.getBeginTime(), linkCount.getEndTime())
+        );
+
     }
 
 
