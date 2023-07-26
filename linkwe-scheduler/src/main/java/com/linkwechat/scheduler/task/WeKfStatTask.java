@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.WeKfOriginEnum;
@@ -85,7 +86,6 @@ public class WeKfStatTask {
 
         //查询当天会话数据
         Map<String, List<WeKfUserStat>> recordData = getRecordData(weCorpAccount, dateTime);
-
         if(CollectionUtil.isNotEmpty(kfUserStat)){
             for (WeKfUserStat userStat : kfUserStat) {
                 userStat.setDateTime(dateTime);
@@ -122,8 +122,8 @@ public class WeKfStatTask {
                     List<WeKfMsg> weKfMsgList = weKfMsgService.list(new LambdaQueryWrapper<WeKfMsg>()
                             .eq(WeKfMsg::getOpenKfId, weKfPool.getOpenKfId())
                             .eq(WeKfMsg::getExternalUserid, weKfPool.getExternalUserId())
-                            .ge(WeKfMsg::getSendTime, DateUtil.offsetSecond(weKfPool.getSessionStartTime(),-2))
-                            .le(WeKfMsg::getSendTime, weKfPool.getSessionEndTime())
+                            .ge(WeKfMsg::getSendTime, DateUtil.formatDateTime(weKfPool.getEnterTime()))
+                            .le(WeKfMsg::getSendTime, DateUtil.formatDateTime(weKfPool.getSessionEndTime()))
                             .orderByAsc(WeKfMsg::getSendTime)
                     );
                     //计算回复聊天对

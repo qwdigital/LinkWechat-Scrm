@@ -168,6 +168,8 @@ public class WeKfMsgServiceImpl extends ServiceImpl<WeKfMsgMapper, WeKfMsg> impl
         Integer timeOutType = weKfInfo.getTimeOutType();
         Integer timeOut = weKfInfo.getTimeOut();
 
+
+
         WeKfMsgAnalyzeVo analyzeVo = new WeKfMsgAnalyzeVo();
 
         if (Objects.nonNull(weKfPool)) {
@@ -184,8 +186,8 @@ public class WeKfMsgServiceImpl extends ServiceImpl<WeKfMsgMapper, WeKfMsg> impl
         List<WeKfMsg> weKfMsgList = list(new LambdaQueryWrapper<WeKfMsg>()
                 .eq(WeKfMsg::getOpenKfId, query.getOpenKfId())
                 .eq(WeKfMsg::getExternalUserid, query.getExternalUserId())
-                .ge(WeKfMsg::getSendTime, DateUtil.offsetSecond(DateUtil.parse(query.getBeginTime()),-2).toString())
-                .le(StringUtils.isNotEmpty(query.getEndTime()),WeKfMsg::getSendTime, query.getEndTime())
+                .ge(WeKfMsg::getSendTime, DateUtil.formatDateTime(weKfPool.getEnterTime()))
+                .le(StringUtils.isNotEmpty(query.getEndTime()),WeKfMsg::getSendTime, DateUtil.formatDateTime(weKfPool.getSessionEndTime()))
                 .orderByAsc(WeKfMsg::getSendTime)
         );
         //计算回复聊天对
