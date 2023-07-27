@@ -3,6 +3,7 @@ package com.linkwechat.scheduler.listener;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -76,6 +77,9 @@ public class QwKfChatMsgKfTimeOutListener {
     @Value("${wecom.kf.kf-timeout.notice.content:【微信客服】\r\n 用户【{}】发送咨询消息，你已超过{}未回复。}")
     private String kfTimeoutNoticeContent;
 
+    //会话最大时长
+    private final Long MAXIMUM_DURATION = 48L;
+
     @RabbitListener(queues = "${wecom.mq.queue.kf-chat-kf-timeout-msg:Qu_KfChatKfTimeOutMsg}")
     @RabbitHandler
     public void kfChatMsgKfTimeOutSubscribe(String msg, Channel channel, Message message) throws IOException {
@@ -126,7 +130,9 @@ public class QwKfChatMsgKfTimeOutListener {
                     .eq(WeKfMsg::getExternalUserid, kfPoolInfo.getExternalUserId())
                     .gt(WeKfMsg::getSendTime,sendTime));
 
-            if (CollectionUtil.isEmpty(lastCustomerMsgList)) {
+            long difference = DateUtil.between(DateUtil.parseDateTime(sendTime), new Date(), DateUnit.HOUR);
+
+            if (CollectionUtil.isEmpty(lastCustomerMsgList) && difference < MAXIMUM_DURATION) {
                 sendKfNotice(weKfInfo, kfPoolInfo, sendTime);
                 //延长超时时间
                 extracted(query, timeOutType, timeOut, sendTime);
