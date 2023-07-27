@@ -212,7 +212,7 @@ public class WeFormSurveySiteStatsTask {
             } else {
                 weFormSurveyStatistics.setAverageTime(0);
             }
-            weFormSurveyStatistics.setCreateTime(DateUtil.parseDateTime(dateStr));
+            weFormSurveyStatistics.setCreateTime(DateUtil.parseDate(dateStr));
             weFormSurveyStatistics.setDelFlag(Constants.COMMON_STATE);
             weFormSurveyStatisticsService.saveOrUpdate(weFormSurveyStatistics,new LambdaQueryWrapper<WeFormSurveyStatistics>()
                     .eq(WeFormSurveyStatistics::getBelongId,weFormSurveyStatistics.getBelongId())
