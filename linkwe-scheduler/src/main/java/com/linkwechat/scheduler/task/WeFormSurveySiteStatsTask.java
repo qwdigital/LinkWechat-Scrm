@@ -64,9 +64,6 @@ public class WeFormSurveySiteStatsTask {
 
                 //总的站点数据统计
                 siteStas(weFormSurveyCatalogue);
-
-                //每天的站点数据统计
-                dayByDaySiteStas(weFormSurveyCatalogue);
             }
         }
     }
