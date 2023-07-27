@@ -1084,6 +1084,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+                }else{
+
+
                 }
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
