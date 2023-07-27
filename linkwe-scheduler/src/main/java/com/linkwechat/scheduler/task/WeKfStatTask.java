@@ -100,7 +100,7 @@ public class WeKfStatTask {
               }
             }
         }
-       // weKfUserStatService.saveBatch(kfUserStat,500);
+        weKfUserStatService.saveBatch(kfUserStat,500);
     }
 
     private Map<String, List<WeKfUserStat>> getRecordData(WeCorpAccount weCorpAccount, String dateTime) {
