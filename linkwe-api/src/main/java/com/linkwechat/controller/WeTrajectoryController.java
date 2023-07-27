@@ -63,7 +63,7 @@ public class WeTrajectoryController extends BaseController {
                         .eq(StringUtils.isNotEmpty(externalUserid), WeCustomerTrajectory::getExternalUseridOrChatid, externalUserid)
                         .eq(StringUtils.isNotEmpty(weUserId), WeCustomerTrajectory::getWeUserId, weUserId)
                         .eq(trajectoryType != null, WeCustomerTrajectory::getTrajectoryType, trajectoryType)
-                        .groupBy(WeCustomerTrajectory::getContent)
+//                        .groupBy(WeCustomerTrajectory::getContent)
                         .orderByDesc(WeCustomerTrajectory::getCreateTime));
 
         List<Long> collect = list.stream().map(o -> o.getMaterialId()).collect(Collectors.toList());
