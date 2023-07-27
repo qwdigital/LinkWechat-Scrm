@@ -11,7 +11,9 @@ import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.WeKfOriginEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.*;
+import com.linkwechat.domain.wecom.vo.kf.WeKfStateVo;
 import com.linkwechat.service.*;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,8 @@ public class WeKfStatTask {
     private IWeKfInfoService weKfInfoService;
 
     @XxlJob("weKfCustomerStatTask")
-    public void customerProcess(String params) {
+    public void customerProcess() {
+        String params = XxlJobHelper.getJobParam();
         log.info("客服客户统计任务>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
 
@@ -61,7 +64,8 @@ public class WeKfStatTask {
     }
 
     @XxlJob("weKfUserStatTask")
-    public void userProcess(String params) {
+    public void userProcess() {
+        String params = XxlJobHelper.getJobParam();
         log.info("客服员工统计任务>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
         if (CollectionUtil.isNotEmpty(accountList)) {
@@ -70,6 +74,7 @@ public class WeKfStatTask {
             }
         }
     }
+
 
     private void getKfCustomerStat(WeCorpAccount weCorpAccount, String params) {
         log.info("客服客户当前统计租户为 tenantId:{},params:{}", weCorpAccount.getId(),params);
@@ -164,4 +169,6 @@ public class WeKfStatTask {
         }
         return userStatMap;
     }
+
+
 }
