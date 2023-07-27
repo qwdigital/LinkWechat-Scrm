@@ -100,7 +100,7 @@ public class WeKfStatTask {
               }
             }
         }
-        weKfUserStatService.saveBatch(kfUserStat,500);
+       // weKfUserStatService.saveBatch(kfUserStat,500);
     }
 
     private Map<String, List<WeKfUserStat>> getRecordData(WeCorpAccount weCorpAccount, String dateTime) {
@@ -142,7 +142,7 @@ public class WeKfStatTask {
                                 } else {
                                     duration = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.HOUR);
                                 }
-                                if (kfTimeOut < duration) {
+                                if (kfTimeOut <= duration) {
                                     outTimeCnt++;
                                     long minute = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.SECOND);
                                     durationCnt += minute;
