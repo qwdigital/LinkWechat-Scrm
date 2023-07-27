@@ -152,6 +152,9 @@ public class WeFormSurveySiteStatsTask {
      * @date 2022/10/14 15:44
      */
     private void dayByDaySiteStas(WeFormSurveyCatalogue weFormSurveyCatalogue) {
+        String params = XxlJobHelper.getJobParam();
+        String dateStr = StringUtils.isNotBlank(params)?params:DateUtil.yesterday().toDateStr();
+
         String[] channels = weFormSurveyCatalogue.getChannelsName().split(",");
         for (String channel : channels) {
 
@@ -176,7 +179,7 @@ public class WeFormSurveySiteStatsTask {
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getAnEffective, 0);
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDataSource, channel);
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDelFlag, Constants.COMMON_STATE);
-            answerQueryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + DateUtil.yesterday().toDateStr() + "'");
+            answerQueryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + dateStr + "'");
             List<WeFormSurveyAnswer> list = weFormSurveyAnswerService.list(answerQueryWrapper);
 
             //新增每天的数据统计
@@ -209,10 +212,12 @@ public class WeFormSurveySiteStatsTask {
             } else {
                 weFormSurveyStatistics.setAverageTime(0);
             }
-            weFormSurveyStatistics.setCreateTime(DateUtil.yesterday());
-            weFormSurveyStatistics.setUpdateTime(DateUtil.yesterday());
+            weFormSurveyStatistics.setCreateTime(DateUtil.parseDateTime(dateStr));
             weFormSurveyStatistics.setDelFlag(Constants.COMMON_STATE);
-            weFormSurveyStatisticsService.save(weFormSurveyStatistics);
+            weFormSurveyStatisticsService.saveOrUpdate(weFormSurveyStatistics,new LambdaQueryWrapper<WeFormSurveyStatistics>()
+                    .eq(WeFormSurveyStatistics::getBelongId,weFormSurveyStatistics.getBelongId())
+                    .eq(WeFormSurveyStatistics::getDataSource,weFormSurveyStatistics.getDataSource())
+                    .eq(WeFormSurveyStatistics::getDelFlag,0));
         }
     }
 
