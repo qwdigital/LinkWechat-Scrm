@@ -217,6 +217,7 @@ public class WeFormSurveySiteStatsTask {
             weFormSurveyStatisticsService.saveOrUpdate(weFormSurveyStatistics,new LambdaQueryWrapper<WeFormSurveyStatistics>()
                     .eq(WeFormSurveyStatistics::getBelongId,weFormSurveyStatistics.getBelongId())
                     .eq(WeFormSurveyStatistics::getDataSource,weFormSurveyStatistics.getDataSource())
+                    .apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + dateStr + "'")
                     .eq(WeFormSurveyStatistics::getDelFlag,0));
         }
     }
