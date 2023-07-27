@@ -176,7 +176,7 @@ public class WeFormSurveySiteStatsTask {
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getAnEffective, 0);
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDataSource, channel);
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDelFlag, Constants.COMMON_STATE);
-            answerQueryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + DateUtil.formatDate(new Date()) + "'");
+            answerQueryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + DateUtil.yesterday().toDateStr() + "'");
             List<WeFormSurveyAnswer> list = weFormSurveyAnswerService.list(answerQueryWrapper);
 
             //新增每天的数据统计
@@ -209,8 +209,8 @@ public class WeFormSurveySiteStatsTask {
             } else {
                 weFormSurveyStatistics.setAverageTime(0);
             }
-            weFormSurveyStatistics.setCreateTime(DateUtil.offsetDay(new Date(), -1));
-            weFormSurveyStatistics.setUpdateTime(DateUtil.offsetDay(new Date(), -1));
+            weFormSurveyStatistics.setCreateTime(DateUtil.yesterday());
+            weFormSurveyStatistics.setUpdateTime(DateUtil.yesterday());
             weFormSurveyStatistics.setDelFlag(Constants.COMMON_STATE);
             weFormSurveyStatisticsService.save(weFormSurveyStatistics);
         }
