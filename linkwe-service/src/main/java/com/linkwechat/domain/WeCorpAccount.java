@@ -269,11 +269,11 @@ public class WeCorpAccount extends BaseEntity {
     /**
      * 获客助手剩余可用量
      */
-    private int customerLinkMargin;
+    private long customerLinkMargin;
 
 
     /**
      * 获客助手总量
      */
-    private int customerLinkTotal;
+    private long customerLinkTotal;
 }

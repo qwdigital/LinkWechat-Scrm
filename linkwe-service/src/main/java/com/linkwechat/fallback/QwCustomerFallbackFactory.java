@@ -6,6 +6,7 @@ import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
@@ -28,7 +29,9 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -220,6 +223,16 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
 
     @Override
     public AjaxResult<WeResultVo> deleteCustomerLink(WeLinkCustomerQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeLinkCustomerAcquisitionQuotaVo> customerAcquisitionQuota(WeBaseQuery weBaseQuery) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeLinkWecustomerCountVo> customerLinkCount(WeLinkCustomerCountQuery query) {
         return null;
     }
 

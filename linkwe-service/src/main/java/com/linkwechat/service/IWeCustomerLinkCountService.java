@@ -19,7 +19,7 @@ public interface IWeCustomerLinkCountService extends IService<WeCustomerLinkCoun
     /**
      * 获客助手统计
      */
-    void synchWeCustomerLinkCount();
+    void synchWeCustomerLinkCount(String linkId);
 
 
     /**

@@ -153,5 +153,20 @@ public class WeCustomerLinkController  extends BaseController {
     }
 
 
+    /**
+     * 同步统计数据
+     * @param linkId
+     * @return
+     */
+    @GetMapping("/synchCustomerCount/{linkId}")
+    public AjaxResult synchCustomerCount(@PathVariable String linkId){
+
+        iWeCustomerLinkCountService.synchWeCustomerLinkCount(linkId);
+
+        return AjaxResult.success();
+
+    }
+
+
 
 }

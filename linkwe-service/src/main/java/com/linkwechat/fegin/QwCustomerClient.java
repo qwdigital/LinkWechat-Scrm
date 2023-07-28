@@ -6,6 +6,7 @@ import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.*;
 import com.linkwechat.domain.wecom.query.customer.state.WeGroupChatStatisticQuery;
@@ -28,7 +29,9 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.domain.wecom.vo.customer.state.WeGroupChatStatisticVo;
@@ -390,7 +393,7 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/createCustomerLink")
+    @PostMapping("/customer/createCustomerLink")
     AjaxResult<WeLinkCustomerVo> createCustomerLink(@RequestBody WeLinkCustomerQuery query);
 
 
@@ -399,7 +402,7 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/updateCustomerLink")
+    @PostMapping("/customer/updateCustomerLink")
     AjaxResult<WeLinkCustomerVo> updateCustomerLink(@RequestBody WeLinkCustomerQuery query);
 
 
@@ -409,6 +412,25 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/deleteCustomerLink")
+    @PostMapping("/customer/deleteCustomerLink")
     AjaxResult<WeResultVo>  deleteCustomerLink(@RequestBody WeLinkCustomerQuery query);
+
+
+    /**
+     * 获客助手查询剩余使用量
+     * @param weBaseQuery
+     * @return
+     */
+    @PostMapping("/customer/customerAcquisitionQuota")
+    public AjaxResult<WeLinkCustomerAcquisitionQuotaVo> customerAcquisitionQuota(@RequestBody WeBaseQuery weBaseQuery);
+
+
+
+    /**
+     * 获取由获客链接添加的客户信息
+     * @param query
+     * @return
+     */
+    @PostMapping("/customer/customerLinkCount")
+    public AjaxResult<WeLinkWecustomerCountVo> customerLinkCount(@RequestBody WeLinkCustomerCountQuery query);
 }

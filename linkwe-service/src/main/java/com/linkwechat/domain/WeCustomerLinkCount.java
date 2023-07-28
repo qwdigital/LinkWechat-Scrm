@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
  */
 @TableName(value ="we_customer_link_count")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class WeCustomerLinkCount extends BaseEntity {
