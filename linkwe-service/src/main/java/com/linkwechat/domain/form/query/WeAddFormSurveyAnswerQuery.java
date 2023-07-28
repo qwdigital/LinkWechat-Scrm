@@ -2,7 +2,9 @@ package com.linkwechat.domain.form.query;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -21,7 +23,7 @@ public class WeAddFormSurveyAnswerQuery {
      * 手机号
      */
     @ApiModelProperty(value = "手机号")
-    @NotNull(message = "手机号不能为空")
+    //@NotNull(message = "手机号不能为空")
     private String mobile;
 
 
@@ -64,6 +66,7 @@ public class WeAddFormSurveyAnswerQuery {
      * 微信unionID
      */
     @ApiModelProperty(value = "微信unionID")
+    @NotEmpty(message = "用户ID不能为空")
     private String unionId;
 
 

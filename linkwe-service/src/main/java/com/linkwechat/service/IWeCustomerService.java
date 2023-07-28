@@ -300,7 +300,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      */
     List<WeCustomersVo> findWeCustomersForCommonAssembly( WeGroupMessageExecuteUsertipVo executeUserOrGroup );
 
-
-
-
+    /**
+     * 通过eid查询客户简单信息
+     * @param externalUserIds
+     */
+    List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
 }

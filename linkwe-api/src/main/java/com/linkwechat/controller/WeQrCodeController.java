@@ -112,7 +112,7 @@ public class WeQrCodeController extends BaseController {
         List<WeQrCodeDetailVo> qrCodeList = weQrCodeService.getQrDetailByQrIds(ids);
         if (CollectionUtil.isNotEmpty(qrCodeList)) {
             List< FileUtils.FileEntity> fileList = qrCodeList.stream().map(item -> {
-                List<WeQrScopeUserVo> userVoList = item.getQrUserInfos().stream().map(WeQrScopeVo::getWeQrUserList).flatMap(Collection::stream).collect(Collectors.toList());
+                List<WeQrScopeUserVo> userVoList = item.getQrUserInfos().stream().map(WeQrScopeVo::getWeQrUserList).filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.toList());
                 String fileName = userVoList.stream().map(WeQrScopeUserVo::getUserName).collect(Collectors.joining(","));
 
                 return  FileUtils.FileEntity.builder()

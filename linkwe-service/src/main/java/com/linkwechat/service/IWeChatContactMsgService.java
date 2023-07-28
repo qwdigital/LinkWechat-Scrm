@@ -2,6 +2,7 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeChatContactMsg;
+import com.linkwechat.domain.msgaudit.query.WeChatContactMsgQuery;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 
 import java.util.List;
@@ -52,5 +53,5 @@ public interface IWeChatContactMsgService extends IService<WeChatContactMsg> {
      * @param weChatContactMsg 检索条件
      * @return 会话列表
      */
-    List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsg weChatContactMsg);
+    List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsgQuery weChatContactMsg);
 } 

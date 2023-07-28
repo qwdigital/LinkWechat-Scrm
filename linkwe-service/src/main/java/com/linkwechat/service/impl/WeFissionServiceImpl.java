@@ -469,7 +469,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
                         messageQuery.setIsAll(false);
-                        messageQuery.setMsgSource(5);
+                        messageQuery.setMsgSource(2);
                         messageQuery.setIsTask(0);
                         messageQuery.setLoginUser(SecurityUtils.getLoginUser());
                         messageQuery.setContent(weFission.getContent());

@@ -16,7 +16,6 @@ public interface IWeFormSurveyStatisticsService extends IService<WeFormSurveySta
 
     void delStatistics(WeFormSurveyStatistics surveyStatistics);
 
-    void addStatistics(WeFormSurveyStatistics surveyStatistics);
 
     /**
      * 获取表单总的统计数据

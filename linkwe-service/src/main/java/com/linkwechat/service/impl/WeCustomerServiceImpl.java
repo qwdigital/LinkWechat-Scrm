@@ -498,7 +498,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //                    List<WeTag> weTags = iWeTagService.listByIds(
 //                            nowAddWeFlowerCustomerTagRel.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
 //                    );
-                if (CollectionUtil.isNotEmpty(addTag)) {
+                if (CollectionUtil.isNotEmpty(addTag) && weMakeCustomerTag.isRecord()) {
                     iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
                             weMakeCustomerTag.getUserId(),
                             weMakeCustomerTag.getIsCompanyTag() ?
@@ -1345,6 +1345,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomersQuery, null
         );
 
+    }
+
+    @Override
+    public List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds) {
+        return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
     }
 
 

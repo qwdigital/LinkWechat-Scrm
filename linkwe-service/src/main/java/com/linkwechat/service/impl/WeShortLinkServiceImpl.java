@@ -17,6 +17,7 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.domain.WeCorpAccount;
@@ -73,6 +74,20 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
 
     @Value("${weixin.short.env-version:develop}")
     private String shortEnvVersion;
+
+
+    @Override
+    public Boolean checkEnv() {
+        WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(SecurityUtils.getCorpId());
+        if(Objects.isNull(corpAccount)){
+            return false;
+        }
+        if(StringUtils.isEmpty(corpAccount.getMiniAppId())
+                || StringUtils.isEmpty(corpAccount.getMiniSecret())){
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public WeShortLinkAddVo addShortLink(WeShortLinkAddQuery query) {

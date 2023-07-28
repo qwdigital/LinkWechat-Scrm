@@ -3,6 +3,7 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.domain.msgaudit.query.WeChatContactMsgQuery;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -53,10 +54,10 @@ public interface WeChatContactMsgMapper extends BaseMapper<WeChatContactMsg> {
 
     /**
      * 全文检索 会话列表
-     * @param weChatContactMsg 检索条件
+     * @param query 检索条件
      * @return 会话列表
      */
-    List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsg weChatContactMsg);
+    List<WeChatContactMsgVo> selectFullSearchChatList(WeChatContactMsgQuery query);
 
 }
 

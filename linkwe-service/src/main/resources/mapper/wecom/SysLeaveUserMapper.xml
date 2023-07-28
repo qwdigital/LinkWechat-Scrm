@@ -39,5 +39,15 @@
     </insert>
 
 
+    <update id="leaveSysUser">
+        UPDATE sys_user SET del_flag=1
+        where we_user_id in
+        <foreach collection="weUserIds" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </update>
+
+
 
 </mapper>
