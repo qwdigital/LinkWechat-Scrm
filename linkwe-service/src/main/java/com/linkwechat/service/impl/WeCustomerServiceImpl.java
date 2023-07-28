@@ -1347,5 +1347,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     }
 
+    @Override
+    public List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds) {
+        return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
+    }
+
 
 }
