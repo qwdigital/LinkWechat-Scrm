@@ -265,4 +265,9 @@ public class WeCorpAccount extends BaseEntity {
     @ApiModelProperty("微信小程序原始ID")
     @TableField("wx_applet_original_id")
     private String wxAppletOriginalId;
+
+    /**
+     * 获客助手剩余可用量
+     */
+    private int customerLinkMargin;
 }
