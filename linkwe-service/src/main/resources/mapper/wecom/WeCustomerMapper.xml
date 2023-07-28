@@ -667,6 +667,16 @@
         </where>
     </select>
 
+    <select id="getCustomerSimpleInfo" resultType="com.linkwechat.domain.customer.vo.WeCustomerSimpleInfoVo">
+        select  external_userid,customer_name,avatar from we_customer
+        <where>
+            and external_userid in
+            <foreach collection="externalUserIds" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+        group by external_userid,customer_name,avatar;
+    </select>
 
 
 </mapper>
