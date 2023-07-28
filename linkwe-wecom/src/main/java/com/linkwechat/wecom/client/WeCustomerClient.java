@@ -36,6 +36,7 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.*;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.moment.*;
@@ -626,6 +627,14 @@ public interface WeCustomerClient {
      */
     @Post("/externalcontact/customer_acquisition/customer")
     WeLinkWecustomerCountVo customerLinkCount(@JSONBody WeLinkCustomerCountQuery query);
+
+
+    /**
+     * 企业可通过此接口查询当前剩余的使用量。
+     * @return
+     */
+    @Get("/externalcontact/customer_acquisition_quota")
+    WeLinkCustomerAcquisitionQuotaVo customerAcquisitionQuota(@JSONBody WeBaseQuery query);
 
 
 

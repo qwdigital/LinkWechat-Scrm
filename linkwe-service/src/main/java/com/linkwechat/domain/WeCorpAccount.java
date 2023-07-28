@@ -270,4 +270,10 @@ public class WeCorpAccount extends BaseEntity {
      * 获客助手剩余可用量
      */
     private int customerLinkMargin;
+
+
+    /**
+     * 获客助手总量
+     */
+    private int customerLinkTotal;
 }

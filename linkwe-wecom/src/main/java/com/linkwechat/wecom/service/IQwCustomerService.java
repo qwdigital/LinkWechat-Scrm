@@ -29,6 +29,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
@@ -377,4 +378,11 @@ public interface IQwCustomerService {
      * @return
      */
     WeLinkWecustomerCountVo customerLinkCount(WeLinkCustomerCountQuery query);
+
+
+    /**
+     * 企业可通过此接口查询当前剩余的使用量。
+     * @return
+     */
+    WeLinkCustomerAcquisitionQuotaVo customerAcquisitionQuota(WeBaseQuery query);
 }

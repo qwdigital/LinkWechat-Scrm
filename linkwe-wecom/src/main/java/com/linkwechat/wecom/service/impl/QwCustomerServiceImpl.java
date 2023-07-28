@@ -27,6 +27,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
@@ -293,6 +294,11 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeLinkWecustomerCountVo customerLinkCount(WeLinkCustomerCountQuery query) {
         return weCustomerClient.customerLinkCount(query);
+    }
+
+    @Override
+    public WeLinkCustomerAcquisitionQuotaVo customerAcquisitionQuota(WeBaseQuery query) {
+        return weCustomerClient.customerAcquisitionQuota(query);
     }
 
 

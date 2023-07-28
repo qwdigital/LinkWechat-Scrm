@@ -23,6 +23,9 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
     @Override
     public void synchWeCustomerLinkCount() {
 
+
+
+
     }
 
     @Override
