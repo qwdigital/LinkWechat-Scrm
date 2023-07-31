@@ -80,7 +80,7 @@ public class WeAllocateCustomer extends BaseEntity
 //    private String customerName;
 
     @TableField(exist = false)
-    private String department;
+    private String deptNames;
 
     @TableField(exist = false)
     private String firstUserId;

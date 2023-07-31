@@ -71,15 +71,16 @@
             wac.takeover_name as takeUserName,
             wac.allocate_time,
             wac.external_userid as externalUserid,
-            wac.takeover_dept_name as department
+            wac.takeover_dept_name as deptNames,
+            wac.takeover_dept_name as takeoverDeptName
         FROM
         we_allocate_customer wac
         <where>
             <if test="leaveUserId != null">
-                wac.leave_user_id=#{leaveUserId}
+                and  wac.leave_user_id=#{leaveUserId}
             </if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-                DATE_FORMAT(wac.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+              and  DATE_FORMAT(wac.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
         </where>
     </select>
@@ -91,6 +92,7 @@
             wag.takeover_name as newOwnerName,
             wag.chat_id,
             wag.chat_name  as group_name,
+            wag.takeover_dept_name as deptNames,
             wag.takeover_dept_name as department,
             wag.allocate_time
         FROM
@@ -100,7 +102,7 @@
                 AND wag.leave_user_id=#{leaveUserId}
             </if>
             <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
-                 DATE_FORMAT(wag.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+                AND DATE_FORMAT(wag.update_time,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
             </if>
         </where>
     </select>
