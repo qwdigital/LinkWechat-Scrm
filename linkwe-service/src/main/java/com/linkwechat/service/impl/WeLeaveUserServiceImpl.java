@@ -390,9 +390,10 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
 
 
-                  //离职员工入库(后期开放离职员工数据可拓展)
-                  List<SysUser> sysUsers =
-                               qwSysUserClient.findAllSysUser(k, null, null).getData();
+                       //离职员工入库(后期开放离职员工数据可拓展)
+                       SysUser sysUser = this.baseMapper.findSysUserByWeUserId(k);
+
+
 
                        SysLeaveUser leaveUser = SysLeaveUser.builder()
                                .id(leaveUserId)
@@ -411,15 +412,14 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                        leaveUser.setUpdateTime(new Date());
                        leaveUser.setUpdateById(SecurityUtils.getUserId());
 
-                 if(CollectionUtil.isNotEmpty(sysUsers)){
-                      SysUser sysUser = sysUsers.stream().findFirst().get();
+                 if(null != sysUser){
                      sysUser.setIsUserLeave(1);
 
                      leaveUser.setUserName(sysUser.getUserName());
                      leaveUser.setDeptNames(sysUser.getDeptName());
                      leaveUser.setWeUserId(sysUser.getWeUserId());
 
-                       }else{
+                }else{
                         leaveUser.setUserName("@企微成员");
                          List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.list();
 
