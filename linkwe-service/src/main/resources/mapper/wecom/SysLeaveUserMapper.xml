@@ -49,7 +49,14 @@
     </update>
 
     <select id="findSysUserByWeUserId" resultType="com.linkwechat.common.core.domain.entity.SysUser">
-        SELECT * from sys_user where we_user_id=#{weUserId}
+        SELECT
+            su.*,
+            sd.dept_name
+        FROM
+            sys_user su
+                LEFT JOIN sys_dept sd on su.dept_id=sd.dept_id
+        WHERE
+            we_user_id = #{weUserId}
     </select>
 
 
