@@ -3,6 +3,7 @@ package com.linkwechat.domain.community.vo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.community.WeEmpleCodeTag;
 import com.linkwechat.domain.community.WeEmpleCodeUseScop;
@@ -12,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class WeCommunityNewGroupVo {
+public class WeCommunityNewGroupVo extends BaseEntity {
 
     private Long id;
 
