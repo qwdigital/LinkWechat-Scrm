@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfScenesMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <resultMap type="com.linkwechat.domain.WeKfScenes" id="WeKfScenesResult">
+        <result property="id" column="id"/>
+        <result property="corpId" column="corp_id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="kfId" column="kf_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <select id="getScenesList" resultType="com.linkwechat.domain.kf.vo.WeKfScenesListVo">
+        select
+        wks.id,
+        wks.name,
+        wks.type,
+        wks.kf_id,
+        wks.open_kf_id,
+        wks.scenes,
+        wks.url,
+        wks.qr_code,
+        wks.create_time,
+        wks.create_by,
+        wks.create_by_id,
+        wks.update_by,
+        wks.update_by_id,
+        wks.update_time,
+        wki.name as kf_name,
+        wki.avatar as kf_avatar,
+        aa.access_cnt,
+        aa.consult_cnt,
+        aa.reception_cnt
+        from we_kf_scenes wks
+        left join we_kf_info wki on wks.open_kf_id = wki.open_kf_id and wki.del_flag = 0
+        left join (
+        select
+        count(distinct case when wkem.event_type = 'enter_session' then concat(wkem.open_kf_id,wkem.external_userid) end) as access_cnt,
+        count(distinct case when wkm.origin = 3 then concat(wkm.open_kf_id,wkm.external_userid) end) as consult_cnt,
+        count(distinct case when wkm.servicer_userid is not null  then concat(wkm.open_kf_id,wkm.external_userid) end) as reception_cnt,
+        wkem.scene
+        from we_kf_event_msg wkem
+        left join we_kf_msg wkm on wkem.open_kf_id = wkm.open_kf_id and wkem.external_userid = wkm.external_userid
+        group by  wkem.scene
+        ) as aa on aa.scene = wks.scenes
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                and wks.id in
+                <foreach item="id" collection="ids" index="index" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="name != null and name != ''">
+                and wks.name like concat('%',#{name},'%')
+            </if>
+            <if test="type != null and type != ''">
+                and wks.type = #{type}
+            </if>
+            <if test="openKfId != null and openKfId != ''">
+                and wks.open_kf_id = #{openKfId}
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wks.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wks.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            and wks.del_flag = 0
+        </where>
+
+    </select>
+
+</mapper>

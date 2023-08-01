@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfMsgMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <select id="getRecordDetail" resultType="com.linkwechat.domain.kf.vo.WeKfRecordVo">
+        select
+        wkm.msg_id,
+        wkm.open_kf_id,
+        wkm.external_userid,
+        wkm.send_time,
+        wkm.origin,
+        wkm.msg_type,
+        wkm.content,
+        wkc.nick_name as customer_name,
+        wkc.avatar as customer_avatar,
+        wki.name as kf_name,
+        wki.avatar as kf_avatar
+        from we_kf_msg wkm
+        left join we_kf_customer wkc on wkm.external_userid = wkc.external_userid
+        left join we_kf_info wki on wkm.open_kf_id = wki.open_kf_id
+        <where>
+            <if test="openKfId != null and openKfId != ''">
+                and wkm.open_kf_id = #{openKfId}
+            </if>
+            <if test="externalUserId != null and externalUserId != ''">
+                and wkm.external_userid = #{externalUserId}
+            </if>
+        </where>
+        order by wkm.send_time asc
+    </select>
+
+</mapper>
