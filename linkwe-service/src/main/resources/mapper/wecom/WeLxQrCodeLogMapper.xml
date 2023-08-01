@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLxQrCodeLogMapper">
+
+
+
+    <resultMap type="com.linkwechat.domain.WeLxQrCodeLog" id="WeLxQrCodeLogResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="qrId" column="qr_id" jdbcType="INTEGER"/>
+                <result property="type" column="type" jdbcType="INTEGER"/>
+                <result property="orderId" column="order_id" jdbcType="VARCHAR"/>
+                <result property="amount" column="amount" jdbcType="INTEGER"/>
+                <result property="unionId" column="union_id" jdbcType="VARCHAR"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeLxQrCodeLogVo">
+        select id, qr_id, type, order_id, amount, union_id, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_lx_qr_code_log
+    </sql>
+
+    <select id="receiveListStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveListVo">
+        select sdd.date as date_time, ifnull(t.today_amount, 0) as today_amount, ifnull(t.today_num, 0) as today_num
+        from sys_dim_date sdd left join
+        (select
+            date_format(create_time, '%Y-%m-%d') as date_time,
+            count(1) as today_num,
+            sum(amount) as today_amount
+        from we_lx_qr_code_log
+        <where>
+            <if test="qrId != null">
+                qr_id = #{qrId}
+            </if>
+            and del_flag = 0
+        </where>
+        group by date_time
+        ) t on sdd.date = t.date_time
+        <where>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND sdd.date &gt;= date_format(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null"><!-- 结束时间检索 -->
+                AND sdd.date &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        order by date_time desc
+    </select>
+
+    <select id="receiveTotalStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeReceiveVo">
+        select
+        count(1) as total_num,
+        sum(amount) as total_amount
+        from we_lx_qr_code_log
+        <where>
+            <if test="qrId != null">
+                qr_id = #{qrId}
+            </if>
+            <if test="beginTime != null"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%Y-%m-%d') &lt;= date_format(#{endTime},'%Y-%m-%d')
+            </if>
+            and del_flag = 0
+        </where>
+    </select>
+
+</mapper>

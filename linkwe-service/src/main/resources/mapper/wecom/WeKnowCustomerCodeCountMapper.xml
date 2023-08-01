@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKnowCustomerCodeCountMapper">
+
+
+    <select id="findWeKnowCustomerCountDetailTab" resultType="com.linkwechat.domain.know.vo.WeKnowCustomerCountTabVo">
+        SELECT a.tdNewCustomerScanNumber,a.ydNewCustomerScanNumber,a.tdOldCustomerScanNumber,a.ydOldCustomerScanNumber,
+               sum(a.tdAddCustomerNumber) as tdAddCustomerNumber,SUM(a.ydAddCustomerNumber) as ydAddCustomerNumber,
+               sum(a.tdLostCustomerNumber) as tdLostCustomerNumber,SUM(a.ydLostCustomerNumber) as ydLostCustomerNumber
+        FROM
+            (
+                SELECT
+
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(now()) and wcc.new_or_old=0,unionid,null)) as tdNewCustomerScanNumber,
+
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wcc.new_or_old=0,unionid,null)) as ydNewCustomerScanNumber,
+
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(now()) and wcc.new_or_old=1,unionid,null)) as tdOldCustomerScanNumber,
+
+                    count(DISTINCT if(to_days(wcc.create_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wcc.new_or_old=1,unionid,null)) as ydOldCustomerScanNumber,
+
+
+                    IFNULL((SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid AND
+                        to_days(wc.add_time) = to_days(now())
+                           ),0)  as tdAddCustomerNumber,
+
+                    IFNULL((SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid  AND
+                            to_days(wc.add_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY))
+                           ),0) as ydAddCustomerNumber,
+
+                    IFNULL((SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid and wc.track_state =5 AND
+                        to_days(wc.update_time) = to_days(now()) and wc.state=#{state}
+                           ),0)  as tdLostCustomerNumber,
+
+                    IFNULL((SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid and wc.track_state =5 AND
+                            to_days(wc.update_time) = to_days(DATE_SUB(curdate(),INTERVAL -1 DAY)) and wc.state=#{state}
+                           ),0) as ydLostCustomerNumber
+                FROM
+                    we_know_customer_code_count wcc where wcc.know_customer_id=#{knowCustomerId}
+                GROUP BY date_format( wcc.create_time, '%Y-%m-%d' )
+            ) a
+    </select>
+
+
+    <select id="findWeKnowCustomerCountTrend" resultType="com.linkwechat.domain.know.vo.WeKnowCustomerCountTrendOrTableVo">
+        SELECT sdd.date,
+               IFNULL(a.newCustomerScanNumber,0) as newCustomerScanNumber,
+               IFNULL(a.addCustomerNumber,0) as addCustomerNumber,
+               IFNULL(a.oldCustomerScanNumber,0) as oldCustomerScanNumber,
+               IFNULL(a.lostCustomerNumber,0) as lostCustomerNumber
+        FROM sys_dim_date sdd
+                 LEFT JOIN
+             (
+                 SELECT
+                     count(DISTINCT if(wcc.new_or_old=0,unionid,null)) as newCustomerScanNumber,
+                     (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid
+                     )  as addCustomerNumber,
+
+                     count(DISTINCT if(wcc.new_or_old=1,unionid,null)) as oldCustomerScanNumber,
+
+                     (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid  AND
+                         to_days(wc.update_time) = to_days(now()) and wc.track_state =5 and wc.state=#{state}
+                     )  as lostCustomerNumber,
+                     date_format( wcc.create_time, '%Y-%m-%d' )  as  create_time
+                 FROM
+                     we_know_customer_code_count wcc where wcc.know_customer_id=#{knowCustomerId}
+                 GROUP BY  date_format( wcc.create_time, '%Y-%m-%d' )
+             )a  on a.create_time=sdd.date
+        WHERE   date_format(sdd.date,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+        ORDER BY sdd.date ASC
+
+    </select>
+
+
+    <select id="findWeKnowCustomerCounTtable" resultType="com.linkwechat.domain.know.vo.WeKnowCustomerCountTrendOrTableVo">
+        SELECT
+            wcc.create_time as date,
+            count(DISTINCT if(wcc.new_or_old=0,unionid,null)) as newCustomerScanNumber,
+            (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid and wc.track_state !=5 and wc.del_flag=0
+                and wc.state=#{state}  )  as addCustomerNumber,
+
+            count(DISTINCT if(wcc.new_or_old=1,unionid,null)) as oldCustomerScanNumber,
+
+            (SELECT count(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.unionid=wcc.unionid and wc.track_state =5 AND
+            to_days(wc.update_time) = to_days(now()) and wc.state=#{state}
+            )  as lostCustomerNumber
+        FROM
+            we_know_customer_code_count wcc where wcc.know_customer_id=#{knowCustomerId}
+        GROUP BY date_format(wcc.create_time,'%Y-%m-%d')
+        ORDER BY wcc.create_time desc
+    </select>
+
+
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKnowCustomerCodeMapper">
+
+
+    <select id="findWeKnowCustomerCodes" resultType="com.linkwechat.domain.know.WeKnowCustomerCode">
+        SELECT
+            wkcc.*,
+            wkcc.create_time as createAddTime,
+            wkcc.create_by as createName,
+            (SELECT count(DISTINCT wkccc.unionid) FROM we_know_customer_code_count wkccc WHERE wkccc.know_customer_id=wkcc.id and to_days(wkccc.create_time) = to_days(now())) as tdScanCodeNumber,
+            (SELECT count(DISTINCT wkccc.unionid) FROM we_know_customer_code_count wkccc WHERE wkccc.know_customer_id=wkcc.id) as totalScanCodeNumber
+        FROM
+            we_know_customer_code wkcc
+        where
+           wkcc.del_flag=0
+            <if test="knowCustomerName !=null and knowCustomerName!=''">
+               and wkcc.know_customer_name like concat( '%' , #{knowCustomerName}, '%')
+            </if>
+        order by update_time desc
+    </select>
+
+
+</mapper>

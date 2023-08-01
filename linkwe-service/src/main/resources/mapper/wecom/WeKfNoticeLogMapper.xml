@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfNoticeLogMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeKfNoticeLog" id="WeKfNoticeLogResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+                <result property="externalUserId" column="external_user_id" jdbcType="VARCHAR"/>
+                <result property="openKfId" column="open_kf_id" jdbcType="VARCHAR"/>
+                <result property="corpId" column="corp_id" jdbcType="VARCHAR"/>
+                <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+                <result property="sendStatus" column="send_status" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeKfNoticeLogVo">
+        select id, user_id, external_user_id, open_kf_id, corp_id, send_time, send_status, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_kf_notice_log
+    </sql>
+
+</mapper>

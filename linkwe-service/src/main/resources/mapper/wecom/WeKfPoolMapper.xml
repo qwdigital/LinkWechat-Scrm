@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfPoolMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <select id="getRecordList" resultType="com.linkwechat.domain.kf.vo.WeKfRecordListVo">
+        select
+        wkc.nick_name as customer_name,
+        wkc.avatar as customer_avatar,
+        wkc.external_userid,
+        record.id as pool_id,
+        record.status,
+        record.scene,
+        record.session_start_time,
+        record.session_end_time,
+        wks.name as scene_name,
+        record.user_id,
+        TIMESTAMPDIFF(SECOND ,record.session_start_time,record.session_end_time) as  duration,
+        wki.name as kf_name,
+        wki.avatar as kf_avatar,
+        ifnull(wki.reception_type,1) as reception_type,
+        wki.open_kf_id
+        from we_kf_customer wkc
+        left join we_kf_pool record on wkc.external_userid = record.external_userid
+        left join we_kf_info wki on record.open_kf_id = wki.open_kf_id
+        left join we_kf_scenes wks on wks.scenes = record.scene
+        <where>
+            <if test="openKfId != null and openKfId != ''">
+                and record.open_kf_id = #{openKfId}
+            </if>
+            <if test="scene != null and scene != ''">
+                and record.scene = #{scene}
+            </if>
+            <choose>
+                <when test="isQyCustomer != null and isQyCustomer == 0">
+                  and  exists(select 1 from we_customer wc where wc.external_userid = wkc.external_userid and wc.del_flag = 0)
+                </when>
+                <when test="isQyCustomer != null and isQyCustomer == 1">
+                    and not exists(select 1 from we_customer wc where wc.external_userid = wkc.external_userid and wc.del_flag = 0)
+                </when>
+            </choose>
+            <if test="userId != null and userId != ''">
+                and record.user_id = #{userId}
+            </if>
+        </where>
+        order by record.session_start_time desc
+    </select>
+
+    <select id="getKfCustomerStat" resultType="com.linkwechat.domain.WeKfCustomerStat">
+        select
+            date_format(create_time,'%Y-%m-%d') data_time,
+            count(1) as session_cnt,
+            sum(case when evaluation_type is not null then 1 else 0 end ) as evaluate_cnt,
+            sum(case when evaluation_type = '101' then 1 else 0 end ) as good_cnt,
+            sum(case when evaluation_type = '102' then 1 else 0 end ) as common_cnt,
+            sum(case when evaluation_type = '103' then 1 else 0 end ) as bad_cnt
+        from we_kf_pool
+        <where>
+            and date_format(create_time,'%Y-%m-%d') = #{dateTime}
+            and session_start_time is not null and user_id is not null
+        </where>
+    </select>
+
+    <select id="getKfUserStat" resultType="com.linkwechat.domain.WeKfUserStat">
+        select
+            user_id,
+            open_kf_id,
+            count(1) as session_cnt,
+            sum(case when evaluation_type is not null then 1 else 0 end ) as evaluate_cnt,
+            sum(case when evaluation_type = '101' then 1 else 0 end ) as good_cnt,
+            sum(case when evaluation_type = '102' then 1 else 0 end ) as common_cnt,
+            sum(case when evaluation_type = '103' then 1 else 0 end ) as bad_cnt
+        from we_kf_pool
+        where date_format(create_time,'%Y-%m-%d') = #{dateTime}
+        and session_start_time is not null and user_id is not null
+        group by user_id,open_kf_id
+    </select>
+
+</mapper>
