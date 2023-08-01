@@ -1,8 +1,7 @@
 package com.linkwechat.service;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.linkwechat.domain.leads.leads.entity.WeLeads;
-import com.linkwechat.domain.leads.leads.vo.WeLeadsVO;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaSaveRequest;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaUpdateRequest;
@@ -102,5 +101,17 @@ public interface IWeLeadsSeaService extends IService<WeLeadsSea> {
      * @date 2023/07/17 16:29
      */
     List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId);
+
+    /**
+     * 数据明细
+     *
+     * @param seaId     公海Id
+     * @param weUserId  跟进人Id
+     * @param dateTimes 日期集合
+     * @return {@link List<WeLeadsSeaDataDetailVO>}
+     * @author WangYX
+     * @date 2023/07/17 16:29
+     */
+    public List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String weUserId, List<DateTime> dateTimes);
 
 }

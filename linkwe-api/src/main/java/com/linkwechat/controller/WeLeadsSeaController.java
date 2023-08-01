@@ -2,6 +2,9 @@ package com.linkwechat.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.support.ExcelTypeEnum;
@@ -10,6 +13,7 @@ import com.alibaba.excel.write.metadata.WriteSheet;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.pagehelper.PageHelper;
 import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
@@ -18,6 +22,9 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysDept;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.page.PageDomain;
+import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
@@ -358,8 +365,29 @@ public class WeLeadsSeaController extends BaseController {
      * @date 2023/07/17 15:54
      */
     @GetMapping("/seaDataDetail")
-    public AjaxResult<List<WeLeadsSeaDataDetailVO>> getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId) {
-        return AjaxResult.success(weLeadsSeaService.getSeaDataDetail(seaId, beginTime, endTime, weUserId));
+    public TableDataInfo getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId) {
+
+        List<DateTime> dateTimes = DateUtil.rangeToList(DateUtil.parseDate(beginTime), DateUtil.parseDate(endTime), DateField.DAY_OF_YEAR);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
+        Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();
+
+        int fromIndex = (pageNum - 1) * pageSize;
+        if (fromIndex > dateTimes.size()) {
+            TableDataInfo dataTable = getDataTable(new ArrayList<>());
+            dataTable.setTotal(dateTimes.size());
+            return dataTable;
+        }
+
+        int toIndex = fromIndex + pageSize;
+        if (toIndex > dateTimes.size()) {
+            toIndex = dateTimes.size();
+        }
+        List<DateTime> dateTimes1 = dateTimes.subList(fromIndex, toIndex);
+        List<WeLeadsSeaDataDetailVO> seaDataDetail = weLeadsSeaService.getSeaDataDetail(seaId, weUserId, dateTimes1);
+        TableDataInfo dataTable = getDataTable(seaDataDetail);
+        dataTable.setTotal(dateTimes.size());
+        return dataTable;
     }
 
 

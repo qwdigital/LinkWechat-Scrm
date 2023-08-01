@@ -386,6 +386,19 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
     }
 
     @Override
+    public List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String weUserId, List<DateTime> dateTimes) {
+        if (seaId == null) {
+            throw new ServiceException("公海池Id不能为null", HttpStatus.BAD_REQUEST);
+        }
+        ArrayList<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
+        for (DateTime vo : dateTimes) {
+            list.add(getWeLeadsSeaDataDetailVO(seaId, weUserId, vo));
+        }
+        return list;
+    }
+
+
+    @Override
     public List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId) {
         if (seaId == null) {
             throw new ServiceException("公海池Id不能为null", HttpStatus.BAD_REQUEST);
@@ -393,44 +406,58 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
         ArrayList<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
         List<DateTime> dateTimes = DateUtil.rangeToList(DateUtil.parseDate(beginTime), DateUtil.parseDate(endTime), DateField.DAY_OF_YEAR);
         for (DateTime vo : dateTimes) {
-            WeLeadsSeaDataDetailVO dataDetailVO = new WeLeadsSeaDataDetailVO();
-            dataDetailVO.setDateTime(vo.toDateStr());
-            // 1、总线索量
-            QueryWrapper<WeLeads> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("sea_id", seaId)
-                    .eq("del_flag", Constants.COMMON_STATE)
-                    .eq("DATE_FORMAT(create_time, '%Y-%m-%d')", vo.toDateStr())
-                    .eq(StrUtil.isNotBlank(weUserId), "we_user_id", weUserId);
-            int totalNum = weLeadsMapper.selectCount(queryWrapper);
-            dataDetailVO.setTotalNum(totalNum);
-
-            // 2、总跟进量
-            QueryWrapper<WeLeads> allFollowQuery = new QueryWrapper<>();
-            allFollowQuery.eq("sea_id", seaId)
-                    .eq("leads_status", LeadsStatusEnum.BE_FOLLOWING_UP.getCode())
-                    .eq("del_flag", Constants.COMMON_STATE)
-                    .eq("DATE_FORMAT(create_time, '%Y-%m-%d')", vo.toDateStr())
-                    .eq(StrUtil.isNotBlank(weUserId), "we_user_id", weUserId);
-            int allFollowNum = weLeadsMapper.selectCount(allFollowQuery);
-            dataDetailVO.setAllFollowNum(allFollowNum);
-
-            // 3、今日领取量
-            List<WeLeadsFollowRecord> list1 = weLeadsFollowRecordMapper.list(seaId, vo.toDateStr(), weUserId, 2);
-            dataDetailVO.setTodayReceiveNum(list1.size());
-
-            // 4、今日有效跟进
-            List<WeLeadsFollowRecord> list2 = weLeadsFollowRecordMapper.list(seaId, vo.toDateStr(), weUserId, 3);
-            dataDetailVO.setTodayFollowNum(list2.size());
-
-            //5、今日跟进率: 今日已产生跟进行为的客户数/当前公海池内处于跟进中状态的线索客户数
-            double todayFollowRatio = 0;
-            if (0 != allFollowNum) {
-                todayFollowRatio = NumberUtil.div(list2.size(), allFollowNum);
-            }
-            dataDetailVO.setTodayFollowRatio(todayFollowRatio);
-            list.add(dataDetailVO);
+            list.add(getWeLeadsSeaDataDetailVO(seaId, weUserId, vo));
         }
         return list;
+    }
+
+    /**
+     * 获取公海数据详情
+     *
+     * @param seaId    公海Id
+     * @param weUserId 企微用户Id
+     * @param vo       日期
+     * @return {@link WeLeadsSeaDataDetailVO} 返回值
+     * @author WangYX
+     * @date 2023/08/01 18:37
+     */
+    private WeLeadsSeaDataDetailVO getWeLeadsSeaDataDetailVO(Long seaId, String weUserId, DateTime vo) {
+        WeLeadsSeaDataDetailVO dataDetailVO = new WeLeadsSeaDataDetailVO();
+        dataDetailVO.setDateTime(vo.toDateStr());
+        // 1、总线索量
+        QueryWrapper<WeLeads> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("sea_id", seaId)
+                .eq("del_flag", Constants.COMMON_STATE)
+                .eq("DATE_FORMAT(create_time, '%Y-%m-%d')", vo.toDateStr())
+                .eq(StrUtil.isNotBlank(weUserId), "we_user_id", weUserId);
+        int totalNum = weLeadsMapper.selectCount(queryWrapper);
+        dataDetailVO.setTotalNum(totalNum);
+
+        // 2、总跟进量
+        QueryWrapper<WeLeads> allFollowQuery = new QueryWrapper<>();
+        allFollowQuery.eq("sea_id", seaId)
+                .eq("leads_status", LeadsStatusEnum.BE_FOLLOWING_UP.getCode())
+                .eq("del_flag", Constants.COMMON_STATE)
+                .eq("DATE_FORMAT(create_time, '%Y-%m-%d')", vo.toDateStr())
+                .eq(StrUtil.isNotBlank(weUserId), "we_user_id", weUserId);
+        int allFollowNum = weLeadsMapper.selectCount(allFollowQuery);
+        dataDetailVO.setAllFollowNum(allFollowNum);
+
+        // 3、今日领取量
+        List<WeLeadsFollowRecord> list1 = weLeadsFollowRecordMapper.list(seaId, vo.toDateStr(), weUserId, 2);
+        dataDetailVO.setTodayReceiveNum(list1.size());
+
+        // 4、今日有效跟进
+        List<WeLeadsFollowRecord> list2 = weLeadsFollowRecordMapper.list(seaId, vo.toDateStr(), weUserId, 3);
+        dataDetailVO.setTodayFollowNum(list2.size());
+
+        //5、今日跟进率: 今日已产生跟进行为的客户数/当前公海池内处于跟进中状态的线索客户数
+        double todayFollowRatio = 0;
+        if (0 != allFollowNum) {
+            todayFollowRatio = NumberUtil.div(list2.size(), allFollowNum);
+        }
+        dataDetailVO.setTodayFollowRatio(todayFollowRatio);
+        return dataDetailVO;
     }
 
 }
