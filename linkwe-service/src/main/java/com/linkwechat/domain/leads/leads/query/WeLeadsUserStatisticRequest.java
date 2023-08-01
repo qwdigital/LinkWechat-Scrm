@@ -2,8 +2,6 @@ package com.linkwechat.domain.leads.leads.query;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-
 /**
  * 员工统计top5请求参数
  *
@@ -15,14 +13,14 @@ import javax.validation.constraints.NotBlank;
 public class WeLeadsUserStatisticRequest {
 
     /**
-     * 部门Id
+     * 部门Id集合，逗号分隔
      */
-    private Long deptId;
+    private String deptIds;
 
     /**
-     * 员工Id
+     * 员工Id集合,逗号分隔
      */
-    private Long userId;
+    private String userIds;
 
 
 }

@@ -232,14 +232,7 @@ public class WeLeadsStatisticController extends BaseController {
         pageNum = pageNum == null ? 0 : pageNum;
         pageSize = pageSize == null ? 10 : pageSize;
 
-        SysUser sysUser = new SysUser();
-        if (request.getDeptId() != null) {
-            sysUser.setDeptId(request.getDeptId());
-        }
-        if (request.getUserId() != null) {
-            sysUser.setUserId(request.getUserId());
-        }
-        AjaxResult<List<SysUser>> result = qwSysUserClient.list(sysUser);
+        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(request.getUserIds(), null, request.getDeptIds());
 
         if (result.getCode() == HttpStatus.SUCCESS) {
             List<SysUser> data = result.getData();
@@ -262,14 +255,7 @@ public class WeLeadsStatisticController extends BaseController {
     @ApiOperation("员工统计导出")
     @GetMapping("/user/export")
     public void userStatisticExport(WeLeadsUserStatisticRequest request) {
-        SysUser sysUser = new SysUser();
-        if (request.getDeptId() != null) {
-            sysUser.setDeptId(request.getDeptId());
-        }
-        if (request.getUserId() != null) {
-            sysUser.setUserId(request.getUserId());
-        }
-        AjaxResult<List<SysUser>> result = qwSysUserClient.list(sysUser);
+        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(request.getUserIds(), null, request.getDeptIds());
         List<WeLeadsUserStatisticVO> vos = new ArrayList<>();
         if (result.getCode() == HttpStatus.SUCCESS) {
             List<SysUser> data = result.getData();
@@ -297,6 +283,7 @@ public class WeLeadsStatisticController extends BaseController {
      * @date 2023/07/20 11:00
      */
     public List<WeLeadsUserStatisticVO> userStatistic(List<SysUser> sub) {
+
         List<Long> userIds = sub.stream().map(SysUser::getUserId).collect(Collectors.toList());
         List<WeLeadsFollowerVO> vos = weLeadsFollowerService.userStatistic(userIds);
 
