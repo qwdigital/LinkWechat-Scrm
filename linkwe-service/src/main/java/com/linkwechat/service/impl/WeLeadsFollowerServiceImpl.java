@@ -89,6 +89,7 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
         list.forEach(i -> {
             WeLeadsFollowerVO build = WeLeadsFollowerVO.builder()
                     .id(i.getId())
+                    .followerId(i.getFollowerId())
                     .followUserName(i.getFollowerName())
                     .followUserDeptName(i.getDeptName())
                     .followerStatus(i.getFollowerStatus())
