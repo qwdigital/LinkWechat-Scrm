@@ -227,9 +227,9 @@
             <when test="isExpiringSoon">
                 AND   timestampdiff(MINUTE,NOW(),wseta.push_end_time) BETWEEN 0 AND 10
             </when>
-            <otherwise>
-                AND to_days( wseta.push_start_time ) = to_days(now())
-            </otherwise>
+<!--            <otherwise>-->
+<!--                AND to_days( wseta.push_start_time ) = to_days(now())-->
+<!--            </otherwise>-->
         </choose>
 
     </select>
@@ -250,9 +250,9 @@
             <when test="isExpiringSoon">
                 AND   timestampdiff(MINUTE,NOW(),wseta.push_end_time) BETWEEN 0 AND 10
             </when>
-            <otherwise>
-                AND to_days( wseta.push_start_time ) = to_days(now())
-            </otherwise>
+<!--            <otherwise>-->
+<!--                AND to_days( wseta.push_start_time ) = to_days(now())-->
+<!--            </otherwise>-->
         </choose>
     </select>
 

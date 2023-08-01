@@ -16,8 +16,8 @@
     <sql id="selectSql">
         SELECT id,
                empl_code_name as codeName,
-               empl_code_id,
-               group_code_id,
+               empl_code_id as emplCodeId,
+               group_code_id as groupCodeId,
                create_by,
                create_time,
                update_by,

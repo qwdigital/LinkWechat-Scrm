@@ -42,10 +42,12 @@ import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
+import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.UnionidToExternalUserIdVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
@@ -503,7 +505,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //                    );
 
 
-                if (CollectionUtil.isNotEmpty(addTag) && weMakeCustomerTag.isRecord()) {
+                if (CollectionUtil.isNotEmpty(addTag) && !weMakeCustomerTag.isRecord()) {
                     iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
                             weMakeCustomerTag.getUserId(),
                             weMakeCustomerTag.getIsCompanyTag() ?
@@ -511,6 +513,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                     TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
                             String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
                     );
+                }else{
+
+                    iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
+                            weMakeCustomerTag.getUserId(),
+                            weMakeCustomerTag.getIsCompanyTag() ?
+                                    TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getType() :
+                                    TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getType(),
+                            String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                    );
+
                 }
 //                }
 
@@ -808,24 +820,45 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         weCustomer.setOtherDescr(weCustomerPortrait.getOtherDescr());
 
 
-        if (this.update(weCustomer, new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getAddUserId, weCustomerPortrait.getUserId())
-                .eq(WeCustomer::getExternalUserid, weCustomerPortrait.getExternalUserid()))) {
+        //相关备注信息同步企业微信
+        UpdateCustomerRemarkQuery remarkQuery=new UpdateCustomerRemarkQuery();
+        remarkQuery.setUserid(weCustomerPortrait.getUserId());
+        remarkQuery.setExternal_userid(weCustomerPortrait.getExternalUserid());
+        remarkQuery.setDescription(weCustomerPortrait.getOtherDescr());
+        remarkQuery.setRemark_company(weCustomerPortrait.getRemarkCorpName());
+        remarkQuery.setRemark_mobiles(ListUtil.toList(
+                weCustomerPortrait.getRemarkMobiles()
+        ));
+        remarkQuery.setRemark(
+                weCustomerPortrait.getCustomerFullName()
+        );
+        AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.updateCustomerRemark(remarkQuery);
+        if(null != weResultVoAjaxResult){
+            WeResultVo weResultVo = weResultVoAjaxResult.getData();
+            if(weResultVo != null && weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                if (this.update(weCustomer, new LambdaQueryWrapper<WeCustomer>()
+                        .eq(WeCustomer::getAddUserId, weCustomerPortrait.getUserId())
+                        .eq(WeCustomer::getExternalUserid, weCustomerPortrait.getExternalUserid()))) {
+                    //更新拓展字段
+                    List<WeCustomerInfoExpand> weCustomerInfoExpands
+                            = weCustomerPortrait.getWeCustomerInfoExpands();
+                    if (CollectionUtil.isNotEmpty(weCustomerInfoExpands)) {
+                        iWeCustomerInfoExpandService.saveOrUpdateBatch(
+                                weCustomerInfoExpands
+                        );
+                    }
 
-            //更新拓展字段
-            List<WeCustomerInfoExpand> weCustomerInfoExpands
-                    = weCustomerPortrait.getWeCustomerInfoExpands();
-            if (CollectionUtil.isNotEmpty(weCustomerInfoExpands)) {
-                iWeCustomerInfoExpandService.saveOrUpdateBatch(
-                        weCustomerInfoExpands
-                );
+                    iWeCustomerTrajectoryService.createEditTrajectory(
+                            weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
+                    );
+                }
             }
-
-
-            iWeCustomerTrajectoryService.createEditTrajectory(
-                    weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
-            );
+        }else{
+            throw new WeComException("数据同步企微端失败,请稍后重试");
         }
+
+
+
 
     }
 
@@ -1088,13 +1121,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+                }else{
+
+                    iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                            .eq(WeFlowerCustomerTagRel::getExternalUserid,externalUserId)
+                            .eq(WeFlowerCustomerTagRel::getUserId,userId));
                 }
+
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
             //生成轨迹
             iWeCustomerTrajectoryService.createEditTrajectory(
                     weCustomer.getExternalUserid(), weCustomer.getAddUserId(), TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getType(), null
             );
+
         }
 
         return weCustomer;

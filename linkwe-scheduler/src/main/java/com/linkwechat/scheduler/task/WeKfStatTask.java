@@ -5,12 +5,15 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.enums.WeKfOriginEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.*;
+import com.linkwechat.domain.wecom.vo.kf.WeKfStateVo;
 import com.linkwechat.service.*;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +51,8 @@ public class WeKfStatTask {
     private IWeKfInfoService weKfInfoService;
 
     @XxlJob("weKfCustomerStatTask")
-    public void customerProcess(String params) {
+    public void customerProcess() {
+        String params = XxlJobHelper.getJobParam();
         log.info("客服客户统计任务>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
 
@@ -60,7 +64,8 @@ public class WeKfStatTask {
     }
 
     @XxlJob("weKfUserStatTask")
-    public void userProcess(String params) {
+    public void userProcess() {
+        String params = XxlJobHelper.getJobParam();
         log.info("客服员工统计任务>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
         List<WeCorpAccount> accountList = weCorpAccountService.getAllCorpAccountInfo();
         if (CollectionUtil.isNotEmpty(accountList)) {
@@ -69,6 +74,7 @@ public class WeKfStatTask {
             }
         }
     }
+
 
     private void getKfCustomerStat(WeCorpAccount weCorpAccount, String params) {
         log.info("客服客户当前统计租户为 tenantId:{},params:{}", weCorpAccount.getId(),params);
@@ -85,7 +91,6 @@ public class WeKfStatTask {
 
         //查询当天会话数据
         Map<String, List<WeKfUserStat>> recordData = getRecordData(weCorpAccount, dateTime);
-
         if(CollectionUtil.isNotEmpty(kfUserStat)){
             for (WeKfUserStat userStat : kfUserStat) {
                 userStat.setDateTime(dateTime);
@@ -115,15 +120,15 @@ public class WeKfStatTask {
                 for (WeKfPool weKfPool : poolList) {
                     WeKfUserStat stat = new WeKfUserStat();
                     WeKfInfo weKfInfo = weKfInfoService.getOne(new LambdaQueryWrapper<WeKfInfo>().eq(WeKfInfo::getCorpId,weCorpAccount.getCorpId()).eq(WeKfInfo::getOpenKfId,weKfPool.getOpenKfId()).last("limit 1"));
-                    Integer timeOutNotice = weKfInfo.getTimeOutNotice();
-                    Integer timeOutType = weKfInfo.getTimeOutType();
-                    Integer timeOut = weKfInfo.getTimeOut();
+                    Integer kfTimeOutNotice = weKfInfo.getKfTimeOutNotice();
+                    Integer kfTimeOutType = weKfInfo.getKfTimeOutType();
+                    Integer kfTimeOut = weKfInfo.getKfTimeOut();
 
                     List<WeKfMsg> weKfMsgList = weKfMsgService.list(new LambdaQueryWrapper<WeKfMsg>()
                             .eq(WeKfMsg::getOpenKfId, weKfPool.getOpenKfId())
                             .eq(WeKfMsg::getExternalUserid, weKfPool.getExternalUserId())
-                            .ge(WeKfMsg::getSendTime, DateUtil.offsetSecond(weKfPool.getSessionStartTime(),-2))
-                            .le(WeKfMsg::getSendTime, weKfPool.getSessionEndTime())
+                            .ge(WeKfMsg::getSendTime, DateUtil.formatDateTime(weKfPool.getEnterTime()))
+                            .le(WeKfMsg::getSendTime, DateUtil.formatDateTime(weKfPool.getSessionEndTime()))
                             .orderByAsc(WeKfMsg::getSendTime)
                     );
                     //计算回复聊天对
@@ -137,12 +142,12 @@ public class WeKfStatTask {
                             if (Objects.equals(WeKfOriginEnum.CUSTOMER_SEND.getType(), weKfMsgList.get(i).getOrigin())
                                     && Objects.equals(WeKfOriginEnum.SERVICER_SEND.getType(), weKfMsgList.get(j).getOrigin())) {
                                 long duration = 0;
-                                if (ObjectUtil.equal(1, timeOutType)) {
+                                if (ObjectUtil.equal(1, kfTimeOutType)) {
                                     duration = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.MINUTE);
                                 } else {
                                     duration = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.HOUR);
                                 }
-                                if (timeOut < duration) {
+                                if (kfTimeOut <= duration) {
                                     outTimeCnt++;
                                     long minute = DateUtil.between(weKfMsgList.get(i).getSendTime(), weKfMsgList.get(j).getSendTime(), DateUnit.SECOND);
                                     durationCnt += minute;
@@ -164,4 +169,6 @@ public class WeKfStatTask {
         }
         return userStatMap;
     }
+
+
 }

@@ -3,6 +3,7 @@ package com.linkwechat.fegin;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
+import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
@@ -390,7 +391,7 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/createCustomerLink")
+    @PostMapping("/customer/createCustomerLink")
     AjaxResult<WeLinkCustomerVo> createCustomerLink(@RequestBody WeLinkCustomerQuery query);
 
 
@@ -399,7 +400,7 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/updateCustomerLink")
+    @PostMapping("/customer/updateCustomerLink")
     AjaxResult<WeLinkCustomerVo> updateCustomerLink(@RequestBody WeLinkCustomerQuery query);
 
 
@@ -409,6 +410,15 @@ public interface QwCustomerClient {
      * @param query
      * @return
      */
-    @PostMapping("/deleteCustomerLink")
+    @PostMapping("/customer/deleteCustomerLink")
     AjaxResult<WeResultVo>  deleteCustomerLink(@RequestBody WeLinkCustomerQuery query);
+
+
+    /**
+     * 更新客户备注
+     * @param query
+     * @return
+     */
+    @PostMapping("/customer/updateCustomerRemark")
+    public AjaxResult<WeResultVo> updateCustomerRemark(@RequestBody UpdateCustomerRemarkQuery query);
 }

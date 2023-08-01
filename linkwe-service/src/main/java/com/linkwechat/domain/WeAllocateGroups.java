@@ -44,4 +44,6 @@ public class WeAllocateGroups extends BaseEntity {
     /**原群主id*/
     private String oldOwner;
 
+    private String deptNames;
+
 }

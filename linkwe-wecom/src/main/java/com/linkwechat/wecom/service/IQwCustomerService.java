@@ -2,7 +2,9 @@ package com.linkwechat.wecom.service;
 
 
 
+import com.dtflys.forest.annotation.JSONBody;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
+import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
@@ -366,4 +368,12 @@ public interface IQwCustomerService {
      * @return
      */
     WeResultVo deleteCustomerLink(WeLinkCustomerQuery query);
+
+
+    /**
+     * 更新客户备注
+     * @param query
+     * @return
+     */
+    WeResultVo updateCustomerRemark(UpdateCustomerRemarkQuery query);
 }

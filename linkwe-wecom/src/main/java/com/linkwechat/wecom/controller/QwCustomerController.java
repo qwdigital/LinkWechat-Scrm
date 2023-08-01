@@ -2,6 +2,7 @@ package com.linkwechat.wecom.controller;
 
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
+import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
@@ -566,6 +567,19 @@ public class QwCustomerController {
 
     }
 
+
+    /**
+     * 更员工相关备注
+     * @param query
+     * @return
+     */
+    @PostMapping("/updateCustomerRemark")
+    public AjaxResult<WeResultVo> updateCustomerRemark(@RequestBody UpdateCustomerRemarkQuery query){
+
+        return AjaxResult.success(
+                qwCustomerService.updateCustomerRemark(query)
+        );
+    }
 
 
 

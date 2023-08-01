@@ -133,16 +133,16 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                 .eq(WeAllocateCustomer::getHandoverUserid, weLeaveUserInfoAllocate.getHandoverUserid()));
 
 
-        List<SysUser> sysUsers =
-                qwSysUserClient.findAllSysUser(weLeaveUserInfoAllocate.getTakeoverUserid()
-                        , null, null).getData();
+        SysUser sysUser
+                = this.baseMapper.findSysUserByWeUserId(weLeaveUserInfoAllocate.getTakeoverUserid());
+
+
 
         if(CollectionUtil.isNotEmpty(weAllocateCustomers)) {
                     weAllocateCustomers.stream().forEach(k -> {
 
 
-                        if(CollectionUtil.isNotEmpty(sysUsers)){
-                            SysUser sysUser = sysUsers.stream().findFirst().get();
+                        if(null != sysUser){
                             k.setTakeoverName(sysUser.getUserName());
                             k.setTakeoverDeptName(sysUser.getDeptName());
                         }
@@ -152,18 +152,23 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                     });
 
 
-             WeTransferCustomerVo transferCustomerVo = qwCustomerClient.resignedTransferCustomer(
-                        WeTransferCustomerQuery.builder()
-                                .external_userid(
-                                        weAllocateCustomers.stream().map(WeAllocateCustomer::getExternalUserid).collect(Collectors.toList())
-                                )
-                                .handover_userid(weLeaveUserInfoAllocate.getHandoverUserid())
-                                .takeover_userid(weLeaveUserInfoAllocate.getTakeoverUserid())
-                                .build()
-                ).getData();
+            AjaxResult<WeTransferCustomerVo> ajaxResult = qwCustomerClient.resignedTransferCustomer(
+                    WeTransferCustomerQuery.builder()
+                            .external_userid(
+                                    weAllocateCustomers.stream().map(WeAllocateCustomer::getExternalUserid).collect(Collectors.toList())
+                            )
+                            .handover_userid(weLeaveUserInfoAllocate.getHandoverUserid())
+                            .takeover_userid(weLeaveUserInfoAllocate.getTakeoverUserid())
+                            .build()
+            );
 
-            if(null != transferCustomerVo && ! transferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                throw new WeComException( WeErrorCodeEnum.parseEnum(transferCustomerVo.getErrCode()).getErrorMsg());
+            if(null != ajaxResult){
+                WeTransferCustomerVo transferCustomerVo = ajaxResult.getData();
+
+                if(null != transferCustomerVo && ! transferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                    throw new WeComException( WeErrorCodeEnum.parseEnum(transferCustomerVo.getErrCode()).getErrorMsg());
+
+                }
 
             }
 
@@ -177,8 +182,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                 .eq(WeAllocateGroup::getOldOwner, weLeaveUserInfoAllocate.getHandoverUserid()));
         if(CollectionUtil.isNotEmpty(weAllocateGroups)){
             weAllocateGroups.stream().forEach(k->{
-                if(CollectionUtil.isNotEmpty(sysUsers)){
-                    SysUser sysUser = sysUsers.stream().findFirst().get();
+                if(null != sysUser){
                     k.setTakeoverName(sysUser.getUserName());
                     k.setTakeoverDeptName(sysUser.getDeptName());
                 }
@@ -187,17 +191,24 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
             });
 
 
-            WeTransferCustomerVo weTransferCustomerVo = qwCustomerClient.transferGroupChat(
+            AjaxResult<WeTransferCustomerVo> ajaxResult = qwCustomerClient.transferGroupChat(
                     WeTransferGroupChatQuery.builder()
                             .chat_id_list(weAllocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList()))
                             .new_owner(weLeaveUserInfoAllocate.getTakeoverUserid())
                             .build()
-            ).getData();
+            );
 
-            if(weTransferCustomerVo != null &&  ! weTransferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                throw new WeComException( WeErrorCodeEnum.parseEnum(weTransferCustomerVo.getErrCode()).getErrorMsg());
+            if(null != ajaxResult){
+                WeTransferCustomerVo weTransferCustomerVo
+                        = ajaxResult.getData();
+                if(weTransferCustomerVo != null &&  ! weTransferCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                    throw new WeComException( WeErrorCodeEnum.parseEnum(weTransferCustomerVo.getErrCode()).getErrorMsg());
+
+                }
 
             }
+
+
 
             iWeAllocateGroupService.saveOrUpdateBatch(weAllocateGroups);
 
@@ -255,7 +266,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
                     WeAllocateGroup weAllocateGroup = WeAllocateGroup.builder()
                             .chatId(weGroup.getChatId())
-                            .oldOwner(weUserId)
+                            .oldOwner(weGroup.getOwner())
                             .status(new Integer(1))
                             .build();
                     weAllocateGroup.setCreateBy(SecurityUtils.getUserName());
@@ -363,7 +374,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
 
 
-                       //从企业微信拉取当前离职员工等待分配的群(后期开放拉取离职客户群可拓展)
+               //从企业微信拉取当前离职员工等待分配的群(后期开放拉取离职客户群可拓展)
                  List<WeGroup> weGroups = iWeGroupService.findGroupInfoFromWechat(WeGroupChatListQuery.builder()
                                .owner_filter(WeOwnerFilterEntity.builder()
                                        .userid_list(ListUtil.toList(k))
@@ -373,16 +384,33 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
                   if(CollectionUtil.isNotEmpty(weGroups)){
                      weGroups.stream().forEach(chat->{
-                                allocateGroups.add(
-                                        WeAllocateGroup.builder()
-                                                .id(SnowFlakeUtil.nextId())
-                                                .leaveUserId(leaveUserId)
-                                                .chatId(chat.getChatId())
-                                                .chatName(chat.getGroupName())
-                                                .oldOwner(k)
-                                                .status(new Integer(1))
-                                                .build()
-                                );
+
+                         if(k.equals(chat.getOwner())){
+                             allocateGroups.add(
+                                     WeAllocateGroup.builder()
+                                             .id(SnowFlakeUtil.nextId())
+                                             .leaveUserId(leaveUserId)
+                                             .chatId(chat.getChatId())
+                                             .chatName(chat.getGroupName())
+                                             .oldOwner(chat.getOwner())
+                                             .status(new Integer(1))
+                                             .build()
+                             );
+                         }
+
+//                         if(chat.getChatId().equals(k)){
+//                             allocateGroups.add(
+//                                     WeAllocateGroup.builder()
+//                                             .id(SnowFlakeUtil.nextId())
+//                                             .leaveUserId(leaveUserId)
+//                                             .chatId(chat.getChatId())
+//                                             .chatName(chat.getGroupName())
+//                                             .oldOwner(k)
+//                                             .status(new Integer(1))
+//                                             .build()
+//                             );
+//                         }
+
                             });
                         }
 
@@ -390,9 +418,10 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
 
 
-                  //离职员工入库(后期开放离职员工数据可拓展)
-                  List<SysUser> sysUsers =
-                               qwSysUserClient.findAllSysUser(k, null, null).getData();
+                       //离职员工入库(后期开放离职员工数据可拓展)
+                       SysUser sysUser = this.baseMapper.findSysUserByWeUserId(k);
+
+
 
                        SysLeaveUser leaveUser = SysLeaveUser.builder()
                                .id(leaveUserId)
@@ -411,15 +440,14 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                        leaveUser.setUpdateTime(new Date());
                        leaveUser.setUpdateById(SecurityUtils.getUserId());
 
-                 if(CollectionUtil.isNotEmpty(sysUsers)){
-                      SysUser sysUser = sysUsers.stream().findFirst().get();
+                 if(null != sysUser){
                      sysUser.setIsUserLeave(1);
 
                      leaveUser.setUserName(sysUser.getUserName());
                      leaveUser.setDeptNames(sysUser.getDeptName());
                      leaveUser.setWeUserId(sysUser.getWeUserId());
 
-                       }else{
+                }else{
                         leaveUser.setUserName("@企微成员");
                          List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.list();
 

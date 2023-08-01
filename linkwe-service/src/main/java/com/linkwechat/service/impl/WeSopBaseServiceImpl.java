@@ -30,6 +30,7 @@ import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.sop.*;
 import com.linkwechat.domain.sop.dto.WeSopBaseDto;
+import com.linkwechat.domain.sop.dto.WeSopPushTaskDto;
 import com.linkwechat.domain.sop.dto.WeSopPushTimeDto;
 import com.linkwechat.domain.sop.vo.*;
 import com.linkwechat.domain.sop.vo.content.*;
@@ -40,6 +41,7 @@ import com.linkwechat.fegin.QwDeptClient;
 import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
+import com.linkwechat.mapper.WeSopExecuteTargetAttachmentsMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -105,6 +107,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
     @Autowired
     private QwSysDeptClient qwSysDeptClient;
+
+
+    @Autowired
+    private WeSopExecuteTargetAttachmentsMapper weSopExecuteTargetAttachmentsMapper;
 
 
 
@@ -448,7 +454,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
         List<WeCustomerSopBaseContentVo> customerExecuteContent
-                = this.baseMapper.findCustomerExecuteContent(executeWeUserId, targetId, executeSubState, null,null,false);
+                = this.baseMapper.findCustomerExecuteContent(executeWeUserId, targetId, executeSubState, null,null,true);
 
         if(CollectionUtil.isNotEmpty(customerExecuteContent)){
             List<WeSendCustomerSopContentVo.WeCustomerSop> weCustomerSops =new ArrayList<>();
@@ -881,17 +887,38 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                 if(weSopPushTimeDto.getPushTimeType()==3){//设置推送时间（相对推送时间）员工添加客户的时间启始时间
 
                                     if(weSopPushTimeDto.getPushTimePre().matches("^[0-9]*$")){
-                                        //推送日期
-                                        String pushDate = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(weSopExecuteTarget.getAddCustomerOrCreateGoupTime()
-                                                , new Integer(weSopPushTimeDto.getPushTimePre())));
 
-                                        attachments.setPushStartTime(
-                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushStartTime())
-                                        );
+                                        if(weSopBase.getBusinessType().equals(new Integer(3))){ //客户转化
 
-                                        attachments.setPushEndTime(
-                                                DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushEndTime())
-                                        );
+                                            //推送日期
+                                            String pushDate = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(weSopBase.getCreateTime()
+                                                    , new Integer(weSopPushTimeDto.getPushTimePre())));
+
+                                            attachments.setPushStartTime(
+                                                    DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushStartTime())
+                                            );
+
+                                            attachments.setPushEndTime(
+                                                    DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushEndTime())
+                                            );
+
+                                        }else{
+
+                                            //推送日期
+                                            String pushDate = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(weSopExecuteTarget.getAddCustomerOrCreateGoupTime()
+                                                    , new Integer(weSopPushTimeDto.getPushTimePre())));
+
+                                            attachments.setPushStartTime(
+                                                    DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushStartTime())
+                                            );
+
+                                            attachments.setPushEndTime(
+                                                    DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,pushDate+" "+weSopPushTimeDto.getPushEndTime())
+                                            );
+                                        }
+
+
+
                                     }
                                 }else if(weSopPushTimeDto.getPushTimeType()==1){//具体推送时间
                                     attachments.setPushStartTime(

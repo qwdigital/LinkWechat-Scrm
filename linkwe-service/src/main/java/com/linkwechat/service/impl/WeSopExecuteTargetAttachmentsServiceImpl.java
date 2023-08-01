@@ -281,40 +281,41 @@ implements IWeSopExecuteTargetAttachmentsService {
             }
 
 
-            Map<String, List<WeSopPushTaskDto>> weSopPushTaskDtos
-                    = weCustomerSopPushTaskDto.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getExecuteWeUserId));
-            if (CollectionUtil.isNotEmpty(weSopPushTaskDtos)) {
+
+//            Map<String, List<WeSopPushTaskDto>> weSopPushTaskDtos
+//                    = weCustomerSopPushTaskDto.stream().collect(Collectors.groupingBy(WeSopPushTaskDto::getExecuteWeUserId));
+//            if (CollectionUtil.isNotEmpty(weSopPushTaskDtos)) {
 
 
                 if(groupOrCustomer){
-
-
-                    List<WeGroup> weGroups = ((WeGroupMapper)iWeGroupService.getBaseMapper()).selectList(
-                            new LambdaQueryWrapper<WeGroup>()
-                                    .in(WeGroup::getChatId, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
-                                    .last("limit 10")
-                    );
-
-                    if(CollectionUtil.isNotEmpty(weGroups)){
-
-                        weGroups.stream().forEach(weGroup->{
-
-                            WeSopPushTaskDto weSopPushTaskDtoStream =
-                                    weCustomerSopPushTaskDto.stream().filter(task -> task.getTargetId().equals(weGroup.getChatId()) && task.getExecuteWeUserId().equals(executeWeUserId))
-                                            .collect(Collectors.toList()).stream().findFirst().get();
-
-                            if(null !=weSopPushTaskDtoStream){
-                                if(isExpiringSoon){
-                                    textContent.append("【"+weGroup.getGroupName()+"】\r\n");
-                                }else{
-                                    textContent.append("【"+weGroup.getGroupName()+"】"+
-                                            DateUtil.format(weSopPushTaskDtoStream.getPushStartTime(),"HH:mm:ss")+"——"+DateUtil.format(weSopPushTaskDtoStream.getPushEndTime(),"HH:mm:ss")+"\r\n");
-
-                                }
-
-                            }
-
-                        });
+//
+//
+//                    List<WeGroup> weGroups = ((WeGroupMapper)iWeGroupService.getBaseMapper()).selectList(
+//                            new LambdaQueryWrapper<WeGroup>()
+//                                    .in(WeGroup::getChatId, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
+//                                    .last("limit 10")
+//                    );
+//
+//                    if(CollectionUtil.isNotEmpty(weGroups)){
+//
+//                        weGroups.stream().forEach(weGroup->{
+//
+//                            WeSopPushTaskDto weSopPushTaskDtoStream =
+//                                    weCustomerSopPushTaskDto.stream().filter(task -> task.getTargetId().equals(weGroup.getChatId()) && task.getExecuteWeUserId().equals(executeWeUserId))
+//                                            .collect(Collectors.toList()).stream().findFirst().get();
+//
+//                            if(null !=weSopPushTaskDtoStream){
+//                                if(isExpiringSoon){
+//                                    textContent.append("【"+weGroup.getGroupName()+"】\r\n");
+//                                }else{
+//                                    textContent.append("【"+weGroup.getGroupName()+"】"+
+//                                            DateUtil.format(weSopPushTaskDtoStream.getPushStartTime(),"HH:mm:ss")+"——"+DateUtil.format(weSopPushTaskDtoStream.getPushEndTime(),"HH:mm:ss")+"\r\n");
+//
+//                                }
+//
+//                            }
+//
+//                        });
 
                         if(isExpiringSoon){
                             textContent.append(" 请注意及时推送。");
@@ -332,41 +333,37 @@ implements IWeSopExecuteTargetAttachmentsService {
                         }
 
 
-
-
-
-                    }
 
                 }else{
 
 
-                    List<WeCustomer> weCustomers =((WeCustomerMapper)iWeCustomerService.getBaseMapper()).selectList(
-                            new LambdaQueryWrapper<WeCustomer>()
-                                    .eq(WeCustomer::getAddUserId,executeWeUserId)
-                                    .in(WeCustomer::getExternalUserid, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
-                                    .last("limit 10")
-                    );
-
-
-                    if(CollectionUtil.isNotEmpty(weCustomers)){
-
-                        weCustomers.stream().forEach(kk->{
-                            WeSopPushTaskDto weSopPushTaskDtoStream =
-                                    weCustomerSopPushTaskDto.stream().filter(task -> task.getTargetId().equals(kk.getExternalUserid()) && task.getExecuteWeUserId().equals(executeWeUserId))
-                                            .collect(Collectors.toList()).stream().findFirst().get();
-
-                            if(null != weSopPushTaskDtoStream){
-                                if(isExpiringSoon){
-                                    textContent.append("【"+kk.getCustomerName()+"】\r\n");
-                                }else{
-                                    textContent.append("【"+kk.getCustomerName()+"】"+
-                                            DateUtil.format(weSopPushTaskDtoStream.getPushStartTime(),"HH:mm:ss")+"——"+DateUtil.format(weSopPushTaskDtoStream.getPushEndTime(),"HH:mm:ss")+"\r\n");
-
-                                }
-
-                            }
-
-                        });
+//                    List<WeCustomer> weCustomers =((WeCustomerMapper)iWeCustomerService.getBaseMapper()).selectList(
+//                            new LambdaQueryWrapper<WeCustomer>()
+//                                    .eq(WeCustomer::getAddUserId,executeWeUserId)
+//                                    .in(WeCustomer::getExternalUserid, weCustomerSopPushTaskDto.stream().map(WeSopPushTaskDto::getTargetId).collect(Collectors.toList()))
+//                                    .last("limit 10")
+//                    );
+//
+//
+//                    if(CollectionUtil.isNotEmpty(weCustomers)){
+//
+//                        weCustomers.stream().forEach(kk->{
+//                            WeSopPushTaskDto weSopPushTaskDtoStream =
+//                                    weCustomerSopPushTaskDto.stream().filter(task -> task.getTargetId().equals(kk.getExternalUserid()) && task.getExecuteWeUserId().equals(executeWeUserId))
+//                                            .collect(Collectors.toList()).stream().findFirst().get();
+//
+//                            if(null != weSopPushTaskDtoStream){
+//                                if(isExpiringSoon){
+//                                    textContent.append("【"+kk.getCustomerName()+"】\r\n");
+//                                }else{
+//                                    textContent.append("【"+kk.getCustomerName()+"】"+
+//                                            DateUtil.format(weSopPushTaskDtoStream.getPushStartTime(),"HH:mm:ss")+"——"+DateUtil.format(weSopPushTaskDtoStream.getPushEndTime(),"HH:mm:ss")+"\r\n");
+//
+//                                }
+//
+//                            }
+//
+//                        });
 
                         if(isExpiringSoon){
                             textContent.append(" 请注意及时推送。");
@@ -382,9 +379,7 @@ implements IWeSopExecuteTargetAttachmentsService {
 
 
 
-                    }
-
-                }
+//                }
 
 
                 //设置为已提示

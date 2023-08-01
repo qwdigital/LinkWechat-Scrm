@@ -703,7 +703,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             MomentsParamDto.Link build = new MomentsParamDto.Link();
             //移动端素材详情地址
             String materialDetailUrl = linkWeChatConfig.getMaterialDetailUrl();
-            String url = String.format(materialDetailUrl, weMaterial.getId());
+            String url = StringUtils.format(materialDetailUrl, weMaterial.getId());
             build.setUrl(url);
             build.setMedia_id(media_id);
             build.setTitle(truncationStr(weMaterial.getMaterialName(), 64));
@@ -1161,8 +1161,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
     /**
      * 同步朋友圈个人互动数据
-     * <p>
-     * TODO 朋友圈改动之后，这里的需求牵扯到了，但是需求不懂，就按照改动之前的逻辑来写的，后面需求不对时，需完善
      *
      * @param msg
      * @author WangYX
@@ -1184,22 +1182,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             if (CollectionUtil.isNotEmpty(list)) {
                 for (WeMomentsUser weMomentsUser : list) {
                     weMomentsInteracteService.syncAddWeMomentsInteracte(weMomentsUser.getMomentsTaskId(), weMomentsUser.getMomentsId());
-                    LambdaQueryWrapper<WeMomentsInteracte> wrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
-                    wrapper.eq(WeMomentsInteracte::getMomentsTaskId, weMomentsUser.getMomentsTaskId());
-                    wrapper.eq(WeMomentsInteracte::getMomentId, weMomentsUser.getMomentsId());
-                    wrapper.eq(WeMomentsInteracte::getDelFlag, Constants.COMMON_STATE);
-                    List<WeMomentsInteracte> interactes = weMomentsInteracteService.list(wrapper);
-                    if (CollectionUtil.isNotEmpty(interactes)) {
-                        interactes.forEach(interacte -> {
-                            if (new Integer(1).equals(interacte.getInteracteUserType())) {//互动人员为客户
-                                iWeCustomerTrajectoryService.createInteractionTrajectory(
-                                        interacte.getInteracteUserId(),
-                                        interacte.getMomentCreteOrId(),
-                                        new Integer(1).equals(interacte.getInteracteType()) ? TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType() : TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType(), null
-                                );
-                            }
-                        });
-                    }
                 }
             }
         }
