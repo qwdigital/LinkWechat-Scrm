@@ -73,10 +73,6 @@ public class WeChatItemServiceImpl extends ServiceImpl<WeChatItemMapper, WeChatI
         return this.baseMapper.findChatItems(sideId, keyword, mediaType, userId);
     }
 
-    @Override
-    public List<WeChatSideVo> findChatPostsItems(Long sideId, String keyword, String mediaType, String userId) {
-        return this.baseMapper.findChatPostsItems(sideId,keyword,mediaType,userId);
-    }
 
     /**
      * 更新该次选择的素材数
