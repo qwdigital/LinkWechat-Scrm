@@ -12,6 +12,7 @@ import com.linkwechat.common.enums.TrackState;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.WeSopChange;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
@@ -72,6 +73,9 @@ implements IWeSopExecuteTargetService {
 
     @Autowired
     private IWeGroupTagRelService weGroupTagRelService;
+
+    @Autowired
+    private IWeSopChangeService iWeSopChangeService;
 
 
 
@@ -320,64 +324,83 @@ implements IWeSopExecuteTargetService {
                         //转入其他sop
                         WeSopExecuteEndVo.ToChangeIntoOtherSop toChangeIntoOtherSop = endContent.getToChangeIntoOtherSop();
                         if(null != toChangeIntoOtherSop && StringUtils.isNotEmpty(toChangeIntoOtherSop.getToChangeIntoSopId())){
-                            WeSopBase toChangeIntoSop = iWeSopBaseService.getById(toChangeIntoOtherSop.getToChangeIntoSopId());
-
-                            if(StringUtils.isNotEmpty(toChangeIntoSop.getExecuteWeUserIds())){
-                                //当前执行人是否符合转接sop的条件
-                                String executeUserId=null;
-                                //当前成员在转入的sop执行计划中不存在
-                                if(this.count(new LambdaQueryWrapper<WeSopExecuteTarget>()
-                                        .eq(WeSopExecuteTarget::getTargetId,executeTarget.getTargetId())
-                                        .eq(WeSopExecuteTarget::getSopBaseId,toChangeIntoSop.getId()))<=0){
-                                    //执行成员在转入的sop执行成员列表中
-                                    List<String> weSopExecuteTargetsIds = Arrays.asList(toChangeIntoSop.getExecuteWeUserIds().split(","));
-
-                                    if(weSopExecuteTargetsIds.contains(executeTarget.getExecuteWeUserId())){
-                                        executeUserId=executeTarget.getExecuteWeUserId();
-                                    }else{
-                                      //转入的sop执行成员池中选择一个当前执行对象的添加人
-                                        List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                                                .eq(WeCustomer::getExternalUserid, executeTarget.getTargetId())
-                                                .ne(WeCustomer::getTrackState, TrackState.STATE_YLS.getType())
-                                                .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE));
 
 
-                                        if(CollectionUtil.isNotEmpty(weCustomers)){
-                                            //执行客户添加人id列表
-                                            List<String> addUserIds = weCustomers.stream().map(WeCustomer::getAddUserId).collect(toList());
-                                            //符合转入的sop执行成员列表的添加员工
-                                            List<String> executeUserIds
-                                                    = weSopExecuteTargetsIds.stream().filter(item -> addUserIds.contains(item)).collect(toList());
-                                            if(CollectionUtil.isNotEmpty(executeUserIds)){
-                                                executeUserId=executeUserIds.stream().findFirst().get();//筛选出一个符合条件的员工作为执行人员
-                                            }else{
-                                                executeUserId=weSopExecuteTargetsIds.stream().findFirst().get();//随机筛选一个非好友员工作为执行人员
-                                            }
-
-
-                                            if(StringUtils.isNotEmpty(executeUserId)){
-                                                //构建指定人的执行计划
-                                                iWeSopBaseService.builderExecuteCustomerSopPlan(toChangeIntoSop,
-                                                        MapUtil.builder(executeUserId,
-                                                                ListUtil.list(false, iWeCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
-                                                                        .eq(WeCustomer::getAddUserId, executeUserId)
-                                                                        .eq(WeCustomer::getExternalUserid, executeTarget.getTargetId())))).build()
-                                                        ,true,false);
-                                            }
-
-
-
-                                        }
+                            //入库至其他sop表中
+                            iWeSopChangeService.save(
+                                    WeSopChange.builder()
+                                            .addUserId(executeTarget.getExecuteWeUserId())
+                                            .sopBaseId(Long.parseLong(toChangeIntoOtherSop.getToChangeIntoSopId()))
+                                            .externalUserid(executeTarget.getTargetId())
+                                            .build()
+                            );
 
 
 
 
-                                    }
-
-                                }
 
 
-                            }
+
+//
+//                            WeSopBase toChangeIntoSop = iWeSopBaseService.getById(toChangeIntoOtherSop.getToChangeIntoSopId());
+//
+//
+//                            if(StringUtils.isNotEmpty(toChangeIntoSop.getExecuteWeUserIds())){
+//                                //当前执行人是否符合转接sop的条件
+//                                String executeUserId=null;
+//                                //当前成员在转入的sop执行计划中不存在
+//                                if(this.count(new LambdaQueryWrapper<WeSopExecuteTarget>()
+//                                        .eq(WeSopExecuteTarget::getTargetId,executeTarget.getTargetId())
+//                                        .eq(WeSopExecuteTarget::getSopBaseId,toChangeIntoSop.getId()))<=0){
+//                                    //执行成员在转入的sop执行成员列表中
+//                                    List<String> weSopExecuteTargetsIds = Arrays.asList(toChangeIntoSop.getExecuteWeUserIds().split(","));
+//
+//                                    if(weSopExecuteTargetsIds.contains(executeTarget.getExecuteWeUserId())){
+//                                        executeUserId=executeTarget.getExecuteWeUserId();
+//                                    }else{
+//                                      //转入的sop执行成员池中选择一个当前执行对象的添加人
+//                                        List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+//                                                .eq(WeCustomer::getExternalUserid, executeTarget.getTargetId())
+//                                                .ne(WeCustomer::getTrackState, TrackState.STATE_YLS.getType())
+//                                                .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE));
+//
+//
+//                                        if(CollectionUtil.isNotEmpty(weCustomers)){
+//                                            //执行客户添加人id列表
+//                                            List<String> addUserIds = weCustomers.stream().map(WeCustomer::getAddUserId).collect(toList());
+//                                            //符合转入的sop执行成员列表的添加员工
+//                                            List<String> executeUserIds
+//                                                    = weSopExecuteTargetsIds.stream().filter(item -> addUserIds.contains(item)).collect(toList());
+//                                            if(CollectionUtil.isNotEmpty(executeUserIds)){
+//                                                executeUserId=executeUserIds.stream().findFirst().get();//筛选出一个符合条件的员工作为执行人员
+//                                            }else{
+//                                                executeUserId=weSopExecuteTargetsIds.stream().findFirst().get();//随机筛选一个非好友员工作为执行人员
+//                                            }
+//
+//
+//                                            if(StringUtils.isNotEmpty(executeUserId)){
+//                                                //构建指定人的执行计划
+//                                                iWeSopBaseService.builderExecuteCustomerSopPlan(toChangeIntoSop,
+//                                                        MapUtil.builder(executeUserId,
+//                                                                ListUtil.list(false, iWeCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>()
+//                                                                        .eq(WeCustomer::getAddUserId, executeUserId)
+//                                                                        .eq(WeCustomer::getExternalUserid, executeTarget.getTargetId())))).build()
+//                                                        ,true,false);
+//                                            }
+//
+//
+//
+//                                        }
+//
+//
+//
+//
+//                                    }
+//
+//                                }
+//
+//
+//                            }
 
 
                         }
