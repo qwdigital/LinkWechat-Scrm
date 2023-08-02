@@ -131,7 +131,7 @@ public class WeLeadsTemplateSettingsController extends BaseController {
      * @date 2023/07/07 10:58
      */
     @ApiOperation(value = "修改排序")
-    @PostMapping(value = "/reRank")
+    @PutMapping(value = "/reRank")
     public AjaxResult<Boolean> reRank(@RequestBody List<WeTemplateSettingsReRankRequest> paramList) {
         return AjaxResult.success(weSeaLeadsTemplateSettingsService.reRank(paramList));
     }
