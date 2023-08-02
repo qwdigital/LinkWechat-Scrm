@@ -398,18 +398,6 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                              );
                          }
 
-//                         if(chat.getChatId().equals(k)){
-//                             allocateGroups.add(
-//                                     WeAllocateGroup.builder()
-//                                             .id(SnowFlakeUtil.nextId())
-//                                             .leaveUserId(leaveUserId)
-//                                             .chatId(chat.getChatId())
-//                                             .chatName(chat.getGroupName())
-//                                             .oldOwner(k)
-//                                             .status(new Integer(1))
-//                                             .build()
-//                             );
-//                         }
 
                             });
                         }

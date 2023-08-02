@@ -61,28 +61,28 @@
         left join we_group_member wgm on wg.id = wgm.group_id and wgm.del_flag = 0
     </sql>
 
-    <select id="getGroupChatIdList" resultType="java.lang.Long">
-        select
-            distinct wg.id from we_group wg
-        left join we_group_member wgm on wg.id = wgm.group_id and wgm.del_flag = 0
-        <where>
-            <if test="chatId != null and chatId != ''">
-                and wg.chat_id = #{chatId}
-            </if>
-        </where>
-    </select>
+<!--    <select id="getGroupChatIdList" resultType="java.lang.Long">-->
+<!--        select-->
+<!--            distinct wg.id from we_group wg-->
+<!--        left join we_group_member wgm on wg.id = wgm.group_id and wgm.del_flag = 0-->
+<!--        <where>-->
+<!--            <if test="chatId != null and chatId != ''">-->
+<!--                and wg.chat_id = #{chatId}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
 
-    <select id="getGroupChatListByIds" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatVo">
-        <include refid="getDetail"/>
-        <where>
-            <if test="groupIdList != null and groupIdList.size > 0">
-            and wg.id in
-                <foreach item="groupId" collection="groupIdList" index="index" open="(" separator="," close=")">
-                    #{groupId}
-                </foreach>
-            </if>
-        </where>
-    </select>
+<!--    <select id="getGroupChatListByIds" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatVo">-->
+<!--        <include refid="getDetail"/>-->
+<!--        <where>-->
+<!--            <if test="groupIdList != null and groupIdList.size > 0">-->
+<!--            and wg.id in-->
+<!--                <foreach item="groupId" collection="groupIdList" index="index" open="(" separator="," close=")">-->
+<!--                    #{groupId}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
 
     <select id="selectWeGroupList" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo">
         SELECT

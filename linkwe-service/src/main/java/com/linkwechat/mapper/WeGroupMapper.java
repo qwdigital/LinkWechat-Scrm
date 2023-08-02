@@ -26,9 +26,9 @@ import java.util.List;
 public interface WeGroupMapper extends BaseMapper<WeGroup> {
 
 
-    List<Long> getGroupChatIdList(WeGroupChatQuery query);
+//    List<Long> getGroupChatIdList(WeGroupChatQuery query);
 
-    List<LinkGroupChatVo> getGroupChatListByIds(@Param("groupIdList") List<Long> groupIdList);
+//    List<LinkGroupChatVo> getGroupChatListByIds(@Param("groupIdList") List<Long> groupIdList);
 
     @DataScope(type = "2", value = @DataColumn(alias = "wg", name = "owner", userid = "we_user_id"))
     List<LinkGroupChatListVo> selectWeGroupList(WeGroupChatQuery query);
