@@ -42,6 +42,12 @@ public class WeSopTask {
     }
 
 
+    @XxlJob("handleChangeSop")
+    public void handleChangeSop(String params){
+        log.info("转入sop构建处理>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+    }
+
+
      @XxlJob("builderXkSopPlanTip")
      public void builderXkSopPlanTip(String params){
          log.info("企业微信发送方式新客sop提醒发送>>>>>>>>>>>>>>>>>>>启动 params:{}", params);

@@ -14,6 +14,7 @@ import com.linkwechat.common.enums.strategiccrowd.CustomerAttributesEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeSopChange;
 import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.domain.sop.dto.WeSopBaseDto;
 import com.linkwechat.domain.sop.vo.WeSopExecuteConditVo;
@@ -41,6 +42,9 @@ public class SopTaskServiceImpl implements SopTaskService {
 
     @Autowired
     private IWeStrategicCrowdService iWeStrategicCrowdService;
+
+    @Autowired
+    private IWeSopChangeService iWeSopChangeService;
 
 
 
@@ -108,6 +112,26 @@ public class SopTaskServiceImpl implements SopTaskService {
             });
 
         }
+
+    }
+
+    @Override
+    public void handleChangeSop() {
+        List<WeSopChange> weSopChanges = iWeSopChangeService.list();
+        if(CollectionUtil.isNotEmpty(weSopChanges)){
+            weSopChanges.stream().forEach(weSopChange -> {
+                Long sopBaseId = weSopChange.getSopBaseId();
+
+
+
+            });
+        }
+
+    }
+
+
+    //指定客户加入对应的sop中
+    public  void builderSop(Long sopBaseId,String executeWeUserId,WeCustomer weCustomer){
 
     }
 

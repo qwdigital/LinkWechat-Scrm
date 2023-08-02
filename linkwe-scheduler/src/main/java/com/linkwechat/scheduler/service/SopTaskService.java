@@ -15,4 +15,10 @@ public interface SopTaskService {
      * 构建新客计划
      */
     void builderXkPlan();
+
+
+    /**
+     * 转入sop处理
+     */
+    void handleChangeSop();
 }
