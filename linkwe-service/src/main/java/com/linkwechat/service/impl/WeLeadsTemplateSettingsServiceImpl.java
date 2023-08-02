@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -23,6 +24,7 @@ import com.linkwechat.domain.leads.template.query.WeLeadsTemplateSettingsRequest
 import com.linkwechat.domain.leads.template.query.WeLeadsTemplateTableEntryContentRequest;
 import com.linkwechat.domain.leads.template.query.WeTemplateSettingsReRankRequest;
 import com.linkwechat.domain.leads.template.vo.WeLeadsTemplateSettingsVO;
+import com.linkwechat.domain.leads.template.vo.WeLeadsTemplateTableEntryContentVO;
 import com.linkwechat.mapper.WeLeadsTemplateSettingsMapper;
 import com.linkwechat.service.IWeLeadsTemplateSettingsService;
 import com.linkwechat.service.IWeLeadsTemplateTableEntryContentService;
@@ -127,6 +129,21 @@ public class WeLeadsTemplateSettingsServiceImpl extends ServiceImpl<WeLeadsTempl
     @Override
     public String autoGenerate() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    @Override
+    public WeLeadsTemplateSettingsVO get(Long id) {
+        WeLeadsTemplateSettings weLeadsTemplateSettings = this.baseMapper.selectById(id);
+        if (BeanUtil.isEmpty(weLeadsTemplateSettings)) {
+            return null;
+        }
+        WeLeadsTemplateSettingsVO templateSettingsVO = BeanUtil.copyProperties(weLeadsTemplateSettings, WeLeadsTemplateSettingsVO.class);
+        List<WeLeadsTemplateTableEntryContent> contents = weTableEntryContentService.getByLeadsTemplateSettingsId(weLeadsTemplateSettings.getId());
+        if (CollectionUtil.isNotEmpty(contents)) {
+            List<WeLeadsTemplateTableEntryContentVO> contentVOS = BeanUtil.copyToList(contents, WeLeadsTemplateTableEntryContentVO.class);
+            templateSettingsVO.setTableEntryContent(contentVOS);
+        }
+        return templateSettingsVO;
     }
 
     /**

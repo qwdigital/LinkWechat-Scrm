@@ -2,13 +2,10 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.leads.template.entity.WeLeadsTemplateSettings;
-import com.linkwechat.domain.leads.template.entity.WeLeadsTemplateTableEntryContent;
 import com.linkwechat.domain.leads.template.query.WeLeadsTemplateSettingsRequest;
 import com.linkwechat.domain.leads.template.query.WeTemplateSettingsReRankRequest;
 import com.linkwechat.domain.leads.template.vo.WeLeadsTemplateSettingsVO;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -65,6 +62,17 @@ public interface IWeLeadsTemplateSettingsService extends IService<WeLeadsTemplat
      * @return 返回一个自动生成的表项id
      */
     String autoGenerate();
+
+    /**
+     * 详情
+     *
+     * @param id 主键Id
+     * @return {@link WeLeadsTemplateSettingsVO}
+     * @author WangYX
+     * @date 2023/08/02 10:23
+     */
+    WeLeadsTemplateSettingsVO get(Long id);
+
 
 }
 

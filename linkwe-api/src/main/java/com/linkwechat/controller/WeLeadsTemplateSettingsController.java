@@ -89,7 +89,7 @@ public class WeLeadsTemplateSettingsController extends BaseController {
      * @date 2023/07/07 10:57
      */
     @ApiOperation(value = "新增")
-    @PutMapping(value = "")
+    @PostMapping(value = "")
     public AjaxResult save(@RequestBody @Validated WeLeadsTemplateSettingsRequest param) {
         return AjaxResult.success(weSeaLeadsTemplateSettingsService.saveLeadsTemplateSettings(param));
     }
@@ -103,7 +103,7 @@ public class WeLeadsTemplateSettingsController extends BaseController {
      * @date 2023/07/07 10:58
      */
     @ApiOperation(value = "修改")
-    @PostMapping(value = "")
+    @PutMapping(value = "")
     public AjaxResult update(@RequestBody @Validated WeLeadsTemplateSettingsRequest param) {
         return AjaxResult.success(weSeaLeadsTemplateSettingsService.updateLeadsTemplateSettings(param));
     }
@@ -175,6 +175,20 @@ public class WeLeadsTemplateSettingsController extends BaseController {
             return vo;
         }).collect(Collectors.toList());
         return AjaxResult.success(result);
+    }
+
+    /**
+     * 详情
+     *
+     * @param id 主键Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/02 10:22
+     */
+    @ApiOperation("详情")
+    @GetMapping("/{id}")
+    public AjaxResult get(@PathVariable("id") Long id) {
+        return AjaxResult.success(weSeaLeadsTemplateSettingsService.get(id));
     }
 }
 
