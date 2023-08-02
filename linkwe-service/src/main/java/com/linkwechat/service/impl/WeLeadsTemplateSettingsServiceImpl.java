@@ -76,6 +76,7 @@ public class WeLeadsTemplateSettingsServiceImpl extends ServiceImpl<WeLeadsTempl
         int count = this.count(queryWrapper);
 
         WeLeadsTemplateSettings settings = mapperFactory.getMapperFacade().map(param, WeLeadsTemplateSettings.class);
+        settings.setTableEntryId(UUID.randomUUID().toString().replace("-", ""));
         settings.setId(IdUtil.getSnowflake().nextId());
         settings.setCanEdit(0);
         settings.setRank(count + 1);

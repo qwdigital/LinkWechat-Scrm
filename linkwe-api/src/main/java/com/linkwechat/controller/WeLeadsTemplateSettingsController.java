@@ -5,7 +5,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.leads.template.CanEditEnum;
 import com.linkwechat.common.enums.leads.template.TableEntryAttrEnum;
 import com.linkwechat.domain.leads.template.entity.WeLeadsTemplateSettings;
@@ -36,7 +38,7 @@ import java.util.stream.Collectors;
 @Validated
 @RestController
 @RequestMapping(value = "/leads/template/settings")
-public class WeLeadsTemplateSettingsController {
+public class WeLeadsTemplateSettingsController extends BaseController {
 
     @Resource
     private IWeLeadsTemplateSettingsService weSeaLeadsTemplateSettingsService;
@@ -54,6 +56,28 @@ public class WeLeadsTemplateSettingsController {
     @GetMapping(value = "")
     public AjaxResult<List<WeLeadsTemplateSettingsVO>> queryAll() {
         return AjaxResult.success(weSeaLeadsTemplateSettingsService.queryAll());
+    }
+
+    /**
+     * 分页
+     *
+     * @return {@link TableDataInfo}
+     * @author WangYX
+     * @date 2023/08/02 9:59
+     */
+    @ApiOperation(value = "分页")
+    @GetMapping(value = "/page")
+    public TableDataInfo page() {
+        startPage();
+        LambdaQueryWrapper<WeLeadsTemplateSettings> queryWrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
+        queryWrapper.orderByAsc(WeLeadsTemplateSettings::getRank);
+        List<WeLeadsTemplateSettings> list = weSeaLeadsTemplateSettingsService.list(queryWrapper);
+        TableDataInfo dataTable = getDataTable(list);
+        if (BeanUtil.isNotEmpty(list)) {
+            List<WeLeadsTemplateSettingsVO> vos = BeanUtil.copyToList(list, WeLeadsTemplateSettingsVO.class);
+            dataTable.setRows(vos);
+        }
+        return dataTable;
     }
 
     /**
