@@ -8,7 +8,7 @@
         <result column="catalogue_id" property="catalogueId" />
         <result column="name" property="name" />
         <result column="type" property="type" />
-        <result column="is_require" property="require" />
+        <result column="is_require" property="required" />
         <result column="expound" property="expound" />
         <result column="value" property="value" />
         <result column="sort" property="sort" />
@@ -28,7 +28,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, catalogue_id, name, type, is_require, expound, value, sort, is_fixed, is_money, is_to_time, is_multiple_choice, is_more, create_time, update_time, create_by, update_by, update_by_id, create_by_id, del_flag
+        id, catalogue_id, name, type, is_require, expound, `value`, sort, is_fixed, is_money, is_to_time, is_multiple_choice, is_more, create_time, update_time, create_by, update_by, update_by_id, create_by_id, del_flag
     </sql>
 
 </mapper>

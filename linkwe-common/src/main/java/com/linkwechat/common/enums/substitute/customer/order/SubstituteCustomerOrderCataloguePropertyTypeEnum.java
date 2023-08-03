@@ -1,5 +1,10 @@
 package com.linkwechat.common.enums.substitute.customer.order;
 
+import cn.hutool.core.bean.BeanUtil;
+
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * 代客下单字段类型枚举
  *
@@ -12,10 +17,10 @@ public enum SubstituteCustomerOrderCataloguePropertyTypeEnum {
     MULTI_LINE_TEXT(1, "多行文本"),
     OPTIONS(2, "选项"),
     DATE_TIME(3, "日期时间"),
-    DEPT(0, "选择部门"),
-    USER(0, "选择员工"),
-    NUMBER(0, "数字"),
-    ATTACHMENT(0, "附件");
+    DEPT(4, "选择部门"),
+    USER(5, "选择员工"),
+    NUMBER(6, "数字"),
+    ATTACHMENT(7, "附件");
 
 
     private Integer code;
@@ -34,5 +39,13 @@ public enum SubstituteCustomerOrderCataloguePropertyTypeEnum {
 
     public String getType() {
         return type;
+    }
+
+
+    public static String byCode(Integer code) {
+        SubstituteCustomerOrderCataloguePropertyTypeEnum[] values = SubstituteCustomerOrderCataloguePropertyTypeEnum.values();
+        Optional<SubstituteCustomerOrderCataloguePropertyTypeEnum> first = Arrays.stream(values).filter(i -> i.getCode().equals(code)).findFirst();
+        SubstituteCustomerOrderCataloguePropertyTypeEnum item = first.orElse(null);
+        return BeanUtil.isNotEmpty(item) ? item.getType() : null;
     }
 }

@@ -42,7 +42,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyUpdateRequest {
      */
     @NotNull(message = "是否必填不能为空")
     @ApiModelProperty("是否必填 0否 1是")
-    private Integer require;
+    private Integer required;
 
     /**
      * 字段说明

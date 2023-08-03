@@ -52,7 +52,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyVO {
      * 是否必填 0否 1是
      */
     @ApiModelProperty("是否必填 0否 1是")
-    private Integer require;
+    private Integer required;
 
     /**
      * 字段说明

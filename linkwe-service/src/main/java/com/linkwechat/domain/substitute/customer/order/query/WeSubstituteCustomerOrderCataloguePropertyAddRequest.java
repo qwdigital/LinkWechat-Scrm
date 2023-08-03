@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * <p>
@@ -27,6 +28,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyAddRequest {
     /**
      * 字段名称
      */
+    @Size(max = 10)
     @NotBlank(message = "字段名称必填")
     @ApiModelProperty("字段名称")
     private String name;
@@ -45,11 +47,12 @@ public class WeSubstituteCustomerOrderCataloguePropertyAddRequest {
      */
     @NotNull(message = "是否必填不能为空")
     @ApiModelProperty("是否必填 0否 1是")
-    private Integer require;
+    private Integer required;
 
     /**
      * 字段说明
      */
+    @Size(max = 20)
     @ApiModelProperty("字段说明")
     private String expound;
 
@@ -58,18 +61,6 @@ public class WeSubstituteCustomerOrderCataloguePropertyAddRequest {
      */
     @ApiModelProperty("字段值")
     private String value;
-
-    /**
-     * 排序
-     */
-    @ApiModelProperty("排序")
-    private Integer sort;
-
-    /**
-     * 是否固定字段，0否 1是
-     */
-    @ApiModelProperty("是否固定字段，0否 1是")
-    private Integer fixed;
 
     /**
      * 是否金额，字段类型为数字时用，需要精确到小数点后两位  0否 1是

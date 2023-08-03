@@ -11,6 +11,7 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.enums.substitute.customer.order.SubstituteCustomerOrderCataloguePropertyTypeEnum;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyAddRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyMoveRequest;
@@ -18,12 +19,17 @@ import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustome
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyUpdateRequest;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyVO;
 import com.linkwechat.service.IWeSubstituteCustomerOrderCataloguePropertyService;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -57,7 +63,9 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
         queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getCatalogueId, request.getCatalogueId());
         List<WeSubstituteCustomerOrderCatalogueProperty> list = weSubstituteCustomerOrderCataloguePropertyService.list(queryWrapper);
         TableDataInfo dataTable = getDataTable(list);
-        dataTable.setRows(BeanUtil.copyToList(list, WeSubstituteCustomerOrderCataloguePropertyVO.class));
+        List<WeSubstituteCustomerOrderCataloguePropertyVO> vos = BeanUtil.copyToList(list, WeSubstituteCustomerOrderCataloguePropertyVO.class);
+        vos.stream().forEach(i -> i.setTypeStr(SubstituteCustomerOrderCataloguePropertyTypeEnum.byCode(i.getType())));
+        dataTable.setRows(vos);
         return dataTable;
     }
 
@@ -107,7 +115,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
         if (property.getFixed().equals(0)) {
             updateWrapper.set(StrUtil.isNotBlank(request.getName()), WeSubstituteCustomerOrderCatalogueProperty::getName, request.getName());
         }
-        updateWrapper.set(request.getRequire() != null, WeSubstituteCustomerOrderCatalogueProperty::getRequire, request.getRequire());
+        updateWrapper.set(request.getRequired() != null, WeSubstituteCustomerOrderCatalogueProperty::getRequired, request.getRequired());
         updateWrapper.set(StrUtil.isNotBlank(request.getExpound()), WeSubstituteCustomerOrderCatalogueProperty::getExpound, request.getExpound());
         updateWrapper.set(StrUtil.isNotBlank(request.getValue()), WeSubstituteCustomerOrderCatalogueProperty::getValue, request.getValue());
         updateWrapper.set(request.getMoney() != null, WeSubstituteCustomerOrderCatalogueProperty::getMoney, request.getMoney());
@@ -151,6 +159,52 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
         return AjaxResult.success();
     }
 
+    /**
+     * 字段类型列表
+     *
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/03 15:35
+     */
+    @ApiOperation("字段类型列表")
+    @GetMapping("/type")
+    public AjaxResult typeList() {
+        SubstituteCustomerOrderCataloguePropertyTypeEnum[] values = SubstituteCustomerOrderCataloguePropertyTypeEnum.values();
+        Map map = new HashMap(values.length);
+        Arrays.stream(values).forEach(i -> map.put(i.getCode(), i.getType()));
+        return AjaxResult.success(map);
+    }
+
+    /**
+     * 详情
+     *
+     * @param id 主键Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/03 16:36
+     */
+    @ApiOperation("详情")
+    @GetMapping("/{id}")
+    public AjaxResult get(@PathVariable("id") Long id) {
+        WeSubstituteCustomerOrderCatalogueProperty one = weSubstituteCustomerOrderCataloguePropertyService.getById(id);
+        WeSubstituteCustomerOrderCataloguePropertyVO vo = BeanUtil.copyProperties(one, WeSubstituteCustomerOrderCataloguePropertyVO.class);
+        vo.setTypeStr(SubstituteCustomerOrderCataloguePropertyTypeEnum.byCode(vo.getType()));
+        return AjaxResult.success(vo);
+    }
+
+    /**
+     * 获取可变字段
+     *
+     * @author WangYX
+     * @date 2023/08/03 16:39
+     * @version 1.0.0
+     */
+    @ApiOperation("获取可变字段")
+    @GetMapping("/variable")
+    public AjaxResult variableProperty() {
+
+        return AjaxResult.success();
+    }
 
 }
 

@@ -53,7 +53,7 @@ public class WeSubstituteCustomerOrderCatalogueProperty extends BaseEntity {
      */
     @ApiModelProperty("是否必填 0否 1是")
     @TableField("is_require")
-    private Integer require;
+    private Integer required;
 
     /**
      * 字段说明
@@ -65,6 +65,7 @@ public class WeSubstituteCustomerOrderCatalogueProperty extends BaseEntity {
      * 字段值
      */
     @ApiModelProperty("字段值")
+    @TableField(value = "`value`")
     private String value;
 
     /**
