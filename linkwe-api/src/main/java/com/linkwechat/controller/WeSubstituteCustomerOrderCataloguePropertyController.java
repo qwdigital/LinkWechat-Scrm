@@ -50,7 +50,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
         startPage();
         LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogueProperty> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogueProperty.class);
         queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.COMMON_STATE);
-        queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getCatalogueId, request.getCatalogueId());
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getCatalogueId,request.getCatalogueId());
         List<WeSubstituteCustomerOrderCatalogueProperty> list = weSubstituteCustomerOrderCataloguePropertyService.list(queryWrapper);
         TableDataInfo dataTable = getDataTable(list);
         dataTable.setRows(BeanUtil.copyToList(list, WeSubstituteCustomerOrderCataloguePropertyVO.class));
