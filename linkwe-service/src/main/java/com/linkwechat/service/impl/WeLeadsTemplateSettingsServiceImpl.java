@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -71,6 +72,7 @@ public class WeLeadsTemplateSettingsServiceImpl extends ServiceImpl<WeLeadsTempl
 
     @Override
     public boolean saveLeadsTemplateSettings(WeLeadsTemplateSettingsRequest param) {
+        param.setTableEntryId(String.valueOf(IdUtil.getSnowflakeNextId()));
         checkSaveParam(param);
 
         LambdaQueryWrapper<WeLeadsTemplateSettings> queryWrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
@@ -78,7 +80,6 @@ public class WeLeadsTemplateSettingsServiceImpl extends ServiceImpl<WeLeadsTempl
         int count = this.count(queryWrapper);
 
         WeLeadsTemplateSettings settings = mapperFactory.getMapperFacade().map(param, WeLeadsTemplateSettings.class);
-        settings.setTableEntryId(UUID.randomUUID().toString().replace("-", ""));
         settings.setId(IdUtil.getSnowflake().nextId());
         settings.setCanEdit(0);
         settings.setRank(count + 1);
