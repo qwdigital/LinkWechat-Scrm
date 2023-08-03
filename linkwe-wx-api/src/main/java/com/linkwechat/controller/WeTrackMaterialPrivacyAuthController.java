@@ -39,18 +39,15 @@ public class WeTrackMaterialPrivacyAuthController {
         queryWrapper.eq(WeTrackMaterialPrivacyAuth::getOpenid, openid);
         queryWrapper.eq(WeTrackMaterialPrivacyAuth::getDelFlag, Constants.COMMON_STATE);
         List<WeTrackMaterialPrivacyAuth> one = weTrackMaterialPrivacyAuthService.list(queryWrapper);
+        //是否授权(0否，1是)
+        Integer isAuth = 0;
         if(CollectionUtil.isNotEmpty(one)){
-            //是否授权(0否，1是)
-            Integer isAuth = 0;
+
             if (ObjectUtil.isNotNull(one)) {
                 isAuth = one.stream().findFirst().get().getIsAuth();
             }
         }
-        //是否授权(0否，1是)
-        Integer isAuth = 0;
-        if (ObjectUtil.isNotNull(one)) {
-            isAuth = one.stream().findFirst().get().getIsAuth();
-        }
+
         return AjaxResult.success(isAuth);
     }
 

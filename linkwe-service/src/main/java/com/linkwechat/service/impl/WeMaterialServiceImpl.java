@@ -359,8 +359,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
         //构建海报生成器
         ImageCombiner combiner = new ImageCombiner(purePoster.getBackgroundImgPath(),
-                purePoster.getWidth() >= 375 ? 375 : purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
-
+               purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
 
         //海报中元素
         List<WePosterSubassembly> posterSubassemblyList = purePoster.getPosterSubassemblyList();

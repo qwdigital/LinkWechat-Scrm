@@ -1046,9 +1046,15 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 //                                    int currentWeek = DateUtil.dayOfWeek(new Date());
 //
 //                                    if(currentWeek-1<=new Integer(weSopPushTimeDto.getPushTimePre())){//生成符合条件当前日期下到周日的具体时间
+
+                                    Integer weekDay = Integer.parseInt(weSopPushTimeDto.getPushTimePre());
+                                    weekDay = weekDay % 7 + 1;
+
                                         //执行日期
-                                        String executeData
-                                                = WeekDateUtils.GetCurrentWeekAllDate().get(Integer.parseInt(weSopPushTimeDto.getPushTimePre()));
+//                                    String executeData
+//                                            = WeekDateUtils.GetCurrentWeekAllDate().get(Integer.parseInt(weSopPushTimeDto.getPushTimePre()));
+                                    String executeData
+                                            = WeekDateUtils.GetCurrentWeekAllDate().get(weekDay);
 
                                         if(StringUtils.isNotEmpty(executeData)){
                                             Date pushEndTime
