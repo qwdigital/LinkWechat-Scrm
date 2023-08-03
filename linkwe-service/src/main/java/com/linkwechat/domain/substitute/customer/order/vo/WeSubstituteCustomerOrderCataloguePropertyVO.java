@@ -43,6 +43,12 @@ public class WeSubstituteCustomerOrderCataloguePropertyVO {
     private Integer type;
 
     /**
+     * 字段类型
+     */
+    @ApiModelProperty("字段类型")
+    private String typeStr;
+
+    /**
      * 是否必填 0否 1是
      */
     @ApiModelProperty("是否必填 0否 1是")

@@ -1,12 +1,11 @@
-package com.linkwechat.domain.substitute.customer.order.entity;
+package com.linkwechat.domain.substitute.customer.order.query;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p>
@@ -17,15 +16,13 @@ import lombok.EqualsAndHashCode;
  * @since 2023-08-03
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@TableName("we_substitute_customer_order_catalogue_property")
-public class WeSubstituteCustomerOrderCatalogueProperty extends BaseEntity {
+public class WeSubstituteCustomerOrderCataloguePropertyUpdateRequest {
 
     /**
      * 主键id
      */
+    @NotNull(message = "主键Id必填")
     @ApiModelProperty("主键Id")
-    @TableId("id")
     private Long id;
 
     /**
@@ -41,18 +38,10 @@ public class WeSubstituteCustomerOrderCatalogueProperty extends BaseEntity {
     private String name;
 
     /**
-     * 字段类型
-     *
-     * @see com.linkwechat.common.enums.substitute.customer.order.SubstituteCustomerOrderCataloguePropertyTypeEnum
-     */
-    @ApiModelProperty("字段类型")
-    private Integer type;
-
-    /**
      * 是否必填 0否 1是
      */
+    @NotNull(message = "是否必填不能为空")
     @ApiModelProperty("是否必填 0否 1是")
-    @TableField("is_require")
     private Integer require;
 
     /**
@@ -68,50 +57,26 @@ public class WeSubstituteCustomerOrderCatalogueProperty extends BaseEntity {
     private String value;
 
     /**
-     * 排序
-     */
-    @ApiModelProperty("排序")
-    private Integer sort;
-
-    /**
-     * 是否固定字段，0否 1是
-     */
-    @ApiModelProperty("是否固定字段，0否 1是")
-    @TableField("is_fixed")
-    private Integer fixed;
-
-    /**
      * 是否金额，字段类型为数字时用，需要精确到小数点后两位  0否 1是
      */
     @ApiModelProperty("是否金额")
-    @TableField("is_money")
     private Integer money;
 
     /**
      * 是否精确到时间，字段类型为日期时用，0否 1是
      */
     @ApiModelProperty("是否精确到时间，字段类型为日期时用，0否 1是")
-    @TableField("is_to_time")
     private Integer toTime;
 
     /**
      * 是否多选，0否 1是
      */
     @ApiModelProperty("是否多选，0否 1是")
-    @TableField("is_multiple_choice")
     private Integer multipleChoice;
 
     /**
      * 是否支持多个，附件时用，0否 1时
      */
     @ApiModelProperty("是否支持多个，附件时用，0否 1时")
-    @TableField("is_more")
     private Integer more;
-
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty("删除标识")
-    private Integer delFlag;
-
 }
