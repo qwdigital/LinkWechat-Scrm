@@ -1,5 +1,6 @@
 package com.linkwechat.domain.leads.template.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -49,6 +50,7 @@ public class WeLeadsTemplateSettingsVO {
     @ApiModelProperty(value = "是否可被编辑 0 可被编辑 1 不可被编辑")
     private Integer canEdit;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
@@ -59,6 +61,7 @@ public class WeLeadsTemplateSettingsVO {
     private Long createById;
 
     @ApiModelProperty(value = "修改时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @ApiModelProperty(value = "更新人")

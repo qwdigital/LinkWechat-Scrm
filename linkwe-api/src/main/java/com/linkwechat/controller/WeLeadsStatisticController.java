@@ -303,7 +303,7 @@ public class WeLeadsStatisticController extends BaseController {
 
             WeLeadsUserStatisticVO vo = new WeLeadsUserStatisticVO();
             vo.setUserName(sysUser.getUserName());
-            vo.setDeptName(sysUser.getDept().getDeptName());
+            vo.setDeptName(sysUser.getDeptName());
             if (list.size() == 0) {
                 vo.setConversionRate(instance.format(0));
                 vo.setReturnRate(instance.format(0));
