@@ -13,6 +13,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyAddRequest;
+import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyMoveRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyUpdateRequest;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyVO;
@@ -145,8 +146,9 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
      */
     @ApiOperation("移动")
     @PutMapping("/move")
-    public AjaxResult move() {
-
+    public AjaxResult move(@RequestBody WeSubstituteCustomerOrderCataloguePropertyMoveRequest request) {
+        weSubstituteCustomerOrderCataloguePropertyService.move(request);
+        return AjaxResult.success();
     }
 
 

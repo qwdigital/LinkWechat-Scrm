@@ -34,5 +34,6 @@ public class WeSubstituteCustomerOrderCataloguePropertyMoveRequest {
      * 移动方向 0上 1下
      */
     @ApiModelProperty("移动方向")
+    @NotNull(message = "移动方向必填")
     private Integer direction;
 }
