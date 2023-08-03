@@ -1,6 +1,7 @@
 package com.linkwechat.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -42,8 +43,9 @@ public class WeSopChange extends BaseEntity {
 
 
     /**
-     * 删除标识 0 有效 1删除
+     * 删除标识 0 有效 1删除(表示已转入)
      */
+    @TableLogic
     private Integer delFlag;
 
 

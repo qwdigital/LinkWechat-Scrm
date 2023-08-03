@@ -38,6 +38,12 @@ public class WeSopBase extends BaseEntity {
     private Integer businessType;
 
     /**
+     *
+     */
+    @TableField(exist = false)
+    private Integer neBusinessType;
+
+    /**
      * sop名称
      */
     private String sopName;

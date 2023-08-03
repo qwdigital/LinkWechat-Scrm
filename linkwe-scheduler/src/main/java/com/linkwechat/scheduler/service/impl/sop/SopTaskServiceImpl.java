@@ -117,21 +117,55 @@ public class SopTaskServiceImpl implements SopTaskService {
 
     @Override
     public void handleChangeSop() {
-        List<WeSopChange> weSopChanges = iWeSopChangeService.list();
+        //处理完毕需要移除的数据(不包含周期sop下需要移除的)
+        List<Long> removeWeSopChangeIds=new ArrayList<>();
+
+        List<WeSopChange> weSopChanges = iWeSopChangeService.list(
+                new LambdaQueryWrapper<WeSopChange>()
+                        .eq(WeSopChange::getDelFlag,Constants.COMMON_STATE)
+        );
         if(CollectionUtil.isNotEmpty(weSopChanges)){
+            //构建客户sop转移的逻辑
             weSopChanges.stream().forEach(weSopChange -> {
-                Long sopBaseId = weSopChange.getSopBaseId();
-
-
-
+                this.builderChangeSop(weSopChange.getId(),weSopChange.getSopBaseId(),
+                        weSopChange.getAddUserId(),
+                        weSopChange.getExternalUserid(),
+                        removeWeSopChangeIds
+                        );
             });
+
+
+        }
+        if(CollectionUtil.isNotEmpty(removeWeSopChangeIds)){
+            iWeSopChangeService.removeByIds(removeWeSopChangeIds);
         }
 
     }
 
 
     //指定客户加入对应的sop中
-    public  void builderSop(Long sopBaseId,String executeWeUserId,WeCustomer weCustomer){
+    public  void builderChangeSop(Long weSopChangeId,Long sopBaseId,String executeWeUserId,String externalUserid,List<Long> removeWeSopChange){
+        List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid, externalUserid)
+                .eq(WeCustomer::getAddUserId, executeWeUserId));
+
+        if(CollectionUtil.isNotEmpty(weCustomers)){
+            WeSopBase weSopBase
+                    = iWeSopBaseService.getById(sopBaseId);
+            if(weSopBase != null && weSopBase.getBaseType().equals(1)){
+                if(!weSopBase.getBusinessType().equals(1)){//非新客sop，加入删除集合
+                    removeWeSopChange.add(weSopChangeId);
+                }
+                //构建客户sop执行计划
+                iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase,
+                        weCustomers.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId)),
+                        false, true);
+
+            }
+        }
+
+
+
 
     }
 
