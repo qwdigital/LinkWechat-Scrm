@@ -38,7 +38,7 @@ public class WeSopBase extends BaseEntity {
     private Integer businessType;
 
     /**
-     *
+     * 排除的类型
      */
     @TableField(exist = false)
     private Integer neBusinessType;

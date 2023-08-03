@@ -45,6 +45,7 @@ public class WeSopTask {
     @XxlJob("handleChangeSop")
     public void handleChangeSop(String params){
         log.info("转入sop构建处理>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+        sopTaskService.handleChangeSop();
     }
 
 
