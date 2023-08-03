@@ -200,7 +200,7 @@
         d.dept_name,
         d.dept_en_name
         from sys_user u
-        left join sys_user_dept ud on u.we_user_id = ud.we_user_id
+        left join sys_user_dept ud on u.user_id = ud.user_id
         left join sys_dept d on ud.dept_id = d.dept_id
         left join sys_user_role sur on sur.user_id=u.user_id
         where u.del_flag = 0 and u.is_user_leave=0
@@ -549,7 +549,7 @@
                         </foreach>
                     </if>
                     <if test="deptIds != null and deptIds != ''">
-                        OR su.dept_id IN
+                        OR sud.dept_id IN
                         <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                             #{item}
                         </foreach>
