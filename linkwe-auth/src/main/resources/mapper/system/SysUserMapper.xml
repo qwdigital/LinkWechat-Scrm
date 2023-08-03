@@ -533,27 +533,30 @@
         LEFT JOIN sys_user_dept sud on su.user_id=sud.user_id
         WHERE
         su.del_flag = 0
-
-        <trim prefixOverrides="OR">
-            <if test="weUserIds !='' and weUserIds !=null">
-                su.we_user_id IN
-                <foreach collection="weUserIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="positions !='' and positions !=null">
-                OR su.position IN
-                <foreach collection="positions.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="deptIds != null and deptIds != ''">
-                OR su.dept_id IN
-                <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-        </trim>
+        <if test="(weUserIds !='' and weUserIds !=null) or (positions !='' and positions !=null) or (deptIds != null and deptIds != '')">
+            AND (
+                <trim prefixOverrides="OR">
+                    <if test="weUserIds !='' and weUserIds !=null">
+                        OR su.we_user_id IN
+                        <foreach collection="weUserIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="positions !='' and positions !=null">
+                        OR su.position IN
+                        <foreach collection="positions.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="deptIds != null and deptIds != ''">
+                        OR su.dept_id IN
+                        <foreach collection="deptIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                </trim>
+            )
+        </if>
 
     </select>
 

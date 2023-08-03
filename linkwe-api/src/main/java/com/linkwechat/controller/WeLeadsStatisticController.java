@@ -229,7 +229,7 @@ public class WeLeadsStatisticController extends BaseController {
 
         Integer pageNum = ServletUtils.getParameterToInt("pageNum");
         Integer pageSize = ServletUtils.getParameterToInt("pageSize");
-        pageNum = pageNum == null ? 0 : pageNum;
+        pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 10 : pageSize;
 
         AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(request.getUserIds(), null, request.getDeptIds());
