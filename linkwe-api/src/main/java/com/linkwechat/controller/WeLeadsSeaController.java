@@ -177,7 +177,7 @@ public class WeLeadsSeaController extends BaseController {
 
             //自己创建的公海，在分公海列表可见，产品确认过
             LambdaQueryWrapper<WeLeadsSea> queryWrapper = Wrappers.lambdaQuery(WeLeadsSea.class);
-            queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName);
+            queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName, WeLeadsSea::getCreateBy, WeLeadsSea::getCreateById, WeLeadsSea::getUpdateTime);
             queryWrapper.eq(WeLeadsSea::getCreateById, SecurityUtils.getUserId());
             queryWrapper.eq(WeLeadsSea::getDelFlag, Constants.COMMON_STATE);
             List<WeLeadsSea> list = weLeadsSeaService.list(queryWrapper);
@@ -208,7 +208,7 @@ public class WeLeadsSeaController extends BaseController {
      */
     private List<WeLeadsSea> getSeaList() {
         LambdaQueryWrapper<WeLeadsSea> queryWrapper = Wrappers.lambdaQuery(WeLeadsSea.class);
-        queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName);
+        queryWrapper.select(WeLeadsSea::getId, WeLeadsSea::getName, WeLeadsSea::getCreateBy, WeLeadsSea::getCreateById, WeLeadsSea::getUpdateTime);
         queryWrapper.eq(WeLeadsSea::getDelFlag, Constants.COMMON_STATE);
         List<WeLeadsSea> list = weLeadsSeaService.list(queryWrapper);
         return list;
