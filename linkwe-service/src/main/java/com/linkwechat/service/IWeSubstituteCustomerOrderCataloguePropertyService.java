@@ -3,6 +3,9 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyMoveRequest;
+import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCatalogueVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,4 +26,12 @@ public interface IWeSubstituteCustomerOrderCataloguePropertyService extends ISer
      */
     void move(WeSubstituteCustomerOrderCataloguePropertyMoveRequest request);
 
+    /**
+     * 属性
+     *
+     * @return {@link List< WeSubstituteCustomerOrderCatalogueVO>}
+     * @author WangYX
+     * @date 2023/08/03 17:05
+     */
+    List<WeSubstituteCustomerOrderCatalogueVO> properties();
 }

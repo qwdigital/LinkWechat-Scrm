@@ -5,13 +5,21 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
+import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogue;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyMoveRequest;
+import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyVO;
+import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCatalogueVO;
+import com.linkwechat.mapper.WeSubstituteCustomerOrderCatalogueMapper;
 import com.linkwechat.mapper.WeSubstituteCustomerOrderCataloguePropertyMapper;
 import com.linkwechat.service.IWeSubstituteCustomerOrderCataloguePropertyService;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -23,6 +31,9 @@ import java.util.List;
  */
 @Service
 public class WeSubstituteCustomerOrderCataloguePropertyServiceImpl extends ServiceImpl<WeSubstituteCustomerOrderCataloguePropertyMapper, WeSubstituteCustomerOrderCatalogueProperty> implements IWeSubstituteCustomerOrderCataloguePropertyService {
+
+    @Resource
+    private WeSubstituteCustomerOrderCatalogueMapper weSubstituteCustomerOrderCatalogueMapper;
 
     @Override
     public void move(WeSubstituteCustomerOrderCataloguePropertyMoveRequest request) {
@@ -70,5 +81,27 @@ public class WeSubstituteCustomerOrderCataloguePropertyServiceImpl extends Servi
             this.baseMapper.update(null, updateWrapper);
         }
 
+    }
+
+    @Override
+    public List<WeSubstituteCustomerOrderCatalogueVO> properties() {
+        LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogue> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogue.class);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogue::getDelFlag, Constants.COMMON_STATE);
+        queryWrapper.orderByAsc(WeSubstituteCustomerOrderCatalogue::getSort);
+        List<WeSubstituteCustomerOrderCatalogue> list = weSubstituteCustomerOrderCatalogueMapper.selectList(queryWrapper);
+        List<WeSubstituteCustomerOrderCatalogueVO> vos = BeanUtil.copyToList(list, WeSubstituteCustomerOrderCatalogueVO.class);
+
+        LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogueProperty> lambdaQuery = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogueProperty.class);
+        lambdaQuery.eq(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.COMMON_STATE);
+        lambdaQuery.orderByAsc(WeSubstituteCustomerOrderCatalogueProperty::getSort);
+        List<WeSubstituteCustomerOrderCatalogueProperty> properties = this.baseMapper.selectList(lambdaQuery);
+        Map<Long, List<WeSubstituteCustomerOrderCatalogueProperty>> map = properties.stream().collect(Collectors.groupingBy(WeSubstituteCustomerOrderCatalogueProperty::getCatalogueId));
+
+        vos.forEach(i -> {
+            List<WeSubstituteCustomerOrderCatalogueProperty> item = map.get(i.getId());
+            i.setProperties(BeanUtil.copyToList(item, WeSubstituteCustomerOrderCataloguePropertyVO.class));
+        });
+
+        return vos;
     }
 }

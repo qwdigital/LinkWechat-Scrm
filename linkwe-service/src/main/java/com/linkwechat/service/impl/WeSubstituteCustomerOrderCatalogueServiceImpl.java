@@ -9,12 +9,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogue;
+import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCatalogueMoveRequest;
 import com.linkwechat.mapper.WeSubstituteCustomerOrderCatalogueMapper;
+import com.linkwechat.mapper.WeSubstituteCustomerOrderCataloguePropertyMapper;
 import com.linkwechat.service.IWeSubstituteCustomerOrderCatalogueService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -27,6 +30,9 @@ import java.util.List;
  */
 @Service
 public class WeSubstituteCustomerOrderCatalogueServiceImpl extends ServiceImpl<WeSubstituteCustomerOrderCatalogueMapper, WeSubstituteCustomerOrderCatalogue> implements IWeSubstituteCustomerOrderCatalogueService {
+
+    @Resource
+    private WeSubstituteCustomerOrderCataloguePropertyMapper weSubstituteCustomerOrderCataloguePropertyMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -44,8 +50,11 @@ public class WeSubstituteCustomerOrderCatalogueServiceImpl extends ServiceImpl<W
         updateWrapper.set(WeSubstituteCustomerOrderCatalogue::getDelFlag, Constants.DELETE_STATE);
         this.baseMapper.update(null, updateWrapper);
 
-        //TODO 删除分组下的字段
-
+        //删除分组下的字段
+        LambdaUpdateWrapper<WeSubstituteCustomerOrderCatalogueProperty> lambdaUpdate = Wrappers.lambdaUpdate(WeSubstituteCustomerOrderCatalogueProperty.class);
+        lambdaUpdate.eq(WeSubstituteCustomerOrderCatalogueProperty::getCatalogueId, id);
+        lambdaUpdate.set(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.DELETE_STATE);
+        weSubstituteCustomerOrderCataloguePropertyMapper.update(null, lambdaUpdate);
     }
 
     @Override

@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * <p>
  * 代客下单字段分类
@@ -40,6 +42,11 @@ public class WeSubstituteCustomerOrderCatalogueVO {
      * 是否固定分组 0否 1是
      */
     @ApiModelProperty("是否固定分组 0否 1是")
-    @TableField("is_fixed")
     private Integer fixed;
+
+    /**
+     * 属性
+     */
+    @ApiModelProperty("属性")
+    private List<WeSubstituteCustomerOrderCataloguePropertyVO> properties;
 }

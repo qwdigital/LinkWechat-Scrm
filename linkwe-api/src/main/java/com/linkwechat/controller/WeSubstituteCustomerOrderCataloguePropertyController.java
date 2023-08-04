@@ -193,17 +193,16 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
     }
 
     /**
-     * 获取可变字段
+     * 属性
      *
+     * @return {@link AjaxResult}
      * @author WangYX
-     * @date 2023/08/03 16:39
-     * @version 1.0.0
+     * @date 2023/08/03 16:59
      */
-    @ApiOperation("获取可变字段")
-    @GetMapping("/variable")
-    public AjaxResult variableProperty() {
-
-        return AjaxResult.success();
+    @ApiOperation("属性")
+    @GetMapping("/properties")
+    public AjaxResult properties() {
+        return AjaxResult.success( weSubstituteCustomerOrderCataloguePropertyService.properties());
     }
 
 }

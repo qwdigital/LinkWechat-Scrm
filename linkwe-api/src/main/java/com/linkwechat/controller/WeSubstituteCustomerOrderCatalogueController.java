@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogue;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCatalogueAddRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCatalogueMoveRequest;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 @Api(tags = "代客下单字段分类")
 @RestController
-@RequestMapping("/substitute/customer/order")
+@RequestMapping("/substitute/customer/order/catalogue")
 public class WeSubstituteCustomerOrderCatalogueController extends BaseController {
 
     @Resource
@@ -68,10 +69,20 @@ public class WeSubstituteCustomerOrderCatalogueController extends BaseController
     @ApiOperation("新增")
     @PostMapping("")
     public AjaxResult add(@Validated @RequestBody WeSubstituteCustomerOrderCatalogueAddRequest request) {
+        //检查分类名称是否重复
         LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogue> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogue.class);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogue::getDelFlag, Constants.COMMON_STATE);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogue::getName, request.getName());
+        WeSubstituteCustomerOrderCatalogue one = weSubstituteCustomerOrderCatalogueService.getOne(queryWrapper);
+        if (BeanUtil.isNotEmpty(one)) {
+            throw new ServiceException("分类名称不能重复！");
+        }
+        //获取数量
+        queryWrapper.clear();
         queryWrapper.eq(WeSubstituteCustomerOrderCatalogue::getDelFlag, Constants.COMMON_STATE);
         int count = weSubstituteCustomerOrderCatalogueService.count(queryWrapper);
 
+        //新增
         WeSubstituteCustomerOrderCatalogue catalogue = new WeSubstituteCustomerOrderCatalogue();
         catalogue.setId(IdUtil.getSnowflakeNextId());
         catalogue.setName(request.getName());
@@ -97,6 +108,17 @@ public class WeSubstituteCustomerOrderCatalogueController extends BaseController
         if (BeanUtil.isEmpty(weSubstituteCustomerOrderCatalogue)) {
             return AjaxResult.success();
         }
+        //检查分类名称是否重复
+        LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogue> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogue.class);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogue::getDelFlag, Constants.COMMON_STATE);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogue::getName, request.getName());
+        queryWrapper.ne(WeSubstituteCustomerOrderCatalogue::getId, request.getId());
+        WeSubstituteCustomerOrderCatalogue one = weSubstituteCustomerOrderCatalogueService.getOne(queryWrapper);
+        if (BeanUtil.isNotEmpty(one)) {
+            throw new ServiceException("分类名称不能重复！");
+        }
+
+        //修改
         LambdaUpdateWrapper<WeSubstituteCustomerOrderCatalogue> updateWrapper = Wrappers.lambdaUpdate(WeSubstituteCustomerOrderCatalogue.class);
         updateWrapper.eq(WeSubstituteCustomerOrderCatalogue::getId, request.getId());
         updateWrapper.set(StrUtil.isNotBlank(request.getName()), WeSubstituteCustomerOrderCatalogue::getName, request.getName());
