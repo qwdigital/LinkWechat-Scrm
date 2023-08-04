@@ -86,6 +86,7 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
     public Long add(WeLeadsSeaSaveRequest request) {
         //判断公海名称是否重复
         LambdaQueryWrapper<WeLeadsSea> queryWrapper = Wrappers.lambdaQuery(WeLeadsSea.class);
+        queryWrapper.eq(WeLeadsSea::getDelFlag, Constants.COMMON_STATE);
         queryWrapper.eq(WeLeadsSea::getName, request.getName());
         WeLeadsSea one = this.getOne(queryWrapper);
         if (BeanUtil.isNotEmpty(one)) {
