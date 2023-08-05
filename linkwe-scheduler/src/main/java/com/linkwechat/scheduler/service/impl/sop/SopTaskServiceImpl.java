@@ -1,7 +1,10 @@
 package com.linkwechat.scheduler.service.impl.sop;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.setting.SettingUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -12,9 +15,12 @@ import com.linkwechat.common.enums.strategiccrowd.CorpAddStateEnum;
 import com.linkwechat.common.enums.strategiccrowd.CrowdSwipeTypeEnum;
 import com.linkwechat.common.enums.strategiccrowd.CustomerAttributesEnum;
 import com.linkwechat.common.utils.DateUtils;
+import com.linkwechat.common.utils.MapUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeSopChange;
+import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.domain.sop.dto.WeSopBaseDto;
 import com.linkwechat.domain.sop.vo.WeSopExecuteConditVo;
@@ -23,6 +29,7 @@ import com.linkwechat.scheduler.service.AbstractCrowdService;
 import com.linkwechat.scheduler.service.SopTaskService;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +50,6 @@ public class SopTaskServiceImpl implements SopTaskService {
     @Autowired
     private IWeStrategicCrowdService iWeStrategicCrowdService;
 
-    @Autowired
-    private IWeSopChangeService iWeSopChangeService;
 
 
 
@@ -83,80 +88,156 @@ public class SopTaskServiceImpl implements SopTaskService {
         }
     }
 
-    @Override
-    public void builderXkPlan() {
+//    @Override
+//    public void builderXkPlan() {
+//
+//        //获取执行中的新客sop
+//        List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
+//                .in(WeSopBase::getBusinessType, ListUtil.toList(SopType.SOP_TYPE_XK.getSopKey(),SopType.SOP_TYPE_XQPY.getSopKey()))
+//                .eq(WeSopBase::getDelFlag, Constants.COMMON_STATE)
+//                .eq(WeSopBase::getSopState, 1));
+//
+//        if (CollectionUtil.isNotEmpty(weSopBases)) {
+//            weSopBases.stream().forEach(weSopBase -> {
+//
+//                Set<String> executeWeUserIds
+//                        = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
+//                if (weSopBase.getBaseType() == 1) { //客户sop
+//
+//                    //构建客户sop执行计划
+//                    iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), false, true);
+//
+//                }else if (weSopBase.getBaseType() == 2) { //客群sop
+//                    //构建客群sop执行计划
+//                    iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
+//                            , iWeSopBaseService.builderExecuteGroup(weSopBase,(WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), false,true);
+//
+//                }
+//
+//            });
+//
+//        }
+//
+//    }
 
+    @Override
+    public void builderNewWeCustomer(WeCustomer weCustomer) {
         //获取执行中的新客sop
         List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
-                .in(WeSopBase::getBusinessType, ListUtil.toList(SopType.SOP_TYPE_XK.getSopKey(),SopType.SOP_TYPE_XQPY.getSopKey()))
+                .eq(WeSopBase::getBusinessType, SopType.SOP_TYPE_XK.getSopKey())
+                .eq(WeSopBase::getDelFlag, Constants.COMMON_STATE)
+                .eq(WeSopBase::getSopState, 1));
+        if(CollectionUtil.isNotEmpty(weSopBases)){
+            weSopBases.stream().forEach(weSopBase -> {
+
+
+
+                Map<String, List<WeCustomer>> stringListMap
+                        = builderExecuteWeCustomer(weSopBase,
+                        CollUtil.newHashSet(weCustomer.getAddUserId()), true);
+
+                if(CollectionUtil.isNotEmpty(stringListMap)){
+                    List<WeCustomer> weCustomers = stringListMap.get(weCustomer.getAddUserId());
+
+                    if(CollectionUtil.isNotEmpty(weCustomers)){
+
+                        weCustomers.stream().forEach(k->{
+
+                            if(k.getExternalUserid().equals(weCustomer.getExternalUserid())){
+                                //加入新客sop
+                                iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase,
+                                        MapUtil.builder(weCustomer.getAddUserId(),ListUtil.list(false, weCustomer)).build()
+                                        , false, true);
+                            }
+
+                        });
+
+                    }
+
+                }
+
+
+
+
+            });
+
+        }
+
+    }
+
+    @Override
+    public void builderNewGroup(LinkGroupChatListVo linkGroupChatListVo) {
+
+
+        //获取执行中的新群sop
+        List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
+                .eq(WeSopBase::getBusinessType,SopType.SOP_TYPE_XQPY.getSopKey())
                 .eq(WeSopBase::getDelFlag, Constants.COMMON_STATE)
                 .eq(WeSopBase::getSopState, 1));
 
-        if (CollectionUtil.isNotEmpty(weSopBases)) {
+        if(CollectionUtil.isNotEmpty(weSopBases)){
             weSopBases.stream().forEach(weSopBase -> {
 
-                Set<String> executeWeUserIds
-                        = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
-                if (weSopBase.getBaseType() == 1) { //客户sop
 
-                    //构建客户sop执行计划
-                    iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase, executeWeUserIds, true), false, true);
+                //判断该群符不符合当前sop的条件
+                Map<String, List<LinkGroupChatListVo>> groupListMap
+                        = iWeSopBaseService.builderExecuteGroup(weSopBase, (WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(),
+                        CollUtil.newHashSet(linkGroupChatListVo.getOwner()));
 
-                }else if (weSopBase.getBaseType() == 2) { //客群sop
-                    //构建客群sop执行计划
-                    iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
-                            , iWeSopBaseService.builderExecuteGroup(weSopBase,(WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), false,true);
+
+                if(CollectionUtil.isNotEmpty(groupListMap)){
+                    List<LinkGroupChatListVo> linkGroupChatListVos
+                            = groupListMap.get(linkGroupChatListVo.getOwner());
+
+                    if(CollectionUtil.isNotEmpty(linkGroupChatListVos)){
+
+                        linkGroupChatListVos.stream().forEach(k->{
+
+                            if(k.getChatId().equals(linkGroupChatListVo.getChatId())){
+                                //构建新群sop
+                                iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
+                                        ,
+                                        MapUtil.builder(linkGroupChatListVo.getOwner(),ListUtil.list(false, linkGroupChatListVo)).build()
+                                        , true,true);
+                            }
+
+                        });
+
+                    }
+
+
+
 
                 }
 
+
+
+
             });
+
+
+
+
+
+
 
         }
 
     }
 
     @Override
-    public void handleChangeSop() {
-        //处理完毕需要移除的数据(不包含周期sop下需要移除的)
-        List<Long> removeWeSopChangeIds=new ArrayList<>();
-
-        List<WeSopChange> weSopChanges = iWeSopChangeService.list(
-                new LambdaQueryWrapper<WeSopChange>()
-                        .eq(WeSopChange::getDelFlag,Constants.COMMON_STATE)
-        );
-        if(CollectionUtil.isNotEmpty(weSopChanges)){
-            //构建客户sop转移的逻辑
-            weSopChanges.stream().forEach(weSopChange -> {
-                this.builderChangeSop(weSopChange.getId(),weSopChange.getSopBaseId(),
-                        weSopChange.getAddUserId(),
-                        weSopChange.getExternalUserid(),
-                        removeWeSopChangeIds
-                        );
-            });
+    public void handleChangeSop(WeSopChange weSopChange) {
 
 
-        }
-        if(CollectionUtil.isNotEmpty(removeWeSopChangeIds)){
-            iWeSopChangeService.removeByIds(removeWeSopChangeIds);
-        }
-
-    }
-
-
-    //指定客户加入对应的sop中
-    public  void builderChangeSop(Long weSopChangeId,Long sopBaseId,String executeWeUserId,String externalUserid,List<Long> removeWeSopChange){
         List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getExternalUserid, externalUserid)
-                .eq(WeCustomer::getAddUserId, executeWeUserId));
+                .eq(WeCustomer::getExternalUserid, weSopChange.getExternalUserid())
+                .eq(WeCustomer::getAddUserId, weSopChange.getAddUserId()));
 
         if(CollectionUtil.isNotEmpty(weCustomers)){
             WeSopBase weSopBase
-                    = iWeSopBaseService.getById(sopBaseId);
+                    = iWeSopBaseService.getById(weSopChange.getSopBaseId());
             if(weSopBase != null && weSopBase.getBaseType().equals(1)){
-                if(!weSopBase.getBusinessType().equals(1)){//非新客sop，加入删除集合
-                    removeWeSopChange.add(weSopChangeId);
-                }
-                //构建客户sop执行计划
+                //构建转入sop的计划
                 iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase,
                         weCustomers.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId)),
                         false, true);
@@ -165,9 +246,9 @@ public class SopTaskServiceImpl implements SopTaskService {
         }
 
 
-
-
     }
+
+
 
     //构建生效客户 isSelectYdCustomer(是否查询昨日新增客户,只针对新客sop，新加入的客户) true查询 false不查询
     private Map<String, List<WeCustomer>> builderExecuteWeCustomer(WeSopBase weSopBase, Set<String> executeWeUserIds, boolean isSelectYdCustomer) {

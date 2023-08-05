@@ -3,13 +3,17 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.SopExecuteStatus;
 import com.linkwechat.common.enums.SopType;
 import com.linkwechat.common.enums.TrackState;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.WeSopChange;
@@ -28,6 +32,7 @@ import com.linkwechat.domain.sop.vo.WeSopExecuteConditVo;
 import com.linkwechat.domain.sop.vo.WeSopExecuteEndVo;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -78,20 +83,27 @@ implements IWeSopExecuteTargetService {
     private IWeSopChangeService iWeSopChangeService;
 
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+    @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+
 
 
 
 
     @Override
-    public void sopExceptionEnd(List<String> executeWeUserIds, List<String> executeWeCustomerIdsOrGroupIds) {
-
-        this.update(WeSopExecuteTarget.builder()
+    public void sopExceptionEnd(String targetId) {
+        this.update(
+                WeSopExecuteTarget.builder()
+                        .executeEndTime(new Date())
                         .executeState(SopExecuteStatus.SOP_STATUS_EXCEPTION.getType())
-                .build(), new LambdaQueryWrapper<WeSopExecuteTarget>()
-                .in(CollectionUtil.isNotEmpty(executeWeUserIds),WeSopExecuteTarget::getExecuteWeUserId,executeWeUserIds)
-                .in(CollectionUtil.isNotEmpty(executeWeCustomerIdsOrGroupIds),WeSopExecuteTarget::getTargetId,executeWeCustomerIdsOrGroupIds)
-                .eq(WeSopExecuteTarget::getExecuteState,SopExecuteStatus.SOP_STATUS_ING.getType()));
-
+                        .build(),new LambdaQueryWrapper<WeSopExecuteTarget>()
+                        .eq(WeSopExecuteTarget::getTargetId,targetId)
+        );
     }
 
     @Override
@@ -326,14 +338,23 @@ implements IWeSopExecuteTargetService {
                         if(null != toChangeIntoOtherSop && StringUtils.isNotEmpty(toChangeIntoOtherSop.getToChangeIntoSopId())){
 
 
-                            //入库至其他sop表中
-                            iWeSopChangeService.save(
-                                    WeSopChange.builder()
-                                            .addUserId(executeTarget.getExecuteWeUserId())
-                                            .sopBaseId(Long.parseLong(toChangeIntoOtherSop.getToChangeIntoSopId()))
-                                            .externalUserid(executeTarget.getTargetId())
-                                            .build()
-                            );
+                            WeSopChange weSopChange = WeSopChange.builder()
+                                    .addUserId(executeTarget.getExecuteWeUserId())
+                                    .sopBaseId(Long.parseLong(toChangeIntoOtherSop.getToChangeIntoSopId()))
+                                    .externalUserid(executeTarget.getTargetId())
+                                    .build();
+
+
+                            //入库至其他sop表中（记录）
+                           if( iWeSopChangeService.save(
+                                   weSopChange
+                           )){
+                               //通知处理转入构建下一个群的计划
+                               rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getChnageWeCustomerSopRk(), JSONObject.toJSONString(weSopChange));
+
+                           };
+
+
 
 
 

@@ -1177,10 +1177,9 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
         else{
-
-            //处理不满足当前条件的生效客群(针对客群sop编辑)
-            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                    new ArrayList<>());
+                //处理不满足当前条件的生效客群(针对客群sop编辑)
+                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+                        new ArrayList<>());
         }
     }
 

@@ -15,10 +15,7 @@ import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
 import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.factory.WeEventStrategy;
-import com.linkwechat.service.IWeCorpAccountService;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeCustomerTrajectoryService;
-import com.linkwechat.service.IWeMessagePushService;
+import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +42,8 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
 
+    @Autowired
+    private IWeSopExecuteTargetService iWeSopExecuteTargetService;
 
     @Autowired
     private IWeMessagePushService iWeMessagePushService;
@@ -59,6 +58,8 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
         }
         weCustomer.setTrackState(TrackState.STATE_YLS.getType());
         if(weCustomerService.updateById(weCustomer)){
+            //异常结束当前客户涉及到的sop任务
+            iWeSopExecuteTargetService.sopExceptionEnd(customerInfo.getExternalUserID());
             //添加跟进动态
             iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(weCustomer.getExternalUserid(),weCustomer.getAddUserId(),false,
                     true);

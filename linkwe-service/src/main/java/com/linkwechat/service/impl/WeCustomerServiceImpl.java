@@ -1060,11 +1060,18 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             iWeFissionService.handleTaskFissionRecord(state, weCustomer);
 
 
+
+
             //生成轨迹
             iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId, userId, true, true);
             //为被添加员工发送一条消息提醒
             iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@" + weCustomer.getCustomerName() + "刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(), false);
 
+
+
+            //通知新客sop
+            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getNewWeCustomerSopRk(),
+                    JSONObject.toJSONString(weCustomer));
 
         }
     }

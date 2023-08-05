@@ -110,6 +110,21 @@ public class RabbitMQSettingConfig {
     private String weCustomerRk;
 
 
+    //新客sop路由
+    @Value("${wecom.mq.route.sync.wecustomer:Rk_Wecustomer_Sop}")
+    private String newWeCustomerSopRk;
+
+
+    //新群sop路由
+    @Value("${wecom.mq.route.sync.wecustomer:Rk_Group_Sop}")
+    private String newWeGroupSopRk;
+
+
+    //转入下一个客户sop路由
+    @Value("${wecom.mq.route.sync.wecustomer:Rk_Change_Wecustomer_Sop}")
+    private String chnageWeCustomerSopRk;
+
+
     //离职成员分配同步路由
     @Value("${wecom.mq.route.sync.leaveUser:Rk_leaveUser}")
     private String weLeaveAllocateUserRk;
@@ -339,6 +354,20 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.sync.wecustomer:Qu_WeCustomer}")
     private String wecustomerQu;
 
+    //新客sop队列
+    @Value("${wecom.mq.queue.sync.sop:Qu_NewWeCustomerSopQu}")
+    private String newWeCustomerSopQu;
+
+
+    //新群sop队列
+    @Value("${wecom.mq.queue.sync.sop:Qu_NewWeGroupSopQu}")
+    private String newWeGroupSopQu;
+
+    //转入下一个客户sop队列
+    @Value("${wecom.mq.queue.sync.sop:Qu_Chnage_WeCustomerSopQu}")
+    private String changeWeCustomerSopQu;
+
+
     //企业微信标签队列
     @Value("${wecom.mq.queue.sync.grouptag:Qu_GroupTag}")
     private String grouptagQu;
@@ -448,5 +477,11 @@ public class RabbitMQSettingConfig {
      */
     @Value("${wecom.mq.queue.group-add-user-code:Qu_GroupAddUserCode}")
     private String groupAddUserCodeQu;
+
+
+
+
+
+
 
 }

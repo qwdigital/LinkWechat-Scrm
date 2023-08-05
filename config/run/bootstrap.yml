@@ -64,7 +64,7 @@ spring:
         # 命名空间id(此处不用public,因public初始化的空间, id为空)
         namespace: 4e237601-cea8-414d-b7b9-d7adc8cbcf95
         # nacos的ip地址和端口 
-        server-addr:  127.0.0.1:8848
+        server-addr:  120.79.64.17:10848
         # 这个就表示 在我们nacos命名空间id为 dev中 有一个data-id 为 demo-service.yml 的配置文件 读取这个里面的配置
         file-extension: yml
         config-retry-time: 300000

@@ -35,25 +35,24 @@ public class WeSopTask {
     private SopTaskService sopTaskService;
 
 
-    @XxlJob("builderXkSopPlan")
-    public void builderXkSopPlan(String params){
-        log.info("新客sop构建计划>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
-        sopTaskService.builderXkPlan();
-    }
+//    @XxlJob("builderXkSopPlan")
+//    public void builderXkSopPlan(String params){
+//        log.info("新客sop构建计划>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+//        sopTaskService.builderXkPlan();
+//    }
 
 
-    @XxlJob("handleChangeSop")
-    public void handleChangeSop(String params){
-        log.info("转入sop构建处理>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
-        sopTaskService.handleChangeSop();
-    }
+//    @XxlJob("handleChangeSop")
+//    public void handleChangeSop(String params){
+//        log.info("转入sop构建处理>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+//        sopTaskService.handleChangeSop();
+//    }
 
 
      @XxlJob("builderXkSopPlanTip")
      public void builderXkSopPlanTip(String params){
          log.info("企业微信发送方式新客sop提醒发送>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
          iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(null);
-
 
      }
 
