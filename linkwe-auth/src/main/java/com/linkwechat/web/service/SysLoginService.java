@@ -16,6 +16,7 @@ import com.linkwechat.common.enums.CommonErrorCodeEnum;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.domain.WeCorpAccount;
@@ -236,4 +237,5 @@ public class SysLoginService {
         wxLoginUser.setLoginTime(System.currentTimeMillis());
         return tokenService.createToken(wxLoginUser);
     }
+
 }

@@ -56,6 +56,7 @@ import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.interceptor.WeContactTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
@@ -322,7 +323,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeGroupChatListVo
      */
-    @Request(url = "/externalcontact/groupchat/list", type = "POST")
+    @Request(url = "/externalcontact/groupchat/list", type = "POST",interceptor= WeContactTokenInterceptor.class)
     WeGroupChatListVo getGroupChatList(@JSONBody WeGroupChatListQuery query);
 
     /**
@@ -331,7 +332,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeGroupChatDetailVo
      */
-    @Request(url = "/externalcontact/groupchat/get", type = "POST")
+    @Request(url = "/externalcontact/groupchat/get", type = "POST",interceptor= WeContactTokenInterceptor.class)
     WeGroupChatDetailVo getGroupChatDetail(@JSONBody WeGroupChatDetailQuery query);
 
     /**

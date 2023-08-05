@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.material.vo.WeMaterialVo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,7 +56,7 @@ public class WeCustomerTrajectory extends BaseEntity {
     private String content;
 
     //客户id获取群id(查询字段冗余)
-    private String  externalUseridOrChatid;
+    private String externalUseridOrChatid;
 
     //员工(查询字段冗余)
     private String weUserId;
@@ -63,8 +64,17 @@ public class WeCustomerTrajectory extends BaseEntity {
     //轨迹场景类型，详细描述，见TrajectorySceneType
     private Integer trajectorySceneType;
 
-
+    /**
+     * 素材Id
+     */
     private Long materialId;
+
+
+    /**
+     * 素材内容
+     */
+    @TableField(exist = false)
+    private WeMaterialVo weMaterialVo;
 
 
 }

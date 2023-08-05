@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -267,7 +268,6 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         SysUser data = JSONObject.parseObject(s, SysUser.class);
 
 
-
         //获取员工对应的企业信息
 //        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
 //        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
@@ -362,6 +362,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         sb.append(minutes != 0L ? minutes + "分" : "");
         sb.append(second != 0L ? second + "秒" : "");
 
+
         //4.发送应用通知消息。由RabbitMQ进行解耦
         if (ObjectUtil.isNotEmpty(weCustomer)) {
 
@@ -411,8 +412,10 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //标题
             weCustomerTrajectory.setTitle(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //文案内容,整体内容
-            String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
-            weCustomerTrajectory.setContent(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
+
+            weCustomerTrajectory.setContent(
+                    String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString())
+            );
             //
             weCustomerTrajectory.setMaterialId(weMaterial.getId());
             weCustomerTrajectoryMapper.insert(weCustomerTrajectory);

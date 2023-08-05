@@ -6,6 +6,7 @@ import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.department.WeAddDeptVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptIdVo;
+import com.linkwechat.domain.wecom.vo.department.WeDeptInfoVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.wecom.interceptor.WeAddressBookAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
@@ -59,4 +60,8 @@ public interface WeDeptClient {
 
     @Request(url = "/department/simplelist", type = "GET")
     WeDeptIdVo getDeptSimpleList(WeDeptQuery query);
+
+
+    @Get(url = "/department/get?id=${query.id}")
+    WeDeptInfoVo getDeptDetail(@Var("query") WeDeptQuery query);
 }

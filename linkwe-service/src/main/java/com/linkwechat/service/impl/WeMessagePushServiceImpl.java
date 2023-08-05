@@ -102,26 +102,43 @@ public class WeMessagePushServiceImpl implements IWeMessagePushService {
                             linkWeChatConfig.getLostCustomerRedirectUrl()
                             , weCorpAccount.getCorpId(), weCorpAccount.getAgentId()));
 
-//                    REDIRECT_URI=  linkWeChatConfig.getLostCustomerRedirectUrl();
                 } else if(taskType.equals(MessageNoticeType.CUSTOMER_SOP.getType())){//客户sop
 
                     if(StringUtils.isEmpty(linkWeChatConfig.getCustomerSopRedirectUrl())){
                         throw new WeComException("客户SOP的H5跳转链接不可为空");
                     }
-                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s",
-                            linkWeChatConfig.getCustomerSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s&isExpiringSoon=%s",
+                            linkWeChatConfig.getCustomerSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType,false));
 
-//                    REDIRECT_URI = linkWeChatConfig.getCustomerSopRedirectUrl();
+
+                }else if(taskType.equals(MessageNoticeType.CUSTOMER_SOP_DQTX.getType())){ //客户sop即将到期提醒
+
+                    if(StringUtils.isEmpty(linkWeChatConfig.getCustomerSopRedirectUrl())){
+                        throw new WeComException("客户SOP的H5跳转链接不可为空");
+                    }
+                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s&isExpiringSoon=%s",
+                            linkWeChatConfig.getCustomerSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType,true));
+
+
 
                 }else if(taskType.equals(MessageNoticeType.GROUP_SOP.getType())){//客群sop
 
                     if(StringUtils.isEmpty(linkWeChatConfig.getGroupSopRedirectUrl())){
                         throw new WeComException("客群SOP的H5跳转链接不可为空");
                     }
-                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s",
-                            linkWeChatConfig.getGroupSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType));
+                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s&isExpiringSoon=%s",
+                            linkWeChatConfig.getGroupSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType,false));
 
-//                    REDIRECT_URI =  linkWeChatConfig.getGroupSopRedirectUrl();
+
+                }else if(taskType.equals(MessageNoticeType.GROUP_SOP_DQTX.getType())){ //客群sop即将到期提醒
+
+
+                    if(StringUtils.isEmpty(linkWeChatConfig.getGroupSopRedirectUrl())){
+                        throw new WeComException("客群SOP的H5跳转链接不可为空");
+                    }
+                    REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s&isExpiringSoon=%s",
+                            linkWeChatConfig.getGroupSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(),taskType,true));
+
 
                 }else{//老客标签建群
                     if(StringUtils.isEmpty( linkWeChatConfig.getTagRedirectUrl())){

@@ -114,7 +114,7 @@ public class WeFission extends BaseEntity {
 
 
     /**
-     * 是否发送过消息通知 1:发送过 2:未发送过
+     * 是否发送过消息通知 1:发送过 2:未发送过 3:推送异常
      */
     private Integer isTip;
 

@@ -28,4 +28,28 @@ public interface QwSysDeptClient {
 
     @PostMapping("/system/dept/getListByDeptIds")
     AjaxResult<List<SysDeptVo>> getListByDeptIds(@RequestBody SysDeptQuery query);
+
+    /**
+     * 回调新增部门
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/dept/callback/add")
+    AjaxResult addDept(@RequestBody SysDeptQuery query);
+
+    /**
+     * 回调删除部门
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/dept/callback/delete")
+    AjaxResult delDept(@RequestBody SysDeptQuery query);
+
+    /**
+     * 回调更新部门
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/dept/callback/update")
+    AjaxResult updateDept(@RequestBody SysDeptQuery query);
 }

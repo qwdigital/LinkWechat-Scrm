@@ -41,16 +41,6 @@ public interface WeChatItemMapper extends BaseMapper<WeChatItem> {
 
 
 
-    /**
-     * h5素材列表(海报)
-     *
-     * @param sideId  侧边栏id
-     * @param keyword 关键词
-     * @return
-     */
-     List<WeChatSideVo> findChatPostsItems(@Param("sideId") Long sideId, @Param("keyword") String keyword,@Param("mediaType") String mediaType,@Param("userId") String userId);
-
-
 
 
 }

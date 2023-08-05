@@ -87,18 +87,23 @@ public class CommonGroupMsgServiceImpl extends AbstractGroupMsgSendTaskService {
             iWeGroupMessageTemplateService.updateById(template);
             throw new WeComException("发送失败");
         }finally {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("businessId",template.getBusinessId());
-            jsonObject.put("source",template.getSource());
-            jsonObject.put("status",template.getStatus());
-            try {
-                QwGroupMsgBusinessTypeEnum qwAppMsgBusinessTypeEnum = QwGroupMsgBusinessTypeEnum.parseEnum(template.getSource());
-                if(qwAppMsgBusinessTypeEnum != null){
-                    SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractGroupMsgService.class).callBackHandler(jsonObject);
+
+            if(template != null){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("businessId",template.getBusinessId());
+                jsonObject.put("source",template.getSource());
+                jsonObject.put("status",template.getStatus());
+                try {
+                    QwGroupMsgBusinessTypeEnum qwAppMsgBusinessTypeEnum = QwGroupMsgBusinessTypeEnum.parseEnum(template.getSource());
+                    if(qwAppMsgBusinessTypeEnum != null){
+                        SpringUtils.getBean(qwAppMsgBusinessTypeEnum.getBeanName(), AbstractGroupMsgService.class).callBackHandler(jsonObject);
+                    }
+                } catch (BeansException e) {
+                    log.error("groupMessageTaskHandler callback-error",e);
                 }
-            } catch (BeansException e) {
-                log.error("groupMessageTaskHandler callback-error",e);
+
             }
+
         }
 
     }

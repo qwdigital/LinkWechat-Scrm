@@ -16,16 +16,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class LinkWeApiApplication {
     public static void main(String[] args) {
 
-        try {
-            new SpringApplicationBuilder(LinkWeApiApplication.class)
-                    .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                    .properties("spring.application.name=linkwe-api")
-                    .build().run(args);
-            System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-api启动成功   ლ(´ڡ`ლ)ﾞ ");
-        }catch (Exception e){
-            e.printStackTrace();
-
-        }
+        new SpringApplicationBuilder(LinkWeApiApplication.class)
+                .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
+                .properties("spring.application.name=linkwe-api")
+                .build().run(args);
+        System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-api启动成功   ლ(´ڡ`ლ)ﾞ ");
 
     }
 

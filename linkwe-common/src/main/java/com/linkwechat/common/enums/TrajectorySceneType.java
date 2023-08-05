@@ -19,6 +19,8 @@ public enum TrajectorySceneType {
     TRAJECTORY_TITLE_GXQYBQ(5,"更新企业标签","员工:%s,更新客户:%s,企业标签为:%s"),
     TRAJECTORY_TITLE_GXGRBQ(6,"更新个人标签","员工:%s,更新客户:%s,个人标签:%s"),
     TRAJECTORY_TITLE_BJBQ(7,"编辑信息","员工:%s 更新客户详细资料:%s"),
+    TRAJECTORY_TITLE_QXKHQYBQ(16,"取消客户企业标签","员工:%s,取消客户:%s 的企业标签"),
+    TRAJECTORY_TITLE_QXKHGRBQ(17,"取消客户个人标签","员工:%s,取消客户:%s 的个人标签"),
 
     TRAJECTORY_TITLE_TJGJ(8,"添加跟进","员工:%s 添加客户:%s 跟进动态为:%s"),
 

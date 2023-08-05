@@ -25,6 +25,9 @@ public class WeAddKfWelcomeQuery {
     @ApiModelProperty("接待方式: 1-人工客服 2-智能助手")
     private Integer receptionType;
 
+    @ApiModelProperty("是否分时段: 1-否 2-是")
+    private Integer splitTime;
+
     @NotEmpty(message = "欢迎语不能为空")
     @Size(min = 1, message = "欢迎语不能为空")
     @ApiModelProperty("欢迎语")

@@ -27,6 +27,9 @@ public enum MessageNoticeType {
     CUSTOMER_SOP(9,"客户sop"),
     GROUP_SOP(10,"客群sop"),
 
+    GROUP_SOP_DQTX(11,"客群sop到期提醒"),
+    CUSTOMER_SOP_DQTX(12,"客户sop到期提醒"),
+
     SOP(2, "群sop");
 
 

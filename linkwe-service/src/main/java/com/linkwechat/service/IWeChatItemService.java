@@ -29,15 +29,6 @@ public interface IWeChatItemService extends IService<WeChatItem> {
      List<WeChatSideVo> chatItems(Long sideId, String keyword, String mediaType, String userId);
 
 
-    /**
-     * h5素材列表(海报)
-     *
-     * @param sideId  侧边栏id
-     * @param keyword 关键词
-     * @return
-     */
-     List<WeChatSideVo> findChatPostsItems(Long sideId,String keyword,String mediaType,String userId);
-
 
 
 }

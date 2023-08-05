@@ -8,7 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
@@ -24,6 +27,9 @@ import java.util.List;
 @Data
 @SuppressWarnings("serial")
 @TableName("we_sensitive")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeSensitive extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L; //1
@@ -87,7 +93,7 @@ public class WeSensitive extends BaseEntity implements Serializable {
     /**
      * 审计范围，敏感词审计需要覆盖的用户或机构
      */
-    @NotEmpty(message = "审计范围不能为空")
+    //@NotEmpty(message = "审计范围不能为空")
     @TableField(exist = false)
     @ApiModelProperty(value = "审计范围")
     private List<WeSensitiveAuditScope> auditUserScope;

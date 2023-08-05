@@ -29,8 +29,8 @@ import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwSysUserClient;
-import com.linkwechat.mapper.WeFissionMapper;
 import com.linkwechat.service.*;
+import com.linkwechat.mapper.WeFissionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -442,8 +442,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         }
     }
 
+
+    /**
+     * 处理裂变任务
+     */
     @Override
     public void handleFission() {
+
 
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
@@ -451,21 +456,25 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 .isNotNull(WeFission::getAddWeUserOrGroupCode)
                 .ne(WeFission::getFassionState, 3));
 
-        if(CollectionUtil.isNotEmpty(weFissions)){
-            weFissions.stream().forEach(weFission -> {
 
-                //如果当前时间在裂变结束时间之前,则裂变结束
-               if(new Date().after(weFission.getFassionEndTime())){
-                   weFission.setFassionState(3);
-               }
+        try {
 
-               //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
-                if(new Date().after(weFission.getFassionStartTime())&&
-                        new Date().before(weFission.getFassionEndTime())
-                ){
 
-                    //发送通知逻辑
-                  if(weFission.getIsTip().equals(new Integer(2))){
+            if(CollectionUtil.isNotEmpty(weFissions)){
+                weFissions.stream().forEach(weFission -> {
+
+                    //如果当前时间在裂变结束时间之前,则裂变结束
+                    if(new Date().after(weFission.getFassionEndTime())){
+                        weFission.setFassionState(3);
+                    }
+
+                    //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
+                    if(new Date().after(weFission.getFassionStartTime())&&
+                            new Date().before(weFission.getFassionEndTime())
+                    ){
+
+                        //发送通知逻辑
+                        if(weFission.getIsTip().equals(new Integer(2))){
 
                         WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
                         messageQuery.setIsAll(false);
@@ -474,24 +483,24 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         messageQuery.setLoginUser(SecurityUtils.getLoginUser());
                         messageQuery.setContent(weFission.getContent());
                         messageQuery.setBusinessIds(weFission.getId().toString());
+                        messageQuery.setSendTime(null);
 
-
-                        WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
-                        if(null != weMaterial){
-                            //构建发送素材
-                            messageQuery.setAttachmentsList(
-                                    ListUtil.toList(WeMessageTemplate.builder()
-                                                    .title(weFission.getFassionName())
-                                                    .msgType(MediaType.LINK.getMediaType())
-                                                    .linkUrl(weFission.getFissionUrl())
-                                                    .build(),
-                                            WeMessageTemplate.builder()
-                                                    .msgType(MediaType.TEXT.getMediaType())
-                                                    .content(weFission.getContent())
-                                                    .build()
-                                    )
-                            );
-                        }
+                            WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
+                            if(null != weMaterial){
+                                //构建发送素材
+                                messageQuery.setAttachmentsList(
+                                        ListUtil.toList(WeMessageTemplate.builder()
+                                                .title(weFission.getFassionName())
+                                                .msgType(MediaType.LINK.getMediaType())
+                                                .linkUrl(weFission.getFissionUrl())
+                                                .build(),
+                                                WeMessageTemplate.builder()
+                                                        .msgType(MediaType.TEXT.getMediaType())
+                                                        .content(weFission.getContent())
+                                                        .build()
+                                                )
+                                );
+                            }
 
 
 //                        if(weFission.getFassionStartTime()//定时发送,活动时间
@@ -502,72 +511,89 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 //                            messageQuery.setIsTask(0);
 //                        }
 
-                        //构建群发时间
-                        List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
+                            //构建群发时间
+                            List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
 
-                        //任务宝
-                        if(TaskFissionType.USER_FISSION.getCode()
-                                .equals(weFission.getFassionType())){
-                            messageQuery.setChatType(1);
-                            List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
-                                    weFission.getExecuteUserOrGroup()
-                            );
-
-                            if(CollectionUtil.isNotEmpty(weCustomersVos)){
-                                weCustomersVos.stream()
-                                        .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
-                                        .forEach((k,v)->{
-                                            senderInfos.add(
-                                                    WeAddGroupMessageQuery
-                                                            .SenderInfo
-                                                            .builder()
-                                                            .userId(k)
-                                                            .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
-                                                            .build()
-                                            );
-
-                                        });
-                            }
-                            //群裂变
-                        }else if(TaskFissionType.GROUP_FISSION.getCode()
-                                .equals(weFission.getFassionType())){
-                            messageQuery.setChatType(2);
-                            WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
-                            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
-                                    .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
-                                            ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
-                            if(CollectionUtil.isNotEmpty(weGroups)){
-
-                                senderInfos.add(
-                                        WeAddGroupMessageQuery
-                                                .SenderInfo
-                                                .builder()
-                                                .userId(executeUserOrGroup.getWeUserIds())
-                                                .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
-                                                .build()
+                            //任务宝
+                            if(TaskFissionType.USER_FISSION.getCode()
+                                    .equals(weFission.getFassionType())){
+                                messageQuery.setChatType(1);
+                                List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
+                                        weFission.getExecuteUserOrGroup()
                                 );
+
+                                if(CollectionUtil.isNotEmpty(weCustomersVos)){
+                                    weCustomersVos.stream()
+                                            .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
+                                            .forEach((k,v)->{
+                                                senderInfos.add(
+                                                        WeAddGroupMessageQuery
+                                                                .SenderInfo
+                                                                .builder()
+                                                                .userId(k)
+                                                                .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
+                                                                .build()
+                                                );
+
+                                            });
+                                }
+                                //群裂变
+                            }else if(TaskFissionType.GROUP_FISSION.getCode()
+                                    .equals(weFission.getFassionType())){
+                                messageQuery.setChatType(2);
+                                WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
+                                List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                                        .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
+                                                ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
+                                if(CollectionUtil.isNotEmpty(weGroups)){
+
+                                    senderInfos.add(
+                                            WeAddGroupMessageQuery
+                                                    .SenderInfo
+                                                    .builder()
+                                                    .userId(executeUserOrGroup.getWeUserIds())
+                                                    .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
+                                                    .build()
+                                    );
+                                }
                             }
+
+                            messageQuery.setSenderList(senderInfos);
+
+                            weFission.setIsTip(1);
+                            //通知员工群发
+                            iWeMessagePushService.officialPushMessage(messageQuery);
                         }
 
-                        messageQuery.setSenderList(senderInfos);
 
-                         weFission.setIsTip(1);
-                        //通知员工群发
-                        iWeMessagePushService.officialPushMessage(messageQuery);
+                        weFission.setFassionState(2);
                     }
 
 
-                    weFission.setFassionState(2);
-                }
+
+
+
+                });
 
 
 
 
+            }
 
-            });
+        }catch (Exception e){
+
+            if(CollectionUtil.isNotEmpty(weFissions)){
+                weFissions.stream().forEach(weFission ->{
+                    weFission.setIsTip(3);
+                });
+            }
 
 
-            this.updateBatchById(weFissions);
+        }finally {
+            if(CollectionUtil.isNotEmpty(weFissions)){
+                this.baseMapper.updateBatchFissionIsTip(weFissions);
+            }
+
 
         }
 

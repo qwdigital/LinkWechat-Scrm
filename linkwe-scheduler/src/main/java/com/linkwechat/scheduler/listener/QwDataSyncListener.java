@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler.listener;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.*;
 import com.rabbitmq.client.Channel;
@@ -39,6 +40,7 @@ public class QwDataSyncListener {
 
     @Resource
     private IWeProductOrderService weProductOrderService;
+
 
     @Autowired
     private IWeLiveService iWeLiveService;
@@ -85,16 +87,34 @@ public class QwDataSyncListener {
         }
     }
 
-    @RabbitHandler
+
+
+
+
+
+    /*@RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.user-depart:Qu_UserDepart}")
     public void weUserAndDepartSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微员工部门同步消息监听：msg:{}", msg);
-            qwSysUserClient.syncUserAndDeptHandler(msg);
+            qwSysUserClient.sync(msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微员工部门同步-消息处理失败 msg:{},error:{}", msg, e);
+        }
+    }*/
+
+    @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.sync.sys-user:Qu_SysUser}")
+    public void sysUserSubscribe(String msg, Channel channel, Message message) {
+        log.info("企微员工信息消息监听：msg:{}", msg);
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(msg);
+            qwSysUserClient.syncUserHandler(jsonObject);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            log.error("企微员工同步消息监听-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
 

@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service.impl;
 
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
+import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
@@ -286,6 +287,11 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeResultVo deleteCustomerLink(WeLinkCustomerQuery query) {
         return weCustomerClient.deleteCustomerLink(query);
+    }
+
+    @Override
+    public WeResultVo updateCustomerRemark(UpdateCustomerRemarkQuery query) {
+        return weCustomerClient.updateCustomerRemark(query);
     }
 
 
