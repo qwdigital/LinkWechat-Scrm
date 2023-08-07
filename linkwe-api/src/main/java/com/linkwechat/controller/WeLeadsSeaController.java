@@ -94,7 +94,7 @@ public class WeLeadsSeaController extends BaseController {
     @PutMapping("/update")
     public AjaxResult update(@Validated @RequestBody WeLeadsSeaUpdateRequest request) {
         if (request.getId().equals(1L)) {
-            throw new ServiceException("默认公海，不支持编辑！");
+            return AjaxResult.error("默认公海，不支持编辑！");
         }
         weLeadsSeaService.update(request);
         return AjaxResult.success();
