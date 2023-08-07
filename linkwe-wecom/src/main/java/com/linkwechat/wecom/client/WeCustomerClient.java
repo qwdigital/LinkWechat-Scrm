@@ -596,7 +596,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/create_link")
+    @Post(url="/externalcontact/customer_acquisition/create_link",interceptor= WeContactTokenInterceptor.class)
     WeLinkCustomerVo createCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -607,7 +607,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/update_link")
+    @Post(url="/externalcontact/customer_acquisition/update_link",interceptor= WeContactTokenInterceptor.class)
     WeResultVo updateCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -618,7 +618,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/delete_link")
+    @Post(url="/externalcontact/customer_acquisition/delete_link",interceptor= WeContactTokenInterceptor.class)
     WeResultVo deleteCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -626,7 +626,7 @@ public interface WeCustomerClient {
      * 获取获客列表
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/customer")
+    @Post(url="/externalcontact/customer_acquisition/customer",interceptor= WeContactTokenInterceptor.class)
     WeLinkWecustomerCountVo customerLinkCount(@JSONBody WeLinkCustomerCountQuery query);
 
 
@@ -634,7 +634,7 @@ public interface WeCustomerClient {
      * 企业可通过此接口查询当前剩余的使用量。
      * @return
      */
-    @Get("/externalcontact/customer_acquisition_quota")
+    @Get(url="/externalcontact/customer_acquisition_quota",interceptor= WeContactTokenInterceptor.class)
     WeLinkCustomerAcquisitionQuotaVo customerAcquisitionQuota(@JSONBody WeBaseQuery query);
 
 
