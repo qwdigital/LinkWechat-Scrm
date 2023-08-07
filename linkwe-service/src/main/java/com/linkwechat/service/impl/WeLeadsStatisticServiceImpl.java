@@ -65,14 +65,13 @@ public class WeLeadsStatisticServiceImpl implements IWeLeadsStatisticService {
 
         NumberFormat instance = NumberFormat.getPercentInstance();
         instance.setMaximumFractionDigits(2);
-
         //线索转化率
-        String conversionRate = instance.format(customerNum / (double) totalNum);
+        String conversionRate = instance.format(totalNum == 0 ? 0 : customerNum / (double) totalNum);
 
         //线索退回数量
         long returnNum = weLeads.stream().filter(i -> i.getLeadsStatus().equals(LeadsStatusEnum.RETURNED.getCode())).count();
         //线索退回率
-        String returnRate = instance.format(returnNum / (double) totalNum);
+        String returnRate = instance.format(totalNum == 0 ? 0 : returnNum / (double) totalNum);
 
         Map<String, Object> result = new HashMap<>(5);
         result.put("totalNum", totalNum);
