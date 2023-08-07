@@ -12,6 +12,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.substitute.customer.order.SubstituteCustomerOrderCataloguePropertyTypeEnum;
+import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyAddRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyMoveRequest;
@@ -19,7 +20,6 @@ import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustome
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderCataloguePropertyUpdateRequest;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyVO;
 import com.linkwechat.service.IWeSubstituteCustomerOrderCataloguePropertyService;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -55,7 +54,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
      * @date 2023/08/03 9:58
      */
     @ApiOperation("列表")
-    @GetMapping("/page")
+    @GetMapping("")
     public TableDataInfo list(@Validated WeSubstituteCustomerOrderCataloguePropertyRequest request) {
         startPage();
         LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogueProperty> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogueProperty.class);
@@ -202,7 +201,33 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
     @ApiOperation("属性")
     @GetMapping("/properties")
     public AjaxResult properties() {
-        return AjaxResult.success( weSubstituteCustomerOrderCataloguePropertyService.properties());
+        return AjaxResult.success(weSubstituteCustomerOrderCataloguePropertyService.properties());
+    }
+
+    /**
+     * 获取订单状态 下拉框值
+     *
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/07 17:13
+     */
+    @ApiOperation("订单状态")
+    @GetMapping("/order/status")
+    public AjaxResult getOrderStatus() {
+        LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogueProperty> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogueProperty.class);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.COMMON_STATE);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getCode, "orderStatus");
+        WeSubstituteCustomerOrderCatalogueProperty one = weSubstituteCustomerOrderCataloguePropertyService.getOne(queryWrapper);
+        if (BeanUtil.isEmpty(one)) {
+            logger.error("订单状态不存在！，检查数据库数据是否初始化，或者订单状态的code是否被修改，固定值为orderStatus");
+            throw new ServiceException("订单状态不存在！！！");
+        }
+        String value = one.getValue();
+        if (StrUtil.isBlank(value)) {
+            logger.error("订单状态值不存在！，检查订单状态值是否存在！");
+            throw new ServiceException("订单状态值不存在！！！");
+        }
+        return AjaxResult.success(value.split(","));
     }
 
 }

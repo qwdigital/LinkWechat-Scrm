@@ -41,6 +41,13 @@ public class WeSubstituteCustomerOrderCatalogueProperty extends BaseEntity {
     private String name;
 
     /**
+     * 字段编码
+     */
+    @ApiModelProperty("字段编码")
+    @TableField("`code`")
+    private String code;
+
+    /**
      * 字段类型
      *
      * @see com.linkwechat.common.enums.substitute.customer.order.SubstituteCustomerOrderCataloguePropertyTypeEnum

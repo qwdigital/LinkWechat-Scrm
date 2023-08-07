@@ -35,6 +35,12 @@ public class WeSubstituteCustomerOrderCataloguePropertyVO {
     private String name;
 
     /**
+     * 字段编码
+     */
+    @ApiModelProperty("字段编码")
+    private String code;
+
+    /**
      * 字段类型
      *
      * @see com.linkwechat.common.enums.substitute.customer.order.SubstituteCustomerOrderCataloguePropertyTypeEnum
@@ -101,5 +107,12 @@ public class WeSubstituteCustomerOrderCataloguePropertyVO {
      */
     @ApiModelProperty("是否支持多个，附件时用，0否 1时")
     private Integer more;
+
+
+    /**
+     * 实际值
+     */
+    @ApiModelProperty("实际值")
+    private Object actualValue;
 
 }
