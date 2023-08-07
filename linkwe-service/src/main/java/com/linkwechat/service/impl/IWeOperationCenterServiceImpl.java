@@ -207,7 +207,7 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
         if (pageDomain.getPageNum() != null && pageDomain.getPageSize() != null) {
             PageHelper.startPage(pageDomain.getPageNum(), pageDomain.getPageSize());
         }
-        List<WeCustomerRealCntVo> customerLostCnt = weOperationCenterMapper.getCustomerLostCnt(query);
+        List<WeCustomerRealCntVo> customerLostCnt = weOperationCenterMapper.getNewCustomerLostCnt(query);
         if (CollectionUtil.isNotEmpty(dayCountDataByTime)) {
             Map<String, List<WePageCountVo>> listMap = dayCountDataByTime.stream().collect(Collectors.groupingBy(WePageCountVo::getXTime));
             Map<String, Integer> lostCntMap = customerLostCnt.stream()
@@ -218,8 +218,12 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
                 if (CollectionUtil.isNotEmpty(WePageCountVos)) {
                     realCnt.setApplyCnt(WePageCountVos.get(0).getNewApplyCnt());
                 }
+
                 if (lostCntMap.containsKey(realCnt.getXTime())) {
                     realCnt.setLostCnt(lostCntMap.get(realCnt.getXTime()));
+                }else{
+                    realCnt.setLostCnt(0);
+
                 }
             });
         }
@@ -248,6 +252,7 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
     public List<WeGroupMemberRealCntVo> selectGroupMemberBrokenLine(WeOperationGroupQuery query) {
         return this.weOperationCenterMapper.selectGroupMemberBrokenLine(query);
     }
+
 
 
 }

@@ -82,6 +82,7 @@ public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements
             iQwAccessTokenService.removeCommonAccessToken(corpId);
             String token = iQwAccessTokenService.findCommonAccessToken(corpId);
             request.replaceOrAddQuery("access_token", token);
+            request.execute();
         }
     }
 

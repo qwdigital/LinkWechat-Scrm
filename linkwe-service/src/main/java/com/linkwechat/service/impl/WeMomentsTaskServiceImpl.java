@@ -55,10 +55,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -322,9 +320,21 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         if (CollectionUtil.isNotEmpty(list)) {
             //是否在lw平台发布的:1:是;0:否;
             if (weMomentsTaskVO.getIsLwPush().equals(1)) {
-                List<Long> materialList = list.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
+                List<Long> materialList = new ArrayList<>();
+                list.stream().forEach(i->materialList.add(i.getMaterialId()));
                 List<WeMaterial> weMaterials = weMaterialService.listByIds(materialList);
-                weMomentsTaskVO.setMaterialList(weMaterials);
+                //防止重复的素材被过滤掉
+                if (BeanUtil.isNotEmpty(weMaterials)) {
+                    Map<Long, WeMaterial> collect = weMaterials.stream().collect(Collectors.toMap(WeMaterial::getId, Function.identity()));
+                    List<WeMaterial> attachments = new ArrayList<>();
+                    materialList.forEach(i -> {
+                        WeMaterial weMaterial = collect.get(i);
+                        if (BeanUtil.isNotEmpty(weMaterial)) {
+                            attachments.add(weMaterial);
+                        }
+                    });
+                    weMomentsTaskVO.setMaterialList(attachments);
+                }
             }
             if (weMomentsTaskVO.getIsLwPush().equals(0)) {
                 List<WeMaterial> weMaterials = new ArrayList<>();
@@ -384,7 +394,8 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         LambdaQueryWrapper<WeMomentsAttachments> wrapper = Wrappers.lambdaQuery(WeMomentsAttachments.class);
         wrapper.eq(WeMomentsAttachments::getMomentsTaskId, weMomentsTaskId);
         List<WeMomentsAttachments> list = weMomentsAttachmentsService.list(wrapper);
-        List<Long> materialIds = list.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
+        List<Long> materialIds = new ArrayList<>();
+        list.forEach(i->materialIds.add(i.getMaterialId()));
 
         //发送朋友圈
         sendWeMoments(weMomentsTask, materialIds);
@@ -587,7 +598,18 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         if (CollectionUtil.isNotEmpty(materialIds)) {
             List<Object> attachments = new ArrayList<>();
             List<WeMaterial> list = weMaterialService.listByIds(materialIds);
-            for (WeMaterial weMaterial : list) {
+            List<WeMaterial> materialList = new ArrayList<>();
+            //防止重复的素材被过滤掉
+            if (BeanUtil.isNotEmpty(list)) {
+                Map<Long, WeMaterial> collect = list.stream().collect(Collectors.toMap(WeMaterial::getId, Function.identity()));
+                materialIds.forEach(i -> {
+                    WeMaterial weMaterial = collect.get(i);
+                    if (BeanUtil.isNotEmpty(weMaterial)) {
+                        materialList.add(weMaterial);
+                    }
+                });
+            }
+            for (WeMaterial weMaterial : materialList) {
                 //图片和海报
                 if (weMaterial.getMediaType().equals(CategoryMediaType.IMAGE.getType().toString()) || weMaterial.getMediaType().equals(CategoryMediaType.POSTER.getType().toString())) {
                     String media_id = weMaterialService.uploadAttachmentMaterial(weMaterial.getMaterialUrl(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
@@ -703,7 +725,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             MomentsParamDto.Link build = new MomentsParamDto.Link();
             //移动端素材详情地址
             String materialDetailUrl = linkWeChatConfig.getMaterialDetailUrl();
-            String url = String.format(materialDetailUrl, weMaterial.getId());
+            String url = StringUtils.format(materialDetailUrl, weMaterial.getId());
             build.setUrl(url);
             build.setMedia_id(media_id);
             build.setTitle(truncationStr(weMaterial.getMaterialName(), 64));
@@ -1161,8 +1183,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
     /**
      * 同步朋友圈个人互动数据
-     * <p>
-     * TODO 朋友圈改动之后，这里的需求牵扯到了，但是需求不懂，就按照改动之前的逻辑来写的，后面需求不对时，需完善
      *
      * @param msg
      * @author WangYX
@@ -1184,22 +1204,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             if (CollectionUtil.isNotEmpty(list)) {
                 for (WeMomentsUser weMomentsUser : list) {
                     weMomentsInteracteService.syncAddWeMomentsInteracte(weMomentsUser.getMomentsTaskId(), weMomentsUser.getMomentsId());
-                    LambdaQueryWrapper<WeMomentsInteracte> wrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
-                    wrapper.eq(WeMomentsInteracte::getMomentsTaskId, weMomentsUser.getMomentsTaskId());
-                    wrapper.eq(WeMomentsInteracte::getMomentId, weMomentsUser.getMomentsId());
-                    wrapper.eq(WeMomentsInteracte::getDelFlag, Constants.COMMON_STATE);
-                    List<WeMomentsInteracte> interactes = weMomentsInteracteService.list(wrapper);
-                    if (CollectionUtil.isNotEmpty(interactes)) {
-                        interactes.forEach(interacte -> {
-                            if (new Integer(1).equals(interacte.getInteracteUserType())) {//互动人员为客户
-                                iWeCustomerTrajectoryService.createInteractionTrajectory(
-                                        interacte.getInteracteUserId(),
-                                        interacte.getMomentCreteOrId(),
-                                        new Integer(1).equals(interacte.getInteracteType()) ? TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType() : TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType(), null
-                                );
-                            }
-                        });
-                    }
                 }
             }
         }

@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 /**
  * @author danmo
  * @description 客户群聊列表出参
@@ -59,6 +61,12 @@ public class LinkGroupChatListVo extends WeGroup {
      * 标签IDS
      */
     private String tagIds;
+
+
+    /**
+     * 群创建时间
+     */
+    private Date addTime;
 
 
 }

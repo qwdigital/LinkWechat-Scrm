@@ -3,6 +3,7 @@ package com.linkwechat.fallback;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
+import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
@@ -233,6 +234,11 @@ public class QwCustomerFallbackFactory implements QwCustomerClient {
 
     @Override
     public AjaxResult<WeLinkWecustomerCountVo> customerLinkCount(WeLinkCustomerCountQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<WeResultVo> updateCustomerRemark(UpdateCustomerRemarkQuery query) {
         return null;
     }
 

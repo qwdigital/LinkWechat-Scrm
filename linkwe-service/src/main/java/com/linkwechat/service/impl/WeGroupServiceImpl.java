@@ -12,6 +12,7 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.GroupUpdateDetailEnum;
 import com.linkwechat.common.enums.MessageNoticeType;
@@ -207,41 +208,77 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
         if (CollectionUtil.isNotEmpty(groupChatList)) {
 
+            //获取相关详情
+            for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
+                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
+                AjaxResult<WeGroupChatDetailVo> result
+                        = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery);
+                if(null != result){
+                    WeGroupChatDetailVo data = result.getData();
+                    if(null != data && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                        WeGroupChatDetailVo.GroupChatDetail groupChatDetail = data.getGroupChat();
+                        if(null != groupChatDetail){
 
-            List<WeGroup> weGroupList = this.list(new LambdaQueryWrapper<WeGroup>()
-                    .in(WeGroup::getChatId, groupChatList.stream().map(WeGroupChatListVo.GroupChat::getChatId).collect(Collectors.toList())));
+                            WeGroup weGroup = new WeGroup();
+                            weGroup.transformQwParams(groupChatDetail);
+                            weGroup.setStatus(groupChat.getStatus());
+                            weGroup.setDelFlag(Constants.COMMON_STATE);
+                            weGroup.setCreateBy(SecurityUtils.getUserName());
+                            weGroup.setCreateById(SecurityUtils.getUserId());
+                            weGroup.setUpdateBy(SecurityUtils.getUserName());
+                            weGroup.setUpdateById(SecurityUtils.getUserId());
+                            weGroup.setCreateTime(new Date());
+                            weGroup.setUpdateTime(new Date());
+                            weGroups.add(weGroup);
+
+                        }
 
 
-
-
-
-            groupChatList.stream().forEach(k->{
-
-                WeGroup weGroup = new WeGroup();
-                weGroup.setChatId(k.getChatId());
-                weGroup.setGroupName("@企微群");
-                weGroup.setDelFlag(Constants.COMMON_STATE);
-                weGroup.setCreateBy(SecurityUtils.getUserName());
-                weGroup.setCreateById(SecurityUtils.getUserId());
-                weGroup.setUpdateBy(SecurityUtils.getUserName());
-                weGroup.setUpdateById(SecurityUtils.getUserId());
-                weGroup.setCreateTime(new Date());
-                weGroup.setUpdateTime(new Date());
-
-
-                if(CollectionUtil.isNotEmpty(weGroupList)) {
-                    WeGroup oldWeGroup
-                            = weGroupList.stream().filter(item -> item.getChatId().equals(k.getChatId())).findFirst().get();
-                    if(null != oldWeGroup){
-                        weGroup.setGroupName(oldWeGroup.getGroupName());
                     }
+
+
 
                 }
 
 
-                weGroups.add(weGroup);
+            }
 
-            });
+
+//
+//            List<WeGroup> weGroupList = this.list(new LambdaQueryWrapper<WeGroup>()
+//                    .in(WeGroup::getChatId, groupChatList.stream().map(WeGroupChatListVo.GroupChat::getChatId).collect(Collectors.toList())));
+//
+//
+//
+//
+//
+//            groupChatList.stream().forEach(k->{
+//
+//                WeGroup weGroup = new WeGroup();
+//                weGroup.setChatId(k.getChatId());
+//                weGroup.setGroupName("@企微群");
+//                weGroup.setDelFlag(Constants.COMMON_STATE);
+//                weGroup.setCreateBy(SecurityUtils.getUserName());
+//                weGroup.setCreateById(SecurityUtils.getUserId());
+//                weGroup.setUpdateBy(SecurityUtils.getUserName());
+//                weGroup.setUpdateById(SecurityUtils.getUserId());
+//                weGroup.setCreateTime(new Date());
+//                weGroup.setUpdateTime(new Date());
+//
+//
+//                if(CollectionUtil.isNotEmpty(weGroupList)) {
+//                    WeGroup oldWeGroup
+//                            = weGroupList.stream().filter(item -> item.getChatId().equals(k.getChatId())).findFirst().get();
+//                    if(null != oldWeGroup){
+//                        weGroup.setGroupName(oldWeGroup.getGroupName());
+//                    }
+//
+//                }
+//
+//
+//                weGroups.add(weGroup);
+//
+//            });
 
 
 

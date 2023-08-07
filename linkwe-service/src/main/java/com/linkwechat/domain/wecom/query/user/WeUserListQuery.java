@@ -16,7 +16,7 @@ public class WeUserListQuery extends WeBaseQuery {
     /**
      * 获取的部门id
      */
-    private String department_id;
+    private Long department_id;
 
     /**
      * 是否递归获取子部门下面的成员：1-递归获取，0-只获取本部门

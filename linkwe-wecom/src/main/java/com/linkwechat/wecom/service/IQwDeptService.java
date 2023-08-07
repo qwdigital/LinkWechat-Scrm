@@ -2,6 +2,7 @@ package com.linkwechat.wecom.service;
 
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
 import com.linkwechat.domain.wecom.vo.department.WeDeptIdVo;
+import com.linkwechat.domain.wecom.vo.department.WeDeptInfoVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 
 /**
@@ -19,4 +20,6 @@ public interface IQwDeptService {
     WeDeptVo getDeptList(WeDeptQuery query);
 
     WeDeptIdVo getDeptSimpleList(WeDeptQuery query);
+
+    WeDeptInfoVo getDeptDetail(WeDeptQuery query);
 }

@@ -66,6 +66,7 @@ public class WeAgentController extends BaseController {
         weAgentQuery.setCorpid(SecurityUtils.getCorpId());
         WeAgentDetailVo weAgentDetailVo = qwAgentClient.getAgentDetail(weAgentQuery).getData();
 
+
         if(null == weAgentDetailVo){
             return AjaxResult.error("当前应用不存在");
         }

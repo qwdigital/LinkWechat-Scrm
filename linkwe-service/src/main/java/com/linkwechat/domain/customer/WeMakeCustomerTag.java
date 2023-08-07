@@ -26,4 +26,11 @@ public class WeMakeCustomerTag {
     //是否是企业标签true是;false:不是
     private Boolean isCompanyTag=true;
 
+    //是否记录
+    private boolean isRecord=true;
+
+    //false无需记录轨迹;true:记录轨迹
+    private boolean source=true;
+
+
 }

@@ -1,6 +1,7 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.domain.WeQiRule;
 import com.linkwechat.domain.msgaudit.vo.WeChatContactMsgVo;
 import com.linkwechat.domain.qirule.query.*;
@@ -37,6 +38,8 @@ public interface IWeQiRuleService extends IService<WeQiRule> {
      */
     WeQiRuleDetailVo getQiRuleDetail(Long id);
 
+
+    PageInfo<WeQiRuleListVo> getQiRulePageList(WeQiRuleListQuery query);
     /**
      * 质检规则列表
      *

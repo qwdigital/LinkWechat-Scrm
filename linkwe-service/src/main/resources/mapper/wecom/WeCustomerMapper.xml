@@ -62,6 +62,10 @@
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
        </where>
+           <if test="weCustomerList.noRepeat">
+                GROUP BY  wcr.external_userid
+           </if>
+
         ORDER BY wcr.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
@@ -222,7 +226,16 @@
 
 
     <select id="countWeCustomerList" resultType="long">
-        SELECT count(0) FROM we_customer wcr
+        SELECT
+        <choose>
+            <when test="weCustomerList.noRepeat">
+                count(DISTINCT wcr.external_userid)
+            </when>
+            <otherwise>
+                count(0)
+            </otherwise>
+        </choose>
+        FROM we_customer wcr
         <where>
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
@@ -270,6 +283,8 @@
                 AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
         </where>
+
+
     </select>
 
     <select id="noRepeatCountCustomer" resultType="long">
@@ -414,7 +429,11 @@
             wu.user_name,
             wc.add_user_id as userId,
             wu.avatar as headImageUrl,
-            wc.add_time as createTime
+            wc.add_time as createTime,
+            wc.add_method as addMethod,
+            wc.add_time as firstAddTime,
+            wc.track_state as trackState,
+            wc.track_time as trackTime
         FROM
             we_customer wc
                 INNER JOIN sys_user wu ON wc.add_user_id = wu.we_user_id
@@ -606,6 +625,18 @@
         ORDER BY wcr.add_time desc
     </select>
 
+    <select id="getCustomerSimpleInfo" resultType="com.linkwechat.domain.customer.vo.WeCustomerSimpleInfoVo">
+        select  external_userid,customer_name,avatar from we_customer
+        <where>
+            and external_userid in
+            <foreach collection="externalUserIds" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+        group by external_userid,customer_name,avatar;
+    </select>
+
+
     <select id="countCustomerChannel" resultType="com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo">
         SELECT
         sdd.date,
@@ -636,6 +667,16 @@
         </where>
     </select>
 
+    <select id="getCustomerSimpleInfo" resultType="com.linkwechat.domain.customer.vo.WeCustomerSimpleInfoVo">
+        select  external_userid,customer_name,avatar from we_customer
+        <where>
+            and external_userid in
+            <foreach collection="externalUserIds" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+        group by external_userid,customer_name,avatar;
+    </select>
 
 
 </mapper>

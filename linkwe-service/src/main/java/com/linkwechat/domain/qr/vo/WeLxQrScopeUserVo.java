@@ -23,7 +23,7 @@ public class WeLxQrScopeUserVo {
     private String userName;
 
     @ApiModelProperty(value = "部门id")
-    private Integer party;
+    private Long party;
 
     @ApiModelProperty(value = "部门名称")
     private String partyName;

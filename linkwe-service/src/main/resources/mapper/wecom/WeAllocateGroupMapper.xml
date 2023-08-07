@@ -25,7 +25,7 @@
         leave_user_id
         ) values
         <foreach collection="weAllocateGroups" item="item" index="index" separator=",">
-            (#{item.id},#{item.chatId},#{item.newOwner},#{item.oldOwner},#{item.allocateTime},#{item.status},#{item.errMsg},
+            (#{item.id},#{item.chatId},#{item.newOwner},#{item.errMsg},#{item.status},#{item.oldOwner},#{item.allocateTime},
              #{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById},
              #{item.chatName},#{item.takeoverName},#{item.takeoverDeptName},#{item.leaveUserId})
         </foreach>

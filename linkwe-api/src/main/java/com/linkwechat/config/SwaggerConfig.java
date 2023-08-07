@@ -1,6 +1,7 @@
 package com.linkwechat.config;
 
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.utils.SecurityUtils;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,5 +136,9 @@ public class SwaggerConfig {
                 // 版本
                 .version("版本号:" + version)
                 .build();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(SecurityUtils.encryptPassword("123456"));
     }
 }

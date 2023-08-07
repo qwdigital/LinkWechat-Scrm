@@ -69,7 +69,6 @@ public class WeMaterialController {
 
         WeContentViewRecordQuery query = new WeContentViewRecordQuery();
         if (StringUtils.isNotBlank(talkId)) {
-            WeContentTalk byId = weContentTalkService.getById(talkId);
             query.setTalkId(Long.valueOf(talkId));
         }
         query.setContentId(Long.valueOf(contentId));

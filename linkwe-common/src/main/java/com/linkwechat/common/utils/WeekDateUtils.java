@@ -2,6 +2,7 @@ package com.linkwechat.common.utils;
 
 import cn.hutool.core.date.DateUtil;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -139,5 +140,32 @@ public class WeekDateUtils {
 
         return list;
     }
+
+
+
+    public static List<Date> dateToWeek(Date mdate) {
+
+        int b = mdate.getDay();
+
+        Date fdate;
+
+        List<Date> list = new ArrayList<Date>();
+
+        Long fTime = mdate.getTime() - b * 24 * 3600000;
+
+        for (int a = 1; a <= 7; a++) {
+
+            fdate = new Date();
+
+            fdate.setTime(fTime + (a * 24 * 3600000));
+
+            list.add(a-1, fdate);
+
+        }
+
+        return list;
+
+    }
+
 
 }

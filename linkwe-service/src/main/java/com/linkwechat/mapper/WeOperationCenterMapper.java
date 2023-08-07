@@ -54,6 +54,13 @@ public interface WeOperationCenterMapper {
     List<WeCustomerRealCntVo> getCustomerLostCnt(WeOperationCustomerQuery query);
 
     /**
+     * 客户实时流失数据(非连续性数据)
+     * @param query
+     * @return
+     */
+    List<WeCustomerRealCntVo> getNewCustomerLostCnt(WeOperationCustomerQuery query);
+
+    /**
      * 员工客户排行
      * @param query
      * @return

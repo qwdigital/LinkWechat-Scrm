@@ -39,5 +39,26 @@
     </insert>
 
 
+    <update id="leaveSysUser">
+        UPDATE sys_user SET del_flag=1
+        where we_user_id in
+        <foreach collection="weUserIds" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </update>
+
+    <select id="findSysUserByWeUserId" resultType="com.linkwechat.common.core.domain.entity.SysUser">
+        SELECT
+            su.*,
+            sd.dept_name
+        FROM
+            sys_user su
+                LEFT JOIN sys_dept sd on su.dept_id=sd.dept_id
+        WHERE
+            we_user_id = #{weUserId}
+    </select>
+
+
 
 </mapper>

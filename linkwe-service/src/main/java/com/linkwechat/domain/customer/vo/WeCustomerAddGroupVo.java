@@ -25,4 +25,11 @@ public class WeCustomerAddGroupVo {
 
     //是否共同群 0:不是共同群；1:是共同群
     private Integer commonGroup;
+
+
+    //入群方式入群方式。
+    //1 - 由群成员邀请入群（直接邀请入群）
+    //2 - 由群成员邀请入群（通过邀请链接入群）
+    //3 - 通过扫描群二维码入群
+    private Integer joinScene;
 }

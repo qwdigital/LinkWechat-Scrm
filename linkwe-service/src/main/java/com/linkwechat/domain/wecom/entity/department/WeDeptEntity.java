@@ -24,17 +24,17 @@ public class WeDeptEntity {
     /**
      * 父部门id，32位整型
      */
-    private Integer parentId;
+    private Long parentId;
 
     /**
      * 在父部门中的次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
      */
-    private Long order;
+    private Integer order;
 
     /**
      * 部门id，32位整型，指定时必须大于1。若不填该参数，将自动生成id
      */
-    private Integer id;
+    private Long id;
 
     /**
      * 	部门负责人的UserID

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WeTaskFissionStatusTask {
 
+
     @Autowired
     private IWeFissionService iWeFissionService;
 

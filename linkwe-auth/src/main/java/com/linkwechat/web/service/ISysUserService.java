@@ -1,14 +1,13 @@
 package com.linkwechat.web.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
-import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
 import com.linkwechat.web.domain.vo.UserVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -114,14 +113,6 @@ public interface ISysUserService extends IService<SysUser> {
     public int insertUser(SysUser user);
 
     /**
-     * 修改用户信息
-     *
-     * @param user 用户信息
-     * @return 结果
-     */
-    public void updateUser(SysUserDTO user);
-
-    /**
      * 修改用户状态
      *
      * @param user 用户信息
@@ -169,7 +160,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param userId 用户ID
      * @return 结果
      */
-    public int deleteUserById(Long userId);
+    public void deleteUserById(Long userId);
 
     /**
      * 批量删除用户信息
@@ -177,7 +168,7 @@ public interface ISysUserService extends IService<SysUser> {
      * @param userIds 需要删除的用户ID
      * @return 结果
      */
-    public int deleteUserByIds(Long[] userIds);
+    public void deleteUserByIds(List<Long> userIds);
 
     /**
      * 导入用户数据
@@ -188,16 +179,6 @@ public interface ISysUserService extends IService<SysUser> {
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
-
-
-    /**
-     * 同步企业微信成员
-     * @param deptId
-     * @param corpId
-     * @return
-     */
-    public List<SysUser> syncWeUser(Long deptId, String corpId);
-
 
     /**
      *  根据we_user_id和租户 查询系统用户信息
@@ -212,7 +193,7 @@ public interface ISysUserService extends IService<SysUser> {
      *
      * @param weUserIds
      */
-    void leaveUser(String[] weUserIds);
+    void leaveUser(List<String> weUserIds);
 
     /**
      * 同步员工和部门(发送同步消息到mq)
@@ -220,14 +201,24 @@ public interface ISysUserService extends IService<SysUser> {
     void syncUserAndDept();
 
     /**
-     * 同步员工和部门(监听mq业务逻辑)
-     *
+     * 同步员工信息
      * @param msg
      */
-    void syncUserAndDeptHandler(String msg);
+    void syncUserHandler(JSONObject msg);
 
-    SysUser addUser(SysUserDTO sysUser);
+    /**
+     * 添加员工回调
+     * @param sysUser
+     */
+    void addUser(SysUserQuery sysUser);
 
+    /**
+     * 修改员工回调
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    public void updateUser(SysUserQuery user);
 
     /**
      * 编辑用户角色
