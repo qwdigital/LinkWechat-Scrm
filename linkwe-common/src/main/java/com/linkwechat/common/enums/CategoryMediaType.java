@@ -28,7 +28,8 @@ public enum CategoryMediaType {
     SOPTLP(16,"SOP模板"),
     QFTLP(17,"群发模板"),
 
-    ZLBDURL(18,"智能表单");
+    ZLBDURL(18,"智能表单"),
+    URL(19,"链接");
 
 
     private final Integer type;
