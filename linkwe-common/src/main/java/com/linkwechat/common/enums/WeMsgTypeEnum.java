@@ -80,9 +80,9 @@ public enum WeMsgTypeEnum {
 
 
     /**
-     * 链接
+     * 外链
      */
-    MURL("14","url")
+    MURL("14","murl")
 
     ;
     /**
