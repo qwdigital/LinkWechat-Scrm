@@ -40,7 +40,7 @@ public class WeSubstituteCustomerOrderController extends BaseController {
     /**
      * 列表-分页
      *
-     * @param
+     * @param request 列表请求参数
      * @return {@link TableDataInfo}
      * @author WangYX
      * @date 2023/08/03 17:37
@@ -61,6 +61,7 @@ public class WeSubstituteCustomerOrderController extends BaseController {
     /**
      * 新增
      *
+     * @param request 新增请求参数
      * @return {@link AjaxResult}
      * @author WangYX
      * @date 2023/08/03 17:54
@@ -71,6 +72,14 @@ public class WeSubstituteCustomerOrderController extends BaseController {
         return AjaxResult.success(weSubstituteCustomerOrderService.add(request));
     }
 
+    /**
+     * 修改
+     *
+     * @param request 修改请求参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/08 15:49
+     */
     @ApiOperation("修改")
     @PutMapping("")
     public AjaxResult update(@Validated @RequestBody WeSubstituteCustomerOrderUpdateRequest request) {
