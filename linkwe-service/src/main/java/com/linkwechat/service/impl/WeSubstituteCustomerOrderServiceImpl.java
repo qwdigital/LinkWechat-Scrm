@@ -58,6 +58,14 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
         WeSubstituteCustomerOrder order = BeanUtil.copyProperties(request, WeSubstituteCustomerOrder.class);
         List<WeSubstituteCustomerOrderCataloguePropertyValueVO> customs = request.getCustoms();
 
+        //订单属性
+        LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogueProperty> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogueProperty.class);
+        queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.COMMON_STATE);
+        List<WeSubstituteCustomerOrderCatalogueProperty> list = weSubstituteCustomerOrderCataloguePropertyService.list(queryWrapper);
+
+        //判断订单属性是否必填
+        judgePropertyRequired(list, order, customs);
+
         order.setId(IdUtil.getSnowflakeNextId());
         order.setDelFlag(Constants.COMMON_STATE);
         if (CollectionUtil.isNotEmpty(customs)) {
@@ -77,6 +85,9 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
         LambdaQueryWrapper<WeSubstituteCustomerOrderCatalogueProperty> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrderCatalogueProperty.class);
         queryWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.COMMON_STATE);
         List<WeSubstituteCustomerOrderCatalogueProperty> list = weSubstituteCustomerOrderCataloguePropertyService.list(queryWrapper);
+
+        //判断订单属性是否必填
+        judgePropertyRequired(list, order, customs);
 
         if (CollectionUtil.isNotEmpty(customs)) {
             order.setProperties(JSONObject.toJSONString(customs));
@@ -258,10 +269,9 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
         //自定义字段判断
         List<WeSubstituteCustomerOrderCatalogueProperty> unFixedList = list.stream().filter(i -> i.getFixed().equals(0)).collect(Collectors.toList());
         for (WeSubstituteCustomerOrderCatalogueProperty property : unFixedList) {
-            //TODO
-
+            Optional<WeSubstituteCustomerOrderCataloguePropertyValueVO> first = customs.stream().filter(i -> i.getId().equals(property.getId())).findFirst();
+            first.ifPresent(i -> required(property, i.getValue()));
         }
-
     }
 
     /**

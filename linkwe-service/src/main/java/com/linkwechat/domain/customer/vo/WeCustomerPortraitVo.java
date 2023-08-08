@@ -98,6 +98,11 @@ public class WeCustomerPortraitVo {
     //客户信息拓展
     private List<WeCustomerInfoExpand> weCustomerInfoExpands;
 
+    /**
+     *添加方式
+     */
+    private Integer addMethod;
+
 
 
 }
