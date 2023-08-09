@@ -29,7 +29,7 @@ public enum CategoryMediaType {
     QFTLP(17,"群发模板"),
 
     ZLBDURL(18,"智能表单"),
-    URL(19,"链接");
+    MURL(19,"外接");
 
 
     private final Integer type;
