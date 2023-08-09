@@ -5,14 +5,19 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerLink;
 import com.linkwechat.domain.WeCustomerLinkCount;
+import com.linkwechat.domain.customer.vo.WeCustomerLinkCountTableVo;
 import com.linkwechat.service.IWeCustomerLinkCountService;
 import com.linkwechat.service.IWeCustomerLinkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -150,6 +155,20 @@ public class WeCustomerLinkController  extends BaseController {
                 iWeCustomerLinkCountService.selectLinkCountTable(linkCount.getLinkId(), linkCount.getBeginTime(), linkCount.getEndTime())
         );
 
+    }
+
+
+    /**
+     *  获客助手数据报表
+     * @param linkCount
+     */
+    @GetMapping("/exportLinkCount")
+    public void exportLinkCount(WeCustomerLinkCount linkCount){
+
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(),WeCustomerLinkCountTableVo.class,iWeCustomerLinkCountService.selectLinkCountTable(linkCount.getLinkId(), linkCount.getBeginTime(), linkCount.getEndTime())
+                ,"获客助手数据报表"
+        );
     }
 
 
