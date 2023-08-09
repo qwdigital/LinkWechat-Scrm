@@ -2,6 +2,10 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.sop.WeSopExecuteTargetAttachments;
+import com.linkwechat.domain.sop.dto.WeSopPushTaskDto;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 
 /**
@@ -23,9 +27,17 @@ public interface IWeSopExecuteTargetAttachmentsService extends IService<WeSopExe
      */
     void manualPushTypeSopTaskTip(boolean isExpiringSoon);
 
-
-
-
+    /**
+     * 根据企微用户Id获取当天待推送数据
+     *
+     * @param weUserId   员工企微Id
+     * @param targetType 目标类型1:客户 2:群
+     * @param sendType   1:企业微信发送;2:手动发送
+     * @return {@link List <  WeSopPushTaskDto >}
+     * @author WangYX
+     * @date 2023/08/09 15:23
+     */
+    List<WeSopPushTaskDto> findWeSopPushTaskDtoByWeUserId(@Param("weUserId") String weUserId, @Param("targetType") Integer targetType, @Param("sendType") Integer sendType);
 
 
 }

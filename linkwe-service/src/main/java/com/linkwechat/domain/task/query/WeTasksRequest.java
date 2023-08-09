@@ -79,4 +79,9 @@ public class WeTasksRequest {
      */
     private List<String> weUserIds;
 
+    /**
+     * 客户SOP或者客群SOP代办任务内容
+     */
+    private String content;
+
 }

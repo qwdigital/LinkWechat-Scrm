@@ -19,6 +19,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.sop.WeSopAttachments;
 import com.linkwechat.domain.sop.WeSopExecuteTargetAttachments;
 import com.linkwechat.domain.sop.dto.WeSopPushTaskDto;
+import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.mapper.WeCustomerMapper;
 import com.linkwechat.mapper.WeGroupMapper;
 import com.linkwechat.mapper.WeSopExecuteTargetAttachmentsMapper;
@@ -27,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.crypto.SealedObject;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +61,9 @@ implements IWeSopExecuteTargetAttachmentsService {
 
     @Autowired
     private IWeCorpAccountService iWeCorpAccountService;
+
+    @Resource
+    private IWeTasksService weTasksService;
 
 
 
@@ -248,7 +253,10 @@ implements IWeSopExecuteTargetAttachmentsService {
 
     }
 
-
+    @Override
+    public List<WeSopPushTaskDto> findWeSopPushTaskDtoByWeUserId(String weUserId, Integer targetType, Integer sendType) {
+        return this.baseMapper.findWeSopPushTaskDtoByWeUserId(weUserId,targetType,sendType);
+    }
 
 
     private void sopTaskTodayTip(String executeWeUserId,boolean groupOrCustomer,List<WeSopPushTaskDto> weCustomerSopPushTaskDto,boolean isExpiringSoon){
@@ -328,7 +336,9 @@ implements IWeSopExecuteTargetAttachmentsService {
                                     ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
                             );
 
-
+                            //客群SOP代办任务
+                            WeTasksRequest build = WeTasksRequest.builder().weUserId(executeWeUserId).content(textContent.toString()).build();
+                            weTasksService.addGroupSop(build);
 
                         }
 
@@ -374,6 +384,10 @@ implements IWeSopExecuteTargetAttachmentsService {
                             iWeMessagePushService.pushMessageSelfH5(
                                     ListUtil.toList(executeWeUserId),textContent.toString(),groupOrCustomer?MessageNoticeType.GROUP_SOP.getType():MessageNoticeType.CUSTOMER_SOP.getType(),true
                             );
+
+                            //客户SOP代办任务
+                            WeTasksRequest build = WeTasksRequest.builder().weUserId(executeWeUserId).content(textContent.toString()).build();
+                            weTasksService.addCustomerSop(build);
 
                         }
 

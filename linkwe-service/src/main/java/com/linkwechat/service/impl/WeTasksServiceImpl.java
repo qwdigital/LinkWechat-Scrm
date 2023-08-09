@@ -18,6 +18,7 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.QwAppMsgBusinessTypeEnum;
 import com.linkwechat.common.enums.WeMsgTypeEnum;
@@ -31,6 +32,7 @@ import com.linkwechat.domain.leads.record.query.WeLeadsFollowRecordCooperateUser
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
+import com.linkwechat.domain.sop.dto.WeSopPushTaskDto;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.task.entity.WeTasks;
@@ -39,6 +41,7 @@ import com.linkwechat.domain.task.vo.WeTasksVO;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeLeadsMapper;
 import com.linkwechat.mapper.WeLeadsSeaMapper;
+import com.linkwechat.mapper.WeSopExecuteTargetAttachmentsMapper;
 import com.linkwechat.mapper.WeTasksMapper;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeTasksService;
@@ -81,6 +84,8 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     private RabbitMQSettingConfig rabbitMQSettingConfig;
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
+    @Resource
+    private WeSopExecuteTargetAttachmentsMapper weSopExecuteTargetAttachmentsMapper;
 
     @Override
     public List<WeTasksVO> myList() {
@@ -328,14 +333,173 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
             case 2:
                 this.handlerUserFollowUp2You(request);
                 break;
-            case 4:
+            case 5:
                 this.handlerUserAppointItemWaitFollowUp(request);
                 break;
+            case 6:
+                this.handlerCustomerSop(request);
+                break;
             case 7:
+                this.handlerGroupSop(request);
+                break;
+            case 8:
                 this.handlerGroupAddByLabel(request);
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void addCustomerSop(WeTasksRequest request) {
+        //跳转链接
+        WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+        String REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s&isExpiringSoon=%s",
+                linkWeChatConfig.getCustomerSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(), MessageNoticeType.CUSTOMER_SOP.getType(), false));
+
+        //员工信息
+        AjaxResult<SysUser> info = qwSysUserClient.getInfo(request.getWeUserId());
+
+        //保存信息
+        WeTasks build = WeTasks.builder()
+                .id(IdUtil.getSnowflakeNextId())
+                .userId(info.getData().getUserId())
+                .weUserId(request.getWeUserId())
+                .type(WeTasksTitleEnum.CUSTOMER_SOP_TODAY_WAIT_PUSH.getCode())
+                .title(WeTasksTitleEnum.CUSTOMER_SOP_TODAY_WAIT_PUSH.getTitle())
+                .content(request.getContent())
+                .sendTime(LocalDateTime.now())
+                .url(REDIRECT_URI)
+                .status(0)
+                .delFlag(Constants.COMMON_STATE)
+                .visible(0)
+                .build();
+        this.save(build);
+
+        //客户sop完成结果处理
+        //时间差
+        DateTime now = DateTime.now();
+        DateTime end = DateUtil.endOfDay(now);
+        long interval = DateUtil.between(now, end, DateUnit.MS);
+
+        WeTasksRequest req = new WeTasksRequest();
+        req.setId(build.getId());
+        req.setType(WeTasksTitleEnum.CUSTOMER_SOP_TODAY_WAIT_PUSH.getCode());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeTasksDelayRk(), JSONObject.toJSONString(request), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", interval);
+            return message;
+        });
+    }
+
+    /**
+     * 客户SOP当天未完成全部的SOP推送则任务消失，不进入历史任务列表。
+     * <p>
+     * 完成则进入历史任务。
+     * </p>
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/08/09 14:39
+     */
+    public void handlerCustomerSop(WeTasksRequest request) {
+        WeTasks weTasks = this.getById(request.getId());
+        if (BeanUtil.isEmpty(weTasks)) {
+            return;
+        }
+        if (weTasks.getType().equals(WeTasksTitleEnum.CUSTOMER_SOP_TODAY_WAIT_PUSH.getCode()) && weTasks.getStatus().equals(0)) {
+            //当天待推送的数据
+            List<WeSopPushTaskDto> list = weSopExecuteTargetAttachmentsMapper.findWeSopPushTaskDtoByWeUserId(weTasks.getWeUserId(), 1, 1);
+            if (CollectionUtil.isNotEmpty(list)) {
+                //删除数据
+                LambdaUpdateWrapper<WeTasks> updateWrapper = Wrappers.lambdaUpdate(WeTasks.class);
+                updateWrapper.eq(WeTasks::getId, weTasks.getId());
+                updateWrapper.set(WeTasks::getDelFlag, Constants.DELETE_STATE);
+                this.update(updateWrapper);
+            } else {
+                //修改状态为已完成
+                LambdaUpdateWrapper<WeTasks> updateWrapper = Wrappers.lambdaUpdate(WeTasks.class);
+                updateWrapper.eq(WeTasks::getId, weTasks.getId());
+                updateWrapper.set(WeTasks::getStatus, 1);
+                this.update(updateWrapper);
+            }
+        }
+    }
+
+
+    @Override
+    public void addGroupSop(WeTasksRequest request) {
+        //跳转链接
+        WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+        String REDIRECT_URI = URLEncoder.encode(String.format("%s?corpId=%s&agentId=%s&type=%s&isExpiringSoon=%s",
+                linkWeChatConfig.getGroupSopRedirectUrl(), weCorpAccount.getCorpId(), weCorpAccount.getAgentId(), MessageNoticeType.GROUP_SOP.getType(), false));
+
+        //员工信息
+        AjaxResult<SysUser> info = qwSysUserClient.getInfo(request.getWeUserId());
+
+        //保存信息
+        WeTasks build = WeTasks.builder()
+                .id(IdUtil.getSnowflakeNextId())
+                .userId(info.getData().getUserId())
+                .weUserId(request.getWeUserId())
+                .type(WeTasksTitleEnum.GROUP_SOP_TODAY_WAIT_PUSH.getCode())
+                .title(WeTasksTitleEnum.GROUP_SOP_TODAY_WAIT_PUSH.getTitle())
+                .content(request.getContent())
+                .sendTime(LocalDateTime.now())
+                .url(REDIRECT_URI)
+                .status(0)
+                .delFlag(Constants.COMMON_STATE)
+                .visible(0)
+                .build();
+        this.save(build);
+
+        //客群sop完成结果处理
+        //时间差
+        DateTime now = DateTime.now();
+        DateTime end = DateUtil.endOfDay(now);
+        long interval = DateUtil.between(now, end, DateUnit.MS);
+
+        WeTasksRequest req = new WeTasksRequest();
+        req.setId(build.getId());
+        req.setType(WeTasksTitleEnum.GROUP_SOP_TODAY_WAIT_PUSH.getCode());
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeTasksDelayRk(), JSONObject.toJSONString(request), message -> {
+            //注意这里时间可使用long类型,毫秒单位，设置header
+            message.getMessageProperties().setHeader("x-delay", interval);
+            return message;
+        });
+    }
+
+    /**
+     * 客群SOP当天未完成全部的SOP推送，任务消失，不进入历史任务列表。
+     * <p>
+     * 完成则进入历史任务。
+     * </p>
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/08/09 11:48
+     */
+    public void handlerGroupSop(WeTasksRequest request) {
+        WeTasks weTasks = this.getById(request.getId());
+        if (BeanUtil.isEmpty(weTasks)) {
+            return;
+        }
+        if (weTasks.getType().equals(WeTasksTitleEnum.GROUP_SOP_TODAY_WAIT_PUSH.getCode()) && weTasks.getStatus().equals(0)) {
+            //当天待推送的数据
+            List<WeSopPushTaskDto> list = weSopExecuteTargetAttachmentsMapper.findWeSopPushTaskDtoByWeUserId(weTasks.getWeUserId(), 2, 1);
+            if (CollectionUtil.isNotEmpty(list)) {
+                //删除数据
+                LambdaUpdateWrapper<WeTasks> updateWrapper = Wrappers.lambdaUpdate(WeTasks.class);
+                updateWrapper.eq(WeTasks::getId, weTasks.getId());
+                updateWrapper.set(WeTasks::getDelFlag, Constants.DELETE_STATE);
+                this.update(updateWrapper);
+            } else {
+                //修改状态为已完成
+                LambdaUpdateWrapper<WeTasks> updateWrapper = Wrappers.lambdaUpdate(WeTasks.class);
+                updateWrapper.eq(WeTasks::getId, weTasks.getId());
+                updateWrapper.set(WeTasks::getStatus, 1);
+                this.update(updateWrapper);
+            }
         }
     }
 

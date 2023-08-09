@@ -159,4 +159,22 @@ public interface IWeTasksService extends IService<WeTasks> {
      */
     void handlerWeTasks(WeTasksRequest request);
 
+    /**
+     * 今日客户sop待推送
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/08/09 11:22
+     */
+    void addCustomerSop(WeTasksRequest request);
+
+    /**
+     * 今日客群sop待推动
+     *
+     * @param request 请求参数
+     * @author WangYX
+     * @date 2023/08/09 11:23
+     */
+    void addGroupSop(WeTasksRequest request);
+
 }
