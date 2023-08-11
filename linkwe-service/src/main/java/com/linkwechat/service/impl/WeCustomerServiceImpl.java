@@ -1114,7 +1114,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setPhone(String.join(",", Optional.ofNullable(followUserEntity.getRemarkMobiles()).orElseGet(ArrayList::new)));
                 //设置标签
                 List<WeCustomerDetailVo.ExternalUserTag> tags = followUserEntity.getTags();
+
+                iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .eq(WeFlowerCustomerTagRel::getExternalUserid,externalUserId)
+                        .eq(WeFlowerCustomerTagRel::getUserId,userId));
+
                 if (CollectionUtil.isNotEmpty(tags)) {
+
                     List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
                             .id(SnowFlakeUtil.nextId())
                             .externalUserid(externalContact.getExternalUserId())
@@ -1124,11 +1130,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
-                }else{
-
-                    iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                            .eq(WeFlowerCustomerTagRel::getExternalUserid,externalUserId)
-                            .eq(WeFlowerCustomerTagRel::getUserId,userId));
                 }
 
             }
