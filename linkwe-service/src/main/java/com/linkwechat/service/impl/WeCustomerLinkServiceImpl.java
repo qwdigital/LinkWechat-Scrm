@@ -11,7 +11,9 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomerLink;
+import com.linkwechat.domain.WeCustomerLinkCount;
 import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
 import com.linkwechat.fegin.QwCustomerClient;
@@ -52,6 +54,11 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
 
     @Autowired
     private QwSysUserClient qwSysUserClient;
+
+    @Override
+    public List<WeCustomersVo> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount) {
+        return this.baseMapper.findLinkWeCustomer(weCustomerLinkCount);
+    }
 
     @Override
     @Transactional

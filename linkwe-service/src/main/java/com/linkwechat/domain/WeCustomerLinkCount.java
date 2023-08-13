@@ -38,7 +38,7 @@ public class WeCustomerLinkCount extends BaseEntity {
     /**
      * 通过获客链接添加此客户的跟进人userid
      */
-    private String userid;
+    private String weUserId;
 
     /**
      * 会话状态，0-客户未发消息 1-客户已发送消息

@@ -187,5 +187,20 @@ public class WeCustomerLinkController  extends BaseController {
     }
 
 
+    /**
+     * 获取获客链接下对应的客户
+     * @param weCustomerLinkCount
+     * @return
+     */
+    @GetMapping("/findLinkWeCustomer")
+    public TableDataInfo findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount){
+        startPage();
+
+        return getDataTable(
+                iWeCustomerLinkService.findLinkWeCustomer(weCustomerLinkCount)
+        );
+    }
+
+
 
 }

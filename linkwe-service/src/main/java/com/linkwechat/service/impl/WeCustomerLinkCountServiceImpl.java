@@ -124,7 +124,7 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
                                 .linkId(linkId)
                                 .chatStatus(k.getChat_status())
                                 .externalUserid(k.getExternal_userid())
-                                .userid(k.getUserid())
+                                .weUserId(k.getUserid())
                                 .build();
 
                         AjaxResult<WeCustomerDetailVo> customerDetail = qwCustomerClient.getCustomerDetail(WeCustomerQuery.builder()
