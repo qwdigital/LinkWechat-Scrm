@@ -187,7 +187,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         //修改线索状态和添加当前跟进人信息
         updateLeadsStatusAndAddCurrentFollower(weLeads.getId());
         //添加线索跟进人
-        WeLeadsFollower weLeadsFollower = addLeadsFollower(weLeads.getId());
+        WeLeadsFollower weLeadsFollower = addLeadsFollower(weLeads.getId(), weLeads.getSeaId());
         return weLeadsFollower;
     }
 
@@ -551,7 +551,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
      * @author WangYX
      * @date 2023/07/18 10:27
      */
-    private WeLeadsFollower addLeadsFollower(Long leadsId) {
+    private WeLeadsFollower addLeadsFollower(Long leadsId, Long seaId) {
         //更新最新跟进人为否
         WeLeadsFollower one = weLeadsFollowerService.getOne(Wrappers.lambdaQuery(WeLeadsFollower.class).eq(WeLeadsFollower::getLeadsId, leadsId).eq(WeLeadsFollower::getLatest, 1));
         if (BeanUtil.isNotEmpty(one)) {
@@ -572,6 +572,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         weLeadsFollower.setFollowerStartTime(new Date());
         weLeadsFollower.setIsCurrentFollower(1);
         weLeadsFollower.setLatest(1);
+        weLeadsFollower.setSeaId(seaId);
         weLeadsFollowerService.save(weLeadsFollower);
         return weLeadsFollower;
     }
