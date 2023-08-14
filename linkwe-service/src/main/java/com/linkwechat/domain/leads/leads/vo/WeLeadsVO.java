@@ -98,8 +98,17 @@ public class WeLeadsVO implements Serializable {
 
     /**
      * 线索来源 0excel导入
+     *
+     * @see com.linkwechat.common.enums.leads.leads.LeadsSourceEnum 线索来源枚举
      */
     private Integer source;
+
+    /**
+     * 线索来源
+     *
+     * @see com.linkwechat.common.enums.leads.leads.LeadsSourceEnum 线索来源枚举
+     */
+    private String sourceStr;
 
     /**
      * @see com.linkwechat.common.enums.SexEnums
@@ -107,6 +116,13 @@ public class WeLeadsVO implements Serializable {
      * 性别, 0 = 未知, 1 = 男, 2 = 女
      */
     private Integer sex;
+
+    /**
+     * 性别
+     *
+     * @see com.linkwechat.common.enums.SexEnums 性别枚举
+     */
+    private String sexStr;
 
     /**
      * 创建时间

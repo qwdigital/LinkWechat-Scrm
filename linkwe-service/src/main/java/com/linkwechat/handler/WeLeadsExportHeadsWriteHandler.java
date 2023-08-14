@@ -31,7 +31,7 @@ public class WeLeadsExportHeadsWriteHandler implements SheetWriteHandler {
         sheet.addMergedRegion(cra);
         // 设置0行0列，这里可以设置一些自定义的样式，颜色，文本，背景等等
         Row row = sheet.createRow(0);
-        row.setHeight((short) 1600);
+        row.setHeight((short) 600);
         Cell cell = row.createCell(0);
 
 

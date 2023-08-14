@@ -13,6 +13,8 @@ import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.enums.SexEnums;
+import com.linkwechat.common.enums.leads.leads.LeadsSourceEnum;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeTag;
@@ -90,6 +92,7 @@ public class WeLeadsController extends BaseController {
         vos.forEach(i -> {
             //手机号脱敏
             i.setPhone(this.phoneDesensitization(i.getPhone()));
+            i.setSourceStr(LeadsSourceEnum.of(i.getSource()).getSource());
         });
         dataTable.setRows(vos);
 
@@ -118,11 +121,16 @@ public class WeLeadsController extends BaseController {
         if (StrUtil.isNotBlank(labelNames)) {
             result.setLabelsNames(labelNames);
         }
+        //导入来源
+        result.setSourceStr(LeadsSourceEnum.of(result.getSource()).getSource());
+        result.setSexStr(SexEnums.ofByCode(result.getSex()).get().getInfo());
+
         //可修改的模板属性
 //        LambdaQueryWrapper<WeLeadsTemplateSettings> wrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
 //        wrapper.eq(WeLeadsTemplateSettings::getCanEdit, CanEditEnum.ALLOW.getCode());
 //        wrapper.eq(WeLeadsTemplateSettings::getDelFlag, Constants.COMMON_STATE);
 //        List<WeLeadsTemplateSettings> list = weLeadsTemplateSettingsService.list(wrapper);
+
         //自定义数据处理
         String properties = result.getProperties();
         if (StrUtil.isNotBlank(properties)) {
@@ -379,8 +387,6 @@ public class WeLeadsController extends BaseController {
         weLeadsService.bindCustomer(request);
         return AjaxResult.success();
     }
-
-
 
 
 }

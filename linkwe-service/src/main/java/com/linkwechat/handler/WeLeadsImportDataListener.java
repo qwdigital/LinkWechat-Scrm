@@ -191,6 +191,7 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
             weLeads.setSeaId(seaId);
             weLeads.setImportRecordId(importRecordId);
             weLeads.setSource(ImportSourceTypeEnum.EXCEL.getCode());
+            weLeads.setSex(0);
 
             Set<Map.Entry<String, String>> entries = rowMap.entrySet();
             List<Properties> propertiesList = new ArrayList<>();
