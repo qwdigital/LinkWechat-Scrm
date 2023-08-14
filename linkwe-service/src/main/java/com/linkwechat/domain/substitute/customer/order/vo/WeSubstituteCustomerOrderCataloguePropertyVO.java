@@ -1,8 +1,14 @@
 package com.linkwechat.domain.substitute.customer.order.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -108,6 +114,18 @@ public class WeSubstituteCustomerOrderCataloguePropertyVO {
     @ApiModelProperty("是否支持多个，附件时用，0否 1时")
     private Integer more;
 
+    /**
+     * 更新者
+     */
+    @ApiModelProperty("更新者")
+    private String updateBy;
+
+    /**
+     * 更新时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty("更新时间")
+    private Date updateTime;
 
     /**
      * 实际值
