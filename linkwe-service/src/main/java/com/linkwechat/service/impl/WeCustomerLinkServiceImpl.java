@@ -31,13 +31,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
-* @author robin
-* @description 针对表【we_customer_link(获客助手)】的数据库操作Service实现
-* @createDate 2023-07-04 17:41:13
-*/
+ * @author robin
+ * @description 针对表【we_customer_link(获客助手)】的数据库操作Service实现
+ * @createDate 2023-07-04 17:41:13
+ */
 @Service
 public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper, WeCustomerLink>
-    implements IWeCustomerLinkService {
+        implements IWeCustomerLinkService {
 
     @Autowired
     private IWeCustomerLinkAttachmentsService iWeCustomerLinkAttachmentsService;
@@ -80,16 +80,16 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
 
 
 
-                WeLinkCustomerVo weLinkCustomerVo =  createOrUpdate ? qwCustomerClient.createCustomerLink(
-                        customerQuery
-                ).getData():qwCustomerClient.updateCustomerLink(customerQuery).getData();
+            WeLinkCustomerVo weLinkCustomerVo =  createOrUpdate ? qwCustomerClient.createCustomerLink(
+                    customerQuery
+            ).getData():qwCustomerClient.updateCustomerLink(customerQuery).getData();
 
 
 
 
-                if(!weLinkCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                    throw new WeComException(weLinkCustomerVo.getErrMsg());
-                }
+            if(!weLinkCustomerVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                throw new WeComException(weLinkCustomerVo.getErrMsg());
+            }
 
 
             if(null != weLinkCustomerVo){
@@ -97,9 +97,9 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
                 if(null != link){
                     customerLink.setLinkId(link.getLink_id());
                     customerLink.setLinkUrl(link.getUrl());
-                    customerLink.setLinkShortUrl(
-                            linkWeChatConfig.getShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
-                    );
+//                    customerLink.setLinkShortUrl(
+//                            linkWeChatConfig.getShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
+//                    );
                 }
             }
 
