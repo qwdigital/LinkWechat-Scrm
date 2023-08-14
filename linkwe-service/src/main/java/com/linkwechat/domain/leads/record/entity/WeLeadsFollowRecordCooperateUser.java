@@ -45,5 +45,5 @@ public class WeLeadsFollowRecordCooperateUser {
     /**
      * 用户名称
      */
-    private Long userName;
+    private String userName;
 }
