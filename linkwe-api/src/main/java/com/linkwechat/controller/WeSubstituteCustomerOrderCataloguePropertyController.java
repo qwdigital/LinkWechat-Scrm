@@ -25,10 +25,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -137,8 +135,38 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
     @ApiOperation("删除")
     @DeleteMapping("/{id}")
     public AjaxResult delete(@PathVariable("id") Long id) {
+        WeSubstituteCustomerOrderCatalogueProperty one = weSubstituteCustomerOrderCataloguePropertyService.getById(id);
+        if (BeanUtil.isEmpty(one)) {
+            return AjaxResult.success();
+        }
+        if (one.getFixed().equals(1)) {
+            throw new ServiceException("固定字段无法删除！");
+        }
         LambdaUpdateWrapper<WeSubstituteCustomerOrderCatalogueProperty> updateWrapper = Wrappers.lambdaUpdate(WeSubstituteCustomerOrderCatalogueProperty.class);
         updateWrapper.eq(WeSubstituteCustomerOrderCatalogueProperty::getId, id);
+        updateWrapper.set(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.DELETE_STATE);
+        weSubstituteCustomerOrderCataloguePropertyService.update(updateWrapper);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 批量删除
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/14 14:33
+     */
+    @ApiOperation("批量删除")
+    @DeleteMapping("")
+    public AjaxResult deleteAll(String ids) {
+        String[] idArr = ids.split(",");
+        List<WeSubstituteCustomerOrderCatalogueProperty> properties = weSubstituteCustomerOrderCataloguePropertyService.listByIds(Arrays.asList(idArr));
+        //过滤掉固定字段，固定字段不可删除
+        List<Long> list = properties.stream().filter(i -> i.getFixed().equals(0)).map(WeSubstituteCustomerOrderCatalogueProperty::getId).collect(Collectors.toList());
+        //删除
+        LambdaUpdateWrapper<WeSubstituteCustomerOrderCatalogueProperty> updateWrapper = Wrappers.lambdaUpdate(WeSubstituteCustomerOrderCatalogueProperty.class);
+        updateWrapper.in(WeSubstituteCustomerOrderCatalogueProperty::getId, list);
         updateWrapper.set(WeSubstituteCustomerOrderCatalogueProperty::getDelFlag, Constants.DELETE_STATE);
         weSubstituteCustomerOrderCataloguePropertyService.update(updateWrapper);
         return AjaxResult.success();
