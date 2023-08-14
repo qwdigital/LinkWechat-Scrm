@@ -24,12 +24,14 @@ public class VisibleRange {
          * 是否被选中
          */
         private boolean isSelect = false;
-
         /**
          * 部门Id集合
          */
         private List<Long> deptIds;
-
+        /**
+         * 部门名称集合
+         */
+        private List<String> deptNames;
     }
 
     @Data
@@ -42,7 +44,6 @@ public class VisibleRange {
          * 部门集合
          */
         private List<String> posts;
-
     }
 
     @Data
@@ -55,6 +56,10 @@ public class VisibleRange {
          * 企微Id集合
          */
         private List<String> weUserIds;
+        /**
+         * 员工名称集合
+         */
+        private List<String> userNames;
     }
 
 }

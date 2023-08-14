@@ -33,7 +33,12 @@ import com.linkwechat.domain.leads.sea.query.VisibleRange;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaSaveRequest;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaUpdateRequest;
 import com.linkwechat.domain.leads.sea.vo.*;
+import com.linkwechat.domain.system.dept.query.SysDeptQuery;
+import com.linkwechat.domain.system.dept.vo.SysDeptVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwSysDeptClient;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.service.IWeLeadsSeaService;
 import com.linkwechat.service.IWeLeadsSeaVisibleRangeService;
 import com.linkwechat.service.IWeLeadsService;
@@ -63,6 +68,8 @@ public class WeLeadsSeaController extends BaseController {
     private IWeLeadsService weLeadsService;
     @Resource
     private QwSysDeptClient qwSysDeptClient;
+    @Resource
+    private QwSysUserClient qwSysUserClient;
     @Resource
     private IWeLeadsSeaService weLeadsSeaService;
     @Resource
@@ -258,9 +265,11 @@ public class WeLeadsSeaController extends BaseController {
                 AjaxResult<List<SysDept>> result = qwSysDeptClient.getListWithOutPermission(new SysDept());
                 if (result.getCode() == HttpStatus.SUCCESS) {
                     List<Long> deptIds = result.getData().stream().map(SysDept::getDeptId).collect(Collectors.toList());
+                    List<String> deptNames = result.getData().stream().map(SysDept::getDeptName).collect(Collectors.toList());
                     VisibleRange.DeptRange deptRange = new VisibleRange.DeptRange();
                     deptRange.setSelect(true);
                     deptRange.setDeptIds(deptIds);
+                    deptRange.setDeptNames(deptNames);
                     i.setDeptRange(deptRange);
                 } else {
                     throw new ServiceException("获取部门数据异常！");
@@ -281,6 +290,15 @@ public class WeLeadsSeaController extends BaseController {
                     VisibleRange.DeptRange deptRange = new VisibleRange.DeptRange();
                     deptRange.setSelect(true);
                     deptRange.setDeptIds(deptIds);
+
+                    SysDeptQuery query = new SysDeptQuery();
+                    query.setDeptIds(deptIds);
+                    AjaxResult<List<SysDeptVo>> result = qwSysDeptClient.getListByDeptIds(query);
+                    if (result.getCode() == HttpStatus.SUCCESS) {
+                        List<String> deptNames = result.getData().stream().map(SysDeptVo::getDeptName).collect(Collectors.toList());
+                        deptRange.setDeptNames(deptNames);
+                    }
+
                     i.setDeptRange(deptRange);
                 });
 
@@ -301,6 +319,14 @@ public class WeLeadsSeaController extends BaseController {
                     VisibleRange.UserRange userRange = new VisibleRange.UserRange();
                     userRange.setSelect(true);
                     userRange.setWeUserIds(weUserIds);
+
+                    SysUserQuery query = new SysUserQuery();
+                    query.setWeUserIds(weUserIds);
+                    AjaxResult<List<SysUserVo>> result = qwSysUserClient.getUserListByWeUserIds(query);
+                    if (result.getCode() == HttpStatus.SUCCESS) {
+                        List<String> userNames = result.getData().stream().map(SysUserVo::getUserName).collect(Collectors.toList());
+                        userRange.setUserNames(userNames);
+                    }
                     i.setUserRange(userRange);
                 });
             }
