@@ -74,12 +74,17 @@ public class WeCustomerLink extends BaseEntity {
 
 
     /**
-     * 附件
+     * 附件(传入)
      */
     @TableField(exist = false)
     private List<WeMessageTemplate> attachments;
 
 
+    /**
+     * 回显
+     */
+    @TableField(exist = false)
+    private List<WeCustomerLinkAttachments> linkAttachments;
 
     /**
      * 删除标识 0 有效 1删除

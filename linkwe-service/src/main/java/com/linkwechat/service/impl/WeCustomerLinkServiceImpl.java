@@ -1,6 +1,7 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
@@ -9,8 +10,10 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomerLink;
+import com.linkwechat.domain.WeCustomerLinkAttachments;
 import com.linkwechat.domain.WeCustomerLinkCount;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +68,11 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
     @Transactional
     public void createOrUpdateCustomerLink(WeCustomerLink customerLink,boolean createOrUpdate) {
 
+
+        if(customerLink.getId() == null){
+            customerLink.setId(SnowFlakeUtil.nextId());
+        }
+
         if(StringUtils.isNotEmpty(customerLink.getWeUserList())){
 
             WeLinkCustomerQuery customerQuery = WeLinkCustomerQuery.builder()
@@ -97,9 +106,9 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
                 if(null != link){
                     customerLink.setLinkId(link.getLink_id());
                     customerLink.setLinkUrl(link.getUrl());
-//                    customerLink.setLinkShortUrl(
-//                            linkWeChatConfig.getShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
-//                    );
+                    customerLink.setLinkShortUrl(
+                            linkWeChatConfig.getShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
+                    );
                 }
             }
 
@@ -152,6 +161,12 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
             }
 
 
+            weCustomerLink.setLinkAttachments(
+                    iWeCustomerLinkAttachmentsService.list(new LambdaQueryWrapper<WeCustomerLinkAttachments>()
+                            .eq(WeCustomerLinkAttachments::getCustomerLinkId,id))
+            );
+
+
         }
 
 
@@ -160,6 +175,24 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
 
         return weCustomerLink;
     }
+
+    @Override
+    public JSONObject getShort2LongUrl(String shortUrl) {
+        long id = Base62NumUtil.decode(shortUrl);
+        WeCustomerLink weCustomerLink = getById(id);
+        JSONObject resObj = new JSONObject();
+        if (Objects.isNull(weCustomerLink)) {
+            resObj.put("errorMsg", "无效链接");
+            return resObj;
+        }
+        resObj.put("type",0);
+
+        if (StringUtils.isNotEmpty(weCustomerLink.getLinkUrl())) {
+            resObj.put("linkUrl", weCustomerLink.getLinkUrl());
+        }
+        return resObj;
+    }
+
 
 }
 
