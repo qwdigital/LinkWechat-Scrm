@@ -368,7 +368,7 @@ public class WeLeadsController extends BaseController {
      */
     @ApiOperation(value = "移动端-更新线索标签")
     @PutMapping("/update")
-    public AjaxResult update(@Validated WeLeadsUpdateRequest request) {
+    public AjaxResult update(@Validated @RequestBody WeLeadsUpdateRequest request) {
         weLeadsService.update(request);
         return AjaxResult.success();
     }

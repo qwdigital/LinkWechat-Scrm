@@ -778,7 +778,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         if (!weLeads.getLeadsStatus().equals(LeadsStatusEnum.BE_FOLLOWING_UP.getCode())) {
             throw new ServiceException("线索不处于跟进中，无法退回");
         }
-        if (weLeads.getFollowerId().equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
+        if (!weLeads.getFollowerId().equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
             throw new ServiceException("您不是线索当前跟进人，无法退回线索");
         }
         //
