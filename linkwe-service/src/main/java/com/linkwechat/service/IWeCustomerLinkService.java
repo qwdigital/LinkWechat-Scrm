@@ -2,7 +2,12 @@ package com.linkwechat.service;
 
 import com.linkwechat.domain.WeCustomerLink;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeCustomerLinkCount;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
 * @author robin
@@ -10,6 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 * @createDate 2023-07-04 17:41:13
 */
 public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
+
+
+    /**
+     * 获取相关链接下的客户
+     * @param weCustomerLinkCount
+     * @return
+     */
+    List<WeCustomersVo> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount);
 
 
     /**
