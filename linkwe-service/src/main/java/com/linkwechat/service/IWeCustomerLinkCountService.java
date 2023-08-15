@@ -23,6 +23,12 @@ public interface IWeCustomerLinkCountService extends IService<WeCustomerLinkCoun
 
 
     /**
+     * 同步链接剩余量
+     */
+    void synchAcquisitionQuota();
+
+
+    /**
      * 获取折线图统计数据
      * @param linkId
      * @param beginTime

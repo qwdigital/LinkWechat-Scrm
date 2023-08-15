@@ -57,25 +57,6 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
     public void synchWeCustomerLinkCount(String linkId) {
 
 
-        //剩余量更新
-        AjaxResult<WeLinkCustomerAcquisitionQuotaVo> result
-                = qwCustomerClient.customerAcquisitionQuota(new WeBaseQuery());
-        if(null != result){
-            WeLinkCustomerAcquisitionQuotaVo data = result.getData();
-            if(data != null && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                List<WeCorpAccount> weCorpAccounts
-                        = iWeCorpAccountService.list(new LambdaQueryWrapper<WeCorpAccount>());
-                if(CollectionUtil.isNotEmpty(weCorpAccounts)){
-                    WeCorpAccount weCorpAccount = weCorpAccounts.stream().findFirst().get();
-                    weCorpAccount.setCustomerLinkTotal(data.getTotal());
-                    weCorpAccount.setCustomerLinkMargin(data.getBalance());
-                    iWeCorpAccountService.updateById(
-                            weCorpAccount
-                    );
-                }
-            }
-        }
-
 
         List<WeCustomerLink> weCustomerLinks = iWeCustomerLinkService.list(
                 new LambdaQueryWrapper<WeCustomerLink>()
@@ -104,6 +85,33 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
 
 
 
+    }
+
+
+    /**
+     * 同步链接剩余量
+     */
+    @Override
+    public void synchAcquisitionQuota() {
+
+        //剩余量更新
+        AjaxResult<WeLinkCustomerAcquisitionQuotaVo> result
+                = qwCustomerClient.customerAcquisitionQuota(new WeBaseQuery());
+        if(null != result){
+            WeLinkCustomerAcquisitionQuotaVo data = result.getData();
+            if(data != null && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                List<WeCorpAccount> weCorpAccounts
+                        = iWeCorpAccountService.list(new LambdaQueryWrapper<WeCorpAccount>());
+                if(CollectionUtil.isNotEmpty(weCorpAccounts)){
+                    WeCorpAccount weCorpAccount = weCorpAccounts.stream().findFirst().get();
+                    weCorpAccount.setCustomerLinkTotal(data.getTotal());
+                    weCorpAccount.setCustomerLinkMargin(data.getBalance());
+                    iWeCorpAccountService.updateById(
+                            weCorpAccount
+                    );
+                }
+            }
+        }
     }
 
 

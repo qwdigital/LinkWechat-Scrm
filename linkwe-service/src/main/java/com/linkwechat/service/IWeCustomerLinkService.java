@@ -51,6 +51,13 @@ public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
     JSONObject getShort2LongUrl(String shortUrl);
 
 
+    /**
+     * 删除获客链接
+     * @param ids
+     */
+    void removeLink(List<Long> ids);
+
+
 
 
 
