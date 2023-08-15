@@ -1,5 +1,6 @@
 package com.linkwechat.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.domain.WeCustomerLink;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeCustomerLinkCount;
@@ -39,6 +40,15 @@ public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
      * @return
      */
     WeCustomerLink findWeCustomerLinkById(Long id);
+
+
+
+    /**
+     *
+     * @param shortUrl
+     * @return
+     */
+    JSONObject getShort2LongUrl(String shortUrl);
 
 
 

@@ -44,7 +44,7 @@ public class WeCustomerLinkController  extends BaseController {
      */
     @GetMapping("/list")
     public TableDataInfo<WeCustomerLink> list(WeCustomerLink weCustomerLink){
-         startPage();
+        startPage();
         return getDataTable(
                 iWeCustomerLinkService.list(new LambdaQueryWrapper<WeCustomerLink>()
                         .like(StringUtils.isNotEmpty(weCustomerLink.getLinkName()),WeCustomerLink::getLinkName,weCustomerLink.getLinkName()))
@@ -80,7 +80,7 @@ public class WeCustomerLinkController  extends BaseController {
         iWeCustomerLinkService.createOrUpdateCustomerLink(customerLink,true);
 
 
-        return  AjaxResult.success();
+        return  AjaxResult.success(customerLink);
     }
 
 
@@ -98,7 +98,7 @@ public class WeCustomerLinkController  extends BaseController {
 
         iWeCustomerLinkService.createOrUpdateCustomerLink(customerLink,false);
 
-        return  AjaxResult.success();
+        return  AjaxResult.success(customerLink);
     }
 
 

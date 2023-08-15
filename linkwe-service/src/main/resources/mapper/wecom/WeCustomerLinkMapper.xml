@@ -4,40 +4,40 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeCustomerLinkMapper">
 
-     <select id="findLinkWeCustomer" resultType="com.linkwechat.domain.customer.vo.WeCustomersVo">
-         SELECT
-             wc.id,
-             wc.unionid,
-             wc.avatar,
-             wc.customer_name,
-             wc.customer_type as customerType,
-             wc.external_userid,
-             wc.add_user_id as firstUserId,
-             wc.track_state,
-             wc.add_method,
-             wc.add_time as firstAddTime,
-             wc.birthday,
-             wc.gender,
-             wc.phone,
-             wc.email,
-             wc.address,
-             wc.qq,
-             wc.position,
-             wc.corp_name as corpName,
-             wc.other_descr as otherDescr
-         FROM
-             we_customer_link_count wcl
-                 LEFT JOIN we_customer wc ON wcl.external_userid = wc.external_userid
-                 AND wcl.we_user_id = wc.add_user_id
-         WHERE wc.del_flag=0
-          <if test="weCustomerLinkCount.linkId != null and weCustomerLinkCount.linkId !=''">
-              and  wcl.link_id=#{weCustomerLinkCount.linkId}
-          </if>
-         <if test="weCustomerLinkCount.beginTime !=null and weCustomerLinkCount.beginTime != '' and weCustomerLinkCount.endTime !='' and weCustomerLinkCount.endTime != null">
-             AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerLinkCount.beginTime} AND #{weCustomerLinkCount.endTime}
-         </if>
-         <if test="weCustomerLinkCount.weUserId !=null">
-             AND wcl.we_user_id=#{weCustomerLinkCount.weUserId}
-         </if>
-     </select>
+    <select id="findLinkWeCustomer" resultType="com.linkwechat.domain.customer.vo.WeCustomersVo">
+        SELECT
+        wc.id,
+        wc.unionid,
+        wc.avatar,
+        wc.customer_name,
+        wc.customer_type as customerType,
+        wc.external_userid,
+        wc.add_user_id as firstUserId,
+        wc.track_state,
+        wc.add_method,
+        wc.add_time as firstAddTime,
+        wc.birthday,
+        wc.gender,
+        wc.phone,
+        wc.email,
+        wc.address,
+        wc.qq,
+        wc.position,
+        wc.corp_name as corpName,
+        wc.other_descr as otherDescr
+        FROM
+        we_customer_link_count wcl
+        LEFT JOIN we_customer wc ON wcl.external_userid = wc.external_userid
+        AND wcl.we_user_id = wc.add_user_id
+        WHERE wc.del_flag=0
+        <if test="weCustomerLinkCount.linkId != null and weCustomerLinkCount.linkId !=''">
+            and  wcl.link_id=#{weCustomerLinkCount.linkId}
+        </if>
+        <if test="weCustomerLinkCount.beginTime !=null and weCustomerLinkCount.beginTime != '' and weCustomerLinkCount.endTime !='' and weCustomerLinkCount.endTime != null">
+            AND  date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{weCustomerLinkCount.beginTime} AND #{weCustomerLinkCount.endTime}
+        </if>
+        <if test="weCustomerLinkCount.weUserId !=null">
+            AND wcl.we_user_id=#{weCustomerLinkCount.weUserId}
+        </if>
+    </select>
 </mapper>
