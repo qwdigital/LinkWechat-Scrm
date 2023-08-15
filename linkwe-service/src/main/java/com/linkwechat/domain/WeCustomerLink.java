@@ -101,6 +101,12 @@ public class WeCustomerLink implements Serializable {
     private String weUserNames;
 
 
+    /**
+     * 渠道标识
+     */
+    private String state;
+
+
 
 
 

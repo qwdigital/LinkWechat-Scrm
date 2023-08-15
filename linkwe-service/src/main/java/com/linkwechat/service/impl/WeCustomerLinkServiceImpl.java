@@ -7,6 +7,7 @@ import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -89,7 +90,8 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
                 WeLinkCustomerVo.Link link = weLinkCustomerVo.getLink();
                 if(null != link){
                     customerLink.setLinkId(link.getLink_id());
-                    customerLink.setLinkUrl(link.getUrl());
+                    customerLink.setState(WelcomeMsgTypeEnum.WE_CUSTOMER_LINK_PREFIX.getType()+customerLink.getId());
+                    customerLink.setLinkUrl(link.getUrl()+"?customer_channel="+customerLink.getState());
                     customerLink.setLinkShortUrl(
                             linkWeChatConfig.getShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
                     );

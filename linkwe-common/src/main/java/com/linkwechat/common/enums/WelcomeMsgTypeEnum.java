@@ -37,6 +37,12 @@ public enum WelcomeMsgTypeEnum {
      */
     WE_KNOW_CUSTOMER_CODE_PREFIX("we_kn_code", "weKnowCustomerMsgServiceImpl"),
 
+
+    /**
+     * 获客链接前缀
+     */
+    WE_CUSTOMER_LINK_PREFIX("we_link","weLinkMsgServiceImpl"),
+
     /**
      * 新客拉群前缀
      */
