@@ -118,17 +118,17 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
         //如果当前时间在裂变结束时间之前,则裂变结束
-        if(new Date().after(weFission.getFassionEndTime())){
-            weFission.setFassionState(3);
-        }
+//        if(new Date().after(weFission.getFassionEndTime())){
+//            weFission.setFassionState(3);
+//        }
 
         //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
-        if(new Date().after(weFission.getFassionStartTime())&&
-                new Date().before(weFission.getFassionEndTime())
-        ) {
-            weFission.setFassionState(2);
-
-        }
+//        if(new Date().after(weFission.getFassionStartTime())&&
+//                new Date().before(weFission.getFassionEndTime())
+//        ) {
+//            weFission.setFassionState(2);
+//
+//        }
 
         WeFission.ExchangeContent exchangeContent = weFission.getExchangeContent();
 
@@ -538,7 +538,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                             });
                                 }
                                 //群裂变
-                            }else if(TaskFissionType.GROUP_FISSION.getCode()
+                            }
+                            else if(TaskFissionType.GROUP_FISSION.getCode()
                                     .equals(weFission.getFassionType())){
                                 messageQuery.setChatType(2);
                                 WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
