@@ -25,7 +25,7 @@ public class WeLeadsBindCustomerRequest {
     /**
      * 客户ID
      */
-    @NotNull(message = "线索ID必填")
+    @NotNull(message = "客户ID必填")
     private Long customerId;
 
     /**

@@ -881,6 +881,10 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         if (BeanUtil.isEmpty(weLeads)) {
             throw new ServiceException("线索不存在！");
         }
+        //校验手机号码是否一致
+        if (!weCustomer.getPhone().equals(weLeads.getPhone())) {
+            throw new ServiceException("客户手机号码与线索手机号码不一致！");
+        }
 
         //判断用户是否线索的当前跟进人
         LambdaQueryWrapper<WeLeadsFollower> lambdaQuery = Wrappers.lambdaQuery();
