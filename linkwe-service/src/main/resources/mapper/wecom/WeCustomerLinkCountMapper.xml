@@ -39,8 +39,8 @@
             date_format(wclc.add_time,'%Y-%m-%d') as date,
             count(wclc.id) as addWeCustomerNumber,
             count(if(wclc.chat_status=1,wclc.id,null)) as weCustomerActiveNumber,
-            (SELECT count(*) from we_customer_link_count wclct where DATEDIFF(wclct.add_time, wclc.add_time)<0) as tdAddWeCustomerNumber,
-            (SELECT count(if(wclc.chat_status=1,wclc.id,null)) from we_customer_link_count wclct where DATEDIFF(wclct.add_time, wclc.add_time)<0) as tdWeCustomerActiveNumber
+            (SELECT count(*) from we_customer_link_count wclct where DATEDIFF(wclct.add_time, wclc.add_time)&lt;0) as tdAddWeCustomerNumber,
+            (SELECT count(if(wclc.chat_status=1,wclc.id,null)) from we_customer_link_count wclct where DATEDIFF(wclct.add_time, wclc.add_time)&lt;0) as tdWeCustomerActiveNumber
         FROM
         we_customer_link_count wclc
         where 	wclc.link_id=#{linkId}
