@@ -336,148 +336,119 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
             List<SysLeaveUser> sysLeaveUsers=new ArrayList<>();
 
-             //构建离职客户对应的员工
             infoList.stream()
                     .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid)).forEach((k,v)->{
 
-                         Long leaveUserId=SnowFlakeUtil.nextId();
+                        Long leaveUserId=SnowFlakeUtil.nextId();
 
-                       List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomerInfoFromWechat(
-                               v.stream().map(WeLeaveUserVo.Info::getExternal_userid).collect(Collectors.toList())
-                       );
-
-
-                       if(CollectionUtil.isNotEmpty(weCustomersVos)){
-
-                           //分配客户
-                           weCustomersVos.stream().forEach(vv->{
-                             allocateCustomers.add(
-                                     WeAllocateCustomer.builder()
-                                             .id(SnowFlakeUtil.nextId())
-                                             .leaveUserId(leaveUserId)
-                                             .customerName(vv.getCustomerName())
-                                             .allocateTime(new Date())
-                                             .extentType(new Integer(0))
-                                             .externalUserid(vv.getExternalUserid())
-                                             .handoverUserid(k)
-                                             .status(new Integer(1))
-                                             .failReason("离职继承")
-                                             .build()
-                             );
-
-                         });
+                        List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomerInfoFromWechat(
+                                v.stream().map(WeLeaveUserVo.Info::getExternal_userid).collect(Collectors.toList())
+                        );
 
 
+                        if(CollectionUtil.isNotEmpty(weCustomersVos)){
 
+                            //分配客户
+                            weCustomersVos.stream().forEach(vv->{
+                                allocateCustomers.add(
+                                        WeAllocateCustomer.builder()
+                                                .id(SnowFlakeUtil.nextId())
+                                                .leaveUserId(leaveUserId)
+                                                .customerName(vv.getCustomerName())
+                                                .allocateTime(new Date())
+                                                .extentType(new Integer(0))
+                                                .externalUserid(vv.getExternalUserid())
+                                                .handoverUserid(k)
+                                                .status(new Integer(1))
+                                                .failReason("离职继承")
+                                                .build()
+                                );
 
-                       }
+                            });
 
 
 
-                       //离职员工入库(后期开放离职员工数据可拓展)
-                       SysUser sysUser = this.baseMapper.findSysUserByWeUserId(k);
+
+                        }
 
 
 
-                       SysLeaveUser leaveUser = SysLeaveUser.builder()
-                               .id(leaveUserId)
-                               .weUserId(k)
-                               .allocateCustomerNum(v.size())
-                               .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
-                               .allocateGroupNum(0)
-                               .isAllocate(0)
-                               .delFlag(Constants.COMMON_STATE)
-                               .build();
 
-                       leaveUser.setCreateBy(SecurityUtils.getUserName());
-                       leaveUser.setCreateTime(new Date());
-                       leaveUser.setCreateById(SecurityUtils.getUserId());
-                       leaveUser.setUpdateBy(SecurityUtils.getUserName());
-                       leaveUser.setUpdateTime(new Date());
-                       leaveUser.setUpdateById(SecurityUtils.getUserId());
+                        //从企业微信拉取当前离职员工等待分配的群(后期开放拉取离职客户群可拓展)
+                        List<WeGroup> weGroups = iWeGroupService.findGroupInfoFromWechat(WeGroupChatListQuery.builder()
+                                .owner_filter(WeOwnerFilterEntity.builder()
+                                        .userid_list(ListUtil.toList(k))
+                                        .build())
+                                .status_filter(1)
+                                .build());
 
-                 if(null != sysUser){
-                     sysUser.setIsUserLeave(1);
+                        if(CollectionUtil.isNotEmpty(weGroups)){
+                            weGroups.stream().forEach(chat->{
 
-                     leaveUser.setUserName(sysUser.getUserName());
-                     leaveUser.setDeptNames(sysUser.getDeptName());
-                     leaveUser.setWeUserId(sysUser.getWeUserId());
-
-                }else{
-                        leaveUser.setUserName("@企微成员");
-                         List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.list();
-
-                     if(CollectionUtil.isNotEmpty(weCorpAccounts)){
-                         leaveUser.setDeptNames( weCorpAccounts.stream().findFirst().get().getCompanyName());
-                     }
-                 }
+                                if(k.equals(chat.getOwner())){
+                                    allocateGroups.add(
+                                            WeAllocateGroup.builder()
+                                                    .id(SnowFlakeUtil.nextId())
+                                                    .leaveUserId(leaveUserId)
+                                                    .chatId(chat.getChatId())
+                                                    .chatName(chat.getGroupName())
+                                                    .oldOwner(chat.getOwner())
+                                                    .status(new Integer(1))
+                                                    .build()
+                                    );
+                                }
 
 
-                       sysLeaveUsers.add( leaveUser);
+                            });
+                        }
+
+
+
+
+
+                        //离职员工入库(后期开放离职员工数据可拓展)
+                        SysUser sysUser = this.baseMapper.findSysUserByWeUserId(k);
+
+
+
+                        SysLeaveUser leaveUser = SysLeaveUser.builder()
+                                .id(leaveUserId)
+                                .weUserId(k)
+                                .allocateCustomerNum(v.size())
+                                .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
+                                .allocateGroupNum(weGroups.size())
+                                .isAllocate(0)
+                                .delFlag(Constants.COMMON_STATE)
+                                .build();
+
+                        leaveUser.setCreateBy(SecurityUtils.getUserName());
+                        leaveUser.setCreateTime(new Date());
+                        leaveUser.setCreateById(SecurityUtils.getUserId());
+                        leaveUser.setUpdateBy(SecurityUtils.getUserName());
+                        leaveUser.setUpdateTime(new Date());
+                        leaveUser.setUpdateById(SecurityUtils.getUserId());
+
+                        if(null != sysUser){
+                            sysUser.setIsUserLeave(1);
+
+                            leaveUser.setUserName(sysUser.getUserName());
+                            leaveUser.setDeptNames(sysUser.getDeptName());
+                            leaveUser.setWeUserId(sysUser.getWeUserId());
+
+                        }else{
+                            leaveUser.setUserName("@企微成员");
+                            List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.list();
+
+                            if(CollectionUtil.isNotEmpty(weCorpAccounts)){
+                                leaveUser.setDeptNames( weCorpAccounts.stream().findFirst().get().getCompanyName());
+                            }
+                        }
+
+
+                        sysLeaveUsers.add( leaveUser);
 
 
                     });
-
-
-
-            //构建离职群对应的员工
-            List<WeGroup> weGroups = iWeGroupService.findGroupInfoFromWechat(WeGroupChatListQuery.builder()
-                    .owner_filter(WeOwnerFilterEntity.builder()
-                            .build())
-                    .status_filter(1)
-                    .build());
-
-            if(CollectionUtil.isNotEmpty(weGroups)){
-               weGroups.stream().collect(Collectors.groupingBy(WeGroup::getOwner))
-                       .forEach((k,v)->{
-
-                           SysLeaveUser leaveUser = sysLeaveUsers.stream()
-                                   .filter(item -> item.getWeUserId().equals(k)).findFirst().get();
-
-                           if(null != leaveUser){
-                               leaveUser.setAllocateGroupNum(v.size());
-                           }else{
-
-                               //离职员工入库(后期开放离职员工数据可拓展)
-                               SysUser sysUser = this.baseMapper.findSysUserByWeUserId(k);
-
-
-
-
-
-
-
-
-
-                           }
-
-                       });
-
-
-//                weGroups.stream().forEach(chat->{
-//
-//
-//
-//
-//
-//
-////                    if(k.equals(chat.getOwner())){
-////                        allocateGroups.add(
-////                                WeAllocateGroup.builder()
-////                                        .id(SnowFlakeUtil.nextId())
-////                                        .leaveUserId(leaveUserId)
-////                                        .chatId(chat.getChatId())
-////                                        .chatName(chat.getGroupName())
-////                                        .oldOwner(chat.getOwner())
-////                                        .status(new Integer(1))
-////                                        .build()
-////                        );
-////                    }
-//
-//
-//                });
-            }
-
 
 
 
@@ -501,26 +472,170 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
             //待分配的客户，群等信息入库
             if(CollectionUtil.isNotEmpty(allocateGroups)){
+//                    iWeGroupService.update(WeGroup.builder()
+//                                    .ownerLeave(1)
+//                            .build(), new LambdaQueryWrapper<WeGroup>()
+//                            .in(WeGroup::getChatId,allocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList())));
                 iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
             }
 
 
             //            //离职待分配员工客户数据处理
             if(CollectionUtil.isNotEmpty(allocateCustomers)){
+//                allocateCustomers.stream().forEach(k->{
+//                    iWeCustomerService.saveOrUpdate(WeCustomer.builder()
+//                            .addUserLeave(1)
+//                            .build(),new LambdaQueryWrapper<WeCustomer>()
+//                            .eq(WeCustomer::getExternalUserid,k.getExternalUserid())
+//                            .eq(WeCustomer::getAddUserId,k.getHandoverUserid()));
+//                });
+
 
                 iWeAllocateCustomerService.batchAddOrUpdate(
                         allocateCustomers
                 );
             }
 
-
+//            //待分配的离职客户
+//            List<WeAllocateCustomer> allocateCustomers=new ArrayList<>();
+//            //等待分配的客群
+//            List<WeAllocateGroup> allocateGroups=new ArrayList<>();
+//
+//            Map<String, List<WeLeaveUserVo.Info>> weLeaveUserVoMap = infoList.stream()
+//                    .collect(Collectors.groupingBy(WeLeaveUserVo.Info::getHandover_userid));
+//
+//
+//
+//             weLeaveUserVoMap.forEach((k,v)->{
+//
+//                 List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+//                         .eq(WeCustomer::getAddUserId, k)
+//                         .in(WeCustomer::getExternalUserid, v.stream().map(WeLeaveUserVo.Info::getExternal_userid).collect(Collectors.toList())));
+//
+//                 if(CollectionUtil.isNotEmpty(weCustomers)){
+//
+//                     //分配客户
+//                     weCustomers.stream().forEach(vv->{
+//                         allocateCustomers.add(
+//                                 WeAllocateCustomer.builder()
+//                                         .id(SnowFlakeUtil.nextId())
+//                                         .allocateTime(new Date())
+//                                         .extentType(new Integer(0))
+//                                         .externalUserid(vv.getExternalUserid())
+//                                         .handoverUserid(k)
+//                                         .status(new Integer(1))
+//                                         .failReason("离职继承")
+//                                         .build()
+//                         );
+//
+//                     });
+//
+//
+//                 }
+//
+//
+//
+//                 //从企业微信拉取当前离职员工等待分配的群(后期开放拉取离职客户群可拓展)
+//                 List<WeGroupChatListVo.GroupChat> weGroups=iWeGroupService.synchWeGroup(WeGroupChatListQuery.builder()
+//                                        .owner_filter(WeOwnerFilterEntity.builder()
+//                                                .userid_list(ListUtil.toList(k))
+//                                                .build())
+//                                        .status_filter(1)
+//                                .build());
+//                 if(CollectionUtil.isNotEmpty(weGroups)){
+//                     weGroups.stream().forEach(chat->{
+//                                allocateGroups.add(
+//                                        WeAllocateGroup.builder()
+//                                                .id(SnowFlakeUtil.nextId())
+//                                                .chatId(chat.getChatId())
+//                                                .oldOwner(k)
+//                                                .status(new Integer(1))
+//                                                .build()
+//                                );
+//                            });
+//                        }
+//
+//
+//                 //离职员工入库(后期开放离职员工数据可拓展)
+//                 AjaxResult<List<SysUser>> ajaxResult = qwSysUserClient.findAllSysUser(k, null, null);
+//
+//                 if(ajaxResult != null && CollectionUtil.isNotEmpty(ajaxResult.getData())){
+//                     SysUser sysUser = ajaxResult.getData().stream().findFirst().get();
+//                     sysUser.setIsUserLeave(1);
+//
+//
+//                     SysLeaveUser leaveUser = SysLeaveUser.builder()
+//                             .id(SnowFlakeUtil.nextId())
+//                             .userName(sysUser.getUserName())
+//                             .deptNames(sysUser.getDeptName())
+//                             .weUserId(sysUser.getWeUserId())
+//                             .allocateCustomerNum(v.size())
+//                             .dimissionTime(new Date(v.stream().findFirst().get().getDimission_time() * 1000L))
+//                             .allocateGroupNum(weGroups.size())
+//                             .isAllocate(0)
+//                             .delFlag(Constants.COMMON_STATE)
+//                             .build();
+//
+//
+//                     leaveUser.setCreateBy(SecurityUtils.getUserName());
+//                     leaveUser.setCreateTime(new Date());
+//                     leaveUser.setCreateById(SecurityUtils.getUserId());
+//                     leaveUser.setUpdateBy(SecurityUtils.getUserName());
+//                     leaveUser.setUpdateTime(new Date());
+//                     leaveUser.setUpdateById(SecurityUtils.getUserId());
+//
+//
+//                     //构建离职员工数据
+//                     this.baseMapper.batchAddOrUpdate(
+//                             ListUtil.toList(
+//                                     leaveUser
+//                             )
+//                     );
+//
+//
+//                     //更新
+//                     SysUserDTO sysUserDTO=new SysUserDTO();
+//                     sysUserDTO.setIsUserLeave(1);
+//                     sysUserDTO.setWeUserId(sysUser.getWeUserId());
+//                     qwSysUserClient.edit(
+//                             sysUserDTO
+//                     );
+//
+//                 }
+//
+//             });
+//
+//            //待分配的客户，群等信息入库
+//            if(CollectionUtil.isNotEmpty(allocateGroups)){
+//                iWeGroupService.update(WeGroup.builder()
+//                                .ownerLeave(1)
+//                        .build(), new LambdaQueryWrapper<WeGroup>()
+//                        .in(WeGroup::getChatId,allocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList())));
+//                iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
+//            }
+//
+//
+//            //离职待分配员工客户数据处理
+//            if(CollectionUtil.isNotEmpty(allocateCustomers)){
+//                allocateCustomers.stream().forEach(k->{
+//                    iWeCustomerService.saveOrUpdate(WeCustomer.builder()
+//                            .addUserLeave(1)
+//                            .build(),new LambdaQueryWrapper<WeCustomer>()
+//                            .eq(WeCustomer::getExternalUserid,k.getExternalUserid())
+//                            .eq(WeCustomer::getAddUserId,k.getHandoverUserid()));
+//                });
+//
+//
+//                iWeAllocateCustomerService.batchAddOrUpdate(
+//                        allocateCustomers
+//                );
+//            }
 
 
         }
 
 
     }
-
 
     private void builderLeaveSysUser(){
 
