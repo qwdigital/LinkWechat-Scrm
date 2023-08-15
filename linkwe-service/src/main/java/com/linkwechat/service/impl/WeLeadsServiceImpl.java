@@ -825,16 +825,16 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
      */
     private Long exeUserReturn(WeLeads weLeads, WeLeadsUserReturnRequest request) {
         //修改线索状态
-        WeLeads item = new WeLeads();
-        item.setId(request.getLeadsId());
-        item.setSeaId(request.getSeaId());
-        item.setRecoveryTimes(weLeads.getRecoveryTimes() + 1);
-        item.setLeadsStatus(LeadsStatusEnum.RETURNED.getCode());
-        item.setFollowerId(null);
-        item.setWeUserId(null);
-        item.setFollowerName(null);
-        item.setDeptId(null);
-        this.updateById(item);
+        LambdaUpdateWrapper<WeLeads> updateWrapper = Wrappers.lambdaUpdate(WeLeads.class);
+        updateWrapper.eq(WeLeads::getId, request.getLeadsId());
+        updateWrapper.eq(WeLeads::getSeaId, request.getSeaId());
+        updateWrapper.set(WeLeads::getRecoveryTimes, weLeads.getRecoveryTimes() + 1);
+        updateWrapper.set(WeLeads::getLeadsStatus, LeadsStatusEnum.RETURNED.getCode());
+        updateWrapper.set(WeLeads::getFollowerId, null);
+        updateWrapper.set(WeLeads::getWeUserId, null);
+        updateWrapper.set(WeLeads::getFollowerName, null);
+        updateWrapper.set(WeLeads::getDeptId, null);
+        this.update(updateWrapper);
 
         //修改跟进人状态
         LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);

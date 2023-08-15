@@ -15,15 +15,18 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.SexEnums;
 import com.linkwechat.common.enums.leads.leads.LeadsSourceEnum;
+import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
+import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
 import com.linkwechat.domain.leads.leads.query.*;
 import com.linkwechat.domain.leads.leads.vo.Properties;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsImportResultVO;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsVO;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
+import com.linkwechat.service.IWeLeadsFollowerService;
 import com.linkwechat.service.IWeLeadsSeaService;
 import com.linkwechat.service.IWeLeadsService;
 import com.linkwechat.service.IWeTagService;
@@ -62,6 +65,8 @@ public class WeLeadsController extends BaseController {
     private IWeLeadsService weLeadsService;
     @Resource
     private IWeTagService weTagService;
+    @Resource
+    private IWeLeadsFollowerService weLeadsFollowerService;
 
     /**
      * 线索列表
@@ -125,6 +130,18 @@ public class WeLeadsController extends BaseController {
         result.setSourceStr(LeadsSourceEnum.of(result.getSource()).getSource());
         result.setSexStr(SexEnums.ofByCode(result.getSex()).get().getInfo());
 
+        //前跟进人
+        if (weLeads.getLeadsStatus().equals(LeadsStatusEnum.RETURNED.getCode())) {
+            LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);
+            queryWrapper.eq(WeLeadsFollower::getLeadsId, id);
+            queryWrapper.eq(WeLeadsFollower::getLatest, 1);
+            WeLeadsFollower one = weLeadsFollowerService.getOne(queryWrapper);
+            if (BeanUtil.isNotEmpty(one)) {
+                result.setPreFollowerName(one.getFollowerName());
+            }
+        }
+
+
         //可修改的模板属性
 //        LambdaQueryWrapper<WeLeadsTemplateSettings> wrapper = Wrappers.lambdaQuery(WeLeadsTemplateSettings.class);
 //        wrapper.eq(WeLeadsTemplateSettings::getCanEdit, CanEditEnum.ALLOW.getCode());
@@ -134,7 +151,7 @@ public class WeLeadsController extends BaseController {
         //自定义数据处理
         String properties = result.getProperties();
         if (StrUtil.isNotBlank(properties)) {
-            List<Properties> propertiesList = new ArrayList<>();
+//            List<Properties> propertiesList = new ArrayList<>();
             List<Properties> tempList = JSONObject.parseArray(properties, Properties.class);
             result.setPropertiesList(tempList);
         }
