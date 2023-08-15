@@ -888,7 +888,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         lambdaQuery.eq(WeLeadsFollower::getFollowerId, SecurityUtils.getLoginUser().getSysUser().getUserId());
         lambdaQuery.eq(WeLeadsFollower::getIsCurrentFollower, 1);
         WeLeadsFollower weLeadsFollower = weLeadsFollowerMapper.selectOne(lambdaQuery);
-        if (BeanUtil.isNotEmpty(weLeadsFollower)) {
+        if (BeanUtil.isEmpty(weLeadsFollower)) {
             throw new ServiceException("不是当前跟进人，无法绑定用户！");
         }
 
