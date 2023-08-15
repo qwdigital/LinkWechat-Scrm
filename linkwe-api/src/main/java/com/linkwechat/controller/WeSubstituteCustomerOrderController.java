@@ -52,7 +52,7 @@ public class WeSubstituteCustomerOrderController extends BaseController {
         LambdaQueryWrapper<WeSubstituteCustomerOrder> queryWrapper = Wrappers.lambdaQuery(WeSubstituteCustomerOrder.class);
         queryWrapper.eq(WeSubstituteCustomerOrder::getDelFlag, Constants.COMMON_STATE);
         queryWrapper.eq(StrUtil.isNotBlank(request.getOrderStatus()), WeSubstituteCustomerOrder::getOrderStatus, request.getOrderStatus());
-        queryWrapper.eq(WeSubstituteCustomerOrder::getUserId, request.getUserId());
+        queryWrapper.eq(WeSubstituteCustomerOrder::getCreateById, request.getUserId());
         List<WeSubstituteCustomerOrder> list = weSubstituteCustomerOrderService.list(queryWrapper);
         TableDataInfo dataTable = getDataTable(list);
         dataTable.setRows(BeanUtil.copyToList(list, WeSubstituteCustomerOrderVO.class));
