@@ -1,6 +1,7 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -61,7 +62,7 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
     private QwSysUserClient qwSysUserClient;
 
     @Override
-    public List<WeCustomersVo> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount) {
+    public List<WeCustomerLinkCount> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount) {
         return this.baseMapper.findLinkWeCustomer(weCustomerLinkCount);
     }
 
@@ -193,6 +194,27 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
             resObj.put("linkUrl", weCustomerLink.getLinkUrl());
         }
         return resObj;
+    }
+
+
+
+    @Override
+    @Transactional
+    public void removeLink(List<Long> ids) {
+
+        if(this.removeByIds(ids)){
+            ids.stream().forEach(k->{
+                WeCustomerLink weCustomerLink = this.getById(k);
+
+                if(weCustomerLink != null && StringUtils.isNotEmpty(weCustomerLink.getLinkUrl())){
+                    qwCustomerClient.deleteCustomerLink(WeLinkCustomerQuery.builder()
+                            .link_id(weCustomerLink.getLinkId())
+                            .build());
+                }
+
+            });
+        }
+
     }
 
 

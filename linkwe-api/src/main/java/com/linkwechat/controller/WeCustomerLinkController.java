@@ -108,7 +108,7 @@ public class WeCustomerLinkController  extends BaseController {
      */
     @DeleteMapping("/{ids}")
     public AjaxResult batchRemove(@PathVariable Long[] ids) {
-        iWeCustomerLinkService.removeByIds(
+        iWeCustomerLinkService.removeLink(
                 ListUtil.toList(ids)
         );
         return AjaxResult.success();
@@ -199,6 +199,17 @@ public class WeCustomerLinkController  extends BaseController {
         return getDataTable(
                 iWeCustomerLinkService.findLinkWeCustomer(weCustomerLinkCount)
         );
+    }
+
+
+    /**
+     * 同步获客助手剩余量
+     * @return
+     */
+    @GetMapping("/synchAcquisitionQuota")
+    public AjaxResult synchAcquisitionQuota(){
+        iWeCustomerLinkCountService.synchAcquisitionQuota();
+        return AjaxResult.success();
     }
 
 

@@ -44,6 +44,13 @@ public interface WeCustomerLinkCountMapper extends BaseMapper<WeCustomerLinkCoun
      */
     WeCustomerLinkCountTabVo selectLinkCountTab(@Param("linkId") String linkId);
 
+
+    /**
+     * 批量新增或更新
+     * @param weCustomerLinkCounts
+     */
+    void batchAddOrUpdate(@Param("weCustomerLinkCounts") List<WeCustomerLinkCount> weCustomerLinkCounts);
+
 }
 
 

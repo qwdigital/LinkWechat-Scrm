@@ -57,4 +57,47 @@
             we_customer_link_count
         where del_flag=0 and link_id=#{linkId}
     </select>
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_customer_link_count(
+            id,
+            external_userid,
+            link_id,
+            we_user_id,
+            customer_name,
+            customer_type,
+            gender,
+            avatar,
+            user_name,
+            chat_status,
+            add_time,
+            state,
+            create_by,
+            create_by_id,
+            create_time,
+            update_by,
+            update_by_id,
+            update_time
+        ) values
+        <foreach collection="weCustomerLinkCounts" item="item" index="index" separator=",">
+            (#{item.id},#{item.externalUserid},#{item.linkId},#{item.weUserId},#{item.customerName},#{item.customerType},
+            #{item.gender},#{item.avatar},#{item.userName},#{item.chatStatus},#{item.addTime},#{item.state},
+            #{item.createBy},#{item.createById},now(),#{item.updateBy},#{item.updateById},now(),
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        link_id=IFNULL(VALUES(link_id),we_customer_link_count.link_id),
+        customer_name=IFNULL(VALUES(customer_name),we_customer_link_count.customer_name),
+        customer_type=IFNULL(VALUES(customer_type),we_customer_link_count.customer_type),
+        gender=IFNULL(VALUES(gender),we_customer_link_count.gender),
+        avatar=IFNULL(VALUES(avatar),we_customer_link_count.avatar),
+        user_name=IFNULL(VALUES(user_name),we_customer_link_count.user_name),
+        chat_status=IFNULL(VALUES(chat_status),we_customer_link_count.chat_status),
+        add_time=IFNULL(VALUES(add_time),we_customer_link_count.add_time),
+        state=IFNULL(VALUES(state),we_customer_link_count.state),
+        update_by=IFNULL(VALUES(update_by),we_customer_link_count.update_by),
+        update_by_id=IFNULL(VALUES(update_by_id),we_customer_link_count.update_by_id),
+        update_time=IFNULL(VALUES(update_time),we_customer_link_count.update_time);
+
+    </insert>
 </mapper>

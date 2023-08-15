@@ -57,6 +57,34 @@ public class WeCustomerLinkCount extends BaseEntity {
 
 
     /**
+     * 客户名称
+     */
+    private String customerName;
+
+    /**
+     * 客户类型 1:微信用户，2:企业用户
+     */
+    private Integer customerType;
+
+
+    /**
+     * 0-未知 1-男性 2-女性
+     */
+    private Integer gender;
+
+
+    /**
+     * 客户头像
+     */
+    private String avatar;
+
+    /**
+     * 添加人名称
+     */
+    private String userName;
+
+
+    /**
      * 删除标识 0 有效 1删除
      */
     private Integer delFlag;

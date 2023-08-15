@@ -23,7 +23,7 @@ public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
      * @param weCustomerLinkCount
      * @return
      */
-    List<WeCustomersVo> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount);
+    List<WeCustomerLinkCount> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount);
 
 
     /**
@@ -49,6 +49,13 @@ public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
      * @return
      */
     JSONObject getShort2LongUrl(String shortUrl);
+
+
+    /**
+     * 删除获客链接
+     * @param ids
+     */
+    void removeLink(List<Long> ids);
 
 
 
