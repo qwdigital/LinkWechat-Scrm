@@ -829,6 +829,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         item.setId(request.getLeadsId());
         item.setSeaId(request.getSeaId());
         item.setRecoveryTimes(weLeads.getRecoveryTimes() + 1);
+        item.setLeadsStatus(LeadsStatusEnum.RETURNED.getCode());
         item.setFollowerId(null);
         item.setWeUserId(null);
         item.setFollowerName(null);
