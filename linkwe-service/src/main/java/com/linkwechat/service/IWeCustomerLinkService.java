@@ -23,7 +23,7 @@ public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
      * @param weCustomerLinkCount
      * @return
      */
-    List<WeCustomersVo> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount);
+    List<WeCustomerLinkCount> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount);
 
 
     /**

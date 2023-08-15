@@ -21,7 +21,7 @@ public interface WeCustomerLinkMapper extends BaseMapper<WeCustomerLink> {
      * @param weCustomerLinkCount
      * @return
      */
-    List<WeCustomersVo> findLinkWeCustomer(@Param("weCustomerLinkCount") WeCustomerLinkCount weCustomerLinkCount);
+    List<WeCustomerLinkCount> findLinkWeCustomer(@Param("weCustomerLinkCount") WeCustomerLinkCount weCustomerLinkCount);
 }
 
 

@@ -61,7 +61,7 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
     private QwSysUserClient qwSysUserClient;
 
     @Override
-    public List<WeCustomersVo> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount) {
+    public List<WeCustomerLinkCount> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount) {
         return this.baseMapper.findLinkWeCustomer(weCustomerLinkCount);
     }
 

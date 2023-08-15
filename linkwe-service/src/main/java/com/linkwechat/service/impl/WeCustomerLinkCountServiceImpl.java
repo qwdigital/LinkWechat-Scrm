@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomerLink;
@@ -13,6 +15,7 @@ import com.linkwechat.domain.WeCustomerLinkCount;
 import com.linkwechat.domain.customer.vo.WeCustomerLinkCountTabVo;
 import com.linkwechat.domain.customer.vo.WeCustomerLinkCountTableVo;
 import com.linkwechat.domain.customer.vo.WeCustomerLinkCountTrendVo;
+import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
@@ -21,6 +24,7 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.mapper.SysLeaveUserMapper;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeCustomerLinkCountService;
 import com.linkwechat.mapper.WeCustomerLinkCountMapper;
@@ -52,6 +56,9 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
     @Autowired
     private IWeCustomerLinkService iWeCustomerLinkService;
 
+    @Autowired
+    private SysLeaveUserMapper sysLeaveUserMapper;
+
     @Override
     @Async
     public void synchWeCustomerLinkCount(String linkId) {
@@ -74,7 +81,7 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
             });
 
             if(CollectionUtil.isNotEmpty(weCustomerLinkCounts)){
-                this.saveBatch(
+                this.baseMapper.batchAddOrUpdate(
                         weCustomerLinkCounts
                 );
             }
@@ -129,6 +136,7 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
                     customerList.stream().forEach(k->{
                         WeCustomerLinkCount weCustomerLinkCount = WeCustomerLinkCount.builder()
                                 .addTime(new Date())
+                                .id(SnowFlakeUtil.nextId())
                                 .linkId(linkId)
                                 .chatStatus(k.getChat_status())
                                 .externalUserid(k.getExternal_userid())
@@ -151,6 +159,24 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
                                         weCustomerLinkCount.setAddTime(
                                                 new Date(weCustomerFollowUserEntity.getCreateTime() * 1000L)
                                         );
+                                        SysUser sysUser
+                                                = sysLeaveUserMapper.findSysUserByWeUserId(weCustomerFollowUserEntity.getUserId());
+
+                                        if(null != sysUser){
+                                            weCustomerLinkCount.setUserName(sysUser.getUserName());
+                                        }else{
+                                            weCustomerLinkCount.setUserName("@员工");
+                                        }
+
+                                        WeCustomerDetailVo.ExternalContact externalContact = data1.getExternalContact();
+
+                                        if(null != externalContact){
+                                            weCustomerLinkCount.setCustomerType(externalContact.getType());
+                                            weCustomerLinkCount.setCustomerName(externalContact.getName());
+                                            weCustomerLinkCount.setAvatar(externalContact.getAvatar());
+                                            weCustomerLinkCount.setGender(externalContact.getGender());
+                                        }
+
                                     }
                                 }
                             }
