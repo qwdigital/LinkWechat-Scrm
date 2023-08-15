@@ -827,7 +827,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         //修改线索状态
         LambdaUpdateWrapper<WeLeads> updateWrapper = Wrappers.lambdaUpdate(WeLeads.class);
         updateWrapper.eq(WeLeads::getId, request.getLeadsId());
-        updateWrapper.eq(WeLeads::getSeaId, request.getSeaId());
+        updateWrapper.set(WeLeads::getSeaId, request.getSeaId());
         updateWrapper.set(WeLeads::getRecoveryTimes, weLeads.getRecoveryTimes() + 1);
         updateWrapper.set(WeLeads::getLeadsStatus, LeadsStatusEnum.RETURNED.getCode());
         updateWrapper.set(WeLeads::getFollowerId, null);
