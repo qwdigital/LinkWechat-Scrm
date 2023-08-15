@@ -41,7 +41,7 @@ public enum WelcomeMsgTypeEnum {
     /**
      * 获客链接前缀
      */
-    WE_CUSTOMER_LINK_PREFIX("we_link","weLinkMsgServiceImpl"),
+    WE_CUSTOMER_LINK_PREFIX("we_link","weCustomerLinkMsgServiceImpl"),
 
     /**
      * 新客拉群前缀

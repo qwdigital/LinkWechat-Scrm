@@ -113,10 +113,6 @@ public class WeCustomerLink extends BaseEntity {
     private String weUserNames;
 
 
-    /**
-     * 渠道标识
-     */
-    private String state;
 
 
 
