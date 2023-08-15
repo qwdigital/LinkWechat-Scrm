@@ -19,4 +19,10 @@ public class WeSubstituteCustomerOrderRequest {
      */
     @ApiModelProperty("订单状态")
     private String orderStatus;
+
+    /**
+     * 员工Id
+     */
+    @ApiModelProperty("员工Id")
+    private Long userId;
 }
