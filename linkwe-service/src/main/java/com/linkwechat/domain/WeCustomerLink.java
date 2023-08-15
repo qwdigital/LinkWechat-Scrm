@@ -74,6 +74,12 @@ public class WeCustomerLink extends BaseEntity {
 
 
     /**
+     * 渠道标识
+     */
+    private String state;
+
+
+    /**
      * 附件(传入)
      */
     @TableField(exist = false)
