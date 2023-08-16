@@ -120,7 +120,7 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
                     iWeCorpAccountService.updateById(
                             weCorpAccount
                     );
-                    redisService.getCacheObject(Constants.CORP_ACCOUNT_KEY);
+                    redisService.deleteObject(Constants.CORP_ACCOUNT_KEY);
                 }
             }
         }
