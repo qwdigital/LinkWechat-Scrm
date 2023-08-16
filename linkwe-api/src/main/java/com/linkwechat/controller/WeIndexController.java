@@ -134,9 +134,9 @@ public class WeIndexController {
     }
 
 
-    @ShortLinkView(prefix = "link:")
+    @ShortLinkView(prefix = "l:")
     @ApiOperation(value = "获客助手短链换取长链", httpMethod = "GET")
-    @GetMapping(value = "/link/{shortUrl}")
+    @GetMapping(value = "/l/{shortUrl}")
     public void getLinkShort2LongUrl(HttpServletRequest request,
                                      HttpServletResponse resp,
                                      @PathVariable("shortUrl") String shortUrl) throws IOException {
