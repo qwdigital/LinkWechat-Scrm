@@ -7,6 +7,7 @@
     <insert id="batchAddOrUpdate" >
         INSERT INTO we_allocate_group(
         id,
+        leave_user_id,
         chat_id,
         new_owner,
         err_msg,
@@ -25,7 +26,7 @@
         leave_user_id
         ) values
         <foreach collection="weAllocateGroups" item="item" index="index" separator=",">
-            (#{item.id},#{item.chatId},#{item.newOwner},#{item.errMsg},#{item.status},#{item.oldOwner},#{item.allocateTime},
+            (#{item.id},#{item.leaveUserId},#{item.chatId},#{item.newOwner},#{item.errMsg},#{item.status},#{item.oldOwner},#{item.allocateTime},
              #{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById},
              #{item.chatName},#{item.takeoverName},#{item.takeoverDeptName},#{item.leaveUserId})
         </foreach>

@@ -472,23 +472,13 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
 
             //待分配的客户，群等信息入库
             if(CollectionUtil.isNotEmpty(allocateGroups)){
-//                    iWeGroupService.update(WeGroup.builder()
-//                                    .ownerLeave(1)
-//                            .build(), new LambdaQueryWrapper<WeGroup>()
-//                            .in(WeGroup::getChatId,allocateGroups.stream().map(WeAllocateGroup::getChatId).collect(Collectors.toList())));
+
                 iWeAllocateGroupService.batchAddOrUpdate(allocateGroups);
             }
 
 
             //            //离职待分配员工客户数据处理
             if(CollectionUtil.isNotEmpty(allocateCustomers)){
-//                allocateCustomers.stream().forEach(k->{
-//                    iWeCustomerService.saveOrUpdate(WeCustomer.builder()
-//                            .addUserLeave(1)
-//                            .build(),new LambdaQueryWrapper<WeCustomer>()
-//                            .eq(WeCustomer::getExternalUserid,k.getExternalUserid())
-//                            .eq(WeCustomer::getAddUserId,k.getHandoverUserid()));
-//                });
 
 
                 iWeAllocateCustomerService.batchAddOrUpdate(

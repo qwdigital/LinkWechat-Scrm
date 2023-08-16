@@ -8,6 +8,7 @@
     <insert id="batchAddOrUpdate" >
         INSERT INTO we_allocate_customer(
         id,
+        leave_user_id,
         takeover_userid,
         external_userid,
         allocate_time,
@@ -28,7 +29,7 @@
         leave_user_id
         ) values
         <foreach collection="weAllocateCustomers" item="item" index="index" separator=",">
-            (#{item.id},#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason}
+            (#{item.id},#{item.leaveUserId},#{item.takeoverUserid},#{item.externalUserid},#{item.allocateTime},#{item.handoverUserid},#{item.status},#{item.takeoverTime},#{item.failReason}
             ,#{item.extentType},#{item.createTime},#{item.updateTime},#{item.createBy},#{item.createById},#{item.updateBy},#{item.updateById}
             ,#{item.customerName},#{item.takeoverName},#{item.takeoverDeptName},#{item.leaveUserId})
         </foreach>
