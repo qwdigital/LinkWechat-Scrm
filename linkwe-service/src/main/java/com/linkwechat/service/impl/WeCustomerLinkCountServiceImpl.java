@@ -7,6 +7,7 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCorpAccount;
@@ -58,6 +59,9 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
 
     @Autowired
     private SysLeaveUserMapper sysLeaveUserMapper;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     @Async
@@ -116,6 +120,7 @@ public class WeCustomerLinkCountServiceImpl extends ServiceImpl<WeCustomerLinkCo
                     iWeCorpAccountService.updateById(
                             weCorpAccount
                     );
+                    redisService.getCacheObject(Constants.CORP_ACCOUNT_KEY);
                 }
             }
         }
