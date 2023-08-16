@@ -110,7 +110,7 @@ public class WeCustomerLinkServiceImpl extends ServiceImpl<WeCustomerLinkMapper,
                     customerLink.setState(WelcomeMsgTypeEnum.WE_CUSTOMER_LINK_PREFIX.getType()+customerLink.getId());
                     customerLink.setLinkUrl(link.getUrl()+"?customer_channel="+customerLink.getState());
                     customerLink.setLinkShortUrl(
-                            linkWeChatConfig.getShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
+                            linkWeChatConfig.getCustomerShortLinkDomainName() + Base62NumUtil.encode(customerLink.getId())
                     );
                 }
             }
