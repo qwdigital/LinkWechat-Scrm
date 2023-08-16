@@ -2,6 +2,7 @@ package com.linkwechat.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +49,7 @@ public class WeCustomerLinkCount extends BaseEntity {
     /**
      * 客户相关添加时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date addTime;
 
     /**
