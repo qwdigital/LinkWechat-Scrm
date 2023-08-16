@@ -82,7 +82,7 @@
         <foreach collection="weCustomerLinkCounts" item="item" index="index" separator=",">
             (#{item.id},#{item.externalUserid},#{item.linkId},#{item.weUserId},#{item.customerName},#{item.customerType},
             #{item.gender},#{item.avatar},#{item.userName},#{item.chatStatus},#{item.addTime},#{item.state},
-            #{item.createBy},#{item.createById},now(),#{item.updateBy},#{item.updateById},now(),
+            #{item.createBy},#{item.createById},now(),#{item.updateBy},#{item.updateById},now()
             )
         </foreach>
         ON DUPLICATE KEY UPDATE

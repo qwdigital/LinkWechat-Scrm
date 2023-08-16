@@ -16,7 +16,7 @@
         <if test="weCustomerLinkCount.beginTime !=null and weCustomerLinkCount.beginTime != '' and weCustomerLinkCount.endTime !='' and weCustomerLinkCount.endTime != null">
             AND  date_format(wcl.add_time,'%Y-%m-%d') BETWEEN #{weCustomerLinkCount.beginTime} AND #{weCustomerLinkCount.endTime}
         </if>
-        <if test="weCustomerLinkCount.weUserId !=null">
+        <if test="weCustomerLinkCount.weUserId !=null and weCustomerLinkCount.weUserId !=''">
             AND wcl.we_user_id=#{weCustomerLinkCount.weUserId}
         </if>
     </select>

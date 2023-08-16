@@ -174,13 +174,17 @@ public class WeCustomerLinkController  extends BaseController {
 
     /**
      * 同步统计数据
-     * @param linkId
+     * @param id
      * @return
      */
-    @GetMapping("/synchCustomerCount/{linkId}")
-    public AjaxResult synchCustomerCount(@PathVariable String linkId){
+    @GetMapping("/synchCustomerCount/{id}")
+    public AjaxResult synchCustomerCount(@PathVariable Long id){
 
-        iWeCustomerLinkCountService.synchWeCustomerLinkCount(linkId);
+        WeCustomerLink weCustomerLink = iWeCustomerLinkService.getById(id);
+
+        if(null != weCustomerLink && StringUtils.isNotEmpty(weCustomerLink.getLinkId())){
+            iWeCustomerLinkCountService.synchWeCustomerLinkCount(weCustomerLink.getLinkId());
+        }
 
         return AjaxResult.success();
 
