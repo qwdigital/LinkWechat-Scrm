@@ -67,30 +67,76 @@ public class WeLeadsFollowRecordController extends BaseController {
     @ApiOperation(value = "线索的跟进记录")
     @GetMapping("/list")
     public TableDataInfo list(@Validated WeLeadsFollowRecordRequest request) {
-        //获取跟进人信息
-        LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);
-        queryWrapper.eq(WeLeadsFollower::getLeadsId, request.getWeLeadsId());
-        queryWrapper.eq(WeLeadsFollower::getFollowerId, request.getFollowUserId());
-        queryWrapper.orderByDesc(WeLeadsFollower::getFollowerStartTime);
-        queryWrapper.last("limit 1");
-        List<WeLeadsFollower> list = weLeadsFollowerService.list(queryWrapper);
-        Optional<WeLeadsFollower> first = list.stream().findFirst();
-        if (!first.isPresent()) {
-            return getDataTable(CollectionUtil.newArrayList());
+        Long id = request.getId();
+        if (id == null) {
+            Long weLeadsId = request.getWeLeadsId();
+            if (weLeadsId == null) {
+                throw new ServiceException("线索Id必填");
+            }
+
+            Long followUserId = request.getFollowUserId();
+            if (followUserId == null) {
+                throw new ServiceException("跟进人Id必填");
+            }
+            //获取跟进人信息
+            LambdaQueryWrapper<WeLeadsFollower> queryWrapper = Wrappers.lambdaQuery(WeLeadsFollower.class);
+            queryWrapper.eq(WeLeadsFollower::getLeadsId, request.getWeLeadsId());
+            queryWrapper.eq(WeLeadsFollower::getFollowerId, request.getFollowUserId());
+            queryWrapper.orderByDesc(WeLeadsFollower::getFollowerStartTime);
+            queryWrapper.last("limit 1");
+            List<WeLeadsFollower> list = weLeadsFollowerService.list(queryWrapper);
+            Optional<WeLeadsFollower> first = list.stream().findFirst();
+            if (!first.isPresent()) {
+                return getDataTable(CollectionUtil.newArrayList());
+            }
+            id = first.get().getId();
         }
+
+        if (id == null) {
+            throw new ServiceException("参数错误！");
+        }
+
         startPage();
         LambdaQueryWrapper<WeLeadsFollowRecord> wrapper = Wrappers.lambdaQuery(WeLeadsFollowRecord.class);
-        wrapper.eq(WeLeadsFollowRecord::getFollowUserId, first.get().getId());
+        wrapper.eq(WeLeadsFollowRecord::getFollowUserId, id);
         wrapper.orderByDesc(WeLeadsFollowRecord::getCreateTime);
         List<WeLeadsFollowRecord> records = weLeadsFollowRecordService.list(wrapper);
 
         TableDataInfo dataTable = getDataTable(records);
         List<WeLeadsFollowRecordVO> rows = BeanUtil.copyToList(records, WeLeadsFollowRecordVO.class);
-        getContents(rows);
+        if (CollectionUtil.isNotEmpty(rows)) {
+            getContents(rows);
+        }
         dataTable.setRows(rows);
-
         return dataTable;
     }
+
+    /**
+     * 线索跟进记录
+     *
+     * @param id 线索跟进人表Id
+     * @return {@link TableDataInfo}
+     * @author WangYX
+     * @date 2023/08/16 18:17
+     */
+    @ApiOperation(value = "线索的跟进记录")
+    @GetMapping("/listById")
+    public TableDataInfo listById(@RequestParam Long id) {
+        startPage();
+        LambdaQueryWrapper<WeLeadsFollowRecord> wrapper = Wrappers.lambdaQuery(WeLeadsFollowRecord.class);
+        wrapper.eq(WeLeadsFollowRecord::getFollowUserId, id);
+        wrapper.orderByDesc(WeLeadsFollowRecord::getCreateTime);
+        List<WeLeadsFollowRecord> records = weLeadsFollowRecordService.list(wrapper);
+
+        TableDataInfo dataTable = getDataTable(records);
+        List<WeLeadsFollowRecordVO> rows = BeanUtil.copyToList(records, WeLeadsFollowRecordVO.class);
+        if (CollectionUtil.isNotEmpty(rows)) {
+            getContents(rows);
+        }
+        dataTable.setRows(rows);
+        return dataTable;
+    }
+
 
     /**
      * 添加跟进

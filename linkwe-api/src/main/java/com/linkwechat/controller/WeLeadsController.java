@@ -6,6 +6,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.RepeatSubmit;
 import com.linkwechat.common.constant.Constants;
@@ -41,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -83,17 +83,8 @@ public class WeLeadsController extends BaseController {
         checkExistSea(request.getSeaId());
         //获取列表
         startPage();
-        LambdaQueryWrapper<WeLeads> wrapper = Wrappers.lambdaQuery();
-        wrapper.select(WeLeads::getId, WeLeads::getSeaId, WeLeads::getName, WeLeads::getPhone, WeLeads::getSource, WeLeads::getLeadsStatus);
-        wrapper.eq(WeLeads::getSeaId, request.getSeaId());
-        wrapper.eq(request.getLeadsStatus() != null, WeLeads::getLeadsStatus, request.getLeadsStatus());
-        wrapper.like(StrUtil.isNotBlank(request.getName()), WeLeads::getName, request.getName());
-        wrapper.like(StrUtil.isNotBlank(request.getPhone()), WeLeads::getPhone, request.getPhone());
-        wrapper.orderByDesc(WeLeads::getCreateTime);
-        List<WeLeads> list = weLeadsService.list(wrapper);
-
-        TableDataInfo dataTable = getDataTable(list);
-        List<WeLeadsVO> vos = BeanUtil.copyToList(list, WeLeadsVO.class);
+        List<WeLeadsVO> vos = weLeadsService.selectList(request);
+        TableDataInfo dataTable = getDataTable(vos);
         vos.forEach(i -> {
             //手机号脱敏
             i.setPhone(this.phoneDesensitization(i.getPhone()));
@@ -229,7 +220,8 @@ public class WeLeadsController extends BaseController {
             @ApiImplicitParam(name = "seaId", value = "公海id", required = true)
     })
     public AjaxResult<WeLeadsImportResultVO> importLeads(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "seaId") Long seaId) throws IOException {
-        return AjaxResult.success(weLeadsService.batchImportFromExcel(file, seaId));
+        WeLeadsImportResultVO vo = weLeadsService.batchImportFromExcel(file, seaId);
+        return AjaxResult.success(vo.getFeedbackMessage(),vo);
     }
 
     /**
@@ -402,6 +394,31 @@ public class WeLeadsController extends BaseController {
     @PostMapping("/bind/customer")
     public AjaxResult bindCustomer(@Validated @RequestBody WeLeadsBindCustomerRequest request) {
         weLeadsService.bindCustomer(request);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 删除
+     *
+     * @param id 线索Id
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/16 14:26
+     */
+    @ApiOperation("删除")
+    @DeleteMapping("/{id}")
+    public AjaxResult delete(@PathVariable("id") Long id) {
+        WeLeads weLeads = weLeadsService.getById(id);
+        if (BeanUtil.isEmpty(weLeads)) {
+            throw new ServiceException("线索不存在");
+        }
+        if (weLeads.getLeadsStatus().equals(LeadsStatusEnum.BE_FOLLOWING_UP.getCode()) || weLeads.getLeadsStatus().equals(LeadsStatusEnum.VISIT.getCode())) {
+            throw new ServiceException("线索当前状态无法删除！");
+        }
+        LambdaUpdateWrapper<WeLeads> updateWrapper = Wrappers.lambdaUpdate(WeLeads.class);
+        updateWrapper.eq(WeLeads::getId, id);
+        updateWrapper.set(WeLeads::getDelFlag, Constants.DELETE_STATE);
+        boolean update = weLeadsService.update(updateWrapper);
         return AjaxResult.success();
     }
 

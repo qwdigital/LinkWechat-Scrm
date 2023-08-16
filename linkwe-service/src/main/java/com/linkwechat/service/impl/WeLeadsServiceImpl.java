@@ -185,7 +185,10 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
      */
     private WeLeadsFollower receiveLeads(WeLeads weLeads) {
         //修改线索状态和添加当前跟进人信息
-        updateLeadsStatusAndAddCurrentFollower(weLeads.getId());
+        updateLeadsStatusAndAddCurrentFollower(weLeads.getId(),
+                SecurityUtils.getLoginUser().getSysUser().getUserId(),
+                SecurityUtils.getLoginUser().getSysUser().getWeUserId(),
+                SecurityUtils.getLoginUser().getSysUser().getUserName());
         //添加线索跟进人
         WeLeadsFollower weLeadsFollower = addLeadsFollower(weLeads.getId(), weLeads.getSeaId());
         return weLeadsFollower;
@@ -325,6 +328,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         WeLeadsImportResultVO result = new WeLeadsImportResultVO();
         result.setSucceedCount(weLeadsImportDataListener.successNum);
         result.setFailCount(weLeadsImportDataListener.failNum);
+        result.setRepetitionCount(weLeadsImportDataListener.repetitionNum);
         result.buildFeedbackMessage();
         return result;
     }
@@ -392,7 +396,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         //员工
         String weUserIds = null;
         if (users != null && users.isSelect()) {
-            List<String> list = Optional.ofNullable(users.getWeUserIds()).orElseThrow(() -> new ServiceException("用户为选择数据"));
+            List<String> list = Optional.ofNullable(users.getWeUserIds()).orElseThrow(() -> new ServiceException("用户数据未选择"));
             weUserIds = StringUtils.join(list, ",");
         }
         List<SysUser> sysUsers = getRemoteUser(weUserIds, postIds, deptIds);
@@ -530,7 +534,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
      */
     private void executeAllocation(WeLeadsFollower vo) {
         //修改线索状态和添加当前跟进人信息
-        updateLeadsStatusAndAddCurrentFollower(vo.getLeadsId());
+        updateLeadsStatusAndAddCurrentFollower(vo.getLeadsId(), vo.getFollowerId(), vo.getFollowerWeUserId(), vo.getFollowerName());
 
         //添加线索跟进人
         //更新上次最新跟进人为否
@@ -606,13 +610,13 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
      * @author WangYX
      * @date 2023/07/13 10:50
      */
-    private void updateLeadsStatusAndAddCurrentFollower(Long leadsId) {
+    private void updateLeadsStatusAndAddCurrentFollower(Long leadsId, Long followerId, String weUserId, String userName) {
         LambdaUpdateWrapper<WeLeads> wrapper = Wrappers.lambdaUpdate();
         wrapper.eq(WeLeads::getId, leadsId);
         wrapper.set(WeLeads::getLeadsStatus, LeadsStatusEnum.BE_FOLLOWING_UP.getCode());
-        wrapper.set(WeLeads::getFollowerId, SecurityUtils.getLoginUser().getSysUser().getUserId());
-        wrapper.set(WeLeads::getWeUserId, SecurityUtils.getLoginUser().getSysUser().getWeUserId());
-        wrapper.set(WeLeads::getFollowerName, SecurityUtils.getLoginUser().getSysUser().getUserName());
+        wrapper.set(WeLeads::getFollowerId, followerId);
+        wrapper.set(WeLeads::getWeUserId, weUserId);
+        wrapper.set(WeLeads::getFollowerName, userName);
         this.update(wrapper);
     }
 
@@ -755,7 +759,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
     @Override
     public List<WeLeads> myFollowList(String name, Integer status) {
         LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
-        queryWrapper.select(WeLeads::getId, WeLeads::getName, WeLeads::getUpdateTime, WeLeads::getLabelsIds, WeLeads::getSex);
+        queryWrapper.select(WeLeads::getId, WeLeads::getLeadsStatus, WeLeads::getName, WeLeads::getUpdateTime, WeLeads::getLabelsIds, WeLeads::getSex);
         queryWrapper.like(StrUtil.isNotBlank(name), WeLeads::getName, StringUtils.queryReplace(name));
         queryWrapper.eq(WeLeads::getLeadsStatus, status);
         queryWrapper.eq(WeLeads::getFollowerId, SecurityUtils.getLoginUser().getSysUser().getUserId());
@@ -938,5 +942,12 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         weLeads.setRecoveryTimes(0);
         weLeadsMapper.insert(weLeads);
         return weLeads.getId();
+    }
+
+    @Override
+    public List<WeLeadsVO> selectList(WeLeadsBaseRequest request) {
+        request.setName(StringUtils.queryReplace(request.getName()));
+        request.setPhone(StringUtils.queryReplace(request.getPhone()));
+        return this.weLeadsMapper.leadsList(request);
     }
 }

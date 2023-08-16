@@ -2,6 +2,7 @@ package com.linkwechat.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -125,13 +126,20 @@ public class WeLeadsSeaController extends BaseController {
             throw new ServiceException("公海不存在！");
         }
 
+        //移动公海中的线索到默认公海
         LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
         queryWrapper.eq(WeLeads::getSeaId, weLeadsSea.getId());
         queryWrapper.eq(WeLeads::getDelFlag, Constants.COMMON_STATE);
-        int count = weLeadsService.count(queryWrapper);
-        if (count > 0) {
-            throw new ServiceException("公海内存在线索，无法删除！");
+        List<WeLeads> list = weLeadsService.list();
+        List<Long> ids = list.stream().map(WeLeads::getId).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(ids)) {
+            LambdaUpdateWrapper<WeLeads> lambdaUpdate = Wrappers.lambdaUpdate(WeLeads.class);
+            lambdaUpdate.in(WeLeads::getId, ids);
+            lambdaUpdate.set(WeLeads::getSeaId, 1L);
+            weLeadsService.update(lambdaUpdate);
         }
+
+        //删除公海
         LambdaUpdateWrapper<WeLeadsSea> updateWrapper = Wrappers.lambdaUpdate(WeLeadsSea.class);
         updateWrapper.set(WeLeadsSea::getDelFlag, Constants.DELETE_STATE);
         updateWrapper.eq(WeLeadsSea::getId, id);

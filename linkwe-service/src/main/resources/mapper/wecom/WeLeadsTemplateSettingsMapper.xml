@@ -56,6 +56,6 @@
             ON wslts.id = wtec.leads_template_settings_id
         WHERE
             wslts.del_flag = 0
-            order by wslts.rank
+            order by wslts.rank,wtec.id asc
     </select>
 </mapper>

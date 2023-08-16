@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.handler.context.SheetWriteHandlerContext;
 import com.linkwechat.common.enums.leads.template.DataAttrEnum;
+import com.linkwechat.common.enums.leads.template.DatetimeTypeEnum;
 import com.linkwechat.domain.leads.template.vo.WeLeadsTemplateSettingsVO;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
@@ -51,9 +52,10 @@ public class DataValidityWriteHandler implements SheetWriteHandler {
                     dataValidationConstraint = helper.createNumericConstraint(DataValidationConstraint.ValidationType.INTEGER, DataValidationConstraint.OperatorType.BETWEEN, String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE));
                     errorMsg = "请填写一个数字";
                 } else if (vo.getDataAttr().equals(DataAttrEnum.DATE.getCode())) {
-                    //日期不进行限制
-                    //原因：excel表格中只能对日期格式的数据做验证，无法对日期+时间这种格式的数据进行校验
-                    //所以这里不做处理，在导入的时候在进行日期数据的校验
+                    //日期
+                    DatetimeTypeEnum of = DatetimeTypeEnum.of(vo.getDatetimeType());
+                    dataValidationConstraint = helper.createDateConstraint(DataValidationConstraint.OperatorType.GREATER_THAN,"Date(1970,1,1)",null,of.getFormat());
+                    errorMsg = "请填写日期格式数据";
                 }
             }
             if (BeanUtil.isNotEmpty(dataValidationConstraint)) {

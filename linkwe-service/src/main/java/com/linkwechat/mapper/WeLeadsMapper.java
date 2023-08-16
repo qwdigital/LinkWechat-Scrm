@@ -2,6 +2,7 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
+import com.linkwechat.domain.leads.leads.query.WeLeadsBaseRequest;
 import com.linkwechat.domain.leads.leads.vo.WeLeadsVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +19,6 @@ import java.util.List;
 @Mapper
 public interface WeLeadsMapper extends BaseMapper<WeLeads> {
 
-
     /**
      * 移动端-公海线索列表
      *
@@ -29,5 +29,15 @@ public interface WeLeadsMapper extends BaseMapper<WeLeads> {
      * @date 2023/07/18 9:59
      */
     List<WeLeadsVO> seaLeadsList(@Param("name") String name, @Param("seaId") Long seaId);
+
+    /**
+     * 线索列表
+     *
+     * @param request 请求参数
+     * @return {@link List<WeLeadsVO>}
+     * @author WangYX
+     * @date 2023/08/16 17:37
+     */
+    List<WeLeadsVO> leadsList(WeLeadsBaseRequest request);
 
 }

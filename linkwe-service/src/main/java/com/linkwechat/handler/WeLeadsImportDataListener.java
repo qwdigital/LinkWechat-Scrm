@@ -6,6 +6,8 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.LeadsCenterConstants;
 import com.linkwechat.common.enums.SexEnums;
@@ -26,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 线索导入监听器
@@ -58,6 +61,10 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
      */
     public int failNum = 0;
     /**
+     * excel表中导入重复的数量
+     */
+    public int repetitionNum = 0;
+    /**
      * 每次写入数据库的集合
      */
     private final List<Map<String, String>> resultList = new ArrayList<>();
@@ -65,12 +72,10 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
      * 模板数据
      */
     private final Map<String, WeLeadsTemplateSettingsVO> settingsMap;
-
     /**
      * 导入文件名
      */
     private final String originalFilename;
-
     /**
      * 公海Id
      */
@@ -91,6 +96,15 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
      * 数字正则
      */
     private final Pattern numberPattern = Pattern.compile("^[0-9]*$");
+    /**
+     * 手机号码正则
+     */
+    private final Pattern phonePattern = Pattern.compile("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$");
+
+    /**
+     * 线索库中已有的手机号码集合
+     */
+    private final Set<String> phoneSet;
 
 
     public WeLeadsImportDataListener(Long seaId,
@@ -103,6 +117,13 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
         this.weLeadsService = weLeadsService;
         this.originalFilename = originalFilename;
         this.weLeadsImportRecordService = weLeadsImportRecordService;
+
+        //手机号码集合
+        LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
+        queryWrapper.select(WeLeads::getPhone);
+        queryWrapper.eq(WeLeads::getDelFlag, Constants.COMMON_STATE);
+        List<WeLeads> list = weLeadsService.list(queryWrapper);
+        phoneSet = list.stream().map(WeLeads::getPhone).collect(Collectors.toSet());
     }
 
     @Override
@@ -184,6 +205,7 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
                 failNum++;
                 continue;
             }
+
             WeLeads weLeads = new WeLeads();
             weLeads.setId(IdUtil.getSnowflake().nextId());
             weLeads.setLeadsStatus(LeadsStatusEnum.WAIT_FOR_DISTRIBUTION.getCode());
@@ -221,6 +243,19 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
                 }
             }
             weLeads.setProperties(JSONObject.toJSONString(propertiesList));
+
+            //验证手机号码格式
+            Matcher matcher = phonePattern.matcher(weLeads.getPhone());
+            if (!matcher.matches()) {
+                failNum++;
+                continue;
+            }
+            //判断手机号码是否重复
+            if (phoneSet.contains(weLeads.getPhone())) {
+                repetitionNum++;
+                continue;
+            }
+
             list.add(weLeads);
             successNum++;
         }
@@ -232,7 +267,7 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
      *
      * @param rowMap      一条行数据
      * @param settingsMap 模板数据
-     * @return {@link boolean}
+     * @return {@link Boolean}
      * @author WangYX
      * @date 2023/07/14 18:25
      */
@@ -255,7 +290,7 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
      *
      * @param value   值
      * @param setting 模板数据
-     * @return {@link boolean}
+     * @return {@link Boolean}
      * @author WangYX
      * @date 2023/07/14 15:59
      */

@@ -128,5 +128,15 @@ public interface IWeLeadsService extends IService<WeLeads> {
      */
     Long manualAdd(WeLeadsAddRequest request);
 
+    /**
+     * 线索列表
+     *
+     * @param request 请求参数
+     * @return {@link List<WeLeadsVO>}
+     * @author WangYX
+     * @date 2023/08/16 17:37
+     */
+    List<WeLeadsVO> selectList(WeLeadsBaseRequest request);
+
 
 }
