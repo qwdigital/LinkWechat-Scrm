@@ -756,7 +756,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
     public List<WeLeads> myFollowList(String name, Integer status) {
         LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
         queryWrapper.select(WeLeads::getId, WeLeads::getName, WeLeads::getUpdateTime, WeLeads::getLabelsIds, WeLeads::getSex);
-        queryWrapper.eq(StrUtil.isNotBlank(name), WeLeads::getName, StringUtils.queryReplace(name));
+        queryWrapper.like(StrUtil.isNotBlank(name), WeLeads::getName, StringUtils.queryReplace(name));
         queryWrapper.eq(WeLeads::getLeadsStatus, status);
         queryWrapper.eq(WeLeads::getFollowerId, SecurityUtils.getLoginUser().getSysUser().getUserId());
         return weLeadsMapper.selectList(queryWrapper);
