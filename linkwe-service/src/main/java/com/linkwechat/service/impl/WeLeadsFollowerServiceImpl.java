@@ -81,10 +81,7 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
 
     @Override
     public List<WeLeadsFollowerVO> getFollowerList(Long leadsId) {
-        LambdaQueryWrapper<WeLeadsFollower> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(WeLeadsFollower::getLeadsId, leadsId);
-        wrapper.orderByDesc(WeLeadsFollower::getFollowerStartTime);
-        List<WeLeadsFollower> list = this.baseMapper.selectList(wrapper);
+        List<WeLeadsFollower> list = this.baseMapper.getFollowerList(leadsId);
         List<WeLeadsFollowerVO> result = new ArrayList<>();
         list.forEach(i -> {
             WeLeadsFollowerVO build = WeLeadsFollowerVO.builder()

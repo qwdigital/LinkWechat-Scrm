@@ -17,7 +17,7 @@ public enum ImportSourceTypeEnum {
     /**
      * excel
      */
-    EXCEL("excel", 0),
+    EXCEL("Excel导入", 0),
 
     /**
      * 智能表单
@@ -28,6 +28,11 @@ public enum ImportSourceTypeEnum {
      * 手动新增
      */
     MANUAL_ADD("手动新增", 2),
+
+    /**
+     * 微信客服
+     */
+    WECHAT_CUSTOMER_SERVICE("微信客服", 3),
 
     ;
 

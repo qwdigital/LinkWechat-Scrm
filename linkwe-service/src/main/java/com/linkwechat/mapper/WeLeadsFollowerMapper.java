@@ -42,4 +42,14 @@ public interface WeLeadsFollowerMapper extends BaseMapper<WeLeadsFollower> {
      */
     List<WeLeadsFollowerVO> userStatistic(@Param("userIds") List<Long> userIds);
 
+    /**
+     * 获取跟进人名单
+     *
+     * @param leadsId 线索Id
+     * @return {@link List< WeLeadsFollowerVO>}
+     * @author WangYX
+     * @date 2023/08/17 10:24
+     */
+    List<WeLeadsFollower> getFollowerList(@Param("leadsId") Long leadsId);
+
 }

@@ -562,6 +562,8 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
             one.setLatest(0);
             weLeadsFollowerService.updateById(one);
         }
+
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         //添加跟进
         WeLeadsFollower weLeadsFollower = new WeLeadsFollower();
         weLeadsFollower.setId(IdUtil.getSnowflake().nextId());
@@ -834,10 +836,10 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         updateWrapper.set(WeLeads::getSeaId, request.getSeaId());
         updateWrapper.set(WeLeads::getRecoveryTimes, weLeads.getRecoveryTimes() + 1);
         updateWrapper.set(WeLeads::getLeadsStatus, LeadsStatusEnum.RETURNED.getCode());
-        updateWrapper.set(WeLeads::getFollowerId, null);
-        updateWrapper.set(WeLeads::getWeUserId, null);
-        updateWrapper.set(WeLeads::getFollowerName, null);
-        updateWrapper.set(WeLeads::getDeptId, null);
+//        updateWrapper.set(WeLeads::getFollowerId, null);
+//        updateWrapper.set(WeLeads::getWeUserId, null);
+//        updateWrapper.set(WeLeads::getFollowerName, null);
+//        updateWrapper.set(WeLeads::getDeptId, null);
         this.update(updateWrapper);
 
         //修改跟进人状态
@@ -938,7 +940,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         weLeads.setSex(request.getSex());
         weLeads.setSeaId(request.getSeaId() == null ? 1 : request.getSeaId());
         weLeads.setDelFlag(Constants.COMMON_STATE);
-        weLeads.setSource(ImportSourceTypeEnum.MANUAL_ADD.getCode());
+        weLeads.setSource(ImportSourceTypeEnum.WECHAT_CUSTOMER_SERVICE.getCode());
         weLeads.setRecoveryTimes(0);
         weLeadsMapper.insert(weLeads);
         return weLeads.getId();
