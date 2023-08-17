@@ -162,10 +162,11 @@ public class WeLeadsTemplateSettingsController extends BaseController {
     public AjaxResult<List<WeLeadsTemplateSettingsVO>> editable() {
         LambdaQueryWrapper<WeLeadsTemplateSettings> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(WeLeadsTemplateSettings::getCanEdit, CanEditEnum.ALLOW.getCode());
+        queryWrapper.orderByAsc(WeLeadsTemplateSettings::getRank);
         List<WeLeadsTemplateSettings> list = weSeaLeadsTemplateSettingsService.list(queryWrapper);
         List<WeLeadsTemplateSettingsVO> result = list.stream().map(i -> {
             WeLeadsTemplateSettingsVO vo = BeanUtil.copyProperties(i, WeLeadsTemplateSettingsVO.class);
-            if (vo.getDataAttr().equals(TableEntryAttrEnum.COMBOBOX.getCode())) {
+            if (vo.getTableEntryAttr().equals(TableEntryAttrEnum.COMBOBOX.getCode())) {
                 List<WeLeadsTemplateTableEntryContent> contents = weTableEntryContentService.getByLeadsTemplateSettingsId(vo.getId());
                 if (CollectionUtil.isNotEmpty(contents)) {
                     List<WeLeadsTemplateTableEntryContentVO> contentVOS = BeanUtil.copyToList(contents, WeLeadsTemplateTableEntryContentVO.class);

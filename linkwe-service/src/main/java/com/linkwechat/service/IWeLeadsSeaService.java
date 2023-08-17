@@ -112,6 +112,6 @@ public interface IWeLeadsSeaService extends IService<WeLeadsSea> {
      * @author WangYX
      * @date 2023/07/17 16:29
      */
-    public List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String weUserId, List<DateTime> dateTimes);
+    List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String weUserId, List<DateTime> dateTimes);
 
 }

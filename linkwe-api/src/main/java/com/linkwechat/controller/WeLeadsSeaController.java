@@ -402,8 +402,10 @@ public class WeLeadsSeaController extends BaseController {
      */
     @GetMapping("/seaDataDetail")
     public TableDataInfo getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId) {
-
+        //日期
         List<DateTime> dateTimes = DateUtil.rangeToList(DateUtil.parseDate(beginTime), DateUtil.parseDate(endTime), DateField.DAY_OF_YEAR);
+        Collections.reverse(dateTimes);
+
         PageDomain pageDomain = TableSupport.buildPageRequest();
         Integer pageNum = pageDomain.getPageNum() == null ? 1 : pageDomain.getPageNum();
         Integer pageSize = pageDomain.getPageSize() == null ? 10 : pageDomain.getPageSize();

@@ -17,13 +17,10 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
-import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.leads.leads.entity.WeLeads;
-import com.linkwechat.domain.leads.leads.vo.WeLeadsVO;
 import com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSea;
 import com.linkwechat.domain.leads.sea.entity.WeLeadsSeaRuleRecord;
@@ -33,6 +30,7 @@ import com.linkwechat.domain.leads.sea.query.WeLeadsSeaSaveRequest;
 import com.linkwechat.domain.leads.sea.query.WeLeadsSeaUpdateRequest;
 import com.linkwechat.domain.leads.sea.vo.WeLeadsSeaDataDetailVO;
 import com.linkwechat.domain.leads.sea.vo.WeLeadsSeaEmployeeRankVO;
+import com.linkwechat.domain.leads.sea.vo.WeLeadsSeaStatisticVO;
 import com.linkwechat.domain.leads.sea.vo.WeLeadsSeaTrendVO;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
@@ -49,6 +47,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -303,16 +302,22 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
     @Override
     public Map<String, Object> getCounts(Long seaId) {
         log.info("公海池id:{}", seaId);
-        LoginUser loginUser = SecurityUtils.getLoginUser();
         Map<String, Object> result = new HashMap<>(8);
 
-        // 1、有效线索总量
-        int leadsNum = weLeadsService.count(Wrappers.lambdaQuery(WeLeads.class).eq(WeLeads::getSeaId, seaId).eq(WeLeads::getDelFlag, Constants.COMMON_STATE));
-        result.put("leadsNum", leadsNum);
+        // 1、总领取量
+        int allFollowNum = weLeadsService.count(Wrappers.lambdaQuery(WeLeads.class).eq(WeLeads::getSeaId, seaId).eq(WeLeads::getLeadsStatus, LeadsStatusEnum.BE_FOLLOWING_UP.getCode()).eq(WeLeads::getDelFlag, Constants.COMMON_STATE));
+        result.put("allReceiveNum", allFollowNum);
 
         // 2、总跟进量
-        int allFollowNum = weLeadsService.count(Wrappers.lambdaQuery(WeLeads.class).eq(WeLeads::getSeaId, seaId).eq(WeLeads::getLeadsStatus, LeadsStatusEnum.BE_FOLLOWING_UP.getCode()).eq(WeLeads::getDelFlag, Constants.COMMON_STATE));
-        result.put("allFollowNum", allFollowNum);
+        //TODO 代码错误
+        LambdaQueryWrapper<WeLeadsFollowRecord> wrapper = Wrappers.lambdaQuery(WeLeadsFollowRecord.class);
+        wrapper.select(WeLeadsFollowRecord::getId);
+        wrapper.eq(WeLeadsFollowRecord::getSeaId, seaId);
+        wrapper.eq(WeLeadsFollowRecord::getRecordStatus, 1);
+        wrapper.last("GROUP BY follow_user_id,DATE_FORMAT(create_time,'%y%m%d')");
+        List<WeLeadsFollowRecord> records = weLeadsFollowRecordMapper.selectList(wrapper);
+
+        result.put("allFollowNum", records.stream());
 
         // 3、今日领取量
         QueryWrapper<WeLeadsFollowRecord> queryWrapper = new QueryWrapper<>();
@@ -352,8 +357,10 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
             yesterdayFollowRatio = NumberUtil.div(yesterdayFollowNum1, allFollowNum);
             yesterdayFollowRatio = NumberUtil.sub(todayFollowRatio, yesterdayFollowRatio);
         }
-        result.put("todayFollowRatio", todayFollowRatio);
-        result.put("yesterdayFollowRatio", yesterdayFollowRatio);
+        NumberFormat instance = NumberFormat.getPercentInstance();
+        instance.setMaximumFractionDigits(2);
+        result.put("todayFollowRatio", instance.format(todayFollowRatio));
+        result.put("yesterdayFollowRatio", instance.format(yesterdayFollowRatio));
         return result;
     }
 
@@ -392,10 +399,35 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
         if (seaId == null) {
             throw new ServiceException("公海池Id不能为null", HttpStatus.BAD_REQUEST);
         }
-        ArrayList<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
+
+        List<WeLeadsSeaStatisticVO> allReceiveNums = this.baseMapper.allReceiveNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> todayReceiveNums = this.baseMapper.todayReceiveNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> allFollowerNums = this.baseMapper.allFollowerNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> todayFollowNums = this.baseMapper.todayFollowNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
+
+        List<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
+
+        NumberFormat instance = NumberFormat.getPercentInstance();
+        instance.setMaximumFractionDigits(2);
+
+        for (int i = 0; i < allReceiveNums.size(); i++) {
+            WeLeadsSeaDataDetailVO vo = new WeLeadsSeaDataDetailVO();
+            vo.setDateTime(allReceiveNums.get(i).getDateTime());
+            vo.setAllReceiveNum(allReceiveNums.get(i).getAllReceiveNum());
+            vo.setAllFollowNum(allFollowerNums.get(i).getAllFollowerNum());
+            vo.setTodayReceiveNum(todayReceiveNums.get(i).getTodayReceiveNum());
+            vo.setTodayFollowNum(todayFollowNums.get(i).getTodayFollowNum());
+            if (vo.getAllFollowNum().equals(new Integer(0))) {
+                vo.setTodayFollowRatio(instance.format(0));
+            } else {
+                vo.setTodayFollowRatio(instance.format(Double.valueOf(vo.getTodayFollowNum()) / Double.valueOf(vo.getAllFollowNum())));
+            }
+            list.add(vo);
+        }
+        /*ArrayList<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
         for (DateTime vo : dateTimes) {
             list.add(getWeLeadsSeaDataDetailVO(seaId, weUserId, vo));
-        }
+        }*/
         return list;
     }
 
@@ -433,7 +465,7 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
                 .eq("DATE_FORMAT(create_time, '%Y-%m-%d')", vo.toDateStr())
                 .eq(StrUtil.isNotBlank(weUserId), "we_user_id", weUserId);
         int totalNum = weLeadsMapper.selectCount(queryWrapper);
-        dataDetailVO.setTotalNum(totalNum);
+        dataDetailVO.setAllReceiveNum(totalNum);
 
         // 2、总跟进量
         QueryWrapper<WeLeads> allFollowQuery = new QueryWrapper<>();
@@ -458,7 +490,7 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
         if (0 != allFollowNum) {
             todayFollowRatio = NumberUtil.div(list2.size(), allFollowNum);
         }
-        dataDetailVO.setTodayFollowRatio(todayFollowRatio);
+        dataDetailVO.setTodayFollowRatio(String.valueOf(todayFollowRatio));
         return dataDetailVO;
     }
 

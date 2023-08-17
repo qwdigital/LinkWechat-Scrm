@@ -18,8 +18,8 @@ public class WeLeadsSeaDataDetailVO {
     @ExcelProperty(value = "日期", index = 0)
     private String dateTime;
 
-    @ExcelProperty(value = "总线索量", index = 1)
-    private Integer totalNum;
+    @ExcelProperty(value = "总领取量", index = 0)
+    private Integer allReceiveNum;
 
     @ExcelProperty(value = "总跟进量", index = 2)
     private Integer allFollowNum;
@@ -27,10 +27,10 @@ public class WeLeadsSeaDataDetailVO {
     @ExcelProperty(value = "当日领取量", index = 3)
     private Integer todayReceiveNum;
 
-    @ExcelProperty(value = "当日有效跟进", index = 4)
+    @ExcelProperty(value = "当日跟进量", index = 4)
     private Integer todayFollowNum;
 
     @ExcelProperty(value = "当日跟进率", index = 5)
-    private Double todayFollowRatio;
+    private String todayFollowRatio;
 
 }
