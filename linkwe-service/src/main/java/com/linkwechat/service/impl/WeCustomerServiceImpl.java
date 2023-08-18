@@ -21,10 +21,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.common.enums.CustomerAddWay;
-import com.linkwechat.common.enums.MessageNoticeType;
-import com.linkwechat.common.enums.TrajectorySceneType;
-import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.enums.*;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -112,6 +109,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Autowired
     @Lazy
     private IWeFissionService iWeFissionService;
+
+    @Autowired
+    private IWeCustomerLinkService iWeCustomerLinkService;
 
 
     @Override
@@ -1024,8 +1024,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
 
-
-            if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {//添加方式为手机号搜索,更新客户公海中对应的状态
+             //添加方式为手机号搜索,更新客户公海中对应的状态
+            if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {
 
                 if (StringUtils.isNotEmpty(weCustomer.getPhone())) {
                     List<WeCustomerSeas> weCustomerSeasList = iWeCustomerSeasService.list(new LambdaQueryWrapper<WeCustomerSeas>()
@@ -1057,6 +1057,32 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             }
 
+            //添加方式为获客助手
+            if(CustomerAddWay.ADD_WAY_HKZS.getKey().equals(weCustomer.getAddMethod())){
+                if(StringUtils.isNotEmpty(weCustomer.getState())){
+                    WeCustomerLink weCustomerLink = iWeCustomerLinkService
+                            .getById(StringUtils.substringAfter(weCustomer.getState(),
+                                    WelcomeMsgTypeEnum.WE_CUSTOMER_LINK_PREFIX.getType()));
+                    if(null != weCustomerLink && StringUtils.isNotEmpty(weCustomerLink.getTagIds())){
+
+
+                        List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                .in(WeTag::getTagId, ListUtil.toList(weCustomerLink.getTagIds().split(","))));
+                        if(CollectionUtil.isNotEmpty(weTags)){
+                            this.makeLabel( WeMakeCustomerTag.builder()
+                                    .isCompanyTag(true)
+                                    .addTag(weTags)
+                                    .userId(userId)
+                                    .externalUserid(externalUserId)
+                                    .build());
+                        }
+
+                    }
+
+                }
+
+
+            }
             iWeFissionService.handleTaskFissionRecord(state, weCustomer);
 
 
@@ -1401,6 +1427,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds) {
         return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
     }
+
 
 
 }
