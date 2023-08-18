@@ -7,8 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.dtflys.forest.annotation.Post;
-import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -28,12 +27,8 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.domain.WeConfigParamInfo;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WxUser;
-import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
-import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
-import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
-import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.*;
@@ -52,7 +47,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.WrappedPlainView;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -137,7 +131,7 @@ public class SysUserController extends BaseController {
     @GetMapping("/listAll")
     public AjaxResult<List<SysUser>> listAll(String userName) {
         return AjaxResult.success(userService.list(
-                new LambdaQueryWrapper<SysUser>().like(StringUtils.isNotEmpty(userName), SysUser::getUserName, userName)
+                new LambdaQueryWrapper<SysUser>().eq(SysUser::getDelFlag, Constants.COMMON_STATE).like(StringUtils.isNotEmpty(userName), SysUser::getUserName, userName)
         ));
     }
 
