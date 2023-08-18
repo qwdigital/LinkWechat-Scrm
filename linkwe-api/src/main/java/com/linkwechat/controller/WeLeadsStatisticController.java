@@ -39,6 +39,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -236,6 +237,10 @@ public class WeLeadsStatisticController extends BaseController {
 
         if (result.getCode() == HttpStatus.SUCCESS) {
             List<SysUser> data = result.getData();
+            //移除admin
+            Optional<SysUser> first = data.stream().filter(i -> i.getUserId().equals(1L)).findFirst();
+            first.ifPresent(i -> data.remove(i));
+
             List<SysUser> sub = CollectionUtil.sub(data, (pageNum - 1) * pageSize, pageNum * pageSize);
             List<WeLeadsUserStatisticVO> vos = userStatistic(sub);
             TableDataInfo dataTable = getDataTable(vos);
@@ -256,9 +261,15 @@ public class WeLeadsStatisticController extends BaseController {
     @GetMapping("/user/export")
     public void userStatisticExport(WeLeadsUserStatisticRequest request) {
         AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(request.getUserIds(), null, request.getDeptIds());
+
+
         List<WeLeadsUserStatisticVO> vos = new ArrayList<>();
         if (result.getCode() == HttpStatus.SUCCESS) {
             List<SysUser> data = result.getData();
+            //移除admin
+            Optional<SysUser> first = data.stream().filter(i -> i.getUserId().equals(1L)).findFirst();
+            first.ifPresent(i -> data.remove(i));
+
             vos = userStatistic(data);
         }
         try {

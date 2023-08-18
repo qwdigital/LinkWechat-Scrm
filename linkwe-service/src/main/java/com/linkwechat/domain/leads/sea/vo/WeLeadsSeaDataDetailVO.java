@@ -18,7 +18,7 @@ public class WeLeadsSeaDataDetailVO {
     @ExcelProperty(value = "日期", index = 0)
     private String dateTime;
 
-    @ExcelProperty(value = "总领取量", index = 0)
+    @ExcelProperty(value = "总领取量", index = 1)
     private Integer allReceiveNum;
 
     @ExcelProperty(value = "总跟进量", index = 2)
