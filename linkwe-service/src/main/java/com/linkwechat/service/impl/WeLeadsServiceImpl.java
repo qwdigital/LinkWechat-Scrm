@@ -50,10 +50,7 @@ import com.linkwechat.domain.leads.template.entity.WeLeadsTemplateSettings;
 import com.linkwechat.domain.leads.template.vo.WeLeadsTemplateSettingsVO;
 import com.linkwechat.domain.leads.template.vo.WeLeadsTemplateTableEntryContentVO;
 import com.linkwechat.fegin.QwSysUserClient;
-import com.linkwechat.handler.DataValidityWriteHandler;
-import com.linkwechat.handler.SpinnerWriteHandler;
-import com.linkwechat.handler.WeLeadsExportHeadsWriteHandler;
-import com.linkwechat.handler.WeLeadsImportDataListener;
+import com.linkwechat.handler.*;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -261,10 +258,13 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
     @Override
     public void importTemplate() {
         List<WeLeadsTemplateSettingsVO> settings = weLeadsTemplateSettingsMapper.queryWithTableEntryContent();
+        //日期格式
+        Map<Integer, Integer> dateMap = new HashMap<>();
         //下拉框
         Map<Integer, String[]> dropDownMap = new HashMap<>();
         for (int i = 0; i < settings.size(); i++) {
             WeLeadsTemplateSettingsVO leadsTemplateSettings = settings.get(i);
+            //下拉框
             Integer tableEntryAttr = leadsTemplateSettings.getTableEntryAttr();
             if (tableEntryAttr.intValue() == TableEntryAttrEnum.COMBOBOX.getCode()) {
                 List<WeLeadsTemplateTableEntryContentVO> tableEntryContent = leadsTemplateSettings.getTableEntryContent();
@@ -272,6 +272,11 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
                     List<String> collects = tableEntryContent.stream().map(WeLeadsTemplateTableEntryContentVO::getContent).collect(Collectors.toList());
                     dropDownMap.put(i, ArrayUtil.toArray(collects, String.class));
                 }
+            }
+            //日期
+            Integer dataAttr = leadsTemplateSettings.getDataAttr();
+            if (dataAttr.intValue() == DataAttrEnum.DATE.getCode()) {
+                dateMap.put(i, leadsTemplateSettings.getDatetimeType());
             }
         }
         List<List<Object>> dataList = new ArrayList<>();
@@ -297,6 +302,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
             builder.relativeHeadRowIndex(1);
             builder.registerWriteHandler(new WeLeadsExportHeadsWriteHandler(head.size() - 1));
             builder.registerWriteHandler(new SpinnerWriteHandler(dropDownMap));
+            builder.registerWriteHandler(new WeLeasExportDateHandler(dateMap));
             builder.registerWriteHandler(new DataValidityWriteHandler(settings));
             ExcelWriter excelWriter = builder.excelType(ExcelTypeEnum.XLSX).file(outputStream).autoCloseStream(true).build();
             WriteSheet sheet = new WriteSheet();

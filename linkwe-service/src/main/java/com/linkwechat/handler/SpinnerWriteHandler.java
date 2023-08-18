@@ -44,7 +44,7 @@ public class SpinnerWriteHandler implements SheetWriteHandler {
         // 设置下拉框
         for (Map.Entry<Integer, String[]> entry : dropDownMap.entrySet()) {
             // 起始行、终止行、起始列、终止列
-            CellRangeAddressList addressList = new CellRangeAddressList(1, 1000, entry.getKey(), entry.getKey());
+            CellRangeAddressList addressList = new CellRangeAddressList(1, 65535, entry.getKey(), entry.getKey());
             // 设置下拉框数据
             DataValidationConstraint constraint = helper.createExplicitListConstraint(entry.getValue());
             DataValidation dataValidation = helper.createValidation(constraint, addressList);

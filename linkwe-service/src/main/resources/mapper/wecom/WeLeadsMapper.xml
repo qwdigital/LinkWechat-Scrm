@@ -39,7 +39,7 @@
         WHERE
         t1.sea_id = #{seaId}
         <if test="name!=null and name!=''">AND t1.name like concat('%',#{name},'%')</if>
-        <if test="phone!=null and phone!=''">AND t1.phone like concat('%',#{name},'%')</if>
+        <if test="phone!=null and phone!=''">AND t1.phone like concat('%',#{phone},'%')</if>
         <if test="leadsStatus!=null">AND t1.leads_status = #{leadsStatus}</if>
         ORDER BY
         create_time DESC

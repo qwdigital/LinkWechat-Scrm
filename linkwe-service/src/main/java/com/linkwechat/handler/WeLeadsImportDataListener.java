@@ -318,6 +318,7 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
                     String format = datetimeTypeEnum.getFormat();
                     Date parse = new SimpleDateFormat(format).parse(value);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return false;
                 }
             }

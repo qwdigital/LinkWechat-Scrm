@@ -22,7 +22,7 @@ public enum DatetimeTypeEnum {
     /**
      * 日期+时间
      */
-    DATETIME("日期+时间", 1, "yyyy/MM/dd HH:mm:ss");
+    DATETIME("日期+时间", 1, "yyyy/MM/dd HH:mm");
 
     private final Integer code;
 

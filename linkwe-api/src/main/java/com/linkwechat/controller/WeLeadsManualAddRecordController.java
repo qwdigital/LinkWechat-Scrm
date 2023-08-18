@@ -65,7 +65,6 @@ public class WeLeadsManualAddRecordController extends BaseController {
         startPage();
         LambdaQueryWrapper<WeLeadsManualAddRecord> queryWrapper = Wrappers.lambdaQuery(WeLeadsManualAddRecord.class);
         queryWrapper.eq(WeLeadsManualAddRecord::getWeUserId, SecurityUtils.getLoginUser().getSysUser().getWeUserId());
-        queryWrapper.orderByDesc(WeLeadsManualAddRecord::getId);
         List<WeLeadsManualAddRecord> list = weLeadsManualAddRecordService.list(queryWrapper);
         TableDataInfo dataTable = getDataTable(list);
         List<Long> leadsIds = list.stream().map(WeLeadsManualAddRecord::getLeadsId).collect(Collectors.toList());
@@ -73,6 +72,7 @@ public class WeLeadsManualAddRecordController extends BaseController {
             LambdaQueryWrapper<WeLeads> lambdaQuery = Wrappers.lambdaQuery(WeLeads.class);
             lambdaQuery.select(WeLeads::getId, WeLeads::getName, WeLeads::getPhone);
             lambdaQuery.in(WeLeads::getId, leadsIds);
+            lambdaQuery.orderByAsc(WeLeads::getId);
             List<WeLeads> weLeads = weLeadsService.list(lambdaQuery);
             List<WeLeadsVO> weLeadsVOS = BeanUtil.copyToList(weLeads, WeLeadsVO.class);
             dataTable.setRows(weLeadsVOS);
