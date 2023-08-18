@@ -220,26 +220,28 @@ public class WeLeadsImportDataListener extends AnalysisEventListener<Map<Integer
             for (Map.Entry<String, String> entry : entries) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                WeLeadsTemplateSettingsVO setting = settingsMap.get(key);
-                if (key.equals(LeadsCenterConstants.NAME)) {
-                    weLeads.setName(value);
-                } else if (key.equals(LeadsCenterConstants.PHONE)) {
-                    weLeads.setPhone(value);
-                } else if (key.equals(LeadsCenterConstants.SEX)) {
-                    if (value.equals(SexEnums.SEX_WZ.getInfo())) {
-                        weLeads.setSex(0);
-                    } else if (value.equals(SexEnums.SEX_NAN.getInfo())) {
-                        weLeads.setSex(1);
+                if (StrUtil.isNotBlank(value)) {
+                    WeLeadsTemplateSettingsVO setting = settingsMap.get(key);
+                    if (key.equals(LeadsCenterConstants.NAME)) {
+                        weLeads.setName(value);
+                    } else if (key.equals(LeadsCenterConstants.PHONE)) {
+                        weLeads.setPhone(value);
+                    } else if (key.equals(LeadsCenterConstants.SEX)) {
+                        if (value.equals(SexEnums.SEX_WZ.getInfo())) {
+                            weLeads.setSex(0);
+                        } else if (value.equals(SexEnums.SEX_NAN.getInfo())) {
+                            weLeads.setSex(1);
+                        } else {
+                            weLeads.setSex(2);
+                        }
                     } else {
-                        weLeads.setSex(2);
+                        propertiesList.add(Properties.builder().id(setting.getId())
+                                .name(setting.getTableEntryName())
+                                .key(setting.getTableEntryName())
+                                .keyEn(setting.getTableEntryId())
+                                .value(value)
+                                .build());
                     }
-                } else {
-                    propertiesList.add(Properties.builder().id(setting.getId())
-                            .name(setting.getTableEntryName())
-                            .key(setting.getTableEntryName())
-                            .keyEn(setting.getTableEntryId())
-                            .value(value)
-                            .build());
                 }
             }
             weLeads.setProperties(JSONObject.toJSONString(propertiesList));
