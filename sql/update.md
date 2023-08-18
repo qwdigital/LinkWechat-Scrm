@@ -581,4 +581,203 @@ PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '待办任务' ROW_FORMAT = Dynamic;
 
 
+```
 
+
+
+---
+### ● 日期：2023.08.18
+```
+ALTER TABLE `we_corp_account` ADD COLUMN `customer_link_margin` bigint(20) NULL DEFAULT NULL COMMENT '获客助手剩余可用量' AFTER `customer_churn_notice_switch`;
+
+ALTER TABLE `we_corp_account` ADD COLUMN `customer_link_total` bigint(20) NULL DEFAULT NULL COMMENT '获客助手总量' AFTER `customer_link_margin`;
+
+CREATE TABLE `we_customer_link`  (
+`id` bigint(20) NOT NULL COMMENT '主键',
+`link_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '链接名称',
+`link_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '企业微信返回的获客链接id',
+`link_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '企业微信返回的获客链接',
+`state` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '渠道标识',
+`link_short_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '获客链接短链',
+`skip_verify` tinyint(4) NULL DEFAULT 1 COMMENT '是否无需验证，默认为true 1:是 0:是',
+`we_user_list` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '此获客链接关联的userid列表，最多可关联100个',
+`department_list` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '此获客链接关联的部门id列表，部门覆盖总人数最多100个',
+`tag_ids` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '标签id多个使用逗号隔开',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人名称',
+`create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人名称',
+`update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+`del_flag` tinyint(4) NULL DEFAULT 0 COMMENT '删除标识 0 有效 1删除',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '获客助手' ROW_FORMAT = Dynamic;
+
+CREATE TABLE `we_customer_link_attachments`  (
+`id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+`customer_link_id` bigint(11) NOT NULL COMMENT '识客码id',
+`msg_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '消息类型 文本:text 图片:image 图文:link 小程序:miniprogram 视频:video 文件:file ',
+`content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '消息内容',
+`media_id` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '媒体id',
+`msg_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '企业微信端返回的消息id',
+`title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息标题',
+`description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息描述',
+`file_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件路径',
+`link_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息链接',
+`pic_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息图片地址',
+`app_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '小程序appid',
+`create_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+`real_type` tinyint(2) NULL DEFAULT NULL COMMENT '素材真实类型',
+`material_id` bigint(20) NULL DEFAULT NULL COMMENT '素材id',
+`del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '删除标识 0 有效 1删除',
+PRIMARY KEY (`id`) USING BTREE,
+INDEX `qr_id_IDX`(`customer_link_id`, `del_flag`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1692356624150212610 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '活码附件表' ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `we_customer_link_count`  (
+`id` bigint(20) NOT NULL COMMENT '主键',
+`external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户external_userid',
+`link_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '获客链接id',
+`we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '通过获客链接添加此客户的跟进人userid',
+`customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称',
+`customer_type` tinyint(4) NULL DEFAULT NULL COMMENT '客户类型 1:微信用户，2:企业用户\n',
+`gender` tinyint(4) NULL DEFAULT NULL COMMENT '0-未知 1-男性 2-女性\n',
+`avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户头像',
+`user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '添加人名称',
+`chat_status` tinyint(4) NULL DEFAULT 0 COMMENT '会话状态，0-客户未发消息 1-客户已发送消息',
+`add_time` datetime NULL DEFAULT NULL COMMENT '客户相关添加时间',
+`state` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用于区分客户具体是通过哪个获客链接进行添加，用户可在获客链接后拼接customer_channel=自定义字符串，字符串不超过64字节，超过会被截断。通过点击带有customer_channel参数的链接获取到的客户，调用获客信息接口或获取客户详情接口时，返回的state参数即为链接后拼接自定义字符串',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人名称',
+`create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人名称',
+`update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+`del_flag` tinyint(4) NULL DEFAULT 0 COMMENT '删除标识 0 有效 1删除',
+UNIQUE INDEX `onlykey`(`external_userid`, `we_user_id`) USING BTREE COMMENT '联合唯一建'
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+
+ALTER TABLE `we_leads` MODIFY COLUMN `bind_customer_time` datetime NULL DEFAULT NULL COMMENT '绑定客户时间' AFTER `external_userid`;
+
+ALTER TABLE `we_leads` ADD UNIQUE INDEX `phone_unique`(`phone`) USING BTREE COMMENT '手机号码索引';
+
+ALTER TABLE `we_leads_follower` MODIFY COLUMN `assigner_id` bigint(20) NULL DEFAULT NULL COMMENT '分配人id' AFTER `return_reason`;
+
+ALTER TABLE `we_leads_follower` MODIFY COLUMN `assigner_name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '分配人名称' AFTER `assigner_id`;
+
+CREATE TABLE `we_leads_record_attachment`  (
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`content_id` bigint(20) NOT NULL COMMENT '跟进记录内容Id',
+`type` tinyint(2) NOT NULL COMMENT '附件类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)',
+`title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '附件名称',
+`url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '附件地址',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '线索跟进记录附件' ROW_FORMAT = Dynamic;
+
+CREATE TABLE `we_leads_record_content`  (
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`record_id` bigint(20) NOT NULL COMMENT '跟进记录Id',
+`item_key` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '记录项目名',
+`item_value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '记录项目值',
+`rank` int(11) NULL DEFAULT NULL COMMENT '排序',
+`is_visible` tinyint(4) NOT NULL COMMENT '是否显示  是否显示 0 显示 1 隐藏',
+`is_attachment` tinyint(4) NOT NULL COMMENT '是否存在附件 0否 1是',
+`parent_id` bigint(20) NULL DEFAULT 0 COMMENT '父类id,无父类默认值为0',
+`replier_from_id` bigint(20) NULL DEFAULT NULL COMMENT '回复者id',
+`replier_from_we_user_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复者企微Id',
+`replier_from` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复者',
+`replier_from_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复者头像',
+`replier_to_id` bigint(20) NULL DEFAULT NULL COMMENT '回复对象id',
+`replier_to` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复对象',
+`replier_to_we_user_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复对象企微id',
+`replier_to_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复对象头像',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`sub_num` int(11) NULL DEFAULT 0 COMMENT '子类数量',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '线索跟进记录内容' ROW_FORMAT = Dynamic;
+
+ALTER TABLE `we_qr_code` ADD COLUMN `qr_welcome_open` tinyint(4) NULL DEFAULT NULL COMMENT '欢迎语开关 1-不发送欢迎语，2-发送欢迎语' AFTER `qr_code`;
+
+ALTER TABLE `we_qr_code` ADD COLUMN `qr_priority_user_welcome` tinyint(4) NULL DEFAULT NULL COMMENT '是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）' AFTER `qr_welcome_open`;
+
+CREATE TABLE `we_substitute_customer_order`  (
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`purchaser` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '购买人',
+`phone` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '联系方式',
+`source` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订单来源',
+`order_time` datetime NOT NULL COMMENT '下单时间',
+`dept_id` bigint(20) NOT NULL COMMENT '归属部门',
+`user_id` bigint(20) NOT NULL COMMENT '归属员工',
+`order_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订单状态',
+`product_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品名称',
+`product_url` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '商品图片',
+`product_unit_price` decimal(9, 2) NOT NULL COMMENT '商品单价',
+`amount` int(11) NOT NULL COMMENT '商品数量',
+`total_price` decimal(10, 0) NOT NULL COMMENT '付款总价',
+`discount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '付款折扣',
+`discount_amount` decimal(9, 2) NOT NULL COMMENT '折扣金额',
+`actual_payment` decimal(9, 2) NOT NULL COMMENT '实际付款',
+`returned_money_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回款方式',
+`returned_money` decimal(9, 2) NOT NULL COMMENT '回款金额',
+`returned_date` datetime NOT NULL COMMENT '回款日期',
+`payer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '打款人',
+`returned_receipt` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回款凭证',
+`status` tinyint(2) NOT NULL COMMENT '状态：0暂存 1完成',
+`properties` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '自定义属性',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT 0 COMMENT '删除标识',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单-订单' ROW_FORMAT = Dynamic;
+
+CREATE TABLE `we_substitute_customer_order_catalogue`  (
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类名称',
+`sort` int(11) NOT NULL COMMENT '排序',
+`is_fixed` tinyint(4) NOT NULL COMMENT '是否固定值 0否 1是',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT 0 COMMENT '删除标识',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单字段分类' ROW_FORMAT = Dynamic;
+
+CREATE TABLE `we_substitute_customer_order_catalogue_property`  (
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`catalogue_id` bigint(20) NOT NULL COMMENT '分类id',
+`name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段名称',
+`code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字段编码',
+`type` tinyint(2) NOT NULL COMMENT '字段类型',
+`is_require` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否必填 0否 1是',
+`expound` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字段说明',
+`value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字段值',
+`sort` int(11) NULL DEFAULT NULL COMMENT '排序',
+`is_fixed` tinyint(4) NULL DEFAULT 0 COMMENT '是否固定字段，0否 1是',
+`is_money` tinyint(4) NULL DEFAULT 0 COMMENT '是否金额，字段类型为数字时用，需要精确到小数点后两位  0否 1是',
+`is_to_time` tinyint(4) NULL DEFAULT 0 COMMENT '是否精确到时间，字段类型为日期时用，0否 1是',
+`is_multiple_choice` tinyint(4) NULL DEFAULT 0 COMMENT '是否多选，0否 1是',
+`is_more` tinyint(4) NULL DEFAULT NULL COMMENT '是否支持多个，附件时用，0否 1时',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT 0 COMMENT '删除标识',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单分类字段' ROW_FORMAT = Dynamic;
+
+ALTER TABLE `we_tasks` ADD COLUMN `record_id` bigint(20) NULL DEFAULT NULL COMMENT '线索中心-跟进记录Id' AFTER `is_visible`;
