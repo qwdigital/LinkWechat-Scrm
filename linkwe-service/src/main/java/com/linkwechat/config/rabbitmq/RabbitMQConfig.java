@@ -708,6 +708,37 @@ public class RabbitMQConfig {
 
 
     /**
+     * 新客sop队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingNewWeCustomerSopExchange() {
+        return BindingBuilder.bind(newWeCustomerSopQu()).to(sopEx()).with(rabbitMQSettingConfig.getNewWeCustomerSopRk()).noargs();
+    }
+
+    /**
+     * 群sop队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingGroupSopExchange() {
+        return BindingBuilder.bind(newGroupSopQu()).to(sopEx()).with(rabbitMQSettingConfig.getNewWeGroupSopRk()).noargs();
+    }
+
+
+    /**
+     * 转入下一个sop队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingChangeWeCustomerSopExchange() {
+        return BindingBuilder.bind(changeWeCustomerSopQu()).to(sopEx()).with(rabbitMQSettingConfig.getChnageWeCustomerSopRk()).noargs();
+    }
+
+    /**
      * sop队列
      *
      * @return
@@ -715,6 +746,37 @@ public class RabbitMQConfig {
     @Bean
     public Queue sopQu() {
         return new Queue(rabbitMQSettingConfig.getSopQu());
+    }
+
+
+    /**
+     * 新客sop队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue newWeCustomerSopQu() {
+        return new Queue(rabbitMQSettingConfig.getNewWeCustomerSopQu());
+    }
+
+    /**
+     * 新群sop队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue newGroupSopQu() {
+        return new Queue(rabbitMQSettingConfig.getNewWeGroupSopQu());
+    }
+
+    /**
+     * 转入下一个sop队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue changeWeCustomerSopQu() {
+        return new Queue(rabbitMQSettingConfig.getChangeWeCustomerSopQu());
     }
 
     /**

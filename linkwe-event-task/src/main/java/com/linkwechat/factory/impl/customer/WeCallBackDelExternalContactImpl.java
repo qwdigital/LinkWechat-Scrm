@@ -11,6 +11,7 @@ import com.linkwechat.factory.WeEventStrategy;
 import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeCustomerTrajectoryService;
 import com.linkwechat.service.IWeFlowerCustomerTagRelService;
+import com.linkwechat.service.IWeSopExecuteTargetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,9 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
     @Autowired
     private IWeFlowerCustomerTagRelService iWeFlowerCustomerTagRelService;
 
+    @Autowired
+    private IWeSopExecuteTargetService iWeSopExecuteTargetService;
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
@@ -50,6 +54,8 @@ public class WeCallBackDelExternalContactImpl extends WeEventStrategy {
                     .eq(WeFlowerCustomerTagRel::getUserId,customerInfo.getUserID())
                     .eq(WeFlowerCustomerTagRel::getExternalUserid,customerInfo.getExternalUserID()));
 
+            //异常结束当前客户涉及到的sop任务
+            iWeSopExecuteTargetService.sopExceptionEnd(customerInfo.getExternalUserID());
         }
 
         //添加跟进动态

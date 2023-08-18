@@ -16,10 +16,9 @@ public interface IWeSopExecuteTargetService extends IService<WeSopExecuteTarget>
 
     /**
      * 非编辑sop下执行任务异常结束
-     * @param executeWeUserIds
-     * @param executeWeCustomerIdsOrGroupIds
+     * @param targetId 目标id，可能是客户也可能是客群
      */
-    void sopExceptionEnd(List<String> executeWeUserIds,List<String> executeWeCustomerIdsOrGroupIds);
+    void sopExceptionEnd(String targetId);
 
 
     /**

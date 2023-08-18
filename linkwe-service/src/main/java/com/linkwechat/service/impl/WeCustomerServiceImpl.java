@@ -23,7 +23,6 @@ import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.enums.message.MessageTypeEnum;
-import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -1063,6 +1062,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             iWeFissionService.handleTaskFissionRecord(state, weCustomer);
 
 
+
+
             //生成轨迹
             iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(externalUserId, userId, true, true);
             //为被添加员工发送一条消息提醒
@@ -1070,6 +1071,12 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             //添加消息通知
             weMessageNotificationService.save(MessageTypeEnum.CUSTOMER.getType(), MessageConstants.CUSTOMER_ADD,weCustomer.getCustomerName());
+
+
+            //通知新客sop
+            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getNewWeCustomerSopRk(),
+                    JSONObject.toJSONString(weCustomer));
+
         }
     }
 

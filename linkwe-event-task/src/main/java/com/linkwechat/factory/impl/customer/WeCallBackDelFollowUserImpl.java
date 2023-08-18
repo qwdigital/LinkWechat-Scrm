@@ -36,6 +36,9 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
     @Autowired
     private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
 
+
+    @Autowired
+    private IWeSopExecuteTargetService iWeSopExecuteTargetService;
     @Resource
     private IWeMessageNotificationService weMessageNotificationService;
 
@@ -45,13 +48,15 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerVo customerInfo = (WeBackCustomerVo) message;
-        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId, customerInfo.getUserID())
-                .eq(WeCustomer::getExternalUserid, customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag, 0).last("limit 1"));
-        if (weCustomer == null) {
+        WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId,customerInfo.getUserID())
+                .eq(WeCustomer::getExternalUserid,customerInfo.getExternalUserID()).eq(WeCustomer::getDelFlag,0).last("limit 1"));
+        if(weCustomer == null){
             return;
         }
         weCustomer.setTrackState(TrackState.STATE_YLS.getType());
-        if (weCustomerService.updateById(weCustomer)) {
+        if(weCustomerService.updateById(weCustomer)){
+            //异常结束当前客户涉及到的sop任务
+            iWeSopExecuteTargetService.sopExceptionEnd(customerInfo.getExternalUserID());
             //添加跟进动态
             iWeCustomerTrajectoryService.createAddOrRemoveTrajectory(weCustomer.getExternalUserid(), weCustomer.getAddUserId(), false, true);
 

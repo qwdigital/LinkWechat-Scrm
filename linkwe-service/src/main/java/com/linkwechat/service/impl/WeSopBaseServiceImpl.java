@@ -260,6 +260,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                 .eq(weSopBase.getBaseType() !=null,WeSopBase::getBaseType, weSopBase.getBaseType())
                 .eq(weSopBase.getSopState() !=null,WeSopBase::getSopState, weSopBase.getSopState())
                 .eq(weSopBase.getBusinessType() !=null,WeSopBase::getBusinessType, weSopBase.getBusinessType())
+                 .ne(weSopBase.getNeBusinessType() != null,WeSopBase::getNeBusinessType,weSopBase.getNeBusinessType())
                 .apply(StringUtils.isNotEmpty(weSopBase.getBeginTime())&&StringUtils.isNotEmpty(weSopBase.getEndTime()),
                         "date_format(create_time,'%Y-%m-%d') BETWEEN '"+
                                 weSopBase.getBeginTime()
@@ -1176,10 +1177,9 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
         else{
-
-            //处理不满足当前条件的生效客群(针对客群sop编辑)
-            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                    new ArrayList<>());
+                //处理不满足当前条件的生效客群(针对客群sop编辑)
+                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+                        new ArrayList<>());
         }
     }
 

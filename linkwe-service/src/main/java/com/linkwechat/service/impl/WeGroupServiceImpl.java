@@ -38,6 +38,7 @@ import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     private IWeFissionService iWeFissionService;
     @Resource
     private IWeMessageNotificationService weMessageNotificationService;
+
 
     @Override
     public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
@@ -377,6 +379,18 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             }
             insertBatchGroupAndMember(weGroups, weGroupMembers,isCallBack);
             weCustomerTrajectoryService.createBuildOrDissGroupTrajectory(weGroups,true);
+
+
+            if(isCallBack){
+                //通知新群sop满足条件则加入执行计划
+                LinkGroupChatListVo linkGroupChatListVo=new LinkGroupChatListVo();
+                linkGroupChatListVo.setGroupName(weGroup.getGroupName());
+                linkGroupChatListVo.setChatId(weGroup.getChatId());
+                linkGroupChatListVo.setOwner(weGroup.getOwner());
+                linkGroupChatListVo.setAddTime(weGroup.getAddTime());
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getNewWeGroupSopRk(), JSONObject.toJSONString(linkGroupChatListVo));
+            }
+
         }
     }
 
@@ -392,6 +406,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     .eq(WeGroup::getChatId,chatId));
             weGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
                     .eq(WeGroupMember::getChatId,chatId));
+
 
             weCustomerTrajectoryService.createBuildOrDissGroupTrajectory(weGroups,false);
         }

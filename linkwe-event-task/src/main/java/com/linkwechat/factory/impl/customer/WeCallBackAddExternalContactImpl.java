@@ -50,6 +50,7 @@ public class WeCallBackAddExternalContactImpl extends WeEventStrategy {
                 weQrCodeService.updateQrMultiplePeople(customerInfo.getState());
             }
 
+
         } catch (Exception e) {
             log.error("添加外部联系人异常 params:{}",JSONObject.toJSONString(message),e);
         }

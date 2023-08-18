@@ -10,6 +10,7 @@ import com.linkwechat.domain.wecom.callback.WeBackCustomerVo;
 import com.linkwechat.factory.WeEventStrategy;
 import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeQrCodeService;
+import com.linkwechat.service.IWeSopExecuteTargetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ public class WeCallBackAddHalfExternalContactImpl extends WeEventStrategy {
 
     @Autowired
     private IWeQrCodeService weQrCodeService;
+
+
 
     @Override
     public void eventHandle(WeBackBaseVo message) {
