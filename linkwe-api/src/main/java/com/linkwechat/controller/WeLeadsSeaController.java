@@ -423,6 +423,7 @@ public class WeLeadsSeaController extends BaseController {
         }
         List<DateTime> dateTimes1 = dateTimes.subList(fromIndex, toIndex);
         List<WeLeadsSeaDataDetailVO> seaDataDetail = weLeadsSeaService.getSeaDataDetail(seaId, weUserId, dateTimes1);
+        Collections.reverse(seaDataDetail);
         TableDataInfo dataTable = getDataTable(seaDataDetail);
         dataTable.setTotal(dateTimes.size());
         return dataTable;
@@ -441,7 +442,10 @@ public class WeLeadsSeaController extends BaseController {
      */
     @GetMapping("/seaDataDetail/export")
     public void SeaDataDetailExport(Long seaId, String beginTime, String endTime, String weUserId, HttpServletResponse response) throws IOException {
-        List<WeLeadsSeaDataDetailVO> customerRealCnt = weLeadsSeaService.getSeaDataDetail(seaId, beginTime, endTime, weUserId);
+        //日期
+        List<DateTime> dateTimes = DateUtil.rangeToList(DateUtil.parseDate(beginTime), DateUtil.parseDate(endTime), DateField.DAY_OF_YEAR);
+        Collections.reverse(dateTimes);
+        List<WeLeadsSeaDataDetailVO> customerRealCnt = weLeadsSeaService.getSeaDataDetail(seaId, weUserId, dateTimes);
 
         ServletOutputStream outputStream = response.getOutputStream();
         String fileName = " 数据明细" + LeadsCenterConstants.XLSX_FILE_EXTENSION;

@@ -90,6 +90,14 @@
         <include refid="todayFollowNum"></include>
     </select>
 
+    <!-- 总跟进量 -->
+    <select id="getAllFollowNum" resultType="java.lang.Integer">
+        SELECT
+            sum(count)
+        FROM
+            ( SELECT count( 1 ) as count  FROM we_leads_follow_record WHERE sea_id = #{seaId} AND record_status = 1 GROUP BY follow_user_id, DATE_FORMAT( create_time, '%y%m%d' ) ) AS t1
+    </select>
+
     <!-- 当日跟进量 -->
     <sql id="todayFollowNum">
         SELECT t5.date as dateTime ,IFNULL(t4.sum,0) as todayFollowNum FROM sys_dim_date t5

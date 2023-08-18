@@ -72,4 +72,15 @@ public interface WeLeadsSeaMapper extends BaseMapper<WeLeadsSea> {
     List<WeLeadsSeaStatisticVO> todayFollowNum(@Param("seaId") Long seaId, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("weUserId") String weUserId);
 
 
+    /**
+     * 获取总跟进量
+     *
+     * @param seaId 公海Id
+     * @return {@link Integer}
+     * @author WangYX
+     * @date 2023/08/18 10:11
+     */
+    Integer getAllFollowNum(Long seaId);
+
+
 }

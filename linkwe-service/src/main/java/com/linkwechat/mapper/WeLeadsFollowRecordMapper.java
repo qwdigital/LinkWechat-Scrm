@@ -63,4 +63,5 @@ public interface WeLeadsFollowRecordMapper extends BaseMapper<WeLeadsFollowRecor
                                    @Param("weUserId") String weUserId,
                                    @Param("recordStatus") Integer recordStatus);
 
+
 }

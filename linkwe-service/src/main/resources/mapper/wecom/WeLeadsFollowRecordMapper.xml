@@ -23,7 +23,7 @@
     </select>
 
     <select id="getCustomerRank" resultType="com.linkwechat.domain.leads.sea.vo.WeLeadsSeaEmployeeRankVO">
-        SELECT t2.follower_name,
+        SELECT t2.follower_name as userName,
         count(t1.id) AS todayFollowNum
         FROM we_leads_follow_record t1
         LEFT JOIN we_leads_follower t2 ON t1.follow_user_id = t2.id

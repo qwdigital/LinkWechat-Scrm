@@ -305,19 +305,12 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
         Map<String, Object> result = new HashMap<>(8);
 
         // 1、总领取量
-        int allFollowNum = weLeadsService.count(Wrappers.lambdaQuery(WeLeads.class).eq(WeLeads::getSeaId, seaId).eq(WeLeads::getLeadsStatus, LeadsStatusEnum.BE_FOLLOWING_UP.getCode()).eq(WeLeads::getDelFlag, Constants.COMMON_STATE));
-        result.put("allReceiveNum", allFollowNum);
+        int allReceiveNum = weLeadsService.count(Wrappers.lambdaQuery(WeLeads.class).eq(WeLeads::getSeaId, seaId).eq(WeLeads::getLeadsStatus, LeadsStatusEnum.BE_FOLLOWING_UP.getCode()).eq(WeLeads::getDelFlag, Constants.COMMON_STATE));
+        result.put("allReceiveNum", allReceiveNum);
 
         // 2、总跟进量
-        //TODO 代码错误
-        LambdaQueryWrapper<WeLeadsFollowRecord> wrapper = Wrappers.lambdaQuery(WeLeadsFollowRecord.class);
-        wrapper.select(WeLeadsFollowRecord::getId);
-        wrapper.eq(WeLeadsFollowRecord::getSeaId, seaId);
-        wrapper.eq(WeLeadsFollowRecord::getRecordStatus, 1);
-        wrapper.last("GROUP BY follow_user_id,DATE_FORMAT(create_time,'%y%m%d')");
-        List<WeLeadsFollowRecord> records = weLeadsFollowRecordMapper.selectList(wrapper);
-
-        result.put("allFollowNum", records.stream());
+        Integer allFollowNum = this.baseMapper.getAllFollowNum(seaId);
+        result.put("allFollowNum", allFollowNum);
 
         // 3、今日领取量
         QueryWrapper<WeLeadsFollowRecord> queryWrapper = new QueryWrapper<>();
@@ -352,9 +345,9 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
         double yesterdayFollowRatio = 0;
         if (0 != allFollowNum) {
             //今日跟进率: 今日已产生跟进行为的客户数/当前公海池内处于跟进中状态的线索客户数
-            todayFollowRatio = NumberUtil.div(todayFollowNum, allFollowNum);
+            todayFollowRatio = NumberUtil.div(Double.valueOf(todayFollowNum), Double.valueOf(allFollowNum));
             // 较昨日跟进率
-            yesterdayFollowRatio = NumberUtil.div(yesterdayFollowNum1, allFollowNum);
+            yesterdayFollowRatio = NumberUtil.div(Double.valueOf(yesterdayFollowNum1), Double.valueOf(allFollowNum));
             yesterdayFollowRatio = NumberUtil.sub(todayFollowRatio, yesterdayFollowRatio);
         }
         NumberFormat instance = NumberFormat.getPercentInstance();
@@ -400,10 +393,10 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
             throw new ServiceException("公海池Id不能为null", HttpStatus.BAD_REQUEST);
         }
 
-        List<WeLeadsSeaStatisticVO> allReceiveNums = this.baseMapper.allReceiveNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
-        List<WeLeadsSeaStatisticVO> todayReceiveNums = this.baseMapper.todayReceiveNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
-        List<WeLeadsSeaStatisticVO> allFollowerNums = this.baseMapper.allFollowerNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
-        List<WeLeadsSeaStatisticVO> todayFollowNums = this.baseMapper.todayFollowNum(seaId, dateTimes.get(0).toDateStr(), dateTimes.get(dateTimes.size() - 1).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> allReceiveNums = this.baseMapper.allReceiveNum(seaId, dateTimes.get(dateTimes.size() - 1).toDateStr(), dateTimes.get(0).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> todayReceiveNums = this.baseMapper.todayReceiveNum(seaId, dateTimes.get(dateTimes.size() - 1).toDateStr(), dateTimes.get(0).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> allFollowerNums = this.baseMapper.allFollowerNum(seaId, dateTimes.get(dateTimes.size() - 1).toDateStr(), dateTimes.get(0).toDateStr(), weUserId);
+        List<WeLeadsSeaStatisticVO> todayFollowNums = this.baseMapper.todayFollowNum(seaId, dateTimes.get(dateTimes.size() - 1).toDateStr(), dateTimes.get(0).toDateStr(), weUserId);
 
         List<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
 
@@ -424,10 +417,6 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
             }
             list.add(vo);
         }
-        /*ArrayList<WeLeadsSeaDataDetailVO> list = new ArrayList<>();
-        for (DateTime vo : dateTimes) {
-            list.add(getWeLeadsSeaDataDetailVO(seaId, weUserId, vo));
-        }*/
         return list;
     }
 
@@ -455,6 +444,7 @@ public class WeLeadsSeaServiceImpl extends ServiceImpl<WeLeadsSeaMapper, WeLeads
      * @author WangYX
      * @date 2023/08/01 18:37
      */
+    @Deprecated
     private WeLeadsSeaDataDetailVO getWeLeadsSeaDataDetailVO(Long seaId, String weUserId, DateTime vo) {
         WeLeadsSeaDataDetailVO dataDetailVO = new WeLeadsSeaDataDetailVO();
         dataDetailVO.setDateTime(vo.toDateStr());

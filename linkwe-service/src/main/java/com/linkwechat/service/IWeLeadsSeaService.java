@@ -100,6 +100,7 @@ public interface IWeLeadsSeaService extends IService<WeLeadsSea> {
      * @author WangYX
      * @date 2023/07/17 16:29
      */
+    @Deprecated
     List<WeLeadsSeaDataDetailVO> getSeaDataDetail(Long seaId, String beginTime, String endTime, String weUserId);
 
     /**
