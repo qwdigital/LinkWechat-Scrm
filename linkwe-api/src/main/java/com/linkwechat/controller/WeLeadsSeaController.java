@@ -448,7 +448,7 @@ public class WeLeadsSeaController extends BaseController {
         List<WeLeadsSeaDataDetailVO> customerRealCnt = weLeadsSeaService.getSeaDataDetail(seaId, weUserId, dateTimes);
 
         ServletOutputStream outputStream = response.getOutputStream();
-        String fileName = " 数据明细" + LeadsCenterConstants.XLSX_FILE_EXTENSION;
+        String fileName = "数据明细" + LeadsCenterConstants.XLSX_FILE_EXTENSION;
         String encode = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
         response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename*=utf-8''" + encode);
