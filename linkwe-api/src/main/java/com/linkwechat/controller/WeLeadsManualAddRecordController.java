@@ -72,7 +72,7 @@ public class WeLeadsManualAddRecordController extends BaseController {
             LambdaQueryWrapper<WeLeads> lambdaQuery = Wrappers.lambdaQuery(WeLeads.class);
             lambdaQuery.select(WeLeads::getId, WeLeads::getName, WeLeads::getPhone);
             lambdaQuery.in(WeLeads::getId, leadsIds);
-            lambdaQuery.orderByAsc(WeLeads::getId);
+            lambdaQuery.orderByDesc(WeLeads::getId);
             List<WeLeads> weLeads = weLeadsService.list(lambdaQuery);
             List<WeLeadsVO> weLeadsVOS = BeanUtil.copyToList(weLeads, WeLeadsVO.class);
             dataTable.setRows(weLeadsVOS);

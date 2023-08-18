@@ -45,7 +45,7 @@ public class WeLeadsAddFollowRequest {
      */
     @ApiModelProperty(value = "协作日期")
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm", timezone = "GMT+8")
     private Date cooperateTime;
 
     /**
