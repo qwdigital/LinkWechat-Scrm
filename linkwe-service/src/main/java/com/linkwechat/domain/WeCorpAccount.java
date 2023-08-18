@@ -265,6 +265,17 @@ public class WeCorpAccount extends BaseEntity {
     @TableField("wx_applet_original_id")
     private String wxAppletOriginalId;
 
+    /**
+     * 获客助手剩余可用量
+     */
+    private long customerLinkMargin;
+
+
+    /**
+     * 获客助手总量
+     */
+    private long customerLinkTotal;
+
 
     /***********************************************
      *******************商城start****************
