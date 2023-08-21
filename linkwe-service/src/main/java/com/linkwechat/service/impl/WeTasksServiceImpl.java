@@ -337,6 +337,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     public void handlerWeTasks(WeTasksRequest request) {
         switch (request.getType()) {
             case 1:
+                //线索约定事项待跟进
                 this.handlerAppointItemWaitFollowUp(request);
                 break;
             case 2:

@@ -166,7 +166,7 @@ public class WeLeadsAutoRecoveryServiceImpl extends ServiceImpl<WeLeadsAutoRecov
                 weTasksService.cancelLeadsLongTimeNotFollowUp(weLeads.getId(), weLeads.getFollowerId());
 
                 //消息通知
-                weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), MessageConstants.LEADS_AUTO_RECOVERY, weLeads.getName());
+                weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), weLeads.getWeUserId(), MessageConstants.LEADS_AUTO_RECOVERY, weLeads.getName());
             }
         }
     }

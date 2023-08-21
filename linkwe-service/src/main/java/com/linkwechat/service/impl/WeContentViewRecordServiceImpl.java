@@ -383,7 +383,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             qwAppSendMsgService.appMsgSend(qwAppMsgBody);
 
             //添加消息通知
-            weMessageNotificationService.save(MessageTypeEnum.MATERIAL.getType(), MessageConstants.MATERIAL_LOOK, weCustomer.getCustomerName(), weMaterial.getMaterialName(), sb.toString());
+            weMessageNotificationService.save(MessageTypeEnum.MATERIAL.getType(), data.getWeUserId(), MessageConstants.MATERIAL_LOOK, weCustomer.getCustomerName(), weMaterial.getMaterialName(), sb.toString());
         }
 
         //5.添加客户轨迹

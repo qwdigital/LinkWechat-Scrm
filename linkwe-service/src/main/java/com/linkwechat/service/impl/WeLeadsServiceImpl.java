@@ -523,7 +523,7 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
                 //自动回收
                 weLeadsAutoRecoveryService.save(vo.getId(), vo.getFollowerId(), vo.getSeaId());
                 //消息通知
-                weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), MessageConstants.LEADS_ALLOCATION, leads.getName());
+                weMessageNotificationService.saveAndSend(MessageTypeEnum.LEADS.getType(), vo.getFollowerWeUserId(), MessageConstants.LEADS_ALLOCATION, leads.getName());
                 //添加线索长时间待跟进
                 weTasksService.addLeadsLongTimeNotFollowUp(leads.getId(), leads.getName(), vo.getFollowerId(), vo.getFollowerName(), leads.getSeaId());
             }

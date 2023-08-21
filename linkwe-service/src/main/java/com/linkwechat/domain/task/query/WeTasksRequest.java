@@ -37,8 +37,6 @@ public class WeTasksRequest {
 
     /**
      * 处理方式 0处理 1取消
-     *
-     * @see com.linkwechat.common.enums.task.WeTasksTitleEnum
      */
     private Integer mode;
 

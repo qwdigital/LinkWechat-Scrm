@@ -1070,7 +1070,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(userId), "【客户动态】<br/><br/> 客户@" + weCustomer.getCustomerName() + "刚刚添加了您", MessageNoticeType.ADDCUTOMER.getType(), false);
 
             //添加消息通知
-            weMessageNotificationService.save(MessageTypeEnum.CUSTOMER.getType(), MessageConstants.CUSTOMER_ADD,weCustomer.getCustomerName());
+            weMessageNotificationService.save(MessageTypeEnum.CUSTOMER.getType(),userId, MessageConstants.CUSTOMER_ADD,weCustomer.getCustomerName());
 
 
             //通知新客sop

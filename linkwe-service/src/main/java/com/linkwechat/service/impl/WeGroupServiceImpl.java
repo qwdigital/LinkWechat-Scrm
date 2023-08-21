@@ -535,7 +535,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                 , "【客群动态】<br/><br/> 客户@"+groupMember.getName()+" 刚刚进入群聊"+groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(),false);
 
                         //添加消息通知
-                       weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(), MessageConstants.GROUP_ADD,  groupMember.getName(), groupChat.getName());
+                       weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),groupChat.getOwner(), MessageConstants.GROUP_ADD,  groupMember.getName(), groupChat.getName());
                     }
                 }
 
@@ -563,7 +563,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     //为被添加员工发送一条消息提醒
                     iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(groupChat.getOwner()), "【客群动态】<br/><br/> 客户@" + memeber.getName() + " 刚刚退出群聊" + groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(), false);
                     //添加消息通知
-                    weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),MessageConstants.GROUP_DELETE,memeber.getName(),groupChat.getName());
+                    weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),groupChat.getOwner(),MessageConstants.GROUP_DELETE,memeber.getName(),groupChat.getName());
                 });
                 weCustomerTrajectoryService.createJoinOrExitGroupTrajectory(needQuitMemberList, groupChat.getName(), false);
             }
