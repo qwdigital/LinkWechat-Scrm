@@ -24,5 +24,5 @@ public class WeSubstituteCustomerOrderRequest {
      * 员工Id
      */
     @ApiModelProperty("员工Id")
-    private Long userId;
+    private String userId;
 }

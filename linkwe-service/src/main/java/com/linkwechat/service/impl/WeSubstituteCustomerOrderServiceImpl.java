@@ -14,10 +14,12 @@ import com.linkwechat.constant.SubstituteCustomerOrderCataloguePropertyConstants
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrder;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderAddRequest;
+import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderUpdateRequest;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyVO;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyValueVO;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCatalogueVO;
+import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderVO;
 import com.linkwechat.mapper.WeSubstituteCustomerOrderMapper;
 import com.linkwechat.service.IWeSubstituteCustomerOrderCataloguePropertyService;
 import com.linkwechat.service.IWeSubstituteCustomerOrderService;
@@ -41,6 +43,11 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
 
     @Resource
     private IWeSubstituteCustomerOrderCataloguePropertyService weSubstituteCustomerOrderCataloguePropertyService;
+
+    @Override
+    public List<WeSubstituteCustomerOrderVO> selectList(WeSubstituteCustomerOrderRequest request) {
+        return this.baseMapper.list(request);
+    }
 
     @Override
     public List<WeSubstituteCustomerOrderCatalogueVO> get(Long id) {

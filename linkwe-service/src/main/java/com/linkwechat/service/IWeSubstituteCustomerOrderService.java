@@ -3,8 +3,10 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrder;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderAddRequest;
+import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderRequest;
 import com.linkwechat.domain.substitute.customer.order.query.WeSubstituteCustomerOrderUpdateRequest;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCatalogueVO;
+import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderVO;
 
 import java.util.List;
 
@@ -17,6 +19,17 @@ import java.util.List;
  * @since 2023-08-03
  */
 public interface IWeSubstituteCustomerOrderService extends IService<WeSubstituteCustomerOrder> {
+
+
+    /**
+     * 订单列表
+     *
+     * @param request 请求参数
+     * @return {@link List<WeSubstituteCustomerOrderVO>}
+     * @author WangYX
+     * @date 2023/08/21 16:25
+     */
+    List<WeSubstituteCustomerOrderVO> selectList(WeSubstituteCustomerOrderRequest request);
 
 
     /**

@@ -1,5 +1,6 @@
 package com.linkwechat.domain.substitute.customer.order.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -57,6 +58,7 @@ public class WeSubstituteCustomerOrderVO {
      * 下单时间
      */
     @ApiModelProperty("下单时间")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime orderTime;
 
 }
