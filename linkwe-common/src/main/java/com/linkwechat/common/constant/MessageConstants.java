@@ -34,6 +34,7 @@ public class MessageConstants {
 
     /**
      * 线索约定事项待跟进-文本卡片消息内容
+     * OR 成员的线索约定事项待跟进-文本卡片消息内容
      * <p>
      * 如：
      * <p>

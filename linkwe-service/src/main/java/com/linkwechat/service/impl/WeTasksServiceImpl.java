@@ -307,7 +307,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
 
         DateTime now = DateTime.now();
         //提醒时间至当前时间的时间间隔
-        long remindTimeInterval = DateUtil.between(remindTime, now, DateUnit.MS);
+        long remindTimeInterval = DateUtil.between(now, remindTime, DateUnit.MS, false);
         request.setMode(0);
         if (remindTimeInterval < 21600000L) {
             //不足6小时，直接发送
@@ -337,7 +337,6 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
     public void handlerWeTasks(WeTasksRequest request) {
         switch (request.getType()) {
             case 1:
-                //线索约定事项待跟进
                 this.handlerAppointItemWaitFollowUp(request);
                 break;
             case 2:
@@ -527,6 +526,9 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
         if (StrUtil.isNotBlank(leadsDetailUrl)) {
             leadsDetailUrl = StrUtil.format(leadsDetailUrl, request.getLeadsId());
         }
+
+        WeTasksTitleEnum weTasksTitleEnum = WeTasksTitleEnum.of(request.getType());
+
         //应用消息跳转链接
         String sendAppMsgUrl = h5Domain + "/#/" + leadsDetailUrl;
 
@@ -543,8 +545,8 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
                     .id(request.getId())
                     .userId(request.getUserId())
                     .weUserId(request.getWeUserId())
-                    .type(WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getCode())
-                    .title(WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getTitle())
+                    .type(weTasksTitleEnum.getCode())
+                    .title(weTasksTitleEnum.getTitle())
                     .content(jsonObject.toJSONString())
                     .sendTime(LocalDateTime.now())
                     .url(leadsDetailUrl)
@@ -558,7 +560,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
 
             //2.发送应用消息
             String desc = StrUtil.format(MessageConstants.LEADS_COVENANT_WAIT_FOLLOW_UP, DateUtil.date().toDateStr(), weLeads.getName());
-            this.sendAppMsg(request.getWeUserId(), WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getTitle(), desc, sendAppMsgUrl);
+            this.sendAppMsg(request.getWeUserId(), weTasksTitleEnum.getTitle(), desc, sendAppMsgUrl);
         } else {
             //取消线索约定事项待跟进
             WeTasks weTasks = this.getById(request.getId());

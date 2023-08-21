@@ -1,5 +1,12 @@
 package com.linkwechat.common.enums.task;
 
+import com.linkwechat.common.enums.leads.leads.WeiXinStatusEnum;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * 任务标题
  *
@@ -33,6 +40,14 @@ public enum WeTasksTitleEnum {
 
     public String getTitle() {
         return title;
+    }
+
+
+    private static final Map<Integer, WeTasksTitleEnum> ENUM_MAP = Arrays.stream(WeTasksTitleEnum.values())
+            .collect(Collectors.toMap(WeTasksTitleEnum::getCode, Function.identity()));
+
+    public static WeTasksTitleEnum of(int code) {
+        return ENUM_MAP.get(code);
     }
 
 
