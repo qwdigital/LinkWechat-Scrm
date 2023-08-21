@@ -3,7 +3,6 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -18,14 +17,16 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto.TaskList;
-import com.linkwechat.domain.moments.entity.*;
+import com.linkwechat.domain.moments.entity.WeMomentsAttachments;
+import com.linkwechat.domain.moments.entity.WeMomentsEstimateCustomer;
+import com.linkwechat.domain.moments.entity.WeMomentsTask;
+import com.linkwechat.domain.moments.entity.WeMomentsUser;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
@@ -272,9 +273,21 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         wrapper.eq(WeMomentsAttachments::getMomentsTaskId, weMomentsTaskId);
         List<WeMomentsAttachments> attachmentsList = weMomentsAttachmentsService.list(wrapper);
         if (CollectionUtil.isNotEmpty(attachmentsList)) {
-            List<Long> materialIds = attachmentsList.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
+            List<Long> materialIds = new ArrayList<>();
+            attachmentsList.stream().forEach(i -> materialIds.add(i.getMaterialId()));
             List<WeMaterial> weMaterials = weMaterialService.listByIds(materialIds);
-            vo.setMaterialList(weMaterials);
+            //防止重复的素材被过滤掉
+            if (BeanUtil.isNotEmpty(weMaterials)) {
+                Map<Long, WeMaterial> collect = weMaterials.stream().collect(Collectors.toMap(WeMaterial::getId, Function.identity()));
+                List<WeMaterial> materialList = new ArrayList<>();
+                materialIds.forEach(i -> {
+                    WeMaterial weMaterial = collect.get(i);
+                    if (BeanUtil.isNotEmpty(weMaterial)) {
+                        materialList.add(weMaterial);
+                    }
+                });
+                vo.setMaterialList(materialList);
+            }
         }
         //客户标签
         if (StrUtil.isNotBlank(vo.getCustomerTag())) {

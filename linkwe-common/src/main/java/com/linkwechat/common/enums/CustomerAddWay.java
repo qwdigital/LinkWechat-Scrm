@@ -26,7 +26,8 @@ public enum CustomerAddWay {
     ADD_WAY_WXTOQW_USER(13,"添加微信好友对应的企业微信"),
     ADD_WAY_ZHYJKF(14,"通过智慧硬件专属客服添加"),
     ADD_WAY_LBCYGX(201,"内部成员共享"),
-    ADD_WAY_GLYFP(202,"管理员/负责人分配");
+    ADD_WAY_GLYFP(202,"管理员/负责人分配"),
+    ADD_WAY_HKZS(16,"通过获客链接添加");
 
     private Integer key;
 
