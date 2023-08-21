@@ -128,6 +128,12 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
 
     @Override
     public void addLeadsLongTimeNotFollowUp(Long leadsId, String name, Long userId, String weUserId, Long seaId) {
+
+        String leadsDetailUrl = linkWeChatConfig.getLeadsDetailUrl();
+        if (StrUtil.isNotBlank(leadsDetailUrl)) {
+            leadsDetailUrl = StrUtil.format(leadsDetailUrl, leadsId);
+        }
+
         WeLeadsSea sea = weLeadsSeaMapper.selectById(seaId);
         //不自动回收
         if (sea.getIsAutoRecovery().equals(0)) {
@@ -143,8 +149,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
                 .title(WeTasksTitleEnum.LEADS_LONG_TIME_NOT_FOLLOW_UP.getTitle())
                 .content(new JSONObject().put("客户", name).toString())
                 .sendTime(dateTime.toLocalDateTime())
-                //TODO 链接等待前端给
-                .url(null)
+                .url(leadsDetailUrl)
                 .status(0)
                 .delFlag(Constants.COMMON_STATE)
                 .visible(0)
@@ -212,8 +217,12 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
             JSONObject jsonObject = JSONObject.parseObject(weTasks.getContent());
             String desc = StrUtil.format(MessageConstants.LEADS_LONG_TIME_NOT_FOLLOW_UP, DateUtil.date().toDateStr(), jsonObject.get("客户"));
             messageTemplate.setDescription(desc);
-            //TODO 链接，等待前端给, 参数要加上
-            messageTemplate.setLinkUrl(null);
+
+            String leadsDetailUrl = linkWeChatConfig.getLeadsDetailUrl();
+            if (StrUtil.isNotBlank(leadsDetailUrl)) {
+                leadsDetailUrl = StrUtil.format(leadsDetailUrl, weTasks.getLeadsId());
+            }
+            messageTemplate.setLinkUrl(leadsDetailUrl);
             messageTemplate.setBtntxt("详情");
             body.setMessageTemplates(messageTemplate);
             qwAppSendMsgService.appMsgSend(body);
@@ -675,7 +684,6 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
         messageTemplate.setMsgType(WeMsgTypeEnum.TASKCARD.getMessageType());
         messageTemplate.setTitle(title);
         messageTemplate.setDescription(desc);
-        //TODO 链接，等待前端给, 参数要加上
         messageTemplate.setLinkUrl(url);
         messageTemplate.setBtntxt("详情");
         body.setMessageTemplates(messageTemplate);
