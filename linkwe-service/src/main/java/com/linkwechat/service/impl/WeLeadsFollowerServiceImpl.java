@@ -190,7 +190,8 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
             }
         }
 
-        if (CollectionUtil.isNotEmpty(cooperateUsers)) {
+        //@消息，暂时不做
+        /*if (CollectionUtil.isNotEmpty(cooperateUsers)) {
             //有成员的线索跟进@了你
             WeTasksRequest build = WeTasksRequest.builder()
                     .userId(SecurityUtils.getLoginUser().getSysUser().getUserId())
@@ -201,7 +202,7 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
                     .cooperateTime(request.getCooperateTime())
                     .cooperateUsers(cooperateUsers).build();
             weTasksService.userFollowUp2You(build);
-        }
+        }*/
     }
 
     @Override

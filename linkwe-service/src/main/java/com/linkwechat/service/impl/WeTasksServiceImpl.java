@@ -512,6 +512,15 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
      * @date 2023/07/24 13:49
      */
     public void handlerAppointItemWaitFollowUp(WeTasksRequest request) {
+        String h5Domain = linkWeChatConfig.getH5Domain();
+        String leadsDetailUrl = linkWeChatConfig.getLeadsDetailUrl();
+        if (StrUtil.isNotBlank(leadsDetailUrl)) {
+            leadsDetailUrl = StrUtil.format(leadsDetailUrl, request.getLeadsId());
+        }
+        //应用消息跳转链接
+        String sendAppMsgUrl = h5Domain + "/#/" + leadsDetailUrl;
+
+        //保存代办任务
         WeLeads weLeads = weLeadsMapper.selectById(request.getLeadsId());
         if (BeanUtil.isEmpty(weLeads)) {
             return;
@@ -528,8 +537,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
                     .title(WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getTitle())
                     .content(jsonObject.toJSONString())
                     .sendTime(LocalDateTime.now())
-                    //TODO 线索约定事项待跟进的URL
-                    .url(null)
+                    .url(leadsDetailUrl)
                     .status(0)
                     .delFlag(Constants.COMMON_STATE)
                     .visible(1)
@@ -540,8 +548,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
 
             //2.发送应用消息
             String desc = StrUtil.format(MessageConstants.LEADS_COVENANT_WAIT_FOLLOW_UP, DateUtil.date().toDateStr(), weLeads.getName());
-            //TODO 链接URL等待前端给
-            this.sendAppMsg(request.getWeUserId(), WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getTitle(), desc, null);
+            this.sendAppMsg(request.getWeUserId(), WeTasksTitleEnum.LEADS_COVENANT_WAIT_FOLLOW_UP.getTitle(), desc, sendAppMsgUrl);
         } else {
             //取消线索约定事项待跟进
             WeTasks weTasks = this.getById(request.getId());

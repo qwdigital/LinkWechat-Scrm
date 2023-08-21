@@ -30,6 +30,7 @@ public class WeTasksListener {
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.delay.we-tasks:Qu_Tasks}")
     public void subscribe(String msg, Channel channel, Message message) {
+        log.info("待办任务监听:{}", msg);
         WeTasksRequest weTasksRequest = JSONObject.parseObject(msg, WeTasksRequest.class);
         weTasksService.handlerWeTasks(weTasksRequest);
     }

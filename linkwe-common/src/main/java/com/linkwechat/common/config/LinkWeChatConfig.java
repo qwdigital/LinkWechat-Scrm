@@ -229,6 +229,11 @@ public class LinkWeChatConfig {
      */
     private String momentsUrl;
 
+    /**
+     * 线索中心移动端-待办任务-详情页
+     */
+    private String leadsDetailUrl;
+
 
     public String getName() {
         return name;
