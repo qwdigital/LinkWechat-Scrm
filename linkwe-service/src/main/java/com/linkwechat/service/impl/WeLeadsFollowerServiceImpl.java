@@ -191,18 +191,18 @@ public class WeLeadsFollowerServiceImpl extends ServiceImpl<WeLeadsFollowerMappe
         }
 
         //@消息，暂时不做
-        /*if (CollectionUtil.isNotEmpty(cooperateUsers)) {
-            //有成员的线索跟进@了你
-            WeTasksRequest build = WeTasksRequest.builder()
-                    .userId(SecurityUtils.getLoginUser().getSysUser().getUserId())
-                    .weUserId(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
-                    .userName(SecurityUtils.getLoginUser().getSysUser().getUserName())
-                    .leadsId(request.getWeLeadsId())
-                    .recordId(record.getId())
-                    .cooperateTime(request.getCooperateTime())
-                    .cooperateUsers(cooperateUsers).build();
-            weTasksService.userFollowUp2You(build);
-        }*/
+//        if (CollectionUtil.isNotEmpty(cooperateUsers)) {
+//            //有成员的线索跟进@了你
+//            WeTasksRequest build = WeTasksRequest.builder()
+//                    .userId(SecurityUtils.getLoginUser().getSysUser().getUserId())
+//                    .weUserId(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
+//                    .userName(SecurityUtils.getLoginUser().getSysUser().getUserName())
+//                    .leadsId(request.getWeLeadsId())
+//                    .recordId(record.getId())
+//                    .cooperateTime(request.getCooperateTime())
+//                    .cooperateUsers(cooperateUsers).build();
+//            weTasksService.userFollowUp2You(build);
+//        }
     }
 
     @Override

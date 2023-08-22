@@ -522,15 +522,15 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
      */
     public void handlerAppointItemWaitFollowUp(WeTasksRequest request) {
         String h5Domain = linkWeChatConfig.getH5Domain();
-        String leadsDetailUrl = linkWeChatConfig.getLeadsDetailUrl();
-        if (StrUtil.isNotBlank(leadsDetailUrl)) {
-            leadsDetailUrl = StrUtil.format(leadsDetailUrl, request.getLeadsId());
+        String leadsCovenantWaitFollowUpUrl = linkWeChatConfig.getLeadsCovenantWaitFollowUpUrl();
+        if (StrUtil.isNotBlank(leadsCovenantWaitFollowUpUrl)) {
+            leadsCovenantWaitFollowUpUrl = StrUtil.format(leadsCovenantWaitFollowUpUrl, request.getRecordId());
         }
 
         WeTasksTitleEnum weTasksTitleEnum = WeTasksTitleEnum.of(request.getType());
 
         //应用消息跳转链接
-        String sendAppMsgUrl = h5Domain + "/#/" + leadsDetailUrl;
+        String sendAppMsgUrl = h5Domain + "/#" + leadsCovenantWaitFollowUpUrl;
 
         //保存代办任务
         WeLeads weLeads = weLeadsMapper.selectById(request.getLeadsId());
@@ -549,7 +549,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
                     .title(weTasksTitleEnum.getTitle())
                     .content(jsonObject.toJSONString())
                     .sendTime(LocalDateTime.now())
-                    .url(leadsDetailUrl)
+                    .url(leadsCovenantWaitFollowUpUrl)
                     .status(0)
                     .delFlag(Constants.COMMON_STATE)
                     .visible(1)
@@ -564,6 +564,9 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
         } else {
             //取消线索约定事项待跟进
             WeTasks weTasks = this.getById(request.getId());
+            if (BeanUtil.isEmpty(weTasks)) {
+                return;
+            }
             if (!weTasks.getStatus().equals(1)) {
                 //任务未完成，则取消执行
                 WeTasks build = WeTasks.builder().id(request.getId()).status(2).build();
