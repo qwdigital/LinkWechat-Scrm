@@ -7,6 +7,8 @@ import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerListsQuery;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeAddMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentQuery;
@@ -35,7 +37,10 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.*;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerListsVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.moment.*;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
@@ -593,7 +598,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/create_link")
+    @Post(url="/externalcontact/customer_acquisition/create_link")
     WeLinkCustomerVo createCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -604,7 +609,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/update_link")
+    @Post(url="/externalcontact/customer_acquisition/update_link")
     WeResultVo updateCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -615,8 +620,33 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/delete_link")
+    @Post(url="/externalcontact/customer_acquisition/delete_link")
     WeResultVo deleteCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+    /**
+     * 获取获客列表
+     * @return
+     */
+    @Post(url="/externalcontact/customer_acquisition/customer")
+    WeLinkWecustomerCountVo customerLinkCount(@JSONBody WeLinkCustomerCountQuery query);
+
+
+    /**
+     * 企业可通过此接口查询当前剩余的使用量。
+     * @return
+     */
+    @Get(url="/externalcontact/customer_acquisition_quota")
+    WeLinkCustomerAcquisitionQuotaVo customerAcquisitionQuota(@JSONBody WeBaseQuery query);
+
+
+    /**
+     * 获取获客链接列表
+     * @param customerListsQuery
+     * @return
+     */
+    @Post(url = "/externalcontact/customer_acquisition/list_link")
+    WeLinkCustomerListsVo listCustomerLink(@JSONBody WeLinkCustomerListsQuery customerListsQuery);
 
 
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeCustomerLink implements Serializable {
+public class WeCustomerLink extends BaseEntity {
     /**
      * 主键
      */
@@ -73,12 +74,23 @@ public class WeCustomerLink implements Serializable {
 
 
     /**
-     * 附件
+     * 渠道标识
+     */
+    private String state;
+
+
+    /**
+     * 附件(传入)
      */
     @TableField(exist = false)
     private List<WeMessageTemplate> attachments;
 
 
+    /**
+     * 回显
+     */
+    @TableField(exist = false)
+    private List<WeCustomerLinkAttachments> linkAttachments;
 
     /**
      * 删除标识 0 有效 1删除
@@ -99,6 +111,8 @@ public class WeCustomerLink implements Serializable {
      */
     @TableField(exist = false)
     private String weUserNames;
+
+
 
 
 

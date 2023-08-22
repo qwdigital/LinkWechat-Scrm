@@ -203,6 +203,12 @@ public class LinkWeChatConfig {
      */
     private String shortLinkDomainName;
 
+
+    /**
+     * 获客助手短链
+     */
+    private String customerShortLinkDomainName;
+
     /**
      * 短链小程序地址
      */
