@@ -326,6 +326,7 @@ INSERT INTO `we_leads_template_settings` VALUES (1679400302667051008, '电话号
 INSERT INTO `we_leads_template_settings` VALUES (1691634393458208768, '性别', '1691634393122664448', 1, 0, 0, 100, 1, 0, '2023-08-16 10:14:03', 3, '2023-08-16 10:14:03', 'admin', 'admin', 1, 1, 0);
 
 
+DROP TABLE IF EXIST `we_leads_template_table_entry_content`
 CREATE TABLE `we_leads_template_table_entry_content` (
 `id` bigint(20) NOT NULL COMMENT '主键Id',
 `leads_template_settings_id` bigint(20) NOT NULL COMMENT '模版表id',
@@ -391,6 +392,7 @@ CREATE TABLE `we_leads_sea_visible_range` (
   PRIMARY KEY (`id`)
 ) COMMENT='公海可见范围';
 
+DROP TABLE IF EXIST `we_leads`
 CREATE TABLE `we_leads` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `name` varchar(32) NOT NULL COMMENT '姓名',
@@ -422,7 +424,7 @@ CREATE TABLE `we_leads` (
   UNIQUE INDEX `phone_unique`(`phone`) USING BTREE COMMENT '手机号码索引'
 ) ENGINE=InnoDB COMMENT='线索';
 
-
+DROP TABLE IF EXIST `we_leads_follower`
 CREATE TABLE `we_leads_follower` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `leads_id` bigint(20) NOT NULL COMMENT '线索Id',
@@ -445,6 +447,7 @@ CREATE TABLE `we_leads_follower` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索跟进人';
 
+DROP TABLE IF EXIST `we_leads_sea_base_settings`
 CREATE TABLE `we_leads_sea_base_settings` (
   `id` bigint(20) NOT NULL,
   `max_claim` int(11) DEFAULT '1' COMMENT '员工每日领取上限',
@@ -461,6 +464,7 @@ CREATE TABLE `we_leads_sea_base_settings` (
 INSERT INTO `we_leads_sea_base_settings` VALUES (1, 10, 100, '2023-07-17 17:18:13', NULL, NULL, NULL, NULL, NULL, 0);
 
 
+DROP TABLE IF EXIST `we_leads_follow_record`
 CREATE TABLE `we_leads_follow_record` (
   `id` bigint(20) NOT NULL,
   `we_leads_id` bigint(20) DEFAULT NULL COMMENT '线索id',
@@ -471,7 +475,7 @@ CREATE TABLE `we_leads_follow_record` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索跟进记录';
 
-
+DROP TABLE IF EXIST `we_leads_records_content`
 CREATE TABLE `we_leads_records_content` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `record_id` bigint(20) NOT NULL COMMENT '跟进记录Id',
@@ -493,6 +497,7 @@ CREATE TABLE `we_leads_records_content` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索跟进记录内容';
 
+DROP TABLE IF EXIST `we_leads_records_attachment`
 CREATE TABLE `we_leads_records_attachment` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `content_id` bigint(20) NOT NULL COMMENT '跟进记录内容Id',
@@ -502,6 +507,7 @@ CREATE TABLE `we_leads_records_attachment` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索跟进记录附件';
 
+DROP TABLE IF EXIST `we_leads_auto_recovery`
 CREATE TABLE `we_leads_auto_recovery` (
   `id` bigint(20) NOT NULL COMMENT '主键id',
   `leads_id` bigint(20) NOT NULL COMMENT '线索id',
@@ -520,6 +526,8 @@ CREATE TABLE `we_leads_auto_recovery` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索自动回收';
 
+
+DROP TABLE IF EXIST `we_leads_record_content_cooperate_user`
 CREATE TABLE `we_leads_record_content_cooperate_user` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `content_id` bigint(20) NOT NULL COMMENT '记录内容id',
@@ -529,7 +537,7 @@ CREATE TABLE `we_leads_record_content_cooperate_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='跟进记录内容协作成员';
 
-
+DROP TABLE IF EXIST `we_leads_import_record`
 CREATE TABLE `we_leads_import_record` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
@@ -549,7 +557,7 @@ CREATE TABLE `we_leads_import_record` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索导入记录';
 
-
+DROP TABLE IF EXIST `we_leads_manual_add_record`
 CREATE TABLE `we_leads_manual_add_record` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `we_user_id` varchar(64) NOT NULL COMMENT '企微员工Id',
@@ -557,6 +565,7 @@ CREATE TABLE `we_leads_manual_add_record` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索手动入线记录';
 
+DROP TABLE IF EXIST `we_message_notification`
 CREATE TABLE `we_message_notification` (
   `id` bigint NOT NULL COMMENT '主键Id',
   `title` varchar(32) NOT NULL COMMENT '通知标题',
@@ -574,6 +583,8 @@ CREATE TABLE `we_message_notification` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='消息通知';
 
+
+DROP TABLE IF EXIST `we_tasks`
 CREATE TABLE `we_tasks` (
   `id` bigint(20) NOT NULL COMMENT '主键Id',
   `user_id` bigint(20) NOT NULL COMMENT '员工id',
@@ -615,6 +626,7 @@ ALTER TABLE `we_corp_account` ADD COLUMN `customer_link_margin` bigint(20) NULL 
 
 ALTER TABLE `we_corp_account` ADD COLUMN `customer_link_total` bigint(20) NULL DEFAULT NULL COMMENT '获客助手总量' AFTER `customer_link_margin`;
 
+DROP TABLE IF EXIST `we_customer_link`
 CREATE TABLE `we_customer_link`  (
 `id` bigint(20) NOT NULL COMMENT '主键',
 `link_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '链接名称',
@@ -636,6 +648,7 @@ CREATE TABLE `we_customer_link`  (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '获客助手' ROW_FORMAT = Dynamic;
 
+DROP TABLE IF EXIST `we_customer_link_attachments`
 CREATE TABLE `we_customer_link_attachments`  (
 `id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
 `customer_link_id` bigint(11) NOT NULL COMMENT '识客码id',
@@ -662,6 +675,8 @@ PRIMARY KEY (`id`) USING BTREE,
 INDEX `qr_id_IDX`(`customer_link_id`, `del_flag`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1692356624150212610 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '活码附件表' ROW_FORMAT = DYNAMIC;
 
+
+DROP TABLE IF EXIST `we_customer_link_count`
 CREATE TABLE `we_customer_link_count`  (
 `id` bigint(20) NOT NULL COMMENT '主键',
 `external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户external_userid',
@@ -694,6 +709,7 @@ ALTER TABLE `we_leads_follower` MODIFY COLUMN `assigner_id` bigint(20) NULL DEFA
 
 ALTER TABLE `we_leads_follower` MODIFY COLUMN `assigner_name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '分配人名称' AFTER `assigner_id`;
 
+DROP TABLE IF EXIST `we_leads_record_attachment`
 CREATE TABLE `we_leads_record_attachment`  (
 `id` bigint(20) NOT NULL COMMENT '主键Id',
 `content_id` bigint(20) NOT NULL COMMENT '跟进记录内容Id',
@@ -703,6 +719,7 @@ CREATE TABLE `we_leads_record_attachment`  (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '线索跟进记录附件' ROW_FORMAT = Dynamic;
 
+DROP TABLE IF EXIST `we_leads_record_content`
 CREATE TABLE `we_leads_record_content`  (
 `id` bigint(20) NOT NULL COMMENT '主键Id',
 `record_id` bigint(20) NOT NULL COMMENT '跟进记录Id',
@@ -729,6 +746,7 @@ ALTER TABLE `we_qr_code` ADD COLUMN `qr_welcome_open` tinyint(4) NULL DEFAULT NU
 
 ALTER TABLE `we_qr_code` ADD COLUMN `qr_priority_user_welcome` tinyint(4) NULL DEFAULT NULL COMMENT '是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）' AFTER `qr_welcome_open`;
 
+DROP TABLE IF EXIST `we_substitute_customer_order`
 CREATE TABLE `we_substitute_customer_order`  (
 `id` bigint(20) NOT NULL COMMENT '主键Id',
 `purchaser` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '购买人',
@@ -763,6 +781,8 @@ CREATE TABLE `we_substitute_customer_order`  (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单-订单' ROW_FORMAT = Dynamic;
 
+
+DROP TABLE IF EXIST `we_substitute_customer_order_catalogue`
 CREATE TABLE `we_substitute_customer_order_catalogue`  (
 `id` bigint(20) NOT NULL COMMENT '主键Id',
 `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类名称',
@@ -778,6 +798,7 @@ CREATE TABLE `we_substitute_customer_order_catalogue`  (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单字段分类' ROW_FORMAT = Dynamic;
 
+DROP TABLE IF EXIST `we_substitute_customer_order_catalogue_property`
 CREATE TABLE `we_substitute_customer_order_catalogue_property`  (
 `id` bigint(20) NOT NULL COMMENT '主键id',
 `catalogue_id` bigint(20) NOT NULL COMMENT '分类id',
