@@ -84,6 +84,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
 
         WeSubstituteCustomerOrderCatalogueProperty property = BeanUtil.copyProperties(request, WeSubstituteCustomerOrderCatalogueProperty.class);
         property.setId(IdUtil.getSnowflakeNextId());
+        property.setCode(String.valueOf(IdUtil.getSnowflakeNextId()));
         property.setSort(count);
         property.setFixed(0);
         property.setDelFlag(Constants.COMMON_STATE);
