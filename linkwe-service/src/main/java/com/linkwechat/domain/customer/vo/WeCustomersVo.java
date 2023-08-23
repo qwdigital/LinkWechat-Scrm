@@ -172,6 +172,7 @@ public class WeCustomersVo {
      * 外部联系人在微信开放平台的唯一身份标识,通过此字段企业可将外部联系人与公众号/小程序用户关联起来。
      */
     @ExcelProperty(value = "unionid", index = 4)
+    @ColumnWidth(30)
     private String unionid;
 
     /**
