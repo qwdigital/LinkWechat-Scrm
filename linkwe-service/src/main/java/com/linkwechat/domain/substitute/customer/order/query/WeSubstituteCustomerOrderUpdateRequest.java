@@ -1,5 +1,6 @@
 package com.linkwechat.domain.substitute.customer.order.query;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderCataloguePropertyValueVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -51,6 +52,7 @@ public class WeSubstituteCustomerOrderUpdateRequest {
      */
     @ApiModelProperty("下单时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime orderTime;
 
     /**
@@ -135,6 +137,8 @@ public class WeSubstituteCustomerOrderUpdateRequest {
      * 回款日期
      */
     @ApiModelProperty("回款日期")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime returnedDate;
 
     /**
