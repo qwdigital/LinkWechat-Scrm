@@ -77,7 +77,7 @@ public class WeAccessTokenInterceptor extends WeForestInterceptor implements Int
         WeErrorCodeEnum weErrorCodeEnum = WeErrorCodeEnum.parseEnum(resultDto.getErrCode());
         if(null != weErrorCodeEnum){
             if(!resultDto.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                saveWeErrorMsg(weErrorCodeEnum,forestRequest,forestResponse);
+                saveWeErrorMsg(weErrorCodeEnum,forestRequest);
             }
             resultDto.setErrMsg(weErrorCodeEnum.getErrorMsg());
         }

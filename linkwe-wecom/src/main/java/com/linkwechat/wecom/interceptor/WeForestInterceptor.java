@@ -61,13 +61,13 @@ public abstract class WeForestInterceptor{
 
 
     @Async
-    protected void saveWeErrorMsg(WeErrorCodeEnum weErrorCodeEnum, ForestRequest forestRequest, ForestResponse forestResponse){
+    protected void saveWeErrorMsg(WeErrorCodeEnum weErrorCodeEnum, ForestRequest forestRequest){
         iWeErrorMsgService.save(
                 WeErrorMsg.builder()
                         .errorMsg(weErrorCodeEnum.getErrorMsg())
                         .errorCode(weErrorCodeEnum.getErrorCode().longValue())
                         .url(forestRequest.getUrl())
-                        .params(JSONObject.toJSONString(forestRequest.getArguments()))
+                        .weParams(JSONObject.toJSONString(forestRequest.getArguments()))
                         .build()
         );
     }

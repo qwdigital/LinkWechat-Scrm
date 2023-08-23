@@ -44,7 +44,7 @@ public class WeErrorMsg extends BaseEntity {
     /**
      * 请求参数
      */
-    private String params;
+    private String weParams;
 
 
 }

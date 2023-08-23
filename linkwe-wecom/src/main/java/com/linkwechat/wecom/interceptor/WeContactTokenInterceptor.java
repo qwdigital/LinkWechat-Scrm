@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class WeContactTokenInterceptor extends WeForestInterceptor implements Interceptor {
+public class WeContactTokenInterceptor extends WeForestInterceptor implements Interceptor<WeResultVo> {
 
     /**
      * 该方法在请求发送之前被调用, 若返回false则不会继续发送请求
@@ -39,7 +40,14 @@ public class WeContactTokenInterceptor extends WeForestInterceptor implements In
      * 请求成功调用(微信端错误异常统一处理)
      */
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(WeResultVo resultVo, ForestRequest request, ForestResponse response) {
+        WeErrorCodeEnum weErrorCodeEnum = WeErrorCodeEnum.parseEnum(resultVo.getErrCode());
+        if(null != weErrorCodeEnum){
+            if(!resultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                saveWeErrorMsg(weErrorCodeEnum,request);
+            }
+            resultVo.setErrMsg(weErrorCodeEnum.getErrorMsg());
+        }
         log.info("url:{},result:{}", request.getUrl(), response.getContent());
     }
 
