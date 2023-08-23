@@ -454,7 +454,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
                 .eq(WeFission::getIsTip,2)
                 .isNotNull(WeFission::getAddWeUserOrGroupCode)
-                .ne(WeFission::getFassionState, 3));
+                .notIn(WeFission::getFassionState, ListUtil.toList(3,4)));
 
 
         try {
@@ -481,26 +481,44 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         messageQuery.setMsgSource(4);
                         messageQuery.setIsTask(0);
                         messageQuery.setLoginUser(SecurityUtils.getLoginUser());
-                        messageQuery.setContent(weFission.getContent());
+
                         messageQuery.setBusinessIds(weFission.getId().toString());
                         messageQuery.setSendTime(null);
 
-                            WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
-                            if(null != weMaterial){
-                                //构建发送素材
-                                messageQuery.setAttachmentsList(
-                                        ListUtil.toList(WeMessageTemplate.builder()
-                                                .title(weFission.getFassionName())
-                                                .msgType(MediaType.LINK.getMediaType())
-                                                .linkUrl(weFission.getFissionUrl())
-                                                .build(),
-                                                WeMessageTemplate.builder()
-                                                        .msgType(MediaType.TEXT.getMediaType())
-                                                        .content(weFission.getContent())
-                                                        .build()
-                                                )
+                            List<WeMessageTemplate> attachmentsList=new ArrayList<>();
+
+
+
+                            //发送文本
+                            if(StringUtils.isNotEmpty(weFission.getContent())){
+                                messageQuery.setContent(weFission.getContent());
+                                attachmentsList.add(
+                                        WeMessageTemplate.builder()
+                                                .msgType(MediaType.TEXT.getMediaType())
+                                                .content(weFission.getContent())
+                                                .build()
                                 );
                             }
+
+
+                            //发送链接
+                            WeMaterial weMaterial = materialService.getById(weFission.getPosterId());
+                            if(null != weMaterial){
+                                attachmentsList.add(
+                                        WeMessageTemplate.builder()
+                                                .title(weFission.getActiveTitle())
+                                                .description(weFission.getActiveDescr())
+                                                .picUrl(weMaterial.getCoverUrl())
+                                                .msgType(MediaType.LINK.getMediaType())
+                                                .linkUrl(weFission.getFissionUrl())
+                                                .build()
+                                );
+
+                            }
+
+                            messageQuery.setAttachmentsList(
+                                    attachmentsList
+                            );
 
 
 //                        if(weFission.getFassionStartTime()//定时发送,活动时间
