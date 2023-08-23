@@ -71,6 +71,9 @@ public enum CategoryMediaType {
         result.add(new SideMaterialType( POSTER.getType(),POSTER.getName(),8));
 
         result.add(new SideMaterialType( ZLBDURL.getType(),ZLBDURL.getName(),9));
+
+        result.add(new SideMaterialType( MURL.getType(),MURL.getName(),10));
+
         result = result.stream().sorted(Comparator.comparing(SideMaterialType::getSort)).collect(Collectors.toList());
 
         return result;
