@@ -5,6 +5,10 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.converter.CustomerAddWayConverter;
+import com.linkwechat.common.converter.CustomerTrackStateConverter;
+import com.linkwechat.common.converter.CustomerTypeConverter;
+import com.linkwechat.common.converter.SexConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +45,7 @@ public class WeCustomersVo {
     /**
      * 客户类型 1:微信用户，2:企业用户
      */
-    @ExcelProperty(value = "客户类型", index = 1,)
+    @ExcelProperty(value = "客户类型", index = 1, converter = CustomerTypeConverter.class)
     private Integer customerType;
 
     /**
@@ -59,13 +63,15 @@ public class WeCustomersVo {
     /**
      * 跟踪状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
      */
-    @ExcelProperty(value = "商机阶段", index = 9)
+    @ExcelProperty(value = "商机阶段", index = 9, converter = CustomerTrackStateConverter.class)
     private Integer trackState;
 
     /**
      * 添加方式
+     *
+     * @see com.linkwechat.common.enums.CustomerAddWay
      */
-    @ExcelProperty(value = "添加方式", index = 10)
+    @ExcelProperty(value = "添加方式", index = 10, converter = CustomerAddWayConverter.class)
     private Integer addMethod;
 
     /**
@@ -84,7 +90,9 @@ public class WeCustomersVo {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
-    //留存天数
+    /**
+     * 留存天数
+     */
     @ExcelIgnore
     private Integer retentionDays;
 
@@ -92,7 +100,7 @@ public class WeCustomersVo {
     /**
      * 0-未知 1-男性 2-女性
      */
-    @ExcelProperty(value = "性别", index = 2)
+    @ExcelProperty(value = "性别", index = 2, converter = SexConverter.class)
     private Integer gender;
 
     /**
@@ -166,12 +174,16 @@ public class WeCustomersVo {
     @ExcelProperty(value = "unionid", index = 4)
     private String unionid;
 
-
-    //跟进时间或流失时间
+    /**
+     * 跟进时间或流失时间
+     */
     @ExcelIgnore
     private Date trackTime;
 
-    //数据更新时间,也可表示客户流失时间
+    /**
+     * 数据更新时间,也可表示客户流失时间
+     */
+    @ExcelIgnore
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
 
