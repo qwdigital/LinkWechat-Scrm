@@ -1,15 +1,22 @@
 package com.linkwechat.wecom.interceptor;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.ForestResponse;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeErrorMsg;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.service.IWeCorpAccountService;
+import com.linkwechat.service.IWeErrorMsgService;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -26,6 +33,9 @@ public abstract class WeForestInterceptor{
 
     @Autowired
     protected IWeCorpAccountService weCorpAccountService;
+
+    @Autowired
+    protected IWeErrorMsgService iWeErrorMsgService;
 
     @Value("${wecom.error-code-retry}")
     protected String errorCodeRetry;
@@ -47,5 +57,18 @@ public abstract class WeForestInterceptor{
             corpId = baseQuery.get("corpid") == null ? null : String.valueOf(baseQuery.get("corpid"));
         }
         return corpId;
+    }
+
+
+    @Async
+    protected void saveWeErrorMsg(WeErrorCodeEnum weErrorCodeEnum, ForestRequest forestRequest, ForestResponse forestResponse){
+        iWeErrorMsgService.save(
+                WeErrorMsg.builder()
+                        .errorMsg(weErrorCodeEnum.getErrorMsg())
+                        .errorCode(weErrorCodeEnum.getErrorCode().longValue())
+                        .url(forestRequest.getUrl())
+                        .params(JSONObject.toJSONString(forestRequest.getArguments()))
+                        .build()
+        );
     }
 }

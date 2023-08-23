@@ -5,6 +5,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.agent.query.WeAgentQuery;
 import com.linkwechat.domain.wecom.vo.agent.vo.WeAgentDetailVo;
 import com.linkwechat.domain.wecom.vo.agent.vo.WeAgentListVo;
+import com.linkwechat.service.IWeCustomerLinkService;
 import com.linkwechat.wecom.service.IQwAgentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
