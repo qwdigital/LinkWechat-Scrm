@@ -2,6 +2,8 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -141,7 +143,15 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
                         property.setActualValue(order.getSource());
                         break;
                     case "orderTime":
-                        property.setActualValue(order.getOrderTime());
+                        if (BeanUtil.isNotEmpty(order.getOrderTime())) {
+                            String format = null;
+                            if (property.getToTime().equals(0)) {
+                                format = DateUtil.format(order.getOrderTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
+                            } else {
+                                format = DateUtil.format(order.getOrderTime(), DatePattern.NORM_DATETIME_PATTERN);
+                            }
+                            property.setActualValue(format);
+                        }
                         break;
                     case "deptId":
                         property.setActualValue(order.getDeptId());
@@ -168,7 +178,15 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
                         property.setActualValue(order.getReturnedMoney());
                         break;
                     case "returnedDate":
-                        property.setActualValue(order.getReturnedDate());
+                        if (BeanUtil.isNotEmpty(order.getReturnedDate())) {
+                            String format = null;
+                            if (property.getToTime().equals(0)) {
+                                format = DateUtil.format(order.getReturnedDate(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
+                            } else {
+                                format = DateUtil.format(order.getReturnedDate(), DatePattern.NORM_DATETIME_PATTERN);
+                            }
+                            property.setActualValue(format);
+                        }
                         break;
                     case "payer":
                         property.setActualValue(order.getPayer());
