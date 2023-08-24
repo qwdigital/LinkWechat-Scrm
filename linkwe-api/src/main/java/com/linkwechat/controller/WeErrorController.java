@@ -10,6 +10,8 @@ import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.service.IWeErrorMsgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 获取错误信息
  */
 @RestController
+@RequestMapping("/error")
 public class WeErrorController extends BaseController {
 
     @Autowired
@@ -30,6 +33,7 @@ public class WeErrorController extends BaseController {
      */
     @GetMapping("/findWeError")
     public TableDataInfo findWeError(WeErrorMsg weErrorMsg){
+        startPage();
         return getDataTable(
                 iWeErrorMsgService.list(
                         new LambdaQueryWrapper<WeErrorMsg>()
@@ -49,7 +53,7 @@ public class WeErrorController extends BaseController {
      * 清空所有数据
      * @return
      */
-    @GetMapping("/removeWeError")
+    @PostMapping("/removeWeError")
     public AjaxResult removeWeError(){
         iWeErrorMsgService.remove(new LambdaQueryWrapper<>());
 
