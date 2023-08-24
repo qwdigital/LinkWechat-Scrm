@@ -116,6 +116,11 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         }
 
 
+        if(weFission.getActiveCoverType()==null || weFission.getActiveCoverType().equals(1)){ //当前封面为海报
+            weFission.setActiveCoverUrl(weFission.getPosterUrl());
+        }
+
+
 
         //如果当前时间在裂变结束时间之前,则裂变结束
 //        if(new Date().after(weFission.getFassionEndTime())){
@@ -462,6 +467,12 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
             if(CollectionUtil.isNotEmpty(weFissions)){
                 weFissions.stream().forEach(weFission -> {
+
+               if(new Date().after(weFission.getFassionStartTime())&&
+                   new Date().before(weFission.getFassionEndTime())
+                ) {
+                    weFission.setFassionState(2);
+                }
 
                     //如果当前时间在裂变结束时间之前,则裂变结束
                     if(new Date().after(weFission.getFassionEndTime())){
