@@ -14,6 +14,8 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.domain.kf.query.*;
 import com.linkwechat.domain.kf.vo.*;
+import com.linkwechat.domain.wecom.query.kf.WeUpgradeServiceQuery;
+import com.linkwechat.domain.wecom.vo.kf.WeUpgradeServiceConfigVo;
 import com.linkwechat.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -141,13 +143,12 @@ public class WeKfController extends BaseController {
     @ApiOperation("删除客服")
     @DeleteMapping("/delete/{id}")
     public AjaxResult delKfInfo(@PathVariable("id") Long id) {
-        if(linkWeChatConfig.isDemoEnviron()){
+        if (linkWeChatConfig.isDemoEnviron()) {
             return AjaxResult.error("当前环境不可删除");
         }
         weKfInfoService.delKfInfo(id);
         return AjaxResult.success();
     }
-
 
     @ApiOperation("客服接待人员列表")
     @GetMapping("/servicer/list")
@@ -157,7 +158,6 @@ public class WeKfController extends BaseController {
         List<WeKfServicerListVo> kfServicerList = weKfServicerService.getKfServicerList(query);
         return getDataTable(kfServicerList);
     }
-
 
     @ApiOperation("新增场景")
     @PostMapping("/scenes/add")
@@ -170,7 +170,7 @@ public class WeKfController extends BaseController {
     @ApiOperation("删除场景")
     @DeleteMapping("/scenes/delete/{ids}")
     public AjaxResult delKfScenes(@PathVariable("ids") List<Long> ids) {
-        if(linkWeChatConfig.isDemoEnviron()){
+        if (linkWeChatConfig.isDemoEnviron()) {
             return AjaxResult.error("当前环境不可删除");
         }
         weKfScenesService.delKfScenes(ids);
@@ -197,8 +197,8 @@ public class WeKfController extends BaseController {
     /**
      * 场景链接批量下载
      *
-     * @param ids 场景值ids
-     * @param request 请求
+     * @param ids      场景值ids
+     * @param request  请求
      * @param response 输出
      * @throws Exception
      */
@@ -208,10 +208,10 @@ public class WeKfController extends BaseController {
         WeKfScenesQuery query = new WeKfScenesQuery();
         query.setIds(ids);
         List<WeKfScenesListVo> scenesList = weKfScenesService.getScenesList(query);
-        if(CollectionUtil.isNotEmpty(scenesList)){
+        if (CollectionUtil.isNotEmpty(scenesList)) {
             List<FileUtils.FileEntity> fileList = scenesList.stream().map(item -> {
-                return  FileUtils.FileEntity.builder()
-                        .fileName( item.getKfName() + "-" + item.getName())
+                return FileUtils.FileEntity.builder()
+                        .fileName(item.getKfName() + "-" + item.getName())
                         .url(item.getQrCode())
                         .suffix(".jpg")
                         .build();
@@ -232,13 +232,13 @@ public class WeKfController extends BaseController {
     @ApiOperation("咨询记录详情")
     @GetMapping("/record/detail")
     public TableDataInfo<WeKfRecordVo> getRecordDetail(WeKfRecordQuery query) {
-        if(query == null){
+        if (query == null) {
             throw new WeComException("参数不能为空");
         }
-        if(StringUtils.isEmpty(query.getOpenKfId())){
+        if (StringUtils.isEmpty(query.getOpenKfId())) {
             throw new WeComException("客服账号ID不能为空");
         }
-        if(StringUtils.isEmpty(query.getExternalUserId())){
+        if (StringUtils.isEmpty(query.getExternalUserId())) {
             throw new WeComException("客户ID不能为空");
         }
         log.info("咨询记录详情入参：param:{}", JSONObject.toJSONString(query));
@@ -263,19 +263,47 @@ public class WeKfController extends BaseController {
     @ApiOperation("会话分析接口")
     @GetMapping("/msg/analyze")
     public AjaxResult<WeKfMsgAnalyzeVo> getMsgAnalyze(WeKfRecordQuery query) {
-        if(Objects.isNull(query)){
+        if (Objects.isNull(query)) {
             throw new WeComException("参数不能为空");
         }
-        if(StringUtils.isEmpty(query.getOpenKfId())){
+        if (StringUtils.isEmpty(query.getOpenKfId())) {
             throw new WeComException("客服ID不能为空");
         }
-        if(StringUtils.isEmpty(query.getExternalUserId())){
+        if (StringUtils.isEmpty(query.getExternalUserId())) {
             throw new WeComException("客户ID不能为空");
         }
-        if(StringUtils.isEmpty(query.getBeginTime())){
+        if (StringUtils.isEmpty(query.getBeginTime())) {
             throw new WeComException("开始时间不能为空");
         }
         WeKfMsgAnalyzeVo weKfMsgAnalyzeVo = weKfMsgService.getMsgAnalyze(query);
         return AjaxResult.success(weKfMsgAnalyzeVo);
+    }
+
+    /**
+     * 获取微信客服升级服务
+     *
+     * @return {@link AjaxResult<WeUpgradeServiceConfigVo>}
+     * @author WangYX
+     * @date 2023/08/25 11:36
+     */
+    @ApiOperation("获取微信客服升级服务")
+    @GetMapping("get/upgrade/service/config")
+    public AjaxResult<WeUpgradeServiceConfigVo> getKfUpgradeServiceConfig() {
+        WeKfUpgradeServiceConfigVO vo = weKfServicerService.getWeUpgradeServiceConfig();
+        return AjaxResult.success(vo);
+    }
+
+    /**
+     * 为客户升级为专员或客户群服务
+     *
+     * @param query 请求参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/08/25 13:53
+     */
+    @GetMapping("/upgrade/service")
+    public AjaxResult upgradeService(WeUpgradeServiceQuery query) {
+        weKfServicerService.upgradeService(query);
+        return AjaxResult.success();
     }
 }
