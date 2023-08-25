@@ -165,6 +165,8 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
                     case "totalPrice":
                         property.setActualValue(order.getTotalPrice());
                         break;
+                    case "discount":
+                        property.setActualValue(order.getDiscount());
                     case "discountAmount":
                         property.setActualValue(order.getDiscountAmount());
                         break;
@@ -202,10 +204,10 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
             //自定义字段写入值
             List<WeSubstituteCustomerOrderCataloguePropertyVO> unFixedProperties = properties.stream().filter(i -> i.getFixed().equals(0)).collect(Collectors.toList());
             if (CollectionUtil.isEmpty(unFixedProperties)) {
-                return;
+                continue;
             }
             if (StrUtil.isBlank(order.getProperties())) {
-                return;
+                continue;
             }
             List<WeSubstituteCustomerOrderCataloguePropertyValueVO> values = JSONObject.parseArray(order.getProperties(), WeSubstituteCustomerOrderCataloguePropertyValueVO.class);
             unFixedProperties.forEach(i -> {
