@@ -519,7 +519,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                         WeMessageTemplate.builder()
                                                 .title(weFission.getActiveTitle())
                                                 .description(weFission.getActiveDescr())
-                                                .picUrl(weMaterial.getCoverUrl())
+                                                .picUrl(weFission.getActiveCoverUrl())
                                                 .msgType(MediaType.LINK.getMediaType())
                                                 .linkUrl(weFission.getFissionUrl())
                                                 .build()
