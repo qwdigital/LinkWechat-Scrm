@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -315,7 +316,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
 
         //缓存key
         if (BeanUtil.isNotEmpty(vo)) {
-            redisService.setCacheObject(KF_UPGRADE_SERVICE_KEY, JSONObject.toJSONString(vo));
+            redisService.setCacheObject(KF_UPGRADE_SERVICE_KEY, JSONObject.toJSONString(vo), 5, TimeUnit.MINUTES);
         }
         return vo;
     }
