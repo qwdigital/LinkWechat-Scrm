@@ -280,16 +280,17 @@ public class WeKfController extends BaseController {
     }
 
     /**
-     * 获取微信客服升级服务
+     * 获取客服升级服务
      *
+     * @param pull 是否拉去最新客服服务数据 true 拉取 false 不拉取
      * @return {@link AjaxResult<WeUpgradeServiceConfigVo>}
      * @author WangYX
-     * @date 2023/08/25 11:36
+     * @date 2023/08/28 9:40
      */
     @ApiOperation("获取微信客服升级服务")
     @GetMapping("get/upgrade/service/config")
-    public AjaxResult<WeUpgradeServiceConfigVo> getKfUpgradeServiceConfig() {
-        WeKfUpgradeServiceConfigVO vo = weKfServicerService.getWeUpgradeServiceConfig();
+    public AjaxResult<WeUpgradeServiceConfigVo> getKfUpgradeServiceConfig(@RequestParam(required = false) boolean pull) {
+        WeKfUpgradeServiceConfigVO vo = weKfServicerService.getWeUpgradeServiceConfig(pull);
         return AjaxResult.success(vo);
     }
 

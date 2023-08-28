@@ -251,13 +251,28 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
     }
 
     @Override
-    public WeKfUpgradeServiceConfigVO getWeUpgradeServiceConfig() {
+    public WeKfUpgradeServiceConfigVO getWeUpgradeServiceConfig(boolean pull) {
+
+        String KF_UPGRADE_SERVICE_KEY = "KF_UPGRADE_SERVICE_KEY";
+
+        if (!pull) {
+            Object cacheObject = redisService.getCacheObject(KF_UPGRADE_SERVICE_KEY);
+            if (BeanUtil.isNotEmpty(cacheObject)) {
+                WeKfUpgradeServiceConfigVO vo = JSONObject.parseObject(cacheObject.toString(), WeKfUpgradeServiceConfigVO.class);
+                return vo;
+            }
+        }
+
         WeKfUpgradeServiceConfigVO vo = new WeKfUpgradeServiceConfigVO();
 
         WeUpgradeServiceQuery query = new WeUpgradeServiceQuery();
         AjaxResult<WeUpgradeServiceConfigVo> result = qwKfClient.getUpgradeServiceConfig(query);
+
         if (result.getCode() == HttpStatus.SUCCESS) {
             WeUpgradeServiceConfigVo data = result.getData();
+            if (!data.getErrCode().equals(0)) {
+                throw new ServiceException(data.getErrMsg());
+            }
             WeUpgradeServiceConfigVo.MemberRange memberRange = data.getMemberRange();
             WeUpgradeServiceConfigVo.GroupChatRange groupChatRange = data.getGroupChatRange();
 
@@ -284,7 +299,6 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 }
             }
             vo.setUserList(userVos);
-
             //客户群
             List<String> chatIdList = groupChatRange.getChatIdList();
             if (CollectionUtil.isNotEmpty(chatIdList)) {
@@ -297,6 +311,11 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                     vo.setGroupList(weGroupSimpleVos);
                 }
             }
+        }
+
+        //缓存key
+        if (BeanUtil.isNotEmpty(vo)) {
+            redisService.setCacheObject(KF_UPGRADE_SERVICE_KEY, JSONObject.toJSONString(vo));
         }
         return vo;
     }

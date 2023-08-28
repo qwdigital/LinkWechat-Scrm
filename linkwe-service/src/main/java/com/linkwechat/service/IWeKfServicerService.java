@@ -66,11 +66,12 @@ public interface IWeKfServicerService extends IService<WeKfServicer> {
     /**
      * 获取客服升级服务
      *
+     * @param pull 是否拉去最新客服升级服务数据  true 拉取 false 不拉取
      * @return {@link WeKfUpgradeServiceConfigVO}
      * @author WangYX
-     * @date 2023/08/25 13:48
+     * @date 2023/08/28 9:39
      */
-    WeKfUpgradeServiceConfigVO getWeUpgradeServiceConfig();
+    WeKfUpgradeServiceConfigVO getWeUpgradeServiceConfig(boolean pull);
 
     /**
      * 为客户升级为专员或客户群服务
