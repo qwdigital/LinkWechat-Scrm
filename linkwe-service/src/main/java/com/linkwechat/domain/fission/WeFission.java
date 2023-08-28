@@ -38,7 +38,7 @@ public class WeFission extends BaseEntity {
     private String fassionName;
 
     /**
-     * 裂变状态（1:待开始;2:进行中;3:已结束）
+     * 裂变状态（1:待开始;2:进行中;3:已结束; 4:暂停）
      */
     private Integer fassionState;
 
@@ -98,7 +98,7 @@ public class WeFission extends BaseEntity {
     private Integer exchangeTip;
 
     /**
-     * 兑奖方式(1:跳转链接兑奖;2:客服兑奖)
+     * 兑奖方式(1:跳转链接兑奖;2:客服兑奖;3:自助兑奖)
      */
     private Integer exchangeType;
 
@@ -139,6 +139,30 @@ public class WeFission extends BaseEntity {
      */
     @TableField(exist = false)
     private Integer fissionCustomerNum;
+
+
+    /**
+     * 活动名称
+     */
+    private String activeTitle;
+
+
+    /**
+     * 活动描述
+     */
+    private String activeDescr;
+
+    /**
+     * 1:海报缩略图 2:自定义
+     */
+    private Integer activeCoverType;
+
+
+    /**
+     * 活动封面url
+     */
+    private String activeCoverUrl;
+
 
 
     @Data

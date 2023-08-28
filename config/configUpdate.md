@@ -14,10 +14,11 @@
         publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKoR8mX0rGKLqzcWmOzbfj64K8ZIgOdHnzkXSOVOZbFu/TJhZ7rFAN+eaGkl3C4buccQd/EjEsj9ir7ijT7h96MCAwEAAQ==
 ```
 ---
-### ● 日期：2023.07.09
+### ● 日期：2023.08.22
   ```
    ● linkwe-common.yml
       linkwechat:
           customerShortLinkDomainName: sl.linkwechat.net/l/
+          leadsDetailUrl: /clueHighseas/detail?id={} #线索中心移动端-待办任务-详情页
   
   ```
