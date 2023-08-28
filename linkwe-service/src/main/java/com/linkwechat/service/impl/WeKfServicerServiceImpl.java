@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -274,6 +275,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
             if (!data.getErrCode().equals(0)) {
                 throw new ServiceException(data.getErrMsg());
             }
+
             WeUpgradeServiceConfigVo.MemberRange memberRange = data.getMemberRange();
             WeUpgradeServiceConfigVo.GroupChatRange groupChatRange = data.getGroupChatRange();
 
@@ -289,7 +291,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 }
             }
             //部门员工
-            List<Integer> departmentList = memberRange.getDepartmentList();
+            List<Integer> departmentList = memberRange.getDepartmentIdList();
             if (CollectionUtil.isNotEmpty(departmentList)) {
                 String deptIds = CollectionUtil.join(departmentList, ",");
                 AjaxResult<List<SysUser>> sysUser = qwSysUserClient.findAllSysUser(null, null, deptIds);
@@ -308,7 +310,13 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 queryWrapper.in(WeGroup::getChatId, chatIdList);
                 List<WeGroup> list = weGroupService.list(queryWrapper);
                 if (CollectionUtil.isNotEmpty(list)) {
-                    List<WeGroupSimpleVo> weGroupSimpleVos = BeanUtil.copyToList(list, WeGroupSimpleVo.class);
+                    List<WeGroupSimpleVo> weGroupSimpleVos = new ArrayList<>();
+                    for (WeGroup weGroup : list) {
+                        WeGroupSimpleVo weGroupSimpleVo = new WeGroupSimpleVo();
+                        weGroupSimpleVo.setChatId(weGroup.getChatId());
+                        weGroupSimpleVo.setName(weGroup.getGroupName());
+                        weGroupSimpleVos.add(weGroupSimpleVo);
+                    }
                     vo.setGroupList(weGroupSimpleVos);
                 }
             }
