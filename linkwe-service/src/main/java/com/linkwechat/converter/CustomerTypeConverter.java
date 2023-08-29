@@ -1,4 +1,4 @@
-package com.linkwechat.common.converter;
+package com.linkwechat.converter;
 
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.converters.WriteConverterContext;

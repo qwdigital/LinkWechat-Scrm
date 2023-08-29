@@ -5,9 +5,9 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.linkwechat.common.converter.CustomerAddWayConverter;
-import com.linkwechat.common.converter.CustomerTrackStateConverter;
-import com.linkwechat.common.converter.CustomerTypeConverter;
+import com.linkwechat.converter.CustomerAddWayConverter;
+import com.linkwechat.converter.CustomerTrackStateConverter;
+import com.linkwechat.converter.CustomerTypeConverter;
 import com.linkwechat.common.converter.SexConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,7 +61,10 @@ public class WeCustomersVo {
     private String firstUserId;
 
     /**
-     * 跟踪状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
+     * 跟踪状态
+     * <p>
+     * 和we_strack_stage表中的stage_val保持一致
+     * </p>
      */
     @ExcelProperty(value = "商机阶段", index = 9, converter = CustomerTrackStateConverter.class)
     private Integer trackState;

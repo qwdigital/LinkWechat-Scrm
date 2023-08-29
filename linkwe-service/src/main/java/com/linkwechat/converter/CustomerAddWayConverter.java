@@ -1,4 +1,4 @@
-package com.linkwechat.common.converter;
+package com.linkwechat.converter;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.excel.converters.Converter;

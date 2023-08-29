@@ -104,8 +104,6 @@ public class WeCustomerController extends BaseController {
             EasyExcel.write(response.getOutputStream(), WeCustomersVo.class).sheet().doWrite(list);
             System.out.println("耗时:" + (System.currentTimeMillis() - currentTimeMillis));
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
