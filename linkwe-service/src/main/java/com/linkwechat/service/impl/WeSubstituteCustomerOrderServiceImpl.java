@@ -116,6 +116,9 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
     private void setActualValue(List<WeSubstituteCustomerOrderCatalogueVO> catalogues, WeSubstituteCustomerOrder order) {
         for (WeSubstituteCustomerOrderCatalogueVO catalogue : catalogues) {
             List<WeSubstituteCustomerOrderCataloguePropertyVO> properties = catalogue.getProperties();
+            if (CollectionUtil.isEmpty(properties)) {
+                continue;
+            }
 
             //固定字段写入值
             List<WeSubstituteCustomerOrderCataloguePropertyVO> fixedProperties = properties.stream().filter(i -> i.getFixed().equals(1)).collect(Collectors.toList());
@@ -290,6 +293,8 @@ public class WeSubstituteCustomerOrderServiceImpl extends ServiceImpl<WeSubstitu
                     break;
                 case SubstituteCustomerOrderCataloguePropertyConstants.RETURNED_RECEIPT:
                     required(property, order.getReturnedReceipt());
+                    break;
+                default:
                     break;
             }
         }

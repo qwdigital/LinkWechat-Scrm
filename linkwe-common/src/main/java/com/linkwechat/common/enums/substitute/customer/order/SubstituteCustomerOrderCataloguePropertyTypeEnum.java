@@ -13,19 +13,50 @@ import java.util.Optional;
  * @date 2023/08/03 9:45
  */
 public enum SubstituteCustomerOrderCataloguePropertyTypeEnum {
+
+    /**
+     * 单行文本
+     */
     SINGLE_LINE_TEXT(0, "单行文本"),
+    /**
+     * 多行文本
+     */
     MULTI_LINE_TEXT(1, "多行文本"),
+    /**
+     * 选项
+     */
     OPTIONS(2, "选项"),
+    /**
+     * 日期时间
+     */
     DATE_TIME(3, "日期时间"),
+    /**
+     * 选择部门
+     */
     DEPT(4, "选择部门"),
+    /**
+     * 选择员工
+     */
     USER(5, "选择员工"),
+    /**
+     * 数字
+     */
     NUMBER(6, "数字"),
+    /**
+     * 附件
+     */
     ATTACHMENT(7, "附件");
 
 
-    private Integer code;
+    /**
+     * 编码
+     */
+    private final Integer code;
 
-    private String type;
+    /**
+     * 类型
+     */
+    private final String type;
 
 
     SubstituteCustomerOrderCataloguePropertyTypeEnum(Integer code, String type) {

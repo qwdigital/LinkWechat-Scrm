@@ -61,4 +61,11 @@ public class WeSubstituteCustomerOrderVO {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private LocalDateTime orderTime;
 
+
+    /**
+     * 商品数量
+     */
+    @ApiModelProperty("商品数量")
+    private Integer amount;
+
 }

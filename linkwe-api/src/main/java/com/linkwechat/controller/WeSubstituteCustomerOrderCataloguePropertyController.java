@@ -62,7 +62,7 @@ public class WeSubstituteCustomerOrderCataloguePropertyController extends BaseCo
         List<WeSubstituteCustomerOrderCatalogueProperty> list = weSubstituteCustomerOrderCataloguePropertyService.list(queryWrapper);
         TableDataInfo dataTable = getDataTable(list);
         List<WeSubstituteCustomerOrderCataloguePropertyVO> vos = BeanUtil.copyToList(list, WeSubstituteCustomerOrderCataloguePropertyVO.class);
-        vos.stream().forEach(i -> i.setTypeStr(SubstituteCustomerOrderCataloguePropertyTypeEnum.byCode(i.getType())));
+        vos.forEach(i -> i.setTypeStr(SubstituteCustomerOrderCataloguePropertyTypeEnum.byCode(i.getType())));
         dataTable.setRows(vos);
         return dataTable;
     }

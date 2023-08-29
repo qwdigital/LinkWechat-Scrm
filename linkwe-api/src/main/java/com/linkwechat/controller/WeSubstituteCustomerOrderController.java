@@ -50,8 +50,7 @@ public class WeSubstituteCustomerOrderController extends BaseController {
     public TableDataInfo page(WeSubstituteCustomerOrderRequest request) {
         startPage();
         List<WeSubstituteCustomerOrderVO> list = weSubstituteCustomerOrderService.selectList(request);
-        TableDataInfo dataTable = getDataTable(list);
-        return dataTable;
+        return getDataTable(list);
     }
 
     /**
