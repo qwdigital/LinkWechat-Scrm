@@ -81,23 +81,23 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
         try {
             List<WeTag> weTags = weTagGroup.getWeTags();
-            if(CollectionUtil.isNotEmpty(weTags)){
+            if (CollectionUtil.isNotEmpty(weTags)) {
                 //客户企业标签(需要同步到企业微信端)
-                if(weTagGroup.getGroupTagType().equals(new Integer(1))){
-                    iWeTagService.addWxTag(weTagGroup,weTags);
-                }else{
+                if (weTagGroup.getGroupTagType().equals(new Integer(1))) {
+                    iWeTagService.addWxTag(weTagGroup, weTags);
+                } else {
                     weTagGroup.setId(SnowFlakeUtil.nextId());
                     weTagGroup.setGroupId(String.valueOf(weTagGroup.getId()));
-                    weTags.stream().forEach(k->{
-                        Long weTagId=SnowFlakeUtil.nextId();
+                    weTags.stream().forEach(k -> {
+                        Long weTagId = SnowFlakeUtil.nextId();
                         k.setId(weTagId);
                         k.setTagId(String.valueOf(weTagId));
                     });
                 }
 
                 //群标签或者个人标签(无需同步企业微信端)
-                if(this.save(weTagGroup)) {
-                    weTags.stream().forEach(k->{
+                if (this.save(weTagGroup)) {
+                    weTags.stream().forEach(k -> {
                         k.setGroupId(
                                 StringUtils.isNotEmpty(weTagGroup.getGroupId())
                                         ? weTagGroup.getGroupId()
@@ -107,7 +107,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                     iWeTagService.saveBatch(weTags);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw e;
         }
 
@@ -120,11 +120,11 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     public void updateWeTagGroup(WeTagGroup weTagGroup) {
 
         //更新标签组名称
-        if(this.updateById(weTagGroup)){
+        if (this.updateById(weTagGroup)) {
             WeTagGroup oldWeTagGroup = this.getById(weTagGroup.getId());
-            if(oldWeTagGroup != null){
+            if (oldWeTagGroup != null) {
 
-                if(!oldWeTagGroup.getGroupName().equals(weTagGroup.getGroupName())){//标签名不同则更新企业微信端
+                if (!oldWeTagGroup.getGroupName().equals(weTagGroup.getGroupName())) {//标签名不同则更新企业微信端
                     qwCustomerClient.editCorpTag(WeUpdateCorpTagQuery.builder()
                             .id(weTagGroup.getGroupId())
                             .name(weTagGroup.getGroupName())
@@ -133,50 +133,47 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
                 List<WeTag> weTags = weTagGroup.getWeTags();
 
-                List<WeTag> removeWeTags =new ArrayList<>();
+                List<WeTag> removeWeTags = new ArrayList<>();
 
-                if(CollectionUtil.isNotEmpty(weTags)){
+                if (CollectionUtil.isNotEmpty(weTags)) {
                     //新增的标签
                     List<WeTag> addWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
-                    if(CollectionUtil.isNotEmpty(addWeTags)){
-                        if(weTagGroup.getGroupTagType().equals(new Integer(1))) {
+                    if (CollectionUtil.isNotEmpty(addWeTags)) {
+                        if (weTagGroup.getGroupTagType().equals(new Integer(1))) {
                             iWeTagService.addWxTag(weTagGroup, addWeTags);
-                        }else{
-                            weTags.stream().forEach(k->{
-                                if(StringUtils.isEmpty(k.getTagId())){
-                                    Long weTagId=SnowFlakeUtil.nextId();
+                        } else {
+                            weTags.stream().forEach(k -> {
+                                if (StringUtils.isEmpty(k.getTagId())) {
+                                    Long weTagId = SnowFlakeUtil.nextId();
                                     k.setId(weTagId);
                                     k.setTagId(String.valueOf(weTagId));
                                 }
 
                             });
                         }
-                        addWeTags.stream().forEach(k->k.setGroupId(weTagGroup.getGroupId()));
+                        addWeTags.stream().forEach(k -> k.setGroupId(weTagGroup.getGroupId()));
                         iWeTagService.saveBatch(addWeTags);
                     }
 
                     removeWeTags.addAll(
                             iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
-                                            weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                                    weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
                                     .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
                     );
 
-                }else{//删除所有标签
+                } else {//删除所有标签
                     removeWeTags.addAll(
                             iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                     .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
                     );
                 }
 
-                if(CollectionUtil.isNotEmpty(removeWeTags)){
-                    iWeTagService.removeWxTag(weTagGroup.getGroupId(),removeWeTags,false);
+                if (CollectionUtil.isNotEmpty(removeWeTags)) {
+                    iWeTagService.removeWxTag(weTagGroup.getGroupId(), removeWeTags, false);
                 }
 
 
             }
-
-
-
 
 
         }
@@ -187,11 +184,11 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     public void deleteWeTagGroupByIds(String[] ids) {
 
         List<WeTagGroup> weTagGroups = this.list(new LambdaQueryWrapper<WeTagGroup>()
-                .in(WeTagGroup::getGroupId,ListUtil.toList(ids)));
+                .in(WeTagGroup::getGroupId, ListUtil.toList(ids)));
 
-        if(CollectionUtil.isNotEmpty(weTagGroups)){
-            weTagGroups.forEach(k->{
-                if(this.removeById(k.getId())){
+        if (CollectionUtil.isNotEmpty(weTagGroups)) {
+            weTagGroups.forEach(k -> {
+                if (this.removeById(k.getId())) {
                     iWeTagService.removeWxTag(k.getGroupId(),
                             iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                     .eq(WeTag::getGroupId, k.getId())),
@@ -202,8 +199,6 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             });
 
         }
-
-
 
 
     }
@@ -227,7 +222,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
         SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
-        this.synchWeGroupAndTag(null,null);
+        this.synchWeGroupAndTag(null, null);
 
     }
 
@@ -235,18 +230,18 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     @Override
     @Transactional
     @Async
-    public void synchWeGroupAndTag(String businessId,String tagType){
+    public void synchWeGroupAndTag(String businessId, String tagType) {
 
 
         WeCorpTagListQuery weCorpTagListQuery = new WeCorpTagListQuery();
 
 
-        if(StringUtils.isNotEmpty(tagType)){
-            if(TagSynchEnum.TAG_TYPE.getType().equals(tagType)){
+        if (StringUtils.isNotEmpty(tagType)) {
+            if (TagSynchEnum.TAG_TYPE.getType().equals(tagType)) {
                 weCorpTagListQuery.setTag_id(
                         ListUtil.toList(businessId)
                 );
-            }else if(TagSynchEnum.GROUP_TAG_TYPE.getType().equals(tagType)){
+            } else if (TagSynchEnum.GROUP_TAG_TYPE.getType().equals(tagType)) {
                 weCorpTagListQuery.setGroup_id(
                         ListUtil.toList(businessId)
                 );
@@ -259,9 +254,9 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
         WeCorpTagListVo weCorpTagListVo = qwCustomerClient.getCorpTagList(weCorpTagListQuery).getData();
 
-        if(null != weCorpTagListVo){
+        if (null != weCorpTagListVo) {
             List<WeCorpTagGroupEntity> tagGroup = weCorpTagListVo.getTagGroup();
-            if(CollectionUtil.isNotEmpty(tagGroup)) {
+            if (CollectionUtil.isNotEmpty(tagGroup)) {
 
                 tagGroup.stream().forEach(k -> {
                     WeTagGroup weTagGroup = new WeTagGroup();
@@ -299,14 +294,14 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             }
         }
 
-        if(StringUtils.isEmpty(tagType)&&StringUtils.isEmpty(businessId)){
+        if (StringUtils.isEmpty(tagType) && StringUtils.isEmpty(businessId)) {
             //先移除所有
             List<WeTagGroup> oldWeTagGroups = this.list(new LambdaQueryWrapper<WeTagGroup>()
                     .eq(WeTagGroup::getGroupTagType, 1));
-            if(CollectionUtil.isNotEmpty(oldWeTagGroups)){
+            if (CollectionUtil.isNotEmpty(oldWeTagGroups)) {
 
-                if(this.removeByIds(oldWeTagGroups.stream()
-                        .map(WeTagGroup::getId).collect(Collectors.toList()))){
+                if (this.removeByIds(oldWeTagGroups.stream()
+                        .map(WeTagGroup::getId).collect(Collectors.toList()))) {
 
                     iWeTagService.remove(new LambdaQueryWrapper<WeTag>()
                             .in(WeTag::getGroupId,
@@ -317,14 +312,14 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
         }
 
         //根据企业微信返回的，存在状态恢复，不存在的新增
-        if(CollectionUtil.isNotEmpty(weTagGroups)){
+        if (CollectionUtil.isNotEmpty(weTagGroups)) {
             this.baseMapper.batchAddOrUpdate(weTagGroups);
         }
 
-        List<List<WeTag>>  handleWeTags
+        List<List<WeTag>> handleWeTags
                 = weTagGroups.stream().map(WeTagGroup::getWeTags).collect(Collectors.toList());
 
-        if(CollectionUtil.isNotEmpty(handleWeTags)){
+        if (CollectionUtil.isNotEmpty(handleWeTags)) {
             iWeTagService.batchAddOrUpdate(handleWeTags.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll));
         }
 
