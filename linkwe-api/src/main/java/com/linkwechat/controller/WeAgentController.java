@@ -59,17 +59,17 @@ public class WeAgentController extends BaseController {
     @ApiOperation(value = "新增应用信息", httpMethod = "POST")
     @PostMapping("/add")
     public AjaxResult addAgent(@RequestBody @Validated WeAgentAddQuery query) {
-        log.info("新增应用信息入参query:{}", JSONObject.toJSONString(query));
-        //校验新增的应用是否存在
-        WeAgentQuery weAgentQuery = new WeAgentQuery();
-        weAgentQuery.setAgentid(String.valueOf(query.getAgentId()));
-        weAgentQuery.setCorpid(SecurityUtils.getCorpId());
-        WeAgentDetailVo weAgentDetailVo = qwAgentClient.getAgentDetail(weAgentQuery).getData();
-
-
-        if(null == weAgentDetailVo){
-            return AjaxResult.error("当前应用不存在");
-        }
+//        log.info("新增应用信息入参query:{}", JSONObject.toJSONString(query));
+//        //校验新增的应用是否存在
+//        WeAgentQuery weAgentQuery = new WeAgentQuery();
+//        weAgentQuery.setAgentid(String.valueOf(query.getAgentId()));
+//        weAgentQuery.setCorpid(SecurityUtils.getCorpId());
+//        WeAgentDetailVo weAgentDetailVo = qwAgentClient.getAgentDetail(weAgentQuery).getData();
+//
+//
+//        if(null == weAgentDetailVo){
+//            return AjaxResult.error("当前应用不存在");
+//        }
 
         Integer id = weAgentInfoService.addAgent(query);
         return AjaxResult.success(id);

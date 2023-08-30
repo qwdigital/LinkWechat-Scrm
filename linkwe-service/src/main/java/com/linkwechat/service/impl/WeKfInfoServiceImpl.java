@@ -18,6 +18,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.MessageType;
@@ -107,6 +108,10 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+
+    @Autowired
+    private IWeCustomerService iWeCustomerService;
 
     @Value("${wecom.kf.end.msgmenu.content:}")
     private String kfEndMsgMenuContent;
@@ -385,9 +390,9 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
                 SysUserQuery userQuery = new SysUserQuery();
                 userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 try {
-                    List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+                    List<SysUser> sysUserList = qwSysUserClient.findSysUser(userQuery).getData();
                     if(CollectionUtil.isNotEmpty(sysUserList)){
-                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserName, (key1, key2) -> key2));
                         userId2NameMap.putAll(userMap);
                     }
                 } catch (Exception e) {

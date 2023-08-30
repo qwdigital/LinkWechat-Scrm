@@ -181,26 +181,16 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
         String weAccessToken = redisService.getCacheObject(weAgentTokenKey);
         //为空,请求微信服务器同时缓存到redis中
         if (StringUtils.isEmpty(weAccessToken)) {
-//            WeAgentInfo weAgentInfo = weAgentInfoService.getAgentInfoByAgentId(agentId);
-//            if (Objects.isNull(weAgentInfo)) {
-//                throw new WeComException("无可用的应用");
-//            }
-            List<WeCorpAccount> weCorpAccounts = iWxCorpAccountService.list(new LambdaQueryWrapper<WeCorpAccount>().eq(
-                    WeCorpAccount::getDelFlag, Constants.COMMON_STATE
-            ));
-
-            if(CollectionUtil.isNotEmpty(weCorpAccounts)){
-
-                WeCorpAccount weCorpAccount = weCorpAccounts.stream().findFirst().get();
-                WeCorpTokenVo weCorpTokenVo = weTokenClient.getToken(weCorpAccount.getCorpId(), weCorpAccount.getCorpSecret());
-
-                if (Objects.nonNull(weCorpTokenVo) && StringUtils.isNotEmpty(weCorpTokenVo.getAccessToken())) {
-                    weAccessToken = weCorpTokenVo.getAccessToken();
-                    redisService.setCacheObject(weAgentTokenKey, weCorpTokenVo.getAccessToken(), weCorpTokenVo.getExpiresIn(), TimeUnit.SECONDS);
-                }
-
+            WeAgentInfo weAgentInfo = weAgentInfoService.getAgentInfoByAgentId(agentId);
+            if (Objects.isNull(weAgentInfo)) {
+                throw new WeComException("无可用的应用");
             }
+            WeCorpTokenVo weCorpTokenVo = weTokenClient.getToken(corpId, weAgentInfo.getSecret());
 
+            if (Objects.nonNull(weCorpTokenVo) && StringUtils.isNotEmpty(weCorpTokenVo.getAccessToken())) {
+                weAccessToken = weCorpTokenVo.getAccessToken();
+                redisService.setCacheObject(weAgentTokenKey, weCorpTokenVo.getAccessToken(), weCorpTokenVo.getExpiresIn(), TimeUnit.SECONDS);
+            }
 
         }
         return weAccessToken;

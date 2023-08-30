@@ -94,7 +94,7 @@
             wg.notice,
             wg.status,
             wg.`owner`,
-            su.user_name as groupLeaderName,
+            IFNULL(su.user_name,wg.`owner`) as groupLeaderName,
             count(DISTINCT wgm.user_id) as memberNum,
             count(DISTINCT IF(wgm.type = 2,1, 0)) as customerNum,
             sum(IF(date_format(wgm.join_time, '%Y-%m-%d') = date_format(now(), '%Y-%m-%d') and wgm.quit_scene IS NULL, 1, 0)) as toDayMemberNum,

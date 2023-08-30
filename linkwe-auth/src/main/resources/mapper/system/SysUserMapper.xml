@@ -606,7 +606,10 @@
         sd.dept_id as sdept_id,
         sd.parent_id,
         sd.dept_name
+
+
         from sys_user su
+
         inner join sys_user_dept sud on sud.user_id = su.user_id and sud.del_flag = 0
         inner join sys_dept sd on sd.dept_id = sud.dept_id and sd.del_flag = 0
         inner join sys_user_role sr on sr.user_id = su.user_id
