@@ -267,6 +267,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     for (List<WeCustomerDetailVo> details : userDetailPartition) {
                         this.weFlowerCustomerHandle(details, currentTenantSysUser);
                     }
+
                 }
             }
         }
@@ -390,21 +391,22 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             }
 
             //更新已流失的客户数据
-            LambdaQueryWrapper<WeCustomer> wrapper = Wrappers.lambdaQuery(WeCustomer.class);
-            wrapper.select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId);
-            wrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-            wrapper.ne(WeCustomer::getTrackState, 5);
-            List<WeCustomer> list = this.list(wrapper);
-            List<WeCustomer> collect = weCustomerList.stream().map(i -> WeCustomer.builder().externalUserid(i.getExternalUserid()).addUserId(i.getAddUserId()).build()).collect(Collectors.toList());
-            if (list.removeAll(collect)) {
-                for (WeCustomer weCustomer : list) {
-                    LambdaUpdateWrapper<WeCustomer> updateWrapper = Wrappers.lambdaUpdate(WeCustomer.class);
-                    updateWrapper.eq(WeCustomer::getAddUserId, weCustomer.getAddUserId());
-                    updateWrapper.eq(WeCustomer::getExternalUserid, weCustomer.getExternalUserid());
-                    updateWrapper.set(WeCustomer::getTrackState, 5);
-                    this.update(updateWrapper);
-                }
-            }
+//            LambdaQueryWrapper<WeCustomer> wrapper = Wrappers.lambdaQuery(WeCustomer.class);
+//            wrapper.select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId);
+//            wrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+//            wrapper.ne(WeCustomer::getTrackState, 5);
+//            List<WeCustomer> list = this.list(wrapper);
+//            List<WeCustomer> collect = weCustomerList.stream().map(i -> WeCustomer.builder().externalUserid(i.getExternalUserid()).addUserId(i.getAddUserId()).build()).collect(Collectors.toList());
+//            if (list.removeAll(collect)) {
+//                for (WeCustomer weCustomer : list) {
+//                    LambdaUpdateWrapper<WeCustomer> updateWrapper = Wrappers.lambdaUpdate(WeCustomer.class);
+//                    updateWrapper.eq(WeCustomer::getAddUserId, weCustomer.getAddUserId());
+//                    updateWrapper.eq(WeCustomer::getExternalUserid, weCustomer.getExternalUserid());
+//                    updateWrapper.set(WeCustomer::getTrackState, 5);
+//                    this.update(updateWrapper);
+//                }
+//            }
+
         }
     }
 
