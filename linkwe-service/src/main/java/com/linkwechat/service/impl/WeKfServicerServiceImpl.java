@@ -349,7 +349,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
         AjaxResult<WeResultVo> result = qwKfClient.customerUpgradeService(query);
         if (result.getCode() == HttpStatus.SUCCESS) {
             if (!result.getData().getErrCode().equals(0)) {
-                throw new ServiceException(result.getMsg());
+                throw new ServiceException(result.getData().getErrMsg());
             }
         }
     }
