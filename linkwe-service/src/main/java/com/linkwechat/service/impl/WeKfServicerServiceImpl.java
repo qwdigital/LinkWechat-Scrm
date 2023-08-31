@@ -3,7 +3,6 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -18,6 +17,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.WeKfEventMsg;
 import com.linkwechat.domain.WeKfServicer;
 import com.linkwechat.domain.groupchat.vo.WeGroupSimpleVo;
 import com.linkwechat.domain.kf.WeKfUser;
@@ -39,6 +39,7 @@ import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeKfServicerMapper;
 import com.linkwechat.service.IWeGroupService;
+import com.linkwechat.service.IWeKfEventMsgService;
 import com.linkwechat.service.IWeKfServicerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,9 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
 
     @Resource
     private IWeGroupService weGroupService;
+
+    @Resource
+    private IWeKfEventMsgService weKfEventMsgService;
 
     @Override
     public List<WeKfUser> getServicerByKfId(Long kfId) {
@@ -331,6 +335,17 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
 
     @Override
     public void upgradeService(WeUpgradeServiceQuery query) {
+        LambdaQueryWrapper<WeKfEventMsg> queryWrapper = Wrappers.lambdaQuery(WeKfEventMsg.class);
+        queryWrapper.eq(WeKfEventMsg::getExternalUserid, query.getExternal_userid());
+        queryWrapper.eq(WeKfEventMsg::getEventType, "enter_session");
+        queryWrapper.eq(WeKfEventMsg::getDelFlag, Constants.COMMON_STATE);
+        queryWrapper.orderByDesc(WeKfEventMsg::getCreateTime);
+        queryWrapper.last("limit 1");
+        WeKfEventMsg one = weKfEventMsgService.getOne(queryWrapper);
+        if (BeanUtil.isEmpty(one)) {
+            throw new ServiceException("数据延迟，请稍后再试！");
+        }
+        query.setOpen_kfid(one.getOpenKfId());
         AjaxResult<WeResultVo> result = qwKfClient.customerUpgradeService(query);
         if (result.getCode() == HttpStatus.SUCCESS) {
             if (!result.getData().getErrCode().equals(0)) {
