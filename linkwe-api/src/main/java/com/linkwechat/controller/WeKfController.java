@@ -302,8 +302,8 @@ public class WeKfController extends BaseController {
      * @author WangYX
      * @date 2023/08/25 13:53
      */
-    @GetMapping("/upgrade/service")
-    public AjaxResult upgradeService(WeUpgradeServiceQuery query) {
+    @PostMapping("/upgrade/service")
+    public AjaxResult upgradeService(@RequestBody WeUpgradeServiceQuery query) {
         weKfServicerService.upgradeService(query);
         return AjaxResult.success();
     }
