@@ -152,6 +152,12 @@ public class WeSubstituteCustomerOrderAddRequest {
     private Integer status;
 
     /**
+     * 外部联系人的userid
+     */
+    @ApiModelProperty("外部联系人的userid")
+    private String externalUserid;
+
+    /**
      * 自定义属性
      */
     @ApiModelProperty("自定义属性")

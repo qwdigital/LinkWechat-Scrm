@@ -21,6 +21,12 @@ public class WeSubstituteCustomerOrderRequest {
     private String orderStatus;
 
     /**
+     * 外部联系人的userid
+     */
+    @ApiModelProperty("外部联系人的userid")
+    private String externalUserid;
+
+    /**
      * 员工Id
      */
     @ApiModelProperty("员工Id")

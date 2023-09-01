@@ -168,4 +168,10 @@ public class WeSubstituteCustomerOrder extends BaseEntity {
     @ApiModelProperty("删除标识")
     private Integer delFlag;
 
+    /**
+     * 外部联系人的userid
+     */
+    @ApiModelProperty("外部联系人的userid")
+    private String externalUserid;
+
 }
