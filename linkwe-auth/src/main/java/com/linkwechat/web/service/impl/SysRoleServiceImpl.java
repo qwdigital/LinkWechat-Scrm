@@ -343,9 +343,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public int deleteRoleById(Long roleId) {
-        if (countUserRoleByRoleId(roleId) > 0) {
-            throw new CustomException("当前角色已分配不可删除");
-        }
+
 
         return roleMapper.deleteRoleById(roleId);
     }

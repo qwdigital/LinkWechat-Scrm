@@ -7,6 +7,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -159,8 +160,8 @@ public class SysRoleController extends BaseController {
 
     @DeleteMapping("/{roleIds}")
     @ApiOperation(value = "删除角色")
-    public AjaxResult remove(@PathVariable Long roleIds) {
-        return toAjax(roleService.deleteRoleById(roleIds));
+    public AjaxResult remove(@PathVariable Long[] roleIds) {
+        return toAjax(roleService.deleteRoleByIds(roleIds));
     }
 
     /**
