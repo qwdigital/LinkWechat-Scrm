@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSubstituteCustomerOrderCataloguePropertyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrderCatalogueProperty">
+        <id column="id" property="id"/>
+        <result column="catalogue_id" property="catalogueId"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="type" property="type"/>
+        <result column="is_require" property="required"/>
+        <result column="expound" property="expound"/>
+        <result column="value" property="value"/>
+        <result column="sort" property="sort"/>
+        <result column="is_fixed" property="fixed"/>
+        <result column="is_money" property="money"/>
+        <result column="is_to_time" property="toTime"/>
+        <result column="is_multiple_choice" property="multipleChoice"/>
+        <result column="is_more" property="more"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, catalogue_id, `name`,`code`, type, is_require, expound, `value`, sort, is_fixed, is_money, is_to_time, is_multiple_choice, is_more, create_time, update_time, create_by, update_by, update_by_id, create_by_id, del_flag
+    </sql>
+
+</mapper>

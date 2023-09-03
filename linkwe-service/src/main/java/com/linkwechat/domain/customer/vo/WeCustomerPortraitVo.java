@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.linkwechat.domain.WeCustomerInfoExpand;
 import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class WeCustomerPortraitVo {
     //备注客户手机号
     private String remarkMobiles;
     //客户生日
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
     //邮箱
     private String email;
@@ -93,11 +94,26 @@ public class WeCustomerPortraitVo {
     private String customerFullName;
 
 
-
-
     //客户信息拓展
     private List<WeCustomerInfoExpand> weCustomerInfoExpands;
 
+    /**
+     * 添加方式
+     *
+     * @see com.linkwechat.common.enums.CustomerAddWay
+     */
+    private Integer addMethod;
+
+    /**
+     * 添加方式
+     */
+    private String addMethodStr;
+
+    /**
+     * 添加时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT-8")
+    private Date addTime;
 
 
 }

@@ -133,11 +133,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
-    public List<WeCustomersVo>  findWeCustomerInfoFromWechat(List<String> externalUserids){
-        List<WeCustomersVo> weCustomersVos=new ArrayList<>();
+    public List<WeCustomersVo> findWeCustomerInfoFromWechat(List<String> externalUserids) {
+        List<WeCustomersVo> weCustomersVos = new ArrayList<>();
 
 
-        if(CollectionUtil.isNotEmpty(externalUserids)) {
+        if (CollectionUtil.isNotEmpty(externalUserids)) {
 
             List<WeCustomer> weCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
                     .in(WeCustomer::getExternalUserid, externalUserids));
@@ -151,7 +151,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             = weCustomers.stream().filter(item -> item.getExternalUserid().equals(k)).collect(Collectors.toList());
                     if (CollectionUtil.isNotEmpty(weCustomerss)) {
 
-                        weCustomersVo.setCustomerName( weCustomerss.stream().findFirst().get().getCustomerName());
+                        weCustomersVo.setCustomerName(weCustomerss.stream().findFirst().get().getCustomerName());
                     }
                 }
 
@@ -267,7 +267,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     for (List<WeCustomerDetailVo> details : userDetailPartition) {
                         this.weFlowerCustomerHandle(details, currentTenantSysUser);
                     }
-
                 }
             }
         }
@@ -387,7 +386,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
-                weCustomers.stream().forEach(fWeCustomer -> iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer));
+                weCustomers.forEach(fWeCustomer -> iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer));
             }
 
             //更新已流失的客户数据
@@ -406,7 +405,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //                    this.update(updateWrapper);
 //                }
 //            }
-
         }
     }
 
@@ -518,7 +516,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                                     TrajectorySceneType.TRAJECTORY_TITLE_GXGRBQ.getType(),
                             String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
                     );
-                }else{
+                } else {
 
                     iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
                             weMakeCustomerTag.getUserId(),
@@ -787,6 +785,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public WeCustomerPortraitVo findCustomerByOperUseridAndCustomerId(String externalUserid, String userid) throws Exception {
         WeCustomerPortraitVo weCustomerPortrait
                 = this.baseMapper.findCustomerByOperUseridAndCustomerId(externalUserid, userid);
+        //添加方式
+        weCustomerPortrait.setAddMethodStr(CustomerAddWay.of(weCustomerPortrait.getAddMethod()).getVal());
 
         if (null != weCustomerPortrait) {
             if (weCustomerPortrait.getBirthday() != null) {
@@ -826,7 +826,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
         //相关备注信息同步企业微信
-        UpdateCustomerRemarkQuery remarkQuery=new UpdateCustomerRemarkQuery();
+        UpdateCustomerRemarkQuery remarkQuery = new UpdateCustomerRemarkQuery();
         remarkQuery.setUserid(weCustomerPortrait.getUserId());
         remarkQuery.setExternal_userid(weCustomerPortrait.getExternalUserid());
         remarkQuery.setDescription(weCustomerPortrait.getOtherDescr());
@@ -838,9 +838,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomerPortrait.getCustomerFullName()
         );
         AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.updateCustomerRemark(remarkQuery);
-        if(null != weResultVoAjaxResult){
+        if (null != weResultVoAjaxResult) {
             WeResultVo weResultVo = weResultVoAjaxResult.getData();
-            if(weResultVo != null && weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+            if (weResultVo != null && weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)) {
                 if (this.update(weCustomer, new LambdaQueryWrapper<WeCustomer>()
                         .eq(WeCustomer::getAddUserId, weCustomerPortrait.getUserId())
                         .eq(WeCustomer::getExternalUserid, weCustomerPortrait.getExternalUserid()))) {
@@ -858,11 +858,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     );
                 }
             }
-        }else{
+        } else {
             throw new WeComException("数据同步企微端失败,请稍后重试");
         }
-
-
 
 
     }
@@ -1168,6 +1166,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                             .delFlag(0)
                             .build()).collect(Collectors.toList());
                     iWeFlowerCustomerTagRelService.batchAddOrUpdate(ListUtil.toList(tagRels));
+                } else {
+
+                    iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                            .eq(WeFlowerCustomerTagRel::getExternalUserid, externalUserId)
+                            .eq(WeFlowerCustomerTagRel::getUserId, userId));
                 }
 
             }
@@ -1380,7 +1383,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public List<WeCustomerChannelCountVo> countCustomerChannel(String state, String startTime, String endTime, Integer delFlag) {
-        return this.baseMapper.countCustomerChannel(state,startTime,endTime,delFlag);
+        return this.baseMapper.countCustomerChannel(state, startTime, endTime, delFlag);
     }
 
     @Override
