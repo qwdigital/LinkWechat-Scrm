@@ -15,7 +15,7 @@ WHERE
 ---
   ### ● 日期：2023.06.09
   ```
-  alter table we_qr_code add rule_mode tinyint default 1 null comment '排班方式 1：轮询 2：顺序 3：随机' after rule_type;
+alter table we_qr_code add rule_mode tinyint default 1 null comment '排班方式 1：轮询 2：顺序 3：随机' after rule_type;
 alter table we_qr_code add open_spare_user tinyint default 0 null comment '开启备用员工 0：否 1：是' after rule_mode;
 alter table we_qr_scope add scheduling_num int default 0 null comment '排班次数' after status;
 alter table we_qr_scope add is_spare_user tinyint default 0 null comment '是否备用员工 0：否 1：是' after scheduling_num;
@@ -857,3 +857,130 @@ ALTER TABLE `we_fission` ADD COLUMN `active_cover_type` tinyint(4) NULL DEFAULT 
 ALTER TABLE `we_fission` ADD COLUMN `active_cover_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '封面图片地址' AFTER `active_cover_type`;
 
 ALTER TABLE `we_group_code_range` ADD COLUMN `status` tinyint(4) NULL DEFAULT NULL COMMENT '关联状态 0-未关联 1-关联' AFTER `chat_id`;
+
+  ```
+---
+  ### ● 日期：2023.06.09
+  ```
+
+ALTER TABLE `we_substitute_customer_order` ADD COLUMN `external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '外部联系人的userid' AFTER `del_flag`;
+
+ALTER TABLE `we_substitute_customer_order` MODIFY COLUMN `discount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '付款折扣' AFTER `total_price`;
+
+ALTER TABLE `we_substitute_customer_order` MODIFY COLUMN `discount_amount` decimal(9, 2) NULL DEFAULT NULL COMMENT '折扣金额' AFTER `discount`;
+
+ALTER TABLE `we_tasks` MODIFY COLUMN `send_time` datetime NULL DEFAULT NULL COMMENT '发送时间' AFTER `content`;
+
+ALTER TABLE we_leads DROP INDEX phone_unique;
+ALTER TABLE `we_substitute_customer_order` ADD COLUMN `external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '外部联系人的userid' AFTER `del_flag`;
+
+DELETE FROM sys_menu WHERE menu_name = '系统管理' AND menu_id=1
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2462, '订单信息', 2367, 2, 'orderInfo', 'salesCenter/orderInfo/index', 1, 'C', '0', '0', 'salesCenter:orderInfo:index', '#', 'admin', NULL, '2023-08-10 16:08:45', 'admin', NULL, '2023-08-17 11:23:25', '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2470, '知识中心', 2230, 45, 'knowledgeBase', NULL, 1, 'M', '0', '0', NULL, '#', 'admin', NULL, '2023-08-21 15:59:46', NULL, NULL, NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2471, '客服问答库', 2470, 1, 'kfKnowledge', NULL, 1, 'M', '0', '0', NULL, '#', 'admin', NULL, '2023-08-21 16:01:27', NULL, NULL, NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2472, '列表', 2471, 1, 'index', 'customerService/knowledgeBase/index', 1, 'C', '1', '0', NULL, '#', 'admin', NULL, '2023-08-21 16:02:34', NULL, NULL, NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2473, '{新增}', 2471, 2, 'add', 'customerService/knowledgeBase/add', 1, 'C', '1', '0', NULL, '#', 'admin', NULL, '2023-08-21 16:07:19', NULL, NULL, NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2474, '详情', 2471, 3, 'detail', 'customerService/knowledgeBase/detail', 1, 'C', '1', '0', NULL, '#', 'admin', NULL, '2023-08-21 16:08:16', NULL, NULL, NULL, '');
+
+CREATE TABLE `we_common_link_stat`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `short_id` bigint(20) NOT NULL COMMENT '短链ID',
+  `date_time` datetime NOT NULL COMMENT '日期',
+  `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接渠道',
+  `pv_num` int(11) NULL DEFAULT 0 COMMENT 'PV数量',
+  `uv_num` int(11) NULL DEFAULT 0 COMMENT 'UV数量',
+  `open_num` int(11) NULL DEFAULT 0 COMMENT '打开小程序数量',
+  `remark` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备用',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人ID',
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` tinyint(4) NULL DEFAULT 0 COMMENT '删除标识 0 有效 1 删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '短链通用统计表' ROW_FORMAT = DYNAMIC;
+
+
+CREATE TABLE `we_kf_answer`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `group_id` bigint(64) NOT NULL COMMENT '活码分组id',
+  `intent_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '企微问答ID',
+  `qt_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '问题名称',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+  `del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否删除:0有效,1删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '客服问答信息表' ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `we_kf_answer_attachments`  (
+  `id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `answer_id` bigint(64) NOT NULL COMMENT '活码id',
+  `material_id` bigint(20) NULL DEFAULT NULL COMMENT '素材Id',
+  `msg_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '消息类型 文本:text 图片:image 图文:link 小程序:miniprogram 视频:video 文件:file ',
+  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息内容',
+  `media_id` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '媒体id',
+  `title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息标题',
+  `description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息描述',
+  `file_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件路径',
+  `link_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息链接',
+  `pic_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息图片地址',
+  `app_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '小程序appid',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+  `del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '删除标识 0 有效 1删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '客服问答回答表' ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `we_kf_answer_group`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `group_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '分组ID',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '分组名称',
+  `is_default` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否为默认分组。0-否 1-是 默认分组为系统自动创建，不可修改/删除',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+  `del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否删除:0有效,1删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '客服问答分组表' ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `we_kf_answer_like_question`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `answer_id` bigint(64) NOT NULL COMMENT '问答id',
+  `qt_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '问题名称',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+  `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+  `del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否删除:0有效,1删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '客服问答相似问题表' ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `we_material_seize_poster`  (
+  `id` bigint(20) NOT NULL COMMENT '主键',
+  `material_id` bigint(20) NULL DEFAULT NULL COMMENT '素材id，为海报类型且海报上的二维码为占位符类型的素材',
+  `real_post_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '实际海报图片地址',
+  `belong_we_user_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '海报上的二维码归属人id，为员工的we_user_id',
+  `config_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '新增联系方式的配置id',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` int(1) NULL DEFAULT 0 COMMENT '0 未删除 1 已删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '素材海报占位符海报生成的实际海报' ROW_FORMAT = DYNAMIC;
