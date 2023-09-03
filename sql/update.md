@@ -825,3 +825,35 @@ PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单分类字段' ROW_FORMAT = Dynamic;
 
 ALTER TABLE `we_tasks` ADD COLUMN `record_id` bigint(20) NULL DEFAULT NULL COMMENT '线索中心-跟进记录Id' AFTER `is_visible`;
+
+---
+
+---
+### ● 日期：2023.08.28
+  ```
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2468, '系统监控', 2185, 9, 'system', NULL, 1, 'M', '0', '0', NULL, 'app', 'admin', NULL, '2023-08-26 16:41:35', NULL, NULL, NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2469, '企微异常', 2468, 1, 'system/exception', 'system/exception/index', 1, 'C', '0', '0', '', 'build', 'admin', NULL, '2023-08-26 17:01:15', 'admin', NULL, '2023-08-26 17:08:45', '');
+CREATE TABLE `we_error_msg`  (
+  `id` bigint(20) NOT NULL COMMENT '主键',
+  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求url',
+  `error_code` bigint(20) NULL DEFAULT NULL COMMENT '错误码',
+  `error_msg` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '错误信息',
+  `we_params` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '请求参数',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '企业微信响应错误参数记录表' ROW_FORMAT = Dynamic;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动名称' AFTER `fission_url`;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动描述' AFTER `active_title`;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_cover_type` tinyint(4) NULL DEFAULT 1 COMMENT '1:海报缩略图 2:自定义' AFTER `active_descr`;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_cover_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '封面图片地址' AFTER `active_cover_type`;
+
+ALTER TABLE `we_group_code_range` ADD COLUMN `status` tinyint(4) NULL DEFAULT NULL COMMENT '关联状态 0-未关联 1-关联' AFTER `chat_id`;
