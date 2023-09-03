@@ -158,10 +158,13 @@ public class SysRoleController extends BaseController {
 //        return toAjax(roleService.deleteRoleByIds(roleIds));
 //    }
 
-    @DeleteMapping("/{roleIds}")
+    @DeleteMapping("/{roleId}")
     @ApiOperation(value = "删除角色")
-    public AjaxResult remove(@PathVariable Long[] roleIds) {
-        return toAjax(roleService.deleteRoleByIds(roleIds));
+    public AjaxResult remove(@PathVariable Long roleId) {
+        if (roleService.countUserRoleByRoleId(roleId) > 0) {
+            return AjaxResult.error("当前角色已分配不可删除");
+        }
+        return toAjax(roleService.deleteRoleById(roleId));
     }
 
     /**
