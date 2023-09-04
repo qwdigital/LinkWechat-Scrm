@@ -7,6 +7,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -151,10 +152,15 @@ public class SysRoleController extends BaseController {
      */
     //@PreAuthorize("@ss.hasPermi('system:role:remove')")
 //    @Log(title = "角色管理", businessType = BusinessType.DELETE)
-    @DeleteMapping("/{roleIds}")
+    @DeleteMapping("/{roleId}")
     @ApiOperation(value = "删除角色")
-    public AjaxResult remove(@PathVariable Long[] roleIds) {
-        return toAjax(roleService.deleteRoleByIds(roleIds));
+    public AjaxResult remove(@PathVariable Long roleId) {
+
+        if (roleService.countUserRoleByRoleId(roleId) > 0) {
+            return AjaxResult.error("当前角色已分配不可删除");
+        }
+
+        return toAjax(roleService.deleteRoleById(roleId));
     }
 
     /**
