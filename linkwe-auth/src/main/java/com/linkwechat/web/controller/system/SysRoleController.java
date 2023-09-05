@@ -20,6 +20,7 @@ import com.linkwechat.web.service.SysPermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -150,13 +151,14 @@ public class SysRoleController extends BaseController {
     /**
      * 删除角色
      */
-    //@PreAuthorize("@ss.hasPermi('system:role:remove')")
+    //
 //    @Log(title = "角色管理", businessType = BusinessType.DELETE)
 //    @DeleteMapping("/{roleIds}")
 //    @ApiOperation(value = "删除角色")
 //    public AjaxResult remove(@PathVariable Long[] roleIds) {
 //        return toAjax(roleService.deleteRoleByIds(roleIds));
 //    }
+
 
     @DeleteMapping("/{roleId}")
     @ApiOperation(value = "删除角色")
