@@ -216,7 +216,8 @@
         (SELECT GROUP_CONCAT(wt.tag_id) FROM we_flower_customer_tag_rel wfctr
         LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
         WHERE wfctr.external_userid=wc.external_userid AND wc.add_user_id=wfctr.user_id AND wt.tag_type=1 and wfctr.del_flag=0)  as tagIds,
-        wc.update_time as updateTime
+        wc.update_time as updateTime,
+        wc.area
         FROM
         we_customer wc
         WHERE
