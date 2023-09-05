@@ -267,6 +267,22 @@ public class WeFissionController  extends BaseController {
     }
 
 
+    /**
+     * 更新裂变状态
+     * @param weFission
+     * @return
+     */
+    @PostMapping("/updateFissionState")
+    public AjaxResult updateFissionState(@RequestBody WeFission weFission){
+
+        iWeFissionService.updateById(weFission);
+
+        return AjaxResult.success();
+    }
+
+
+
+
 
 
 

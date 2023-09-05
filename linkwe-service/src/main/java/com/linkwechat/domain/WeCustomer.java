@@ -148,6 +148,7 @@ public class WeCustomer extends BaseEntity {
 
     /**
      *添加方式
+     * @see com.linkwechat.common.enums.CustomerAddWay
      */
     private Integer addMethod;
 

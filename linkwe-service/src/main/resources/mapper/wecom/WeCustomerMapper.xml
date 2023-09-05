@@ -389,7 +389,9 @@
             wc.city_id,
             wc.area_id,
             wc.area,
-            wc.customer_full_name as customerFullName
+            wc.customer_full_name as customerFullName,
+            wc.add_method,
+            wc.add_time
         FROM
             we_customer wc
                 LEFT JOIN we_flower_customer_tag_rel wfcrf ON wfcrf.user_id = wc.add_user_id  AND wfcrf.external_userid=wc.external_userid AND wfcrf.del_flag=0

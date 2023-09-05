@@ -22,3 +22,15 @@
           leadsDetailUrl: /clueHighseas/detail?id={} #线索中心移动端-待办任务-详情页
   
   ```
+### ● 日期：2023.09.03
+  ```
+   ● linkwe-common.yml
+      linkwechat:
+          customerShortLinkDomainName: sl.linkwechat.net/l/
+          leadsDetailUrl: /clueHighseas/detail?id={} #线索中心移动端-待办任务-详情页
+          leadsCovenantWaitFollowUpUrl: /clueHighseas/followDetail?recordId={} #线索中心移动端-待办任务-线索约定事项待跟进-详情页
+          
+          移除
+          yshop-mall: yshop-mall
+  
+  ```

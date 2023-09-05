@@ -16,8 +16,8 @@
         FROM
             we_group_code  wgc
                 LEFT JOIN we_group_code_tag_rel wgctr ON wgc.id = wgctr.group_code_id
-                LEFT JOIN we_tag wt ON wt.tag_id=wgctr.tag_id
-        WHERE wgc.del_flag=0 and wt.del_flag=0
+                LEFT JOIN we_tag wt ON wt.tag_id=wgctr.tag_id and wt.del_flag=0
+        WHERE wgc.del_flag=0
         <if test="activityName != null  and activityName != ''">
          AND wgc.activity_name  like concat('%', #{activityName}, '%')
         </if>

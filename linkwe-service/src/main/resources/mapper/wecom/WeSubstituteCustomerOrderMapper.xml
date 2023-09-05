@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSubstituteCustomerOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.linkwechat.domain.substitute.customer.order.entity.WeSubstituteCustomerOrder">
+        <id column="id" property="id"/>
+        <result column="purchaser" property="purchaser"/>
+        <result column="phone" property="phone"/>
+        <result column="source" property="source"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_url" property="productUrl"/>
+        <result column="product_unit_price" property="productUnitPrice"/>
+        <result column="amount" property="amount"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="discount" property="discount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="actual_payment" property="actualPayment"/>
+        <result column="returned_money_type" property="returnedMoneyType"/>
+        <result column="returned_money" property="returnedMoney"/>
+        <result column="returned_date" property="returnedDate"/>
+        <result column="payer" property="payer"/>
+        <result column="returned_receipt" property="returnedReceipt"/>
+        <result column="status" property="status"/>
+        <result column="properties" property="properties"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="external_userid" property="externalUserid"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, purchaser, phone, source, order_time, dept_id, user_id, order_status, product_name, product_url, product_unit_price, amount, total_price, discount, discount_amount, actual_payment, returned_money_type, returned_money, returned_date, payer, returned_receipt, status, properties, create_time, update_time, create_by, update_by, update_by_id, create_by_id, del_flag, external_userid
+    </sql>
+
+    <!-- 订单列表 -->
+    <select id="list" resultType="com.linkwechat.domain.substitute.customer.order.vo.WeSubstituteCustomerOrderVO">
+        SELECT
+        t1.id,
+        t1.product_name,
+        t1.product_url,
+        t1.order_status,
+        t1.total_price,
+        t1.purchaser,
+        t1.order_time,
+        t1.amount
+        FROM
+        we_substitute_customer_order t1
+        LEFT JOIN sys_user t2 ON t1.create_by_id = t2.user_id
+        WHERE t1.del_flag = 0
+        <if test="userId!=null and userId!=''">
+            AND t2.we_user_id = #{userId}
+        </if>
+        <if test="externalUserid!=null and externalUserid!=''">
+            AND t1.external_userid = #{externalUserid}
+        </if>
+        <if test="orderStatus!=null and orderStatus!=''">
+            AND t1.order_status = #{orderStatus}
+        </if>
+        order by t1.create_time desc
+    </select>
+
+</mapper>
