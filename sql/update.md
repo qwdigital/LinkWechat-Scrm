@@ -746,40 +746,41 @@ ALTER TABLE `we_qr_code` ADD COLUMN `qr_welcome_open` tinyint(4) NULL DEFAULT NU
 
 ALTER TABLE `we_qr_code` ADD COLUMN `qr_priority_user_welcome` tinyint(4) NULL DEFAULT NULL COMMENT '是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）' AFTER `qr_welcome_open`;
 
-DROP TABLE IF EXIST `we_substitute_customer_order`
-CREATE TABLE `we_substitute_customer_order`  (
-`id` bigint(20) NOT NULL COMMENT '主键Id',
-`purchaser` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '购买人',
-`phone` char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '联系方式',
-`source` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订单来源',
-`order_time` datetime NOT NULL COMMENT '下单时间',
-`dept_id` bigint(20) NOT NULL COMMENT '归属部门',
-`user_id` bigint(20) NOT NULL COMMENT '归属员工',
-`order_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订单状态',
-`product_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '商品名称',
-`product_url` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '商品图片',
-`product_unit_price` decimal(9, 2) NOT NULL COMMENT '商品单价',
-`amount` int(11) NOT NULL COMMENT '商品数量',
-`total_price` decimal(10, 0) NOT NULL COMMENT '付款总价',
-`discount` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '付款折扣',
-`discount_amount` decimal(9, 2) NOT NULL COMMENT '折扣金额',
-`actual_payment` decimal(9, 2) NOT NULL COMMENT '实际付款',
-`returned_money_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '回款方式',
-`returned_money` decimal(9, 2) NOT NULL COMMENT '回款金额',
-`returned_date` datetime NOT NULL COMMENT '回款日期',
-`payer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '打款人',
-`returned_receipt` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回款凭证',
-`status` tinyint(2) NOT NULL COMMENT '状态：0暂存 1完成',
-`properties` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '自定义属性',
-`create_time` datetime NOT NULL COMMENT '创建时间',
-`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
-`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人',
-`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
-`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
-`del_flag` tinyint(1) NOT NULL DEFAULT 0 COMMENT '删除标识',
-PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '代客下单-订单' ROW_FORMAT = Dynamic;
+DROP TABLE IF EXISTS `we_substitute_customer_order`;
+CREATE TABLE `we_substitute_customer_order` (
+  `id` bigint(20) NOT NULL COMMENT '主键Id',
+  `purchaser` varchar(255) NOT NULL COMMENT '购买人',
+  `phone` char(11) NOT NULL COMMENT '联系方式',
+  `source` varchar(20) NOT NULL COMMENT '订单来源',
+  `order_time` datetime NOT NULL COMMENT '下单时间',
+  `dept_id` bigint(20) NOT NULL COMMENT '归属部门',
+  `user_id` bigint(20) NOT NULL COMMENT '归属员工',
+  `order_status` varchar(20) NOT NULL COMMENT '订单状态',
+  `product_name` varchar(255) NOT NULL COMMENT '商品名称',
+  `product_url` varchar(1000) DEFAULT NULL COMMENT '商品图片',
+  `product_unit_price` decimal(9,2) NOT NULL COMMENT '商品单价',
+  `amount` int(11) NOT NULL COMMENT '商品数量',
+  `total_price` decimal(10,0) NOT NULL COMMENT '付款总价',
+  `discount` varchar(255) DEFAULT NULL COMMENT '付款折扣',
+  `discount_amount` decimal(9,2) DEFAULT NULL COMMENT '折扣金额',
+  `actual_payment` decimal(9,2) NOT NULL COMMENT '实际付款',
+  `returned_money_type` varchar(20) NOT NULL COMMENT '回款方式',
+  `returned_money` decimal(9,2) NOT NULL COMMENT '回款金额',
+  `returned_date` datetime NOT NULL COMMENT '回款日期',
+  `payer` varchar(255) NOT NULL COMMENT '打款人',
+  `returned_receipt` varchar(1000) DEFAULT NULL COMMENT '回款凭证',
+  `status` tinyint(2) NOT NULL COMMENT '状态：0暂存 1完成',
+  `properties` varchar(1000) DEFAULT NULL COMMENT '自定义属性',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `create_by` varchar(255) NOT NULL COMMENT '创建人',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+  `create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+  `external_userid` varchar(255) NOT NULL COMMENT '外部联系人的userid',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代客下单-订单';
 
 
 DROP TABLE IF EXIST `we_substitute_customer_order_catalogue`
