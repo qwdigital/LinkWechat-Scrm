@@ -45,7 +45,7 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
                     attachments.add(images);
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments links = new Links(messageTemplate.getMsgType(), messageTemplate.getTitle(),
-                            messageTemplate.getPicUrl(), messageTemplate.getDescription(), messageTemplate.getLinkUrl());
+                            messageTemplate.getPicUrl(), StringUtils.isNotEmpty(messageTemplate.getDescription())?messageTemplate.getDescription():messageTemplate.getContent(), messageTemplate.getLinkUrl());
                     attachments.add(links);
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments miniprograms = new Miniprograms(messageTemplate.getMsgType(), messageTemplate.getTitle(),
