@@ -205,7 +205,8 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
 
                   //删除不包含当前的群以及成员
-                  insertBatchGroupAndMember(weGroups, weGroupMembers,false);
+                    this.baseMapper.insertBatch(weGroups);
+//                  insertBatchGroupAndMember(weGroups, weGroupMembers,false);
 
                 }
 

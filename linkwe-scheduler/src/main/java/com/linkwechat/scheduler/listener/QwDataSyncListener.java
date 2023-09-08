@@ -53,8 +53,9 @@ public class QwDataSyncListener {
     public void groupChatSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微客户群同步消息监听：msg:{}", msg);
-            weGroupService.synchWeGroupHandler(msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            weGroupService.synchWeGroupHandler(msg);
+
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微客户群同步-消息处理失败 msg:{},error:{}", msg, e);
@@ -65,9 +66,10 @@ public class QwDataSyncListener {
     @RabbitListener(queues = "${wecom.mq.queue.sync.group-chat:Qu_Detail_GroupChat}")
     public void groupChatDetailSubscribe(String msg, Channel channel, Message message) {
         try {
-            log.info("企微客户群同步消息监听：msg:{}", msg);
-            weGroupService.synchWeGroupMemberHandler(msg);
+            log.info("企微客户群详情同步消息监听：msg:{}", msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            weGroupService.synchWeGroupMemberHandler(msg);
+
         } catch (Exception e) {
             e.printStackTrace();
             log.error("企微客户群同步-消息处理失败 msg:{},error:{}", msg, e);
