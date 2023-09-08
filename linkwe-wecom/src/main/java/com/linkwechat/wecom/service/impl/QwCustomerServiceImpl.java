@@ -4,6 +4,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
+import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
@@ -23,6 +24,7 @@ import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
+import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
@@ -305,6 +307,11 @@ public class QwCustomerServiceImpl implements IQwCustomerService {
     @Override
     public WeResultVo updateCustomerRemark(UpdateCustomerRemarkQuery query) {
         return weCustomerClient.updateCustomerRemark(query);
+    }
+
+    @Override
+    public WeCustomerListVo getCustomerList(WeCustomerListQuery query) {
+        return weCustomerClient.getCustomerList(query);
     }
 
 

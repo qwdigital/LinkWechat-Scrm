@@ -42,17 +42,11 @@ import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
-import com.linkwechat.domain.wecom.query.customer.UnionidToExternalUserIdQuery;
-import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
-import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
-import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
+import com.linkwechat.domain.wecom.query.customer.*;
 import com.linkwechat.domain.wecom.query.customer.tag.WeMarkTagQuery;
 import com.linkwechat.domain.wecom.query.customer.transfer.WeTransferCustomerQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
-import com.linkwechat.domain.wecom.vo.customer.UnionidToExternalUserIdVo;
-import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
-import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
-import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
+import com.linkwechat.domain.wecom.vo.customer.*;
 import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeCustomerMapper;
@@ -112,6 +106,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     @Autowired
     @Lazy
     private IWeFissionService iWeFissionService;
+
+    @Autowired
+    private IWeFlowUserListService iWeFlowUserListService;
 
 
     @Override
@@ -231,7 +228,50 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
         WeFollowUserListVo followUserList = qwCustomerClient.getFollowUserList(new WeBaseQuery()).getData();
+
         if (null != followUserList && CollectionUtil.isNotEmpty(followUserList.getFollowUser())) {
+
+            List<WeFlowUserList> weFlowUserLists=new ArrayList<>();
+
+             //获取员工对应的客户列表
+            followUserList.getFollowUser().stream().forEach(kk->{
+
+                AjaxResult<WeCustomerListVo> ajaxResult = qwCustomerClient.getCustomerList(WeCustomerListQuery.builder()
+                        .userid(kk)
+                        .build());
+
+                if(null != ajaxResult && ajaxResult.getData() != null
+                        && CollectionUtil.isNotEmpty(ajaxResult.getData().getExternalUserId())){
+                    ajaxResult.getData().getExternalUserId().stream().forEach(exId->{
+                        weFlowUserLists.add(
+                                WeFlowUserList.builder()
+                                        .weUserId(kk)
+                                        .externalUserid(exId)
+                                        .build()
+
+                        );
+
+                    });
+
+                }
+
+
+//                weFlowUserLists.add(
+//                        WeFlowUserList.builder()
+//                                .weUserId()
+//                                .externalUserid()
+//                                .build()
+//
+//                );
+
+
+
+            });
+            //入库
+            if(CollectionUtil.isNotEmpty(weFlowUserLists)){
+                iWeFlowUserListService.saveBatch(weFlowUserLists);
+            }
+            //通知批处理框架处理请求数据
             this.synchWeCustomerByAddIds(followUserList.getFollowUser());
         }
 
