@@ -62,6 +62,19 @@ public class QwDataSyncListener {
     }
 
     @RabbitHandler
+    @RabbitListener(queues = "${wecom.mq.queue.sync.group-chat:Qu_Detail_GroupChat}")
+    public void groupChatDetailSubscribe(String msg, Channel channel, Message message) {
+        try {
+            log.info("企微客户群同步消息监听：msg:{}", msg);
+            weGroupService.synchWeGroupMemberHandler(msg);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("企微客户群同步-消息处理失败 msg:{},error:{}", msg, e);
+        }
+    }
+
+    @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sync.wecustomer:Qu_WeCustomer}")
     public void wecustomerSubscribe(String msg, Channel channel, Message message) {
         try {
@@ -76,7 +89,7 @@ public class QwDataSyncListener {
 
 
     @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.sync.wecustomer:Qu_WeCustomer}")
+    @RabbitListener(queues = "${wecom.mq.queue.sync.wecustomer:Qu_Detail_WeCustomer}")
     public void wecustomerDetailSubscribe(String msg, Channel channel, Message message) {
         try {
             log.info("企微客户详情同步消息监听：msg:{}", msg);
