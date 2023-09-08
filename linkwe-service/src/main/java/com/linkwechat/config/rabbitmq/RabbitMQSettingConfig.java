@@ -104,9 +104,6 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.group-chat:Rk_GroupChat}")
     private String weGroupChatRk;
 
-    //客户群详情同步路由
-    @Value("${wecom.mq.route.sync.group-chat:Rk_Detail_GroupChat}")
-    private String weGroupChatDetailRk;
 
 
     //客户同步路由
@@ -288,9 +285,6 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.sync.group-chat:Qu_GroupChat}")
     private String weGroupChatQu;
 
-    //客户群详情同步消费队列
-    @Value("${wecom.mq.queue.sync.group-chat:Qu_Detail_GroupChat}")
-    private String weGroupChatDetailQu;
 
     //客服账号同步消费队列
     @Value("${wecom.mq.queue.sync.kf-account:Qu_kfAccount}")

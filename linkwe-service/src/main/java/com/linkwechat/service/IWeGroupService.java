@@ -54,11 +54,7 @@ public interface IWeGroupService extends IService<WeGroup> {
     void synchWeGroupHandler(String msg);
 
 
-    /**
-     * 根据群id同步群信息
-     * @param msg
-     */
-    void synchWeGroupMemberHandler(String msg);
+
 
 
 //    /**

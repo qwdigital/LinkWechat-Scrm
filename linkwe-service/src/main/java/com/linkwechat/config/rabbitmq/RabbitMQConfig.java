@@ -147,15 +147,7 @@ public class RabbitMQConfig {
 
 
 
-    /**
-     * 客户群同步队列
-     *
-     * @return
-     */
-    @Bean
-    public Queue quSyncDetailGroupChat() {
-        return new Queue(rabbitMQSettingConfig.getWeGroupChatDetailQu());
-    }
+
 
     /**
      * 客户群同步队列绑定交换机
@@ -168,15 +160,6 @@ public class RabbitMQConfig {
     }
 
 
-    /**
-     * 客户群同步队列绑定交换机
-     *
-     * @return
-     */
-    @Bean
-    public Binding bindingExchangeSyncGroupChatDetail() {
-        return BindingBuilder.bind(quSyncDetailGroupChat()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupChatDetailRk()).noargs();
-    }
 
 
     /**

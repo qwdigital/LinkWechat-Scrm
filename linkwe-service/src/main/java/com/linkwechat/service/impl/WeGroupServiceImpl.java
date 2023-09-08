@@ -78,6 +78,9 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @Autowired
     private IWeFissionService iWeFissionService;
 
+    @Autowired
+    private IWeGroupMemberService iWeGroupMemberService;
+
 
     @Override
     public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
@@ -119,7 +122,23 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
     public void synchWeGroup() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeGroupChatRk(), JSONObject.toJSONString(loginUser));
+        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
+
+        this.getGroupChatList(groupChatList,WeGroupChatListQuery.builder().build());
+        //当前群先入库
+        if (CollectionUtil.isNotEmpty(groupChatList)){
+            List<List<WeGroupChatListVo.GroupChat>> partition = Lists.partition(groupChatList, 20);
+
+            for (List<WeGroupChatListVo.GroupChat> groupChat : partition) {
+                loginUser.setChatIds(groupChat.stream().map(WeGroupChatListVo.GroupChat::getChatId)
+                        .collect(Collectors.toList()));
+                //发送通知更新群群详情
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeGroupChatRk(), JSONObject.toJSONString(loginUser));
+
+            }
+
+        }
+
     }
 
     @Async
@@ -131,37 +150,6 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
 
-        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
-
-        this.getGroupChatList(groupChatList,WeGroupChatListQuery.builder().build());
-
-
-        //当前群先入库
-        if (CollectionUtil.isNotEmpty(groupChatList)){
-            List<List<WeGroupChatListVo.GroupChat>> partition = Lists.partition(groupChatList, 20);
-
-            for (List<WeGroupChatListVo.GroupChat> groupChat : partition) {
-                loginUser.setChatIds(groupChat.stream().map(WeGroupChatListVo.GroupChat::getChatId)
-                        .collect(Collectors.toList()));
-                //发送通知更新群群详情
-                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeGroupChatDetailRk(), JSONObject.toJSONString(loginUser));
-
-            }
-
-        }
-
-
-    }
-
-
-
-    //根据客户id同步相应的客户详情
-    @Override
-    public void synchWeGroupMemberHandler(String msg){
-        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
-        SecurityContextHolder.setCorpId(loginUser.getCorpId());
-        SecurityContextHolder.setUserName(loginUser.getUserName());
-        SecurityContextHolder.setUserType(loginUser.getUserType());
         List<String> chatIds = loginUser.getChatIds();
         if(CollectionUtil.isNotEmpty(chatIds)){
             chatIds.stream().forEach(chatId->{
@@ -184,7 +172,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     weGroup.setUpdateTime(new Date());
                     weGroups.add(weGroup);
 
-                  List<WeGroupMemberEntity> memberLists = detail.getMemberList();
+                    List<WeGroupMemberEntity> memberLists = detail.getMemberList();
                     if (CollectionUtil.isNotEmpty(memberLists)) {
                         memberLists.forEach(groupMember -> {
                             WeGroupMember weGroupMember = new WeGroupMember();
@@ -204,8 +192,9 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     }
 
 
-                  //删除不包含当前的群以及成员
+                    //删除不包含当前的群以及成员
                     this.baseMapper.insertBatch(weGroups);
+                    iWeGroupMemberService.insertBatch(weGroupMembers);
 //                  insertBatchGroupAndMember(weGroups, weGroupMembers,false);
 
                 }
