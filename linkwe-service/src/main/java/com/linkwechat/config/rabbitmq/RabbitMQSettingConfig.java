@@ -104,10 +104,19 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.route.sync.group-chat:Rk_GroupChat}")
     private String weGroupChatRk;
 
+    //客户群详情同步路由
+    @Value("${wecom.mq.route.sync.group-chat:Rk_Detail_GroupChat}")
+    private String weGroupChatDetailRk;
+
 
     //客户同步路由
     @Value("${wecom.mq.route.sync.wecustomer:Rk_Wecustomer}")
     private String weCustomerRk;
+
+
+    //客户详情同步路由
+    @Value("${wecom.mq.route.sync.wecustomer:Rk_Wecustomer_Detail}")
+    private String weCustomerDetailRk;
 
 
     //离职成员分配同步路由
@@ -279,6 +288,10 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.queue.sync.group-chat:Qu_GroupChat}")
     private String weGroupChatQu;
 
+    //客户群详情同步消费队列
+    @Value("${wecom.mq.queue.sync.group-chat:Qu_Detail_GroupChat}")
+    private String weGroupChatDetailQu;
+
     //客服账号同步消费队列
     @Value("${wecom.mq.queue.sync.kf-account:Qu_kfAccount}")
     private String weKfAccountQu;
@@ -338,6 +351,10 @@ public class RabbitMQSettingConfig {
     //企业微信客户队列
     @Value("${wecom.mq.queue.sync.wecustomer:Qu_WeCustomer}")
     private String wecustomerQu;
+
+    //企业微信客户详情队列
+    @Value("${wecom.mq.queue.sync.wecustomer:Qu_Detail_WeCustomer}")
+    private String wecustomerDetailQu;
 
     //企业微信标签队列
     @Value("${wecom.mq.queue.sync.grouptag:Qu_GroupTag}")

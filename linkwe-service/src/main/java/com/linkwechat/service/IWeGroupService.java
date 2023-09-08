@@ -55,11 +55,18 @@ public interface IWeGroupService extends IService<WeGroup> {
 
 
     /**
-     * 跟进条件同步客群
-     * @param chatListQuery
-     * @return
+     * 根据群id同步群信息
+     * @param msg
      */
-    List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery);
+    void synchWeGroupMemberHandler(String msg);
+
+
+//    /**
+//     * 跟进条件同步客群
+//     * @param chatListQuery
+//     * @return
+//     */
+//    List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery);
 
 
 
