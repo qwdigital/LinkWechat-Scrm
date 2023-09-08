@@ -67,4 +67,7 @@ public class LoginUser implements Serializable
 
     /**企业微信员工id集合*/
     private List<String> weUserIds;
+
+    /**企微客群id集合*/
+    private List<String> chatIds;
 }

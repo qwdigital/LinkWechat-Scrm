@@ -2,6 +2,7 @@ package com.linkwechat.scheduler;
 
 import com.linkwechat.common.config.fegin.FeginConfig;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan("com.linkwechat.**")
 @MapperScan("com.linkwechat.**.mapper")
 @EnableFeignClients(basePackages="com.linkwechat.**",defaultConfiguration = FeginConfig.class)
+@EnableBatchProcessing
 @SpringBootApplication
 public class LinkWechatSchedulerApplication {
     public static void main(String[] args) {

@@ -145,6 +145,10 @@ public class RabbitMQConfig {
         return new Queue(rabbitMQSettingConfig.getWeGroupChatQu());
     }
 
+
+
+
+
     /**
      * 客户群同步队列绑定交换机
      *
@@ -154,6 +158,8 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncGroupChat() {
         return BindingBuilder.bind(quSyncGroupChat()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupChatRk()).noargs();
     }
+
+
 
 
     /**
@@ -166,6 +172,19 @@ public class RabbitMQConfig {
         return new Queue(rabbitMQSettingConfig.getWecustomerQu());
     }
 
+
+
+    /**
+     * 客户详情同步队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDetailWeCustomer() {
+        return new Queue(rabbitMQSettingConfig.getWecustomerDetailQu());
+    }
+
+
     /**
      * 客户同步队列绑定交换机
      *
@@ -175,6 +194,18 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncWeCustomer() {
         return BindingBuilder.bind(quWeCustomer()).to(syncEx()).with(rabbitMQSettingConfig.getWeCustomerRk()).noargs();
     }
+
+
+    /**
+     * 客户详情同步队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncWeCustomerDetail() {
+        return BindingBuilder.bind(quDetailWeCustomer()).to(syncEx()).with(rabbitMQSettingConfig.getWeCustomerDetailRk()).noargs();
+    }
+
 
     /**
      * 员工部门队列
