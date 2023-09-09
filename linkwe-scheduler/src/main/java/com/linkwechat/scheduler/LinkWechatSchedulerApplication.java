@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan("com.linkwechat.**")
 @MapperScan("com.linkwechat.**.mapper")
 @EnableFeignClients(basePackages="com.linkwechat.**",defaultConfiguration = FeginConfig.class)
-@EnableBatchProcessing
 @SpringBootApplication
 public class LinkWechatSchedulerApplication {
     public static void main(String[] args) {

@@ -64,13 +64,6 @@
             <artifactId>linkwe-service</artifactId>
         </dependency>
 
-        <!--  spring batch -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-batch</artifactId>
-        </dependency>
-
-
         <!-- 定时任务 -->
         <dependency>
             <groupId>com.xuxueli</groupId>
