@@ -445,5 +445,5 @@ public interface QwCustomerClient {
      * @return
      */
     @PostMapping("/customer/getCustomerList")
-    public AjaxResult<WeCustomerListVo> getCustomerList(WeCustomerListQuery query);
+    public AjaxResult<WeCustomerListVo> getCustomerList(@RequestBody WeCustomerListQuery query);
 }

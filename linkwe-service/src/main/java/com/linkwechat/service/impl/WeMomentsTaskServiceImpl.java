@@ -759,13 +759,26 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         Long startTime = DateUtil.beginOfDay(new Date()).getTime() / 1000;
         Long endTime = DateUtil.date().getTime() / 1000;
         MomentsListDetailParamDto query = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).filter_type(filterType).build();
-
+        query.setCursor(null);
         List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
-        getMoment(null, moments, query);
+        getMomentPage(query);
 
-        if (CollectionUtil.isNotEmpty(moments)) {
-            syncAndSave(moments);
+
+    }
+
+    //朋友圈同步分页入库
+    public void getMomentPage(MomentsListDetailParamDto query){
+        MomentsListDetailResultDto result = qwMomentsClient.momentList(query).getData();
+        if (null != result) {
+            if (WeConstans.WE_SUCCESS_CODE.equals(result.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(result.getErrCode()) && CollectionUtil.isNotEmpty(result.getMoment_list())) {
+                syncAndSave(result.getMoment_list());
+                if (StringUtils.isNotEmpty(result.getNext_cursor())) {
+                    query.setCursor(result.getNext_cursor());
+                    getMomentPage(query);
+                }
+            }
         }
+
     }
 
     @Override
@@ -943,6 +956,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         if (null != result) {
             if (WeConstans.WE_SUCCESS_CODE.equals(result.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(result.getErrCode()) && CollectionUtil.isNotEmpty(result.getMoment_list())) {
                 list.addAll(result.getMoment_list());
+
                 if (StringUtils.isNotEmpty(result.getNext_cursor())) {
                     getMoment(result.getNext_cursor(), list, query);
                 }

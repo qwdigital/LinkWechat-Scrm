@@ -15,6 +15,7 @@ import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.enums.GroupUpdateDetailEnum;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
@@ -25,6 +26,7 @@ import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.wecom.entity.customer.groupChat.WeGroupMemberEntity;
@@ -88,6 +90,23 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
 
     @Override
+    public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query, PageDomain pageDomain) {
+        List<LinkGroupChatListVo> groupChatListVos = new ArrayList<>();
+        List<String> weGroupListIds = this.baseMapper.findWeGroupListIds(query, pageDomain);
+
+        if (CollectionUtil.isNotEmpty(weGroupListIds)) {
+            groupChatListVos = this.baseMapper.selectWeGroupListByIds(weGroupListIds);
+        }
+
+        return groupChatListVos;
+    }
+
+    @Override
+    public long countWeGroupListIds(WeGroupChatQuery query) {
+        return this.baseMapper.countWeGroupListIds(query);
+    }
+
+    @Override
     public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
 
         List<LinkGroupChatListVo> linkGroupChatListVos = this.baseMapper.selectWeGroupList(query);
@@ -127,12 +146,14 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
     public void synchWeGroup() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
 
+        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
         this.getGroupChatList(groupChatList,WeGroupChatListQuery.builder().build());
         //当前群先入库
         if (CollectionUtil.isNotEmpty(groupChatList)){
-            List<List<WeGroupChatListVo.GroupChat>> partition = Lists.partition(groupChatList, 20);
+
+            List<List<WeGroupChatListVo.GroupChat>> partition = Lists.partition(groupChatList, 5);
+
 
             for (List<WeGroupChatListVo.GroupChat> groupChat : partition) {
                 loginUser.setChatIds(groupChat.stream().map(WeGroupChatListVo.GroupChat::getChatId)
@@ -146,7 +167,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
     }
 
-    @Async
+
     @Override
     public void synchWeGroupHandler(String msg) {
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
@@ -197,10 +218,16 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     }
 
 
-                    //删除不包含当前的群以及成员
-                    this.baseMapper.insertBatch(weGroups);
-                    iWeGroupMemberService.insertBatch(weGroupMembers);
-//                  insertBatchGroupAndMember(weGroups, weGroupMembers,false);
+                    if(CollectionUtil.isNotEmpty(weGroups)){
+                        //删除不包含当前的群以及成员
+                        this.baseMapper.insertBatch(weGroups);
+                    }
+
+
+                    if(CollectionUtil.isNotEmpty(weGroupMembers)){
+                        iWeGroupMemberService.insertBatch(weGroupMembers);
+                    }
+
 
                 }
 
@@ -342,6 +369,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
                 && CollectionUtil.isNotEmpty(groupChatListVo.getGroupChatList())) {
             groupChatList.addAll(groupChatListVo.getGroupChatList());
+
             if(StringUtils.isNotEmpty(groupChatListVo.getNextCursor())){
                 chatListQuery.setCursor(groupChatListVo.getNextCursor());
                 getGroupChatList(groupChatList,chatListQuery);

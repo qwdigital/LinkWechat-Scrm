@@ -218,7 +218,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public void synchWeCustomer() {
 
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeCustomerRk(), JSONObject.toJSONString(loginUser));
+
+        WeFollowUserListVo followUserList = qwCustomerClient.getFollowUserList(new WeBaseQuery()).getData();
+
+        if (null != followUserList && CollectionUtil.isNotEmpty(followUserList.getFollowUser())) {
+
+            List<List<String>> partition = ListUtil.partition(followUserList.getFollowUser(), 10);
+
+            for(List<String> weUserIds:partition){
+                loginUser.setWeUserIds(weUserIds);
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeCustomerRk(), JSONObject.toJSONString(loginUser));
+
+            }
+
+        }
 
 
     }
@@ -226,59 +239,65 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
     @Override
     public void synchWeCustomerHandler(String msg) {
-
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
         SecurityContextHolder.setCorpId(loginUser.getCorpId());
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
         SecurityContextHolder.setUserType(loginUser.getUserType());
+        List<String> weUserIds = loginUser.getWeUserIds();
+        if(CollectionUtil.isNotEmpty(weUserIds)){
+            //跟进人批量更新获取同步
+            this.synchWeCustomerByAddIds(weUserIds);
 
-        WeFollowUserListVo followUserList = qwCustomerClient.getFollowUserList(new WeBaseQuery()).getData();
-
-        if (null != followUserList && CollectionUtil.isNotEmpty(followUserList.getFollowUser())) {
-
-            List<WeFlowUserList> weFlowUserLists=new ArrayList<>();
-
-             //获取员工对应的客户列表 （多线程分片）
-            followUserList.getFollowUser().stream().forEach(kk->{
-
-                AjaxResult<WeCustomerListVo> ajaxResult = qwCustomerClient.getCustomerList(WeCustomerListQuery.builder()
-                        .userid(kk)
-                        .build());
-
-                if(null != ajaxResult && ajaxResult.getData() != null
-                        && CollectionUtil.isNotEmpty(ajaxResult.getData().getExternalUserId())){
-                    ajaxResult.getData().getExternalUserId().stream().forEach(exId->{
-                        weFlowUserLists.add(
-                                WeFlowUserList.builder()
-                                        .weUserId(kk)
-                                        .externalUserid(exId)
-                                        .build()
-
-                        );
-
-                    });
-
-                    //一个员工对应的所有客户做一次入库,避免看不到数据
-                    if(CollectionUtil.isNotEmpty(weFlowUserLists)){
-                        iWeFlowUserListService.saveBatch(weFlowUserLists);
-                    }
-
-                    loginUser.setWeUserIds(ListUtil.toList(kk));
-
-
-
-                    //通知mq做数据更新
-                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeCustomerDetailRk(), JSONObject.toJSONString(loginUser));
-
-
-
-                }
-
-            });
+            //单个客户获取同步逻辑
+//            weUserIds.stream().forEach(weUserId->{
+//
+//                AjaxResult<WeCustomerListVo> ajaxResult = qwCustomerClient.getCustomerList(WeCustomerListQuery.builder()
+//                        .userid(weUserId)
+//                        .build());
+//
+//                if(null != ajaxResult && ajaxResult.getData() != null
+//                        && CollectionUtil.isNotEmpty(ajaxResult.getData().getExternalUserId())){
+//
+//
+//                    List<List<String>> partition = ListUtil.partition(ajaxResult.getData().getExternalUserId(), 100);
+//
+//                    for(List<String> exids: partition){
+//
+//
+//                        exids.stream().forEach(extId->{
+//
+//                            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+//                            List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
+//                            this.getBySingleUser(extId, null, weCustomerDetailVos);
+//
+//                            if (CollectionUtil.isNotEmpty(weCustomerDetailVos)) {
+//                                this.weFlowerCustomerHandle(weCustomerDetailVos, currentTenantSysUser);
+//                            }
+//
+//
+//                        });
+//
+//
+//
+//                    }
+//
+//
+//
+//
+//
+//
+//
+//                }
+//
+//
+//
+//            });
 
 
         }
+
+
 
     }
 
@@ -295,77 +314,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public void synchWeCustomerByAddIds(List<String> followUserIds) {
         if (CollectionUtil.isNotEmpty(followUserIds)) {
 
-            List<List<String>> partition = Lists.partition(followUserIds, 100);
+//            List<List<String>> partition = Lists.partition(followUserIds, 100);
+//            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
             Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
 
-            for (List<String> followUser : partition) {
+//            List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
+            this.getByUser(followUserIds, null,currentTenantSysUser);
 
-                List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
-                this.getByUser(followUser, null, weCustomerDetailVos);
-                if (CollectionUtil.isNotEmpty(weCustomerDetailVos)) {
-                    List<List<WeCustomerDetailVo>> userDetailPartition = Lists.partition(weCustomerDetailVos, 1000);
-                    for (List<WeCustomerDetailVo> details : userDetailPartition) {
-                        this.weFlowerCustomerHandle(details, currentTenantSysUser);
-                    }
-                }
-            }
+
+
         }
     }
 
 
-    /**
-     * 根据客户id同步客户详情
-     * @param msg
-     */
-    @Override
-    public void synchWeCustomerByExIdHandle(String msg){
 
-        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
-        SecurityContextHolder.setCorpId(loginUser.getCorpId());
-        SecurityContextHolder.setUserName(loginUser.getUserName());
-        SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
-        SecurityContextHolder.setUserType(loginUser.getUserType());
-
-        List<String> weUserIds = loginUser.getWeUserIds();
-
-
-        if(StringUtils.isNotEmpty(weUserIds)){
-
-            weUserIds.stream().forEach(weUserId->{
-                List<WeFlowUserList> weFlowUserLists = iWeFlowUserListService.list(new LambdaQueryWrapper<WeFlowUserList>()
-                        .eq(WeFlowUserList::getWeUserId, weUserId)
-                        .ne(WeFlowUserList::getSynchState,1));
-                if(CollectionUtil.isNotEmpty(weFlowUserLists)){
-                    weFlowUserLists.stream().forEach(k->{
-
-                        try {
-                            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
-                            List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
-                            this.getBySingleUser(k.getExternalUserid(), null, weCustomerDetailVos);
-                            if (CollectionUtil.isNotEmpty(weCustomerDetailVos)) {
-                                this.weFlowerCustomerHandle(weCustomerDetailVos, currentTenantSysUser);
-                                k.setSynchState(1);
-                            }else{
-                                k.setSynchState(2);
-                            }
-                        }catch (Exception e){
-                            k.setSynchState(2);
-                            log.error("同步客户失败："+k.getExternalUserid());
-                        }
-
-                    });
-                    iWeFlowUserListService.updateBatchById(
-                            weFlowUserLists
-                    );
-                }
-            });
-
-        }
-
-
-
-
-    }
 
 
     /**
@@ -382,16 +344,20 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 .in(WeCustomer::getAddUserId, followUserIds));
     }
 
-    private void getByUser(List<String> followUser, String nextCursor, List<WeCustomerDetailVo> list) {
+    private void getByUser(List<String> followUser, String nextCursor, Map<String, SysUser> currentTenantSysUser) {
+
         WeBatchCustomerDetailVo weBatchCustomerDetails = qwCustomerClient
                 .getBatchCustomerDetail(new WeBatchCustomerQuery(followUser, nextCursor, 100)).getData();
 
         if (WeErrorCodeEnum.ERROR_CODE_0.getErrorCode().equals(weBatchCustomerDetails.getErrCode())
                 || WeConstans.NOT_EXIST_CONTACT.equals(weBatchCustomerDetails.getErrCode())
                 && ArrayUtil.isNotEmpty(weBatchCustomerDetails.getExternalContactList())) {
-            list.addAll(weBatchCustomerDetails.getExternalContactList());
+
+            this.weFlowerCustomerHandle(weBatchCustomerDetails.getExternalContactList(), currentTenantSysUser);
+
+
             if (StringUtils.isNotEmpty(weBatchCustomerDetails.getNext_cursor())) {
-                getByUser(followUser, weBatchCustomerDetails.getNext_cursor(), list);
+                getByUser(followUser, weBatchCustomerDetails.getNext_cursor(),currentTenantSysUser);
             }
         }
 
@@ -427,79 +393,64 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             WeCustomerDetailVo.ExternalContact externalContact = k.getExternalContact();
 
-            if(null != externalContact){
+            WeCustomerFollowInfoEntity followInfo = k.getFollowInfo();
 
-                List<WeCustomerFollowUserEntity> followUsers = k.getFollowUser();
+            if (null != followInfo && null != externalContact) {
+                WeCustomer weCustomer = new WeCustomer();
+                weCustomer.setId(SnowFlakeUtil.nextId());
 
-                if(CollectionUtil.isNotEmpty(followUsers)){
-                    followUsers.stream().forEach(followInfo->{
+                SysUser sysUser = currentTenantSysUser.get(followInfo.getUserId());
 
-                        WeCustomer weCustomer = new WeCustomer();
-                        weCustomer.setId(SnowFlakeUtil.nextId());
-
-                        SysUser sysUser = currentTenantSysUser.get(followInfo.getUserId());
-
-                        if (null != sysUser) {
-                            weCustomer.setCreateBy(sysUser.getUserName());
-                            weCustomer.setCreateById(sysUser.getUserId());
-                            weCustomer.setUpdateBy(sysUser.getUserName());
-                            weCustomer.setUpdateById(sysUser.getUserId());
-                        }
-
-                        weCustomer.setCreateTime(new Date());
-                        weCustomer.setUpdateTime(new Date());
-                        weCustomer.setExternalUserid(externalContact.getExternalUserId());
-                        weCustomer.setCustomerName(externalContact.getName());
-                        weCustomer.setCustomerType(externalContact.getType());
-                        weCustomer.setAvatar(externalContact.getAvatar());
-                        weCustomer.setGender(externalContact.getGender());
-                        weCustomer.setUnionid(externalContact.getUnionId());
-                        weCustomer.setCorpName(followInfo.getRemarkCompany());
-                        weCustomer.setAddUserId(followInfo.getUserId());
-                        weCustomer.setAddTime(new Date(followInfo.getCreateTime() * 1000L));
-                        weCustomer.setAddMethod(followInfo.getAddWay());
-                        weCustomer.setState(followInfo.getState());
-                        weCustomer.setDelFlag(0);
-                        weCustomer.setRemarkName(followInfo.getRemark());
-                        weCustomer.setOtherDescr(followInfo.getDescription());
-                        weCustomer.setPhone(String.join(",", Optional.ofNullable(followInfo.getRemarkMobiles()).orElseGet(ArrayList::new)));
-
-
-                        List<WeCustomerDetailVo.ExternalUserTag> tags = followInfo.getTags();
-
-                        if (CollectionUtil.isNotEmpty(tags)) {
-
-                            weCustomer.setTagIds(tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId).collect(Collectors.joining(",")));
-
-                            tags.stream().forEach(tagId -> {
-                                WeFlowerCustomerTagRel weFlowerCustomerTagRel = WeFlowerCustomerTagRel.builder()
-                                        .id(SnowFlakeUtil.nextId())
-                                        .externalUserid(externalContact.getExternalUserId())
-                                        .tagId(tagId.getTagId())
-                                        .userId(followInfo.getUserId())
-                                        .isCompanyTag(true)
-                                        .delFlag(0)
-                                        .build();
-                                weFlowerCustomerTagRel.setCreateTime(new Date());
-                                weFlowerCustomerTagRel.setUpdateTime(new Date());
-                                if (null != sysUser) {
-                                    weFlowerCustomerTagRel.setCreateBy(sysUser.getUserName());
-                                    weFlowerCustomerTagRel.setCreateById(sysUser.getUserId());
-                                    weFlowerCustomerTagRel.setUpdateBy(sysUser.getUserName());
-                                    weFlowerCustomerTagRel.setUpdateById(sysUser.getUserId());
-                                }
-                                weFlowerCustomerTagRels.add(weFlowerCustomerTagRel);
-                            });
-                        }
-                        weCustomerList.add(weCustomer);
-
-                    });
-
+                if (null != sysUser) {
+                    weCustomer.setCreateBy(sysUser.getUserName());
+                    weCustomer.setCreateById(sysUser.getUserId());
+                    weCustomer.setUpdateBy(sysUser.getUserName());
+                    weCustomer.setUpdateById(sysUser.getUserId());
                 }
+                weCustomer.setCreateTime(new Date());
+                weCustomer.setUpdateTime(new Date());
+                weCustomer.setExternalUserid(externalContact.getExternalUserId());
+                weCustomer.setCustomerName(externalContact.getName());
+                weCustomer.setCustomerType(externalContact.getType());
+                weCustomer.setAvatar(externalContact.getAvatar());
+                weCustomer.setGender(externalContact.getGender());
+                weCustomer.setUnionid(externalContact.getUnionId());
+                weCustomer.setCorpName(followInfo.getRemarkCompany());
+                weCustomer.setAddUserId(followInfo.getUserId());
+                weCustomer.setAddTime(new Date(followInfo.getCreateTime() * 1000L));
+                weCustomer.setAddMethod(followInfo.getAddWay());
+                weCustomer.setState(followInfo.getState());
+                weCustomer.setDelFlag(0);
+                weCustomer.setRemarkName(followInfo.getRemark());
+                weCustomer.setOtherDescr(followInfo.getDescription());
+                weCustomer.setPhone(String.join(",", Optional.ofNullable(followInfo.getRemarkMobiles()).orElseGet(ArrayList::new)));
 
+                List<String> tagIds = followInfo.getTagId();
+                if (CollectionUtil.isNotEmpty(tagIds)) {
+                    weCustomer.setTagIds(tagIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+
+                    tagIds.stream().forEach(tagId -> {
+                        WeFlowerCustomerTagRel weFlowerCustomerTagRel = WeFlowerCustomerTagRel.builder()
+                                .id(SnowFlakeUtil.nextId())
+                                .externalUserid(externalContact.getExternalUserId())
+                                .tagId(tagId)
+                                .userId(followInfo.getUserId())
+                                .isCompanyTag(true)
+                                .delFlag(0)
+                                .build();
+                        weFlowerCustomerTagRel.setCreateTime(new Date());
+                        weFlowerCustomerTagRel.setUpdateTime(new Date());
+                        if (null != sysUser) {
+                            weFlowerCustomerTagRel.setCreateBy(sysUser.getUserName());
+                            weFlowerCustomerTagRel.setCreateById(sysUser.getUserId());
+                            weFlowerCustomerTagRel.setUpdateBy(sysUser.getUserName());
+                            weFlowerCustomerTagRel.setUpdateById(sysUser.getUserId());
+                        }
+                        weFlowerCustomerTagRels.add(weFlowerCustomerTagRel);
+                    });
+                }
+                weCustomerList.add(weCustomer);
             }
-
-
         });
 
         //添加客户标签

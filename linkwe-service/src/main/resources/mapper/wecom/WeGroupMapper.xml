@@ -84,6 +84,152 @@
 <!--        </where>-->
 <!--    </select>-->
 
+
+    <select id="findWeGroupListIds"  resultType="java.lang.String">
+        SELECT
+         wg.id
+        FROM
+        we_group wg
+        left join we_group_tag_rel wgtr  on wg.chat_id=wgtr.chat_id and wgtr.del_flag = 0
+        left join we_tag  wt  on wt.id = wgtr.tag_id
+        left join sys_user su on su.we_user_id = wg.owner and su.del_flag = 0
+        where wg.del_flag=0
+        <if test="query.id !=null">
+            and wg.id = #{query.id}
+        </if>
+        <if test="query.chatId !=null and query.chatId !=''">
+            and wg.chat_id in
+            <foreach item="item" index="index" collection="query.chatId.split(',')"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.groupName != null  and query.groupName != ''">
+            AND  CONCAT( IFNULL(wg.group_name,''),IFNULL(su.user_name,''))
+            LIKE CONCAT('%',#{query.groupName,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="query.groupLeaderName != null  and query.groupLeaderName != ''">
+            and su.user_name like concat('%', #{query.groupLeaderName}, '%')
+        </if>
+
+        <if test="query.beginTime != null and query.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{query.beginTime},'%y%m%d')
+        </if>
+        <if test="query.endTime != null and query.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{query.endTime},'%y%m%d')
+        </if>
+        <if test="query.userIds != null and query.userIds !=''">
+            <if test="query.userIds.indexOf(',') != -1">
+                AND wg.`owner` in
+                <foreach item="item" index="index" collection="query.userIds.split(',')" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.userIds.indexOf(',') == -1">
+                AND wg.`owner`=#{query.userIds}
+            </if>
+        </if>
+        <if test="query.tagIds != null and query.tagIds !=''">
+            AND wt.`id` in
+            <foreach item="tagId" index="index" collection="query.tagIds.split(',')" open="(" separator="," close=")">
+                #{query.tagId}
+            </foreach>
+        </if>
+        GROUP BY wg.id
+        <if test="pageDomain !=null">
+            <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
+                limit ${pageDomain.pageSize * (pageDomain.pageNum-1)}, #{pageDomain.pageSize}
+            </if>
+        </if>
+    </select>
+
+    <select id="countWeGroupListIds"  resultType="long">
+        SELECT
+          count(DISTINCT wg.id)
+        FROM
+        we_group wg
+        left join we_group_tag_rel wgtr  on wg.chat_id=wgtr.chat_id and wgtr.del_flag = 0
+        left join we_tag  wt  on wt.id = wgtr.tag_id
+        left join sys_user su on su.we_user_id = wg.owner and su.del_flag = 0
+        where wg.del_flag=0
+        <if test="query.id !=null">
+            and wg.id = #{query.id}
+        </if>
+        <if test="query.chatId !=null and query.chatId !=''">
+            and wg.chat_id in
+            <foreach item="item" index="index" collection="query.chatId.split(',')"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.groupName != null  and query.groupName != ''">
+            AND  CONCAT( IFNULL(wg.group_name,''),IFNULL(su.user_name,''))
+            LIKE CONCAT('%',#{query.groupName,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="query.groupLeaderName != null  and query.groupLeaderName != ''">
+            and su.user_name like concat('%', #{query.groupLeaderName}, '%')
+        </if>
+
+        <if test="query.beginTime != null and query.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{query.beginTime},'%y%m%d')
+        </if>
+        <if test="query.endTime != null and query.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{query.endTime},'%y%m%d')
+        </if>
+        <if test="query.userIds != null and query.userIds !=''">
+            <if test="query.userIds.indexOf(',') != -1">
+                AND wg.`owner` in
+                <foreach item="item" index="index" collection="query.userIds.split(',')" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.userIds.indexOf(',') == -1">
+                AND wg.`owner`=#{query.userIds}
+            </if>
+        </if>
+        <if test="query.tagIds != null and query.tagIds !=''">
+            AND wt.`id` in
+            <foreach item="tagId" index="index" collection="query.tagIds.split(',')" open="(" separator="," close=")">
+                #{query.tagId}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="selectWeGroupListByIds" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo">
+        SELECT
+        wg.id,
+        wg.chat_id,
+        wg.group_name,
+        wg.add_time,
+        wg.create_time,
+        wg.notice,
+        wg.status,
+        wg.`owner`,
+        IFNULL(su.user_name,wg.`owner`) as groupLeaderName,
+        count(DISTINCT wgm.user_id) as memberNum,
+        count(DISTINCT IF(wgm.type = 2,1, 0)) as customerNum,
+        sum(IF(date_format(wgm.join_time, '%Y-%m-%d') = date_format(now(), '%Y-%m-%d') and wgm.quit_scene IS NULL, 1, 0)) as toDayMemberNum,
+        sum(IF(date_format(wgm.join_time, '%Y-%m-%d') = date_format(now(), '%Y-%m-%d') and wgm.quit_scene IS NOT NULL, 1, 0)) as toDayExitMemberNum,
+        GROUP_CONCAT(distinct wt.`name`) as tags,
+        GROUP_CONCAT(distinct wt.`id`) as tagIds
+        FROM
+        we_group wg
+        left join we_group_member wgm  on wgm.chat_id=wg.chat_id and wgm.del_flag=0
+        left join we_group_tag_rel wgtr  on wg.chat_id=wgtr.chat_id and wgtr.del_flag = 0
+        left join we_tag  wt  on wt.id = wgtr.tag_id
+        left join sys_user su on su.we_user_id = wg.owner and su.del_flag = 0
+        where wg.del_flag=0
+        <if test="ids != null and ids.size() > 0">
+            and wg.id in
+        <foreach collection="ids" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        </if>
+        GROUP BY wg.id
+        order by  wg.add_time desc
+    </select>
+
     <select id="selectWeGroupList" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo">
         SELECT
             wg.id,
@@ -236,7 +382,7 @@
         on duplicate key update group_name= values(group_name),owner= values(owner),
         notice= values(notice),status= values(status),admin_user_id= values(admin_user_id),
         del_flag= values(del_flag),
-        update_by= values(update_by),update_time= values(update_time),update_by_id= values(update_by_id)
+        update_by= values(update_by),update_time= values(update_time),update_by_id= values(update_by_id);
     </insert>
 
 

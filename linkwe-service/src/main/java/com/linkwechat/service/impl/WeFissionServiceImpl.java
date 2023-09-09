@@ -477,7 +477,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 //                }
 
                     //如果当前时间在裂变结束时间之前,则裂变结束
-                    if(new Date().after(weFission.getFassionEndTime())){
+                    if(weFission.getFassionEndTime().getTime()<new Date().getTime()){
                         weFission.setFassionState(3);
                     }
 
@@ -603,8 +603,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
 
-
-
                 });
 
 
@@ -623,7 +621,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         }finally {
             if(CollectionUtil.isNotEmpty(weFissions)){
-                this.baseMapper.updateBatchFissionIsTip(weFissions);
+                this.updateBatchById(weFissions);
             }
 
 

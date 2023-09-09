@@ -623,7 +623,7 @@ public class QwCustomerController {
      * @return
      */
     @PostMapping("/getCustomerList")
-    public AjaxResult<WeCustomerListVo> getCustomerList(WeCustomerListQuery query){
+    public AjaxResult<WeCustomerListVo> getCustomerList(@RequestBody WeCustomerListQuery query){
 
 
         return AjaxResult.success(

@@ -94,11 +94,6 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      */
     void synchWeCustomerByAddIds(List<String> followUserIds);
 
-    /**
-     * 根据客户id更新客户详情
-     * @param msg
-     */
-    void synchWeCustomerByExIdHandle(String msg);
 
 
     /**
@@ -337,4 +332,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param externalUserIds
      */
     List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
+
+
+
+
+
 }

@@ -70,4 +70,7 @@ public class LoginUser implements Serializable
 
     /**企微客群id集合*/
     private List<String> chatIds;
+
+    /**客户id集合*/
+    private List<String> extIds;
 }
