@@ -993,8 +993,12 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             //同步过，更新统计的情况
             //朋友圈Id存在
             Long momentTaskId = one.getMomentTaskId();
+
+
             //1.同步朋友圈发送情况
             weMomentsUserService.syncUpdateMomentsUser(momentTaskId, moment_id);
+            //3.同步朋友圈附件
+            weMomentsAttachmentsService.syncAddMomentsAttachments(momentTaskId, moment);
             //2.同步员工发送成功的数据
             weMomentsCustomerService.syncMomentsCustomerSendSuccess(momentTaskId, moment_id);
             //3.同步互动数据

@@ -7,6 +7,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.ServiceException;
@@ -67,6 +68,9 @@ public class WeMomentsAttachmentsServiceImpl extends ServiceImpl<WeMomentsAttach
 
     @Override
     public void syncAddMomentsAttachments(Long momentsTaskId, MomentsListDetailResultDto.Moment moment) {
+
+        this.remove(new LambdaQueryWrapper<WeMomentsAttachments>()
+                .eq(WeMomentsAttachments::getMomentsTaskId,momentsTaskId));
         //图片
         List<MomentsListDetailResultDto.MediaId> images = moment.getImage();
         if (CollectionUtil.isNotEmpty(images)) {
