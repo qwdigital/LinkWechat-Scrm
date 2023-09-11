@@ -829,37 +829,7 @@ ALTER TABLE `we_tasks` ADD COLUMN `record_id` bigint(20) NULL DEFAULT NULL COMME
 
 ---
 
----
-### ● 日期：2023.08.28
-  ```
-INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2468, '系统监控', 2185, 9, 'system', NULL, 1, 'M', '0', '0', NULL, 'app', 'admin', NULL, '2023-08-26 16:41:35', NULL, NULL, NULL, '');
-INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2469, '企微异常', 2468, 1, 'system/exception', 'system/exception/index', 1, 'C', '0', '0', '', 'build', 'admin', NULL, '2023-08-26 17:01:15', 'admin', NULL, '2023-08-26 17:08:45', '');
-CREATE TABLE `we_error_msg`  (
-  `id` bigint(20) NOT NULL COMMENT '主键',
-  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求url',
-  `error_code` bigint(20) NULL DEFAULT NULL COMMENT '错误码',
-  `error_msg` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '错误信息',
-  `we_params` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '请求参数',
-  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
-  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '企业微信响应错误参数记录表' ROW_FORMAT = Dynamic;
 
-ALTER TABLE `we_fission` ADD COLUMN `active_title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动名称' AFTER `fission_url`;
-
-ALTER TABLE `we_fission` ADD COLUMN `active_descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动描述' AFTER `active_title`;
-
-ALTER TABLE `we_fission` ADD COLUMN `active_cover_type` tinyint(4) NULL DEFAULT 1 COMMENT '1:海报缩略图 2:自定义' AFTER `active_descr`;
-
-ALTER TABLE `we_fission` ADD COLUMN `active_cover_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '封面图片地址' AFTER `active_cover_type`;
-
-ALTER TABLE `we_group_code_range` ADD COLUMN `status` tinyint(4) NULL DEFAULT NULL COMMENT '关联状态 0-未关联 1-关联' AFTER `chat_id`;
-
-  ```
 ---
   ### ● 日期：2023.06.09
   ```
@@ -1005,3 +975,50 @@ CREATE TABLE `we_material_seize_poster`  (
   `del_flag` int(1) NULL DEFAULT 0 COMMENT '0 未删除 1 已删除',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '素材海报占位符海报生成的实际海报' ROW_FORMAT = DYNAMIC;
+
+---
+### ● 日期：2023.08.28
+  ```
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2468, '系统监控', 2185, 9, 'system', NULL, 1, 'M', '0', '0', NULL, 'app', 'admin', NULL, '2023-08-26 16:41:35', NULL, NULL, NULL, '');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2469, '企微异常', 2468, 1, 'system/exception', 'system/exception/index', 1, 'C', '0', '0', '', 'build', 'admin', NULL, '2023-08-26 17:01:15', 'admin', NULL, '2023-08-26 17:08:45', '');
+CREATE TABLE `we_error_msg`  (
+`id` bigint(20) NOT NULL COMMENT '主键',
+`url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求url',
+`error_code` bigint(20) NULL DEFAULT NULL COMMENT '错误码',
+`error_msg` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '错误信息',
+`we_params` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '请求参数',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '企业微信响应错误参数记录表' ROW_FORMAT = Dynamic;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动名称' AFTER `fission_url`;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动描述' AFTER `active_title`;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_cover_type` tinyint(4) NULL DEFAULT 1 COMMENT '1:海报缩略图 2:自定义' AFTER `active_descr`;
+
+ALTER TABLE `we_fission` ADD COLUMN `active_cover_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '封面图片地址' AFTER `active_cover_type`;
+
+ALTER TABLE `we_group_code_range` ADD COLUMN `status` tinyint(4) NULL DEFAULT NULL COMMENT '关联状态 0-未关联 1-关联' AFTER `chat_id`;
+
+  ```
+
+---
+### ● 日期：2023.09.11
+  ```
+INSERT INTO `we_leads_template_settings` (`id`, `table_entry_name`, `table_entry_id`, `table_entry_attr`, `data_attr`, `datetime_type`, `max_input_len`, `can_edit`, `is_required`, `create_time`, `rank`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1678322167884226560, '姓名', 'name', 0, 0, NULL, 10, 1, 1, '2023-07-10 16:36:01', 4, '2023-09-10 20:51:35', 'admin', 'lw', 168, 1, 0);
+INSERT INTO `we_leads_template_settings` (`id`, `table_entry_name`, `table_entry_id`, `table_entry_attr`, `data_attr`, `datetime_type`, `max_input_len`, `can_edit`, `is_required`, `create_time`, `rank`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1679400302667051008, '电话号码', 'phone', 0, 0, NULL, 11, 1, 1, '2023-07-13 16:00:09', 2, '2023-09-09 11:53:46', 'admin', 'lw', 168, 1, 0);
+INSERT INTO `we_leads_template_settings` (`id`, `table_entry_name`, `table_entry_id`, `table_entry_attr`, `data_attr`, `datetime_type`, `max_input_len`, `can_edit`, `is_required`, `create_time`, `rank`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1691634393458208768, '性别', '1691634393122664448', 1, 0, 0, 100, 1, 0, '2023-08-16 10:14:03', 5, '2023-09-10 20:51:37', 'admin', 'lw', 168, 1, 0);
+INSERT INTO `we_leads_template_settings` (`id`, `table_entry_name`, `table_entry_id`, `table_entry_attr`, `data_attr`, `datetime_type`, `max_input_len`, `can_edit`, `is_required`, `create_time`, `rank`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1691695879538970624, '年龄', '1691695879102763008', 0, 1, 0, 100, 0, 0, '2023-08-16 14:18:23', 3, '2023-09-10 20:51:37', 'admin', 'lw', 168, 1, 0);
+INSERT INTO `we_leads_template_settings` (`id`, `table_entry_name`, `table_entry_id`, `table_entry_attr`, `data_attr`, `datetime_type`, `max_input_len`, `can_edit`, `is_required`, `create_time`, `rank`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1691695967267033088, '身高', '1691695966935683072', 0, 1, 0, 100, 0, 0, '2023-08-16 14:18:43', 1, '2023-09-10 20:51:35', 'admin', 'lw', 168, 1, 0);
+
+ALTER TABLE `we_customer` MODIFY COLUMN `add_user_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `del_flag`;
+ALTER TABLE `we_customer` MODIFY COLUMN `phone` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `track_time`;
+
+
+  ```

@@ -73,8 +73,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
-    @Resource
-    private IWeTasksService weTasksService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -356,9 +355,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 taskStatMapper.batchSave(statList);
                 weMessagePushService.pushMessageSelfH5(followerIds, "【任务动态】<br/> 您有一项「标签建群」任务待完成，请尽快处理", MessageNoticeType.TAG.getType(), true);
 
-                //待办任务
-                WeTasksRequest request = WeTasksRequest.builder().weUserIds(followerIds).build();
-                weTasksService.groupAddByLabel(request);
             }
         } catch (Exception e) {
             log.error("============> 老客标签建群任务发送失败, 任务明细: {}", task);
