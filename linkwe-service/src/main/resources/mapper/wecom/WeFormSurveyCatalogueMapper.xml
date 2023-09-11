@@ -75,7 +75,15 @@
     </select>
 
     <select id="getListIgnoreTenantId" resultType="com.linkwechat.domain.WeFormSurveyCatalogue">
-        <include refid="selectWeFormSurveyCatalogueVo"></include>
+        SELECT
+            id,
+            channels_name,
+            an_timing,
+            survey_state,
+            timing_start,
+            timing_end
+        FROM
+            we_form_survey_catalogue
         where del_flag = 0
     </select>
 

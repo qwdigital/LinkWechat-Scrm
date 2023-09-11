@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfInfoMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <resultMap id="WeKfListResult" type="com.linkwechat.domain.kf.vo.QwKfListVo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="receptionType" column="reception_type"/>
+        <result property="openKfId" column="open_kf_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="userIdList" ofType="com.linkwechat.domain.kf.WeKfUser">
+            <result property="userId" column="user_id"/>
+            <result property="userName" column="user_name"/>
+            <result property="departmentId" column="department_id"/>
+            <result property="deptName" column="dept_name"/>
+        </collection>
+        <collection property="scenesList" ofType="com.linkwechat.domain.kf.vo.WeKfScenesVo">
+            <result property="scenesId" column="scenes_id"/>
+            <result property="scenesName" column="scenes_name"/>
+        </collection>
+    </resultMap>
+
+    <select id="getKfList" resultMap="WeKfListResult">
+        select
+        wki.id,
+        wki.name,
+        wki.avatar,
+        wki.reception_type,
+        wki.open_kf_id,
+        wks.user_id,
+        wks.department_id,
+        wkss.id as scenes_id,
+        wkss.name as scenes_name,
+        wki.create_time,
+        wki.create_by,
+        wki.update_time,
+        wki.update_by
+        from we_kf_info wki
+        left join we_kf_servicer wks on wki.id = wks.kf_id and wks.del_flag = 0
+        left join we_kf_scenes wkss on wki.id = wkss.kf_id and  wkss.del_flag = 0
+        <where>
+            <if test="name != null and name != ''">
+                and wki.name like concat('%', #{name}, '%')
+            </if>
+            <if test="receptionType != null">
+                and wki.reception_type = #{receptionType}
+            </if>
+            <if test="userIds != null and userIds.size > 0">
+                and wks.user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="scenesIds != null and scenesIds.size > 0">
+                and wkss.id in
+                <foreach item="scenesId" collection="scenesIds" index="index" open="(" separator="," close=")">
+                    #{scenesId}
+                </foreach>
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wki.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wki.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            <if test="ids != null and ids.size > 0">
+                and wki.id in
+                <foreach item="id" collection="ids" index="index" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            and wki.del_flag = 0
+        </where>
+        order by wki.update_time desc
+    </select>
+
+    <select id="getKfIdList" resultType="java.lang.Long">
+        select
+            distinct wki.id
+        from we_kf_info wki
+        left join we_kf_servicer wks on wki.id = wks.kf_id and wks.del_flag = 0
+        left join we_kf_scenes wkss on wki.id = wkss.kf_id and  wkss.del_flag = 0
+        <where>
+            <if test="name != null and name != ''">
+                and wki.name like concat('%', #{name}, '%')
+            </if>
+            <if test="receptionType != null">
+                and wki.reception_type = #{receptionType}
+            </if>
+            <if test="userIds != null and userIds.size > 0">
+                and wks.user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="scenesIds != null and scenesIds.size > 0">
+                and wkss.id in
+                <foreach item="scenesId" collection="scenesIds" index="index" open="(" separator="," close=")">
+                    #{scenesId}
+                </foreach>
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(wki.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(wki.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+            and wki.del_flag = 0
+        </where>
+        order by wki.update_time desc
+    </select>
+
+</mapper>

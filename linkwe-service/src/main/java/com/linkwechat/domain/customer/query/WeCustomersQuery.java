@@ -56,18 +56,23 @@ public class WeCustomersQuery {
     private String excludeTagIds;
 
     //个人数据:false 全部数据(相对于角色定义的数据权限):true
-    private Boolean dataScope=false;
+    private Boolean dataScope = false;
 
     //渠道值
     private List<String> stateList;
 
     //是否按照无标签查询 true:是 false:不是
-    private boolean noTagCheck=false;
+    private boolean noTagCheck = false;
 
     //是否去重客户 true:去重  false:不去重
-    private boolean noRepeat=false;
+    private boolean noRepeat = false;
 
-    private boolean isFilterLossCustomer=false;
+    private boolean isFilterLossCustomer = false;
+
+    /**
+     * 手机号码
+     */
+    private String phone;
 
 
 }

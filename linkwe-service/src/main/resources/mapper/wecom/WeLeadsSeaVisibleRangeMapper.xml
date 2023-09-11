@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsSeaVisibleRangeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.leads.sea.entity.WeLeadsSeaVisibleRange">
+        <id column="id" property="id"/>
+        <result column="sea_id" property="seaId"/>
+        <result column="type" property="type"/>
+        <result column="data_id" property="dataId"/>
+        <result column="data_name" property="dataName"/>
+        <result column="is_admin" property="isAdmin"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , sea_id, type, data_id, data_name, is_admin, create_time, update_time, create_by, update_by, update_by_id, create_by_id, del_flag
+    </sql>
+
+    <select id="getVisibleRange" resultType="com.linkwechat.domain.leads.sea.entity.WeLeadsSeaVisibleRange">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        we_leads_sea_visible_range
+        WHERE
+        type = 0 and data_id in (select dept_id from sys_user_dept where user_id = #{userId})
+        or ( type = 1 and data_name = (select position from sys_user where user_id = #{userId} ) )
+        or (type =2 and data_id = #{weUserId})
+    </select>
+
+</mapper>

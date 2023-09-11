@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsSeaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.leads.sea.entity.WeLeadsSea">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="is_auto_recovery" property="isAutoRecovery"/>
+        <result column="num" property="num"/>
+        <result column="first" property="first"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_by_id" property="updateById"/>
+        <result column="create_by_id" property="createById"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , name, is_auto_recovery, num, first, create_time, update_time, create_by, update_by, update_by_id, create_by_id, del_flag,version
+    </sql>
+
+    <!-- 获取总领取量 -->
+    <select id="allReceiveNum" resultType="com.linkwechat.domain.leads.sea.vo.WeLeadsSeaStatisticVO">
+        SELECT t3.dateTime ,(@total:= @total+ t3.todayReceiveNum) as allReceiveNum
+        FROM
+        (
+        <include refid="todayReceiveNum"></include>
+        ) as t3,
+        (select @total:= (SELECT count( 1 ) FROM we_leads_follower WHERE sea_id = 1
+        <if test="weUserId!=null">
+            AND follower_we_user_id = #{weUserId}
+        </if>
+        AND follower_status = 1
+        AND DATE_FORMAT( follower_start_time, '%Y-%m-%d' ) &lt; DATE_FORMAT(#{startTime},'%Y-%m-%d'))) as t4
+    </select>
+
+    <!-- 当日领取量 -->
+    <select id="todayReceiveNum" resultType="com.linkwechat.domain.leads.sea.vo.WeLeadsSeaStatisticVO">
+        <include refid="todayReceiveNum"></include>
+    </select>
+
+    <!-- 当日领取量 -->
+    <sql id="todayReceiveNum">
+        SELECT t1.date as dateTime ,IFNULL(t2.today,0) as todayReceiveNum FROM sys_dim_date t1
+        LEFT JOIN (
+        SELECT
+        DATE_FORMAT(follower_start_time, '%Y-%m-%d' ) as dateTime ,count(1) as today
+        FROM
+        we_leads_follower
+        WHERE
+        sea_id = #{seaId}
+        AND follower_status = 1
+        <if test="weUserId!=null">
+            AND follower_we_user_id = #{weUserId}
+        </if>
+        AND DATE_FORMAT( follower_start_time, '%Y-%m-%d' ) &gt;= DATE_FORMAT( #{startTime}, '%Y-%m-%d' )
+        AND DATE_FORMAT( follower_start_time, '%Y-%m-%d' ) &lt;= DATE_FORMAT( #{endTime}, '%Y-%m-%d' )
+        GROUP BY DATE_FORMAT(follower_start_time, '%Y-%m-%d' )
+        ) AS t2 ON t1.date = t2.dateTime
+        WHERE date &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d' ) AND date &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d' )
+        ORDER BY date
+    </sql>
+
+
+
+    <!-- 总跟进量 -->
+    <select id="allFollowerNum" resultType="com.linkwechat.domain.leads.sea.vo.WeLeadsSeaStatisticVO">
+        SELECT t6.dateTime,todayFollowNum,(@total:=@total+todayFollowNum) as allFollowerNum  FROM
+        (
+            <include refid="todayFollowNum"></include>
+        ) AS t6,
+        (select @total:= (SELECT count( 1 ) FROM we_leads_follow_record t1
+        LEFT JOIN we_leads_follower t2 on t1.follow_user_id = t2.id
+        WHERE t1.sea_id = #{seaId}
+        AND t1.record_status = 1
+        <if test="weUserId!=null and weUserId!=''">
+            AND t2.follower_we_user_id = #{weUserId}
+        </if>
+        AND DATE_FORMAT(t1.create_time, '%Y-%m-%d' ) &lt; DATE_FORMAT(#{startTime},'%Y-%m-%d'))) as t7
+    </select>
+
+    <!-- 当日跟进量 -->
+    <select id="todayFollowNum" resultType="com.linkwechat.domain.leads.sea.vo.WeLeadsSeaStatisticVO">
+        <include refid="todayFollowNum"></include>
+    </select>
+
+    <!-- 总跟进量 -->
+    <select id="getAllFollowNum" resultType="java.lang.Integer">
+        SELECT
+            ifnull(sum(count),0)
+        FROM
+            ( SELECT count( 1 ) as count  FROM we_leads_follow_record WHERE sea_id = #{seaId} AND record_status = 1 GROUP BY follow_user_id, DATE_FORMAT( create_time, '%y%m%d' ) ) AS t1
+    </select>
+
+    <!-- 当日跟进量 -->
+    <sql id="todayFollowNum">
+        SELECT t5.date as dateTime ,IFNULL(t4.sum,0) as todayFollowNum FROM sys_dim_date t5
+        left join (
+        select dateTime ,sum(count) as sum
+        from (
+        select
+        DATE_FORMAT( create_time, '%Y-%m-%d' ) as dateTime,count(1)  AS count
+        from
+        we_leads_follow_record t1
+        left join we_leads_follower t2 on t1.follow_user_id = t2.id
+        where t1.sea_id = #{seaId}
+        AND t1.record_status = 1
+        <if test="weUserId!=null and weUserId!=''">
+            AND t2.follower_we_user_id = #{weUserId}
+        </if>
+        AND DATE_FORMAT( t1.create_time, '%Y-%m-%d' ) &gt;= DATE_FORMAT( #{startTime}, '%Y-%m-%d' )
+        AND DATE_FORMAT( t1.create_time, '%Y-%m-%d' ) &lt;= DATE_FORMAT( #{endTime}, '%Y-%m-%d' )
+        group by t1.follow_user_id,DATE_FORMAT( t1.create_time, '%y-%m-%d' )
+        ) as t3
+        group by dateTime ) as t4 on t5.date = t4.dateTime
+        WHERE t5.date &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d' ) AND t5.date &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d' )
+        ORDER BY t5.date
+    </sql>
+
+
+
+
+</mapper>

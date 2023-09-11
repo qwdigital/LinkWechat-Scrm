@@ -214,15 +214,15 @@
     </select>
 
     <update id="updateBatchFissionIsTip">
-       UPDATE we_fission
-            SET
-            is_tip = 1,
-            update_time = NOW()
-            WHERE
-        <foreach collection="weFissions" index="index" item="item" separator="," open="id IN (" close=")">
-           #{item.id}
-       </foreach>
-
+        <foreach collection="weFissions" item="item" separator=";">
+           UPDATE we_fission
+                SET
+                is_tip = 1,
+                fassion_state = #{item.fassionState}
+                update_time = NOW()
+                WHERE id=
+               #{item.id}
+        </foreach>
     </update>
 
 

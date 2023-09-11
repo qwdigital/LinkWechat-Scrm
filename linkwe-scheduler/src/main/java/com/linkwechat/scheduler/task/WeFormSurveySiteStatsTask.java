@@ -7,7 +7,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.SiteStasConstants;
 import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
@@ -53,7 +52,7 @@ public class WeFormSurveySiteStatsTask {
     @Resource
     private IWeFormSurveyStatisticsService weFormSurveyStatisticsService;
 
-    private ExecutorService executorService = ThreadUtil.newExecutor(5,10,10240);
+    private ExecutorService executorService = ThreadUtil.newExecutor(5, 10, 10240);
 
 
     @XxlJob("weFormSurveySiteStasTask")
@@ -153,7 +152,7 @@ public class WeFormSurveySiteStatsTask {
      */
     private void dayByDaySiteStas(WeFormSurveyCatalogue weFormSurveyCatalogue) {
         String params = XxlJobHelper.getJobParam();
-        String dateStr = StringUtils.isNotBlank(params)?params:DateUtil.yesterday().toDateStr();
+        String dateStr = StringUtils.isNotBlank(params) ? params : DateUtil.yesterday().toDateStr();
 
         String[] channels = weFormSurveyCatalogue.getChannelsName().split(",");
         for (String channel : channels) {
@@ -162,7 +161,7 @@ public class WeFormSurveySiteStatsTask {
             String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
             Integer pv = (Integer) redisTemplate.opsForValue().get(pvKey);
             //IP
-            String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
+            String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             Long uv = redisTemplate.opsForSet().size(ipKey) - 1;
 
             //之前总的统计数据
@@ -214,11 +213,11 @@ public class WeFormSurveySiteStatsTask {
             }
             weFormSurveyStatistics.setCreateTime(DateUtil.parseDate(dateStr));
             weFormSurveyStatistics.setDelFlag(Constants.COMMON_STATE);
-            weFormSurveyStatisticsService.saveOrUpdate(weFormSurveyStatistics,new LambdaQueryWrapper<WeFormSurveyStatistics>()
-                    .eq(WeFormSurveyStatistics::getBelongId,weFormSurveyStatistics.getBelongId())
-                    .eq(WeFormSurveyStatistics::getDataSource,weFormSurveyStatistics.getDataSource())
+            weFormSurveyStatisticsService.saveOrUpdate(weFormSurveyStatistics, new LambdaQueryWrapper<WeFormSurveyStatistics>()
+                    .eq(WeFormSurveyStatistics::getBelongId, weFormSurveyStatistics.getBelongId())
+                    .eq(WeFormSurveyStatistics::getDataSource, weFormSurveyStatistics.getDataSource())
                     .apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + dateStr + "'")
-                    .eq(WeFormSurveyStatistics::getDelFlag,0));
+                    .eq(WeFormSurveyStatistics::getDelFlag, 0));
         }
     }
 

@@ -457,7 +457,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
-                .eq(WeFission::getIsTip,2)
+//                .eq(WeFission::getIsTip,2)
                 .isNotNull(WeFission::getAddWeUserOrGroupCode)
                 .notIn(WeFission::getFassionState, ListUtil.toList(3,4)));
 
@@ -466,16 +466,18 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
             if(CollectionUtil.isNotEmpty(weFissions)){
+
+
                 weFissions.stream().forEach(weFission -> {
 
-               if(new Date().after(weFission.getFassionStartTime())&&
-                   new Date().before(weFission.getFassionEndTime())
-                ) {
-                    weFission.setFassionState(2);
-                }
+//               if(new Date().after(weFission.getFassionStartTime())&&
+//                   new Date().before(weFission.getFassionEndTime())
+//                ) {
+//                    weFission.setFassionState(2);
+//                }
 
                     //如果当前时间在裂变结束时间之前,则裂变结束
-                    if(new Date().after(weFission.getFassionEndTime())){
+                    if(weFission.getFassionEndTime().getTime()<new Date().getTime()){
                         weFission.setFassionState(3);
                     }
 
@@ -601,8 +603,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
 
-
-
                 });
 
 
@@ -621,7 +621,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         }finally {
             if(CollectionUtil.isNotEmpty(weFissions)){
-                this.baseMapper.updateBatchFissionIsTip(weFissions);
+                this.updateBatchById(weFissions);
             }
 
 

@@ -35,6 +35,9 @@
             <if test="weCustomerList.delFlag != null">
                 AND wcr.del_flag = #{weCustomerList.delFlag}
             </if>
+            <if test="weCustomerList.phone != null and weCustomerList.phone !=''">
+               AND wcr.phone = #{weCustomerList.phone,jdbcType=VARCHAR}
+            </if>
             <if test="weCustomerList.name != null and weCustomerList.name !=''">
                 AND  CONCAT( IFNULL(wcr.customer_name,''))
                 LIKE CONCAT('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
@@ -213,7 +216,8 @@
         (SELECT GROUP_CONCAT(wt.tag_id) FROM we_flower_customer_tag_rel wfctr
         LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
         WHERE wfctr.external_userid=wc.external_userid AND wc.add_user_id=wfctr.user_id AND wt.tag_type=1 and wfctr.del_flag=0)  as tagIds,
-        wc.update_time as updateTime
+        wc.update_time as updateTime,
+        wc.area
         FROM
         we_customer wc
         WHERE
@@ -625,17 +629,6 @@
             </if>
         </where>
         ORDER BY wcr.add_time desc
-    </select>
-
-    <select id="getCustomerSimpleInfo" resultType="com.linkwechat.domain.customer.vo.WeCustomerSimpleInfoVo">
-        select  external_userid,customer_name,avatar from we_customer
-        <where>
-            and external_userid in
-            <foreach collection="externalUserIds" item="item" index="index" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </where>
-        group by external_userid,customer_name,avatar;
     </select>
 
 

@@ -759,13 +759,26 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         Long startTime = DateUtil.beginOfDay(new Date()).getTime() / 1000;
         Long endTime = DateUtil.date().getTime() / 1000;
         MomentsListDetailParamDto query = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).filter_type(filterType).build();
-
+        query.setCursor(null);
         List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
-        getMoment(null, moments, query);
+        getMomentPage(query);
 
-        if (CollectionUtil.isNotEmpty(moments)) {
-            syncAndSave(moments);
+
+    }
+
+    //朋友圈同步分页入库
+    public void getMomentPage(MomentsListDetailParamDto query){
+        MomentsListDetailResultDto result = qwMomentsClient.momentList(query).getData();
+        if (null != result) {
+            if (WeConstans.WE_SUCCESS_CODE.equals(result.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(result.getErrCode()) && CollectionUtil.isNotEmpty(result.getMoment_list())) {
+                syncAndSave(result.getMoment_list());
+                if (StringUtils.isNotEmpty(result.getNext_cursor())) {
+                    query.setCursor(result.getNext_cursor());
+                    getMomentPage(query);
+                }
+            }
         }
+
     }
 
     @Override
@@ -943,6 +956,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         if (null != result) {
             if (WeConstans.WE_SUCCESS_CODE.equals(result.getErrCode()) || WeConstans.NOT_EXIST_CONTACT.equals(result.getErrCode()) && CollectionUtil.isNotEmpty(result.getMoment_list())) {
                 list.addAll(result.getMoment_list());
+
                 if (StringUtils.isNotEmpty(result.getNext_cursor())) {
                     getMoment(result.getNext_cursor(), list, query);
                 }
@@ -979,8 +993,12 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             //同步过，更新统计的情况
             //朋友圈Id存在
             Long momentTaskId = one.getMomentTaskId();
+
+
             //1.同步朋友圈发送情况
             weMomentsUserService.syncUpdateMomentsUser(momentTaskId, moment_id);
+            //3.同步朋友圈附件
+            weMomentsAttachmentsService.syncAddMomentsAttachments(momentTaskId, moment);
             //2.同步员工发送成功的数据
             weMomentsCustomerService.syncMomentsCustomerSendSuccess(momentTaskId, moment_id);
             //3.同步互动数据
