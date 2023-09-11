@@ -1,4 +1,4 @@
-//package com.linkwechat.framework.config;
+package com.linkwechat.framework.config;//package com.linkwechat.framework.config;
 //
 //import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 //import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

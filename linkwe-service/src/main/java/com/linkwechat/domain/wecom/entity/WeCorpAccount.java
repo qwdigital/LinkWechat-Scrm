@@ -1,4 +1,4 @@
-//package com.linkwechat.wecom.domain.entity;
+package com.linkwechat.domain.wecom.entity;//package com.linkwechat.wecom.domain.entity;
 //
 //import com.baomidou.mybatisplus.annotation.TableId;
 //import com.baomidou.mybatisplus.annotation.TableName;
