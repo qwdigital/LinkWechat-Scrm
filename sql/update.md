@@ -1,5 +1,5 @@
-   # **sql更新记录**
-   #### 注：当前为每次版本升级时涉及到的数据库变更记录
+# **sql更新记录**
+#### 注：当前为每次版本升级时涉及到的数据库变更记录
 ---
 
 ---
@@ -47,7 +47,7 @@ KEY `cha_id_index` (`code_id`,`chat_id`)
 ---
 ### ● 日期：2023.07.9
   ```
- ALTER TABLE `we_allocate_customer` ADD COLUMN `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称' AFTER `external_userid`;
+ALTER TABLE `we_allocate_customer` ADD COLUMN `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称' AFTER `external_userid`;
 
 ALTER TABLE `we_allocate_customer` ADD COLUMN `takeover_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '接替成员名称' AFTER `customer_name`;
 
@@ -75,18 +75,18 @@ ALTER TABLE `we_form_survey_answer` MODIFY COLUMN `answer` longtext CHARACTER SE
 
 
 CREATE TABLE `we_group_code_range`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `code_id` bigint(20) NOT NULL COMMENT '活码ID',
-  `chat_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '群聊ID',
-  `del_flag` tinyint(1) NULL DEFAULT 0 COMMENT '0:正常;1:删除;',
-  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `cha_id_index`(`code_id`, `chat_id`) USING BTREE
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+`code_id` bigint(20) NOT NULL COMMENT '活码ID',
+`chat_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '群聊ID',
+`del_flag` tinyint(1) NULL DEFAULT 0 COMMENT '0:正常;1:删除;',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+PRIMARY KEY (`id`) USING BTREE,
+INDEX `cha_id_index`(`code_id`, `chat_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '客户群活码范围' ROW_FORMAT = Dynamic;
 
 
@@ -105,70 +105,70 @@ ALTER TABLE `we_material` MODIFY COLUMN `height` int(11) NULL DEFAULT NULL COMME
 ALTER TABLE `we_material` MODIFY COLUMN `media_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '资源类型(0图片，1语音，2视频，3文件，4文本，5海报，9图文，10链接，11小程序，12文章)' AFTER `height`;
 
 CREATE TABLE `we_moments_attachments`  (
-  `id` bigint(20) NOT NULL COMMENT '主键id',
-  `moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
-  `is_material` tinyint(1) NOT NULL COMMENT '是否内容中心素材: 0不是 1是',
-  `msg_type` tinyint(1) NULL DEFAULT NULL COMMENT '附件类型:0图片 1视频 2链接 3位置',
-  `media_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '企微素材id,有效期3天',
-  `media_id_expire` datetime NULL DEFAULT NULL COMMENT '企微素材id失效时间',
-  `media_id_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '获取企微临时素材后，上传到oss',
-  `thumb_media_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '视频封面media_id',
-  `thumb_media_id_expire` datetime NULL DEFAULT NULL COMMENT '视频封面media_id的失效时间',
-  `thumb_media_id_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '视频封面media_id的url地址',
-  `link_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '网页链接标题',
-  `link_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '网页链接url',
-  `location_latitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '地理位置纬度',
-  `location_longitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '地理位置经度',
-  `location_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '地理位置名称',
-  `material_id` bigint(20) NULL DEFAULT NULL COMMENT '素材中心Id',
-  `real_type` tinyint(2) NULL DEFAULT NULL COMMENT '真实素材类型',
-  PRIMARY KEY (`id`) USING BTREE
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
+`is_material` tinyint(1) NOT NULL COMMENT '是否内容中心素材: 0不是 1是',
+`msg_type` tinyint(1) NULL DEFAULT NULL COMMENT '附件类型:0图片 1视频 2链接 3位置',
+`media_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '企微素材id,有效期3天',
+`media_id_expire` datetime NULL DEFAULT NULL COMMENT '企微素材id失效时间',
+`media_id_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '获取企微临时素材后，上传到oss',
+`thumb_media_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '视频封面media_id',
+`thumb_media_id_expire` datetime NULL DEFAULT NULL COMMENT '视频封面media_id的失效时间',
+`thumb_media_id_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '视频封面media_id的url地址',
+`link_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '网页链接标题',
+`link_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '网页链接url',
+`location_latitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '地理位置纬度',
+`location_longitude` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '地理位置经度',
+`location_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '地理位置名称',
+`material_id` bigint(20) NULL DEFAULT NULL COMMENT '素材中心Id',
+`real_type` tinyint(2) NULL DEFAULT NULL COMMENT '真实素材类型',
+PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '朋友圈附件' ROW_FORMAT = Dynamic;
 
 CREATE TABLE `we_moments_customer`  (
-  `id` bigint(20) NOT NULL COMMENT '主键id',
-  `moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
-  `moments_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '朋友圈id',
-  `user_id` bigint(20) NOT NULL COMMENT '员工id',
-  `we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
-  `user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '员工名称',
-  `external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户id',
-  `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称',
-  `delivery_status` int(11) NULL DEFAULT NULL COMMENT '送达状态 0已送达 1未送达',
-  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
-  `del_flag` tinyint(4) NULL DEFAULT NULL COMMENT '删除标识 0:正常 1:删除',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `moments_task_id`(`moments_task_id`, `moments_id`, `user_id`, `external_userid`) USING BTREE
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
+`moments_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '朋友圈id',
+`user_id` bigint(20) NOT NULL COMMENT '员工id',
+`we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
+`user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '员工名称',
+`external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户id',
+`customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称',
+`delivery_status` int(11) NULL DEFAULT NULL COMMENT '送达状态 0已送达 1未送达',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+`update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+`del_flag` tinyint(4) NULL DEFAULT NULL COMMENT '删除标识 0:正常 1:删除',
+PRIMARY KEY (`id`) USING BTREE,
+INDEX `moments_task_id`(`moments_task_id`, `moments_id`, `user_id`, `external_userid`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '朋友圈可见客户' ROW_FORMAT = Dynamic;
 
 CREATE TABLE `we_moments_estimate_customer`  (
-  `id` bigint(20) NOT NULL COMMENT '主键id',
-  `moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
-  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '员工id',
-  `we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
-  `user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '员工名称',
-  `external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '客户id',
-  `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `moments_task_id`(`moments_task_id`, `we_user_id`, `external_userid`) USING BTREE
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
+`user_id` bigint(20) NULL DEFAULT NULL COMMENT '员工id',
+`we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
+`user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '员工名称',
+`external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '客户id',
+`customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户名称',
+PRIMARY KEY (`id`) USING BTREE,
+INDEX `moments_task_id`(`moments_task_id`, `we_user_id`, `external_userid`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '预估朋友圈可见客户' ROW_FORMAT = Dynamic;
 
 CREATE TABLE `we_moments_estimate_user`  (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
-  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '员工id',
-  `we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
-  `user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '员工名称',
-  `dept_id` bigint(20) NULL DEFAULT NULL COMMENT '部门id',
-  `dept_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '部门名称',
-  `execute_count` int(11) NULL DEFAULT 0 COMMENT '提醒执行次数',
-  `execute_status` tinyint(1) NOT NULL COMMENT '执行状态:0未执行，1已执行',
-  PRIMARY KEY (`id`) USING BTREE
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
+`user_id` bigint(20) NULL DEFAULT NULL COMMENT '员工id',
+`we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
+`user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '员工名称',
+`dept_id` bigint(20) NULL DEFAULT NULL COMMENT '部门id',
+`dept_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '部门名称',
+`execute_count` int(11) NULL DEFAULT 0 COMMENT '提醒执行次数',
+`execute_status` tinyint(1) NOT NULL COMMENT '执行状态:0未执行，1已执行',
+PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '预估朋友圈执行员工' ROW_FORMAT = Dynamic;
 
 
@@ -181,62 +181,62 @@ ALTER TABLE `we_moments_interacte` MODIFY COLUMN `id` bigint(11) NOT NULL COMMEN
 ALTER TABLE `we_moments_interacte` MODIFY COLUMN `moment_id` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '朋友圈id' AFTER `moments_task_id`;
 
 CREATE TABLE `we_moments_task`  (
-  `id` bigint(20) NOT NULL DEFAULT 0 COMMENT '主键ID',
-  `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '任务名称',
-  `type` tinyint(1) NOT NULL DEFAULT 0 COMMENT '朋友圈类型:0:企业动态;1:个人动态',
-  `send_type` tinyint(1) NOT NULL COMMENT '发送方式: 0企微群发，1个人发送，2成员群发',
-  `is_lw_push` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否是在lw平台发布的:1:是;0:否;',
-  `scope_type` tinyint(1) NOT NULL DEFAULT 1 COMMENT '发送范围: 0全部客户 1按条件筛选',
-  `customer_num` int(11) NULL DEFAULT 0 COMMENT '朋友圈可见客户数',
-  `dept_ids` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '部门id集合',
-  `post_ids` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '岗位id集合',
-  `user_ids` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '员工id集合',
-  `customer_tag` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '客户标签，多个使用逗号隔开',
-  `content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '朋友圈部分内容',
-  `execute_time` datetime NULL DEFAULT NULL COMMENT '执行时间',
-  `execute_end_time` datetime NULL DEFAULT NULL COMMENT '结束时间',
-  `like_tag_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '点赞标签',
-  `comment_tag_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '评论标签',
-  `status` tinyint(4) NOT NULL DEFAULT 3 COMMENT '任务状态：1未开始，2进行中，3已结束',
-  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
-  `create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
-  `del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '删除标识 0:正常 1:删除',
-  `establish_time` datetime NULL DEFAULT NULL COMMENT '企微创建时间',
-  PRIMARY KEY (`id`) USING BTREE
+`id` bigint(20) NOT NULL DEFAULT 0 COMMENT '主键ID',
+`name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '任务名称',
+`type` tinyint(1) NOT NULL DEFAULT 0 COMMENT '朋友圈类型:0:企业动态;1:个人动态',
+`send_type` tinyint(1) NOT NULL COMMENT '发送方式: 0企微群发，1个人发送，2成员群发',
+`is_lw_push` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否是在lw平台发布的:1:是;0:否;',
+`scope_type` tinyint(1) NOT NULL DEFAULT 1 COMMENT '发送范围: 0全部客户 1按条件筛选',
+`customer_num` int(11) NULL DEFAULT 0 COMMENT '朋友圈可见客户数',
+`dept_ids` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '部门id集合',
+`post_ids` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '岗位id集合',
+`user_ids` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '员工id集合',
+`customer_tag` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '客户标签，多个使用逗号隔开',
+`content` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '朋友圈部分内容',
+`execute_time` datetime NULL DEFAULT NULL COMMENT '执行时间',
+`execute_end_time` datetime NULL DEFAULT NULL COMMENT '结束时间',
+`like_tag_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '点赞标签',
+`comment_tag_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '评论标签',
+`status` tinyint(4) NOT NULL DEFAULT 3 COMMENT '任务状态：1未开始，2进行中，3已结束',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+`del_flag` tinyint(4) NOT NULL DEFAULT 0 COMMENT '删除标识 0:正常 1:删除',
+`establish_time` datetime NULL DEFAULT NULL COMMENT '企微创建时间',
+PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '朋友圈' ROW_FORMAT = Dynamic;
 
 CREATE TABLE `we_moments_task_relation`  (
-  `id` bigint(20) NOT NULL COMMENT '主键id',
-  `moment_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
-  `job_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '异步任务id，24小时有效',
-  `job_id_expire` datetime NULL DEFAULT NULL COMMENT '异步任务id失效时间',
-  `moment_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '朋友圈id',
-  PRIMARY KEY (`id`) USING BTREE
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`moment_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
+`job_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '异步任务id，24小时有效',
+`job_id_expire` datetime NULL DEFAULT NULL COMMENT '异步任务id失效时间',
+`moment_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '朋友圈id',
+PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '朋友圈任务和企微朋友圈关联表' ROW_FORMAT = Dynamic;
 
 CREATE TABLE `we_moments_user`  (
-  `id` bigint(20) NOT NULL COMMENT '主键id',
-  `moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
-  `moments_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '朋友圈id',
-  `user_id` bigint(20) NOT NULL COMMENT '员工id',
-  `we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
-  `user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '员工名称',
-  `dept_id` bigint(20) NULL DEFAULT NULL COMMENT '部门id',
-  `dept_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '部门名称',
-  `execute_status` tinyint(1) NOT NULL COMMENT '执行状态:0未执行，1已执行',
-  `execute_count` int(11) NOT NULL COMMENT '提醒执行次数',
-  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
-  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
-  `del_flag` tinyint(4) NULL DEFAULT NULL COMMENT '删除标识 0:正常 1:删除',
-  PRIMARY KEY (`id`) USING BTREE
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`moments_task_id` bigint(20) NOT NULL COMMENT '朋友圈任务id',
+`moments_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '朋友圈id',
+`user_id` bigint(20) NOT NULL COMMENT '员工id',
+`we_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企微员工id',
+`user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '员工名称',
+`dept_id` bigint(20) NULL DEFAULT NULL COMMENT '部门id',
+`dept_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '部门名称',
+`execute_status` tinyint(1) NOT NULL COMMENT '执行状态:0未执行，1已执行',
+`execute_count` int(11) NOT NULL COMMENT '提醒执行次数',
+`create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建人',
+`update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(20) NULL DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(20) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+`update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+`del_flag` tinyint(4) NULL DEFAULT NULL COMMENT '删除标识 0:正常 1:删除',
+PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '朋友圈执行员工' ROW_FORMAT = Dynamic;
 
 ALTER TABLE `we_msg_tlp` ADD COLUMN `template_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '欢迎语模版id' AFTER `category_id`;
@@ -297,10 +297,10 @@ UPDATE `sys_menu` SET `menu_name` = '迁移分析', `parent_id` = 2285, `order_n
 UPDATE `sys_menu` SET `menu_name` = '老客孵化', `parent_id` = 2366, `order_num` = 3, `path` = 'highSeas', `component` = NULL, `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2022-09-12 23:56:37', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-08-18 10:22:51', `remark` = '' WHERE `menu_id` = 2285;
 
 
- ALTER TABLE `sys_user` ADD COLUMN `is_open_daily` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否开启动态日报 0开启，1关闭 默认开启0' AFTER `kf_status`;
+ALTER TABLE `sys_user` ADD COLUMN `is_open_daily` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否开启动态日报 0开启，1关闭 默认开启0' AFTER `kf_status`;
 
- DROP TABLE IF EXIST `we_leads_template_settings`
- CREATE TABLE `we_leads_template_settings` (
+DROP TABLE IF EXIST `we_leads_template_settings`
+CREATE TABLE `we_leads_template_settings` (
 `id` bigint(20) NOT NULL COMMENT '主键',
 `table_entry_name` varchar(255) NOT NULL COMMENT '表项名称',
 `table_entry_id` varchar(255) NOT NULL COMMENT '表项Id',
@@ -343,269 +343,269 @@ INSERT INTO `we_leads_template_table_entry_content` VALUES (1679402002626850818,
 
 DROP TABLE IF EXISTS `we_leads_sea`;
 CREATE TABLE `we_leads_sea` (
-  `id` bigint NOT NULL COMMENT '主键Id',
-  `name` varchar(32)  DEFAULT NULL COMMENT '公海名称',
-  `is_auto_recovery` tinyint DEFAULT NULL COMMENT '是否自动回收（1 表示是，0 表示否）',
-  `num` int DEFAULT '0' COMMENT '公海线索数',
-  `first` int DEFAULT NULL COMMENT '成员领取线索超过A天未能实现几次跟进，则回收至公海池。且必须在前几天内完成首次跟进。(A)',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255)  NOT NULL COMMENT '创建人',
-  `update_by` varchar(255)  DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint NOT NULL COMMENT '创建人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  `version` bigint NOT NULL COMMENT '当前规则版本',
-  PRIMARY KEY (`id`)
+`id` bigint NOT NULL COMMENT '主键Id',
+`name` varchar(32)  DEFAULT NULL COMMENT '公海名称',
+`is_auto_recovery` tinyint DEFAULT NULL COMMENT '是否自动回收（1 表示是，0 表示否）',
+`num` int DEFAULT '0' COMMENT '公海线索数',
+`first` int DEFAULT NULL COMMENT '成员领取线索超过A天未能实现几次跟进，则回收至公海池。且必须在前几天内完成首次跟进。(A)',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255)  NOT NULL COMMENT '创建人',
+`update_by` varchar(255)  DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+`version` bigint NOT NULL COMMENT '当前规则版本',
+PRIMARY KEY (`id`)
 ) COMMENT='线索公海';
 INSERT INTO `we_leads_sea` VALUES (1, '默认公海', 0, 0, NULL, '2023-07-14 17:18:41', '2023-07-14 17:18:44', 'admin', 'admin', 1, 1, 0, 0);
 
 
 DROP TABLE IF EXISTS `we_leads_sea_rule_record`;
 CREATE TABLE `we_leads_sea_rule_record` (
-  `id` bigint NOT NULL COMMENT '主键Id',
-  `sea_id` bigint NOT NULL COMMENT '公海id',
-  `is_auto_recovery` tinyint NOT NULL COMMENT '是否自动回收（1 表示是，0 表示否）',
-  `first` int DEFAULT NULL COMMENT '成员领取线索超过A天未能实现几次跟进，则回收至公海池。且必须在前几天内完成首次跟进。(A)',
-  `version` int NOT NULL COMMENT '历史规则版本',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `create_by` varchar(255)  DEFAULT NULL COMMENT '创建人',
-  `create_by_id` bigint DEFAULT NULL COMMENT '创建人Id',
-  PRIMARY KEY (`id`)
+`id` bigint NOT NULL COMMENT '主键Id',
+`sea_id` bigint NOT NULL COMMENT '公海id',
+`is_auto_recovery` tinyint NOT NULL COMMENT '是否自动回收（1 表示是，0 表示否）',
+`first` int DEFAULT NULL COMMENT '成员领取线索超过A天未能实现几次跟进，则回收至公海池。且必须在前几天内完成首次跟进。(A)',
+`version` int NOT NULL COMMENT '历史规则版本',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`create_by` varchar(255)  DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint DEFAULT NULL COMMENT '创建人Id',
+PRIMARY KEY (`id`)
 ) COMMENT='线索公海规则修改记录';
 
 DROP TABLE IF EXISTS `we_leads_sea_visible_range`;
 CREATE TABLE `we_leads_sea_visible_range` (
-  `id` bigint NOT NULL COMMENT '主键Id',
-  `sea_id` bigint NOT NULL COMMENT '公海池Id',
-  `type` tinyint NOT NULL COMMENT '类型(0部门 1岗位 2员工)',
-  `data_id` varchar(32)  DEFAULT NULL COMMENT '数据Id',
-  `data_name` varchar(32)  DEFAULT NULL COMMENT '数据名称',
-  `is_admin` tinyint(1) DEFAULT '0' COMMENT '是否管理员（1是，0否）',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255)  NOT NULL COMMENT '创建人',
-  `update_by` varchar(255)  DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint NOT NULL COMMENT '创建人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  PRIMARY KEY (`id`)
+`id` bigint NOT NULL COMMENT '主键Id',
+`sea_id` bigint NOT NULL COMMENT '公海池Id',
+`type` tinyint NOT NULL COMMENT '类型(0部门 1岗位 2员工)',
+`data_id` varchar(32)  DEFAULT NULL COMMENT '数据Id',
+`data_name` varchar(32)  DEFAULT NULL COMMENT '数据名称',
+`is_admin` tinyint(1) DEFAULT '0' COMMENT '是否管理员（1是，0否）',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255)  NOT NULL COMMENT '创建人',
+`update_by` varchar(255)  DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+PRIMARY KEY (`id`)
 ) COMMENT='公海可见范围';
 
 DROP TABLE IF EXIST `we_leads`
 CREATE TABLE `we_leads` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `name` varchar(32) NOT NULL COMMENT '姓名',
-  `phone` char(11) NOT NULL COMMENT '电话号码',
-  `leads_status` tinyint(2) NOT NULL COMMENT '线索状态(0待分配，1跟进中，2已上门，3已退回)',
-  `labels_ids` varchar(500) DEFAULT NULL COMMENT '备注标签',
-  `properties` text COMMENT '自定义属性',
-  `sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255) NOT NULL COMMENT '创建人',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `create_by_id` bigint(20) NOT NULL COMMENT '创建人id',
-  `update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  `follower_id` bigint(20) DEFAULT NULL COMMENT '当前跟进人Id',
-  `we_user_id` varchar(32) DEFAULT NULL COMMENT '当前跟进人企微Id',
-  `follower_name` varchar(32) DEFAULT NULL COMMENT '当前跟进人名称',
-  `dept_id` varchar(32) DEFAULT NULL COMMENT '当前跟进人部门Id',
-  `recovery_times` int(11) NOT NULL DEFAULT '0' COMMENT '回收次数',
-  `return_reason` tinyint(2) DEFAULT NULL COMMENT '末次回收原因',
-  `source` tinyint(3) DEFAULT NULL COMMENT '线索来源 0excel导入',
-  `sex` tinyint(2) DEFAULT NULL COMMENT ' 性别 0 = 未知, 1 = 男, 2 = 女',
-  `import_record_id` bigint(20) DEFAULT NULL COMMENT '导入记录id',
-  `customer_id` bigint(20) DEFAULT NULL COMMENT '客户Id',
-  `external_userid` varchar(255) DEFAULT NULL COMMENT '客户外部联系人Id',
-  `bind_customer_time` datetime NOT NULL COMMENT '绑定客户时间',
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `phone_unique`(`phone`) USING BTREE COMMENT '手机号码索引'
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`name` varchar(32) NOT NULL COMMENT '姓名',
+`phone` char(11) NOT NULL COMMENT '电话号码',
+`leads_status` tinyint(2) NOT NULL COMMENT '线索状态(0待分配，1跟进中，2已上门，3已退回)',
+`labels_ids` varchar(500) DEFAULT NULL COMMENT '备注标签',
+`properties` text COMMENT '自定义属性',
+`sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) NOT NULL COMMENT '创建人',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`create_by_id` bigint(20) NOT NULL COMMENT '创建人id',
+`update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+`follower_id` bigint(20) DEFAULT NULL COMMENT '当前跟进人Id',
+`we_user_id` varchar(32) DEFAULT NULL COMMENT '当前跟进人企微Id',
+`follower_name` varchar(32) DEFAULT NULL COMMENT '当前跟进人名称',
+`dept_id` varchar(32) DEFAULT NULL COMMENT '当前跟进人部门Id',
+`recovery_times` int(11) NOT NULL DEFAULT '0' COMMENT '回收次数',
+`return_reason` tinyint(2) DEFAULT NULL COMMENT '末次回收原因',
+`source` tinyint(3) DEFAULT NULL COMMENT '线索来源 0excel导入',
+`sex` tinyint(2) DEFAULT NULL COMMENT ' 性别 0 = 未知, 1 = 男, 2 = 女',
+`import_record_id` bigint(20) DEFAULT NULL COMMENT '导入记录id',
+`customer_id` bigint(20) DEFAULT NULL COMMENT '客户Id',
+`external_userid` varchar(255) DEFAULT NULL COMMENT '客户外部联系人Id',
+`bind_customer_time` datetime NOT NULL COMMENT '绑定客户时间',
+PRIMARY KEY (`id`),
+UNIQUE INDEX `phone_unique`(`phone`) USING BTREE COMMENT '手机号码索引'
 ) ENGINE=InnoDB COMMENT='线索';
 
 DROP TABLE IF EXIST `we_leads_follower`
 CREATE TABLE `we_leads_follower` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `leads_id` bigint(20) NOT NULL COMMENT '线索Id',
-  `follower_id` bigint(20) NOT NULL COMMENT '跟进人id',
-  `follower_we_user_id` varchar(32) DEFAULT NULL COMMENT '跟进人企微Id',
-  `follower_name` varchar(32) NOT NULL COMMENT '跟进人名称',
-  `dept_id` bigint(20) DEFAULT NULL COMMENT '跟进人所属部门Id',
-  `dept_name` varchar(32) DEFAULT NULL COMMENT '跟进人所属部门名称',
-  `get_type` tinyint(2) NOT NULL COMMENT '领取方式（0指定分配，1主动领取，2线索转接）',
-  `follower_status` tinyint(2) NOT NULL COMMENT '跟进状态：0已领取，1跟进中，2已上门，3已退回',
-  `return_type` tinyint(2) DEFAULT NULL COMMENT '退回方式 0成员主动退回 1超时自动退回 2管理员强制回收 3离职退回',
-  `return_reason` varchar(500) DEFAULT NULL COMMENT '退回原因',
-  `assigner_id` bigint(20) NULL COMMENT '分配人id',
-  `assigner_name` varchar(32) NULL COMMENT '分配人名称',
-  `follower_start_time` datetime DEFAULT NULL COMMENT '跟进开始时间',
-  `follower_end_time` datetime DEFAULT NULL COMMENT '跟进结束时间',
-  `is_current_follower` tinyint(2) DEFAULT NULL COMMENT '是否当前跟进人（0否，1是）',
-  `sea_id` bigint(20) NOT NULL COMMENT '跟进时线索所处的公海Id',
-  `is_latest` tinyint(2) DEFAULT NULL COMMENT '是否最新跟进人（0否，1是）',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`leads_id` bigint(20) NOT NULL COMMENT '线索Id',
+`follower_id` bigint(20) NOT NULL COMMENT '跟进人id',
+`follower_we_user_id` varchar(32) DEFAULT NULL COMMENT '跟进人企微Id',
+`follower_name` varchar(32) NOT NULL COMMENT '跟进人名称',
+`dept_id` bigint(20) DEFAULT NULL COMMENT '跟进人所属部门Id',
+`dept_name` varchar(32) DEFAULT NULL COMMENT '跟进人所属部门名称',
+`get_type` tinyint(2) NOT NULL COMMENT '领取方式（0指定分配，1主动领取，2线索转接）',
+`follower_status` tinyint(2) NOT NULL COMMENT '跟进状态：0已领取，1跟进中，2已上门，3已退回',
+`return_type` tinyint(2) DEFAULT NULL COMMENT '退回方式 0成员主动退回 1超时自动退回 2管理员强制回收 3离职退回',
+`return_reason` varchar(500) DEFAULT NULL COMMENT '退回原因',
+`assigner_id` bigint(20) NULL COMMENT '分配人id',
+`assigner_name` varchar(32) NULL COMMENT '分配人名称',
+`follower_start_time` datetime DEFAULT NULL COMMENT '跟进开始时间',
+`follower_end_time` datetime DEFAULT NULL COMMENT '跟进结束时间',
+`is_current_follower` tinyint(2) DEFAULT NULL COMMENT '是否当前跟进人（0否，1是）',
+`sea_id` bigint(20) NOT NULL COMMENT '跟进时线索所处的公海Id',
+`is_latest` tinyint(2) DEFAULT NULL COMMENT '是否最新跟进人（0否，1是）',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索跟进人';
 
 DROP TABLE IF EXIST `we_leads_sea_base_settings`
 CREATE TABLE `we_leads_sea_base_settings` (
-  `id` bigint(20) NOT NULL,
-  `max_claim` int(11) DEFAULT '1' COMMENT '员工每日领取上限',
-  `stock_max_claim` int(11) DEFAULT '1' COMMENT '成员客户存量上限',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建人',
-  `create_by_id` bigint(20) DEFAULT NULL COMMENT '创建人id',
-  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
-  `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识 0 正常 1 删除',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL,
+`max_claim` int(11) DEFAULT '1' COMMENT '员工每日领取上限',
+`stock_max_claim` int(11) DEFAULT '1' COMMENT '成员客户存量上限',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`create_by` varchar(255) DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(20) DEFAULT NULL COMMENT '创建人id',
+`update_time` datetime DEFAULT NULL COMMENT '修改时间',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
+`del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识 0 正常 1 删除',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='公海基础配置表';
 INSERT INTO `we_leads_sea_base_settings` VALUES (1, 10, 100, '2023-07-17 17:18:13', NULL, NULL, NULL, NULL, NULL, 0);
 
 
 DROP TABLE IF EXIST `we_leads_follow_record`
 CREATE TABLE `we_leads_follow_record` (
-  `id` bigint(20) NOT NULL,
-  `we_leads_id` bigint(20) DEFAULT NULL COMMENT '线索id',
-  `sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
-  `follow_user_id` bigint(20) DEFAULT NULL COMMENT '线索跟进人表Id',
-  `record_status` tinyint(4) DEFAULT NULL COMMENT '记录状态 0已领取 1跟进中 2已转化 3已退回',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL,
+`we_leads_id` bigint(20) DEFAULT NULL COMMENT '线索id',
+`sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
+`follow_user_id` bigint(20) DEFAULT NULL COMMENT '线索跟进人表Id',
+`record_status` tinyint(4) DEFAULT NULL COMMENT '记录状态 0已领取 1跟进中 2已转化 3已退回',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索跟进记录';
 
 DROP TABLE IF EXIST `we_leads_records_content`
 CREATE TABLE `we_leads_records_content` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `record_id` bigint(20) NOT NULL COMMENT '跟进记录Id',
-  `item_key` varchar(32) NOT NULL COMMENT '记录项目名',
-  `item_value` varchar(500) NOT NULL COMMENT '记录项目值',
-  `rank` int(11) DEFAULT NULL COMMENT '排序',
-  `is_visible` tinyint(4) NOT NULL COMMENT '是否显示 0 显示 1 隐藏',
-  `is_attachment` tinyint(4) NOT NULL COMMENT '是否存在附件 0否 1是',
-  `parent_id` bigint(20) DEFAULT 0 COMMENT '父类id,无父类默认值为0',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `replier_from_id` bigint(20) DEFAULT NULL COMMENT '回复者id',
-  `replier_from_we_user_Id` varchar(32) DEFAULT NULL COMMENT '回复者企微Id',
-  `replier_from` varchar(32) DEFAULT NULL COMMENT '回复者',
-  `replier_from_avatar` varchar(255) DEFAULT NULL COMMENT '回复者头像',
-  `replier_to_id` bigint(20) DEFAULT NULL COMMENT '回复对象id',
-  `replier_to` varchar(32) DEFAULT NULL COMMENT '回复对象',
-  `replier_to_we_user_Id` varchar(32) DEFAULT NULL COMMENT '回复对象企微id',
-  `replier_to_avatar` varchar(255) DEFAULT NULL COMMENT '回复对象头像',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`record_id` bigint(20) NOT NULL COMMENT '跟进记录Id',
+`item_key` varchar(32) NOT NULL COMMENT '记录项目名',
+`item_value` varchar(500) NOT NULL COMMENT '记录项目值',
+`rank` int(11) DEFAULT NULL COMMENT '排序',
+`is_visible` tinyint(4) NOT NULL COMMENT '是否显示 0 显示 1 隐藏',
+`is_attachment` tinyint(4) NOT NULL COMMENT '是否存在附件 0否 1是',
+`parent_id` bigint(20) DEFAULT 0 COMMENT '父类id,无父类默认值为0',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`replier_from_id` bigint(20) DEFAULT NULL COMMENT '回复者id',
+`replier_from_we_user_Id` varchar(32) DEFAULT NULL COMMENT '回复者企微Id',
+`replier_from` varchar(32) DEFAULT NULL COMMENT '回复者',
+`replier_from_avatar` varchar(255) DEFAULT NULL COMMENT '回复者头像',
+`replier_to_id` bigint(20) DEFAULT NULL COMMENT '回复对象id',
+`replier_to` varchar(32) DEFAULT NULL COMMENT '回复对象',
+`replier_to_we_user_Id` varchar(32) DEFAULT NULL COMMENT '回复对象企微id',
+`replier_to_avatar` varchar(255) DEFAULT NULL COMMENT '回复对象头像',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索跟进记录内容';
 
 DROP TABLE IF EXIST `we_leads_records_attachment`
 CREATE TABLE `we_leads_records_attachment` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `content_id` bigint(20) NOT NULL COMMENT '跟进记录内容Id',
-  `type` tinyint(2) NOT NULL COMMENT '附件类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)',
-  `title` varchar(255) NOT NULL COMMENT '附件名称',
-  `url` varchar(255) NOT NULL COMMENT '附件地址',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`content_id` bigint(20) NOT NULL COMMENT '跟进记录内容Id',
+`type` tinyint(2) NOT NULL COMMENT '附件类型 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file)',
+`title` varchar(255) NOT NULL COMMENT '附件名称',
+`url` varchar(255) NOT NULL COMMENT '附件地址',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索跟进记录附件';
 
 DROP TABLE IF EXIST `we_leads_auto_recovery`
 CREATE TABLE `we_leads_auto_recovery` (
-  `id` bigint(20) NOT NULL COMMENT '主键id',
-  `leads_id` bigint(20) NOT NULL COMMENT '线索id',
-  `follower_id` bigint(20) NOT NULL COMMENT '跟进人id',
-  `type` tinyint(2) NOT NULL COMMENT '自动回收类型',
-  `recovery_time` datetime NOT NULL COMMENT '回收时间',
-  `recovery_reason` tinyint(4) comment '回收原因',
-  `executing_state` tinyint(2) NOT NULL COMMENT '执行状态 0待执行 1已执行 2已取消',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255) NOT NULL COMMENT '创建人',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键id',
+`leads_id` bigint(20) NOT NULL COMMENT '线索id',
+`follower_id` bigint(20) NOT NULL COMMENT '跟进人id',
+`type` tinyint(2) NOT NULL COMMENT '自动回收类型',
+`recovery_time` datetime NOT NULL COMMENT '回收时间',
+`recovery_reason` tinyint(4) comment '回收原因',
+`executing_state` tinyint(2) NOT NULL COMMENT '执行状态 0待执行 1已执行 2已取消',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) NOT NULL COMMENT '创建人',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='线索自动回收';
 
 
 DROP TABLE IF EXIST `we_leads_record_content_cooperate_user`
 CREATE TABLE `we_leads_record_content_cooperate_user` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `content_id` bigint(20) NOT NULL COMMENT '记录内容id',
-  `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
-  `we_user_id` varchar(32) DEFAULT NULL COMMENT '用户企微Id',
-  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名称',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`content_id` bigint(20) NOT NULL COMMENT '记录内容id',
+`user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
+`we_user_id` varchar(32) DEFAULT NULL COMMENT '用户企微Id',
+`user_name` varchar(32) DEFAULT NULL COMMENT '用户名称',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='跟进记录内容协作成员';
 
 DROP TABLE IF EXIST `we_leads_import_record`
 CREATE TABLE `we_leads_import_record` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
-  `import_source_file_name` varchar(255) DEFAULT NULL COMMENT '导入的表单或excel的文件名',
-  `import_source_type` tinyint(4) DEFAULT NULL COMMENT '导入来源 0 excel 1 智能表单 2 手动新增',
-  `form_id` bigint(20) DEFAULT NULL COMMENT '智能表单id，当导入来源类型为智能表单时，这个值不为空',
-  `total_num` int(11) DEFAULT NULL COMMENT 'excel的线索总数',
-  `success_num` int(11) DEFAULT NULL COMMENT '线索导入的成功数',
-  `fail_num` int(11) DEFAULT NULL COMMENT '线索导入的失败数',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建人',
-  `create_by_id` bigint(20) DEFAULT NULL COMMENT '创建人id',
-  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
-  `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识 0 正常 1 删除',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`sea_id` bigint(20) DEFAULT NULL COMMENT '所属公海',
+`import_source_file_name` varchar(255) DEFAULT NULL COMMENT '导入的表单或excel的文件名',
+`import_source_type` tinyint(4) DEFAULT NULL COMMENT '导入来源 0 excel 1 智能表单 2 手动新增',
+`form_id` bigint(20) DEFAULT NULL COMMENT '智能表单id，当导入来源类型为智能表单时，这个值不为空',
+`total_num` int(11) DEFAULT NULL COMMENT 'excel的线索总数',
+`success_num` int(11) DEFAULT NULL COMMENT '线索导入的成功数',
+`fail_num` int(11) DEFAULT NULL COMMENT '线索导入的失败数',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`create_by` varchar(255) DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(20) DEFAULT NULL COMMENT '创建人id',
+`update_time` datetime DEFAULT NULL COMMENT '修改时间',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
+`del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识 0 正常 1 删除',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索导入记录';
 
 DROP TABLE IF EXIST `we_leads_manual_add_record`
 CREATE TABLE `we_leads_manual_add_record` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `we_user_id` varchar(64) NOT NULL COMMENT '企微员工Id',
-  `leads_id` bigint(20) NOT NULL COMMENT '线索Id',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`we_user_id` varchar(64) NOT NULL COMMENT '企微员工Id',
+`leads_id` bigint(20) NOT NULL COMMENT '线索Id',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='线索手动入线记录';
 
 DROP TABLE IF EXIST `we_message_notification`
 CREATE TABLE `we_message_notification` (
-  `id` bigint NOT NULL COMMENT '主键Id',
-  `title` varchar(32) NOT NULL COMMENT '通知标题',
-  `content` varchar(255) NOT NULL COMMENT '通知内容',
-  `notification_time` datetime NOT NULL COMMENT '通知时间',
-  `we_user_id` varchar(32) NOT NULL COMMENT '员工Id',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255) NOT NULL COMMENT '创建人',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  `is_read` tinyint(1) DEFAULT NULL COMMENT '是否已读 0未读 1已读',
-  PRIMARY KEY (`id`)
+`id` bigint NOT NULL COMMENT '主键Id',
+`title` varchar(32) NOT NULL COMMENT '通知标题',
+`content` varchar(255) NOT NULL COMMENT '通知内容',
+`notification_time` datetime NOT NULL COMMENT '通知时间',
+`we_user_id` varchar(32) NOT NULL COMMENT '员工Id',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) NOT NULL COMMENT '创建人',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+`is_read` tinyint(1) DEFAULT NULL COMMENT '是否已读 0未读 1已读',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='消息通知';
 
 
 DROP TABLE IF EXIST `we_tasks`
 CREATE TABLE `we_tasks` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `user_id` bigint(20) NOT NULL COMMENT '员工id',
-  `we_user_id` varchar(32) NOT NULL COMMENT '员工企微Id',
-  `type` tinyint(4) NOT NULL COMMENT '任务类型',
-  `title` varchar(255) NOT NULL COMMENT '任务标题',
-  `content` varchar(500) NOT NULL COMMENT '自定义任务内容',
-  `send_time` datetime NOT NULL COMMENT '发送时间',
-  `url` varchar(255) DEFAULT NULL COMMENT '链接',
-  `status` tinyint(2) DEFAULT NULL COMMENT '状态，0待执行，1已完成，2已取消',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255) NOT NULL COMMENT '创建人',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  `leads_id` bigint(20) NOT NULL COMMENT '线索中心-线索Id',
-  `is_visible` tinyint(1) DEFAULT NULL COMMENT '是否显示（0不显示 1显示）',
-  `record_id` bigint(20) DEFAULT NULL COMMENT '线索中心-跟进记录Id',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`user_id` bigint(20) NOT NULL COMMENT '员工id',
+`we_user_id` varchar(32) NOT NULL COMMENT '员工企微Id',
+`type` tinyint(4) NOT NULL COMMENT '任务类型',
+`title` varchar(255) NOT NULL COMMENT '任务标题',
+`content` varchar(500) NOT NULL COMMENT '自定义任务内容',
+`send_time` datetime NOT NULL COMMENT '发送时间',
+`url` varchar(255) DEFAULT NULL COMMENT '链接',
+`status` tinyint(2) DEFAULT NULL COMMENT '状态，0待执行，1已完成，2已取消',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) NOT NULL COMMENT '创建人',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+`leads_id` bigint(20) NOT NULL COMMENT '线索中心-线索Id',
+`is_visible` tinyint(1) DEFAULT NULL COMMENT '是否显示（0不显示 1显示）',
+`record_id` bigint(20) DEFAULT NULL COMMENT '线索中心-跟进记录Id',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='待办任务';
 
 
@@ -748,38 +748,38 @@ ALTER TABLE `we_qr_code` ADD COLUMN `qr_priority_user_welcome` tinyint(4) NULL D
 
 DROP TABLE IF EXISTS `we_substitute_customer_order`;
 CREATE TABLE `we_substitute_customer_order` (
-  `id` bigint(20) NOT NULL COMMENT '主键Id',
-  `purchaser` varchar(255) NOT NULL COMMENT '购买人',
-  `phone` char(11) NOT NULL COMMENT '联系方式',
-  `source` varchar(20) NOT NULL COMMENT '订单来源',
-  `order_time` datetime NOT NULL COMMENT '下单时间',
-  `dept_id` bigint(20) NOT NULL COMMENT '归属部门',
-  `user_id` bigint(20) NOT NULL COMMENT '归属员工',
-  `order_status` varchar(20) NOT NULL COMMENT '订单状态',
-  `product_name` varchar(255) NOT NULL COMMENT '商品名称',
-  `product_url` varchar(1000) DEFAULT NULL COMMENT '商品图片',
-  `product_unit_price` decimal(9,2) NOT NULL COMMENT '商品单价',
-  `amount` int(11) NOT NULL COMMENT '商品数量',
-  `total_price` decimal(10,0) NOT NULL COMMENT '付款总价',
-  `discount` varchar(255) DEFAULT NULL COMMENT '付款折扣',
-  `discount_amount` decimal(9,2) DEFAULT NULL COMMENT '折扣金额',
-  `actual_payment` decimal(9,2) NOT NULL COMMENT '实际付款',
-  `returned_money_type` varchar(20) NOT NULL COMMENT '回款方式',
-  `returned_money` decimal(9,2) NOT NULL COMMENT '回款金额',
-  `returned_date` datetime NOT NULL COMMENT '回款日期',
-  `payer` varchar(255) NOT NULL COMMENT '打款人',
-  `returned_receipt` varchar(1000) DEFAULT NULL COMMENT '回款凭证',
-  `status` tinyint(2) NOT NULL COMMENT '状态：0暂存 1完成',
-  `properties` varchar(1000) DEFAULT NULL COMMENT '自定义属性',
-  `create_time` datetime NOT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `create_by` varchar(255) NOT NULL COMMENT '创建人',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
-  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
-  `create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
-  `del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
-  `external_userid` varchar(255) NOT NULL COMMENT '外部联系人的userid',
-  PRIMARY KEY (`id`)
+`id` bigint(20) NOT NULL COMMENT '主键Id',
+`purchaser` varchar(255) NOT NULL COMMENT '购买人',
+`phone` char(11) NOT NULL COMMENT '联系方式',
+`source` varchar(20) NOT NULL COMMENT '订单来源',
+`order_time` datetime NOT NULL COMMENT '下单时间',
+`dept_id` bigint(20) NOT NULL COMMENT '归属部门',
+`user_id` bigint(20) NOT NULL COMMENT '归属员工',
+`order_status` varchar(20) NOT NULL COMMENT '订单状态',
+`product_name` varchar(255) NOT NULL COMMENT '商品名称',
+`product_url` varchar(1000) DEFAULT NULL COMMENT '商品图片',
+`product_unit_price` decimal(9,2) NOT NULL COMMENT '商品单价',
+`amount` int(11) NOT NULL COMMENT '商品数量',
+`total_price` decimal(10,0) NOT NULL COMMENT '付款总价',
+`discount` varchar(255) DEFAULT NULL COMMENT '付款折扣',
+`discount_amount` decimal(9,2) DEFAULT NULL COMMENT '折扣金额',
+`actual_payment` decimal(9,2) NOT NULL COMMENT '实际付款',
+`returned_money_type` varchar(20) NOT NULL COMMENT '回款方式',
+`returned_money` decimal(9,2) NOT NULL COMMENT '回款金额',
+`returned_date` datetime NOT NULL COMMENT '回款日期',
+`payer` varchar(255) NOT NULL COMMENT '打款人',
+`returned_receipt` varchar(1000) DEFAULT NULL COMMENT '回款凭证',
+`status` tinyint(2) NOT NULL COMMENT '状态：0暂存 1完成',
+`properties` varchar(1000) DEFAULT NULL COMMENT '自定义属性',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime DEFAULT NULL COMMENT '更新时间',
+`create_by` varchar(255) NOT NULL COMMENT '创建人',
+`update_by` varchar(255) DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+`create_by_id` bigint(11) NOT NULL COMMENT '创建人id',
+`del_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标识',
+`external_userid` varchar(255) NOT NULL COMMENT '外部联系人的userid',
+PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='代客下单-订单';
 
 
@@ -831,7 +831,7 @@ ALTER TABLE `we_tasks` ADD COLUMN `record_id` bigint(20) NULL DEFAULT NULL COMME
 
 
 ---
-  ### ● 日期：2023.06.09
+### ● 日期：2023.06.09
   ```
 
 ALTER TABLE `we_substitute_customer_order` ADD COLUMN `external_userid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '外部联系人的userid' AFTER `del_flag`;

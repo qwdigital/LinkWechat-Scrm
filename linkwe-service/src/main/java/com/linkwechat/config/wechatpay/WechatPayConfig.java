@@ -1,4 +1,4 @@
-package com.linkwechat.config.wechatpay;//package com.linkwechat.config.wechatpay;
+//package com.linkwechat.config.wechatpay;
 //
 //
 //import cn.hutool.core.io.resource.ResourceUtil;

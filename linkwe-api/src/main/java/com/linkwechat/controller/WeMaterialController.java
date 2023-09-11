@@ -228,7 +228,7 @@ public class WeMaterialController extends BaseController {
         List<WeMaterial> materials = materialService.lambdaQuery()
                 .eq(WeMaterial::getMediaType, MediaType.POSTER.getType()).eq(WeMaterial::getDelFlag, 0)
                 .eq(categoryId != null, WeMaterial::getCategoryId, categoryId)
-                .like(StringUtils.isNotBlank(name), WeMaterial::getMaterialName, name)
+                .like(com.linkwechat.common.utils.StringUtils.isNotBlank(name), WeMaterial::getMaterialName, name)
                 .orderByDesc(WeMaterial::getCreateTime).list();
         List<WePosterVo> posterList = materials.stream().map(m -> {
             WePosterVo vo = BeanUtil.copyProperties(m, WePosterVo.class);

@@ -23,7 +23,7 @@ public interface IWeMomentsCustomerService extends IService<WeMomentsCustomer> {
      * 预估客户数量
      *
      * @param request 客户范围查询参数
-     * @return {@link Integer}
+     * @return {@link java.lang.Integer}
      * @author WangYX
      * @date 2023/06/07 17:01
      */
