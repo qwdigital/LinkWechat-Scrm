@@ -6,7 +6,9 @@
     <select id="getServicerByKfId" resultType="com.linkwechat.domain.kf.WeKfUser">
         select wks.user_id,
                department_id,
-               status
+               status,
+               (SELECT GROUP_CONCAT(su.user_name) from sys_user su WHERE su.we_user_id=wks.user_id) as userName,
+               (SELECT GROUP_CONCAT(sd.dept_name) FROM sys_dept sd where sd.dept_id=wks.department_id) as deptName
         from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0
     </select>
 
