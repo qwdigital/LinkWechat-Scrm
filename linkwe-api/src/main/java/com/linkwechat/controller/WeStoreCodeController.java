@@ -1,3 +1,4 @@
+
 package com.linkwechat.controller;
 
 
@@ -149,7 +150,7 @@ public class WeStoreCodeController extends BaseController {
     public TableDataInfo storeCodes(WeStoreCode weStoreCode){
         startPage();
         return getDataTable(
-             iWeStoreCodeService.storeCodes(weStoreCode)
+                iWeStoreCodeService.storeCodes(weStoreCode)
         );
     }
 
@@ -188,7 +189,7 @@ public class WeStoreCodeController extends BaseController {
     public AjaxResult batchStartOrStop(@PathVariable("ids") Long[] ids,@RequestBody WeStoreCode weStoreCode){
 
         iWeStoreCodeService.update(WeStoreCode.builder()
-                        .storeState(weStoreCode.getStoreState())
+                .storeState(weStoreCode.getStoreState())
                 .build(), new LambdaQueryWrapper<WeStoreCode>()
                 .in(WeStoreCode::getId,Arrays.asList(ids)));
 
@@ -345,10 +346,10 @@ public class WeStoreCodeController extends BaseController {
      */
     @GetMapping("/countShopGuideReport")
     public TableDataInfo<WeStoreShopGuideReportVo> countShopGuideReport(WeStoreCode weStoreCode){
-           startPage();
-           return getDataTable(
-                   iWeStoreCodeService.countShopGuideReport(weStoreCode)
-           );
+        startPage();
+        return getDataTable(
+                iWeStoreCodeService.countShopGuideReport(weStoreCode)
+        );
     }
 
     /**

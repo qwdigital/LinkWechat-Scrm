@@ -93,4 +93,4 @@ public class WeStoreCode extends BaseEntity {
     @ExcelIgnore
     private String state;
 
- }
+}
