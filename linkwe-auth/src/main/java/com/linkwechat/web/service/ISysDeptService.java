@@ -1,7 +1,9 @@
 package com.linkwechat.web.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.TreeSelect;
 import com.linkwechat.common.core.domain.entity.SysDept;
+import com.linkwechat.domain.leads.leads.entity.WeLeadsFollower;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +15,7 @@ import java.util.List;
  *
  * @author ruoyi
  */
-public interface ISysDeptService {
+public interface ISysDeptService extends IService<SysDept> {
     /**
      * 查询部门管理数据
      *

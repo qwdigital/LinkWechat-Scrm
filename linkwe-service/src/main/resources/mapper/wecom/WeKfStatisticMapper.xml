@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.linkwechat.mapper.WeKfStatisticMapper">
+
+    <select id="getSceneCustomerAnalysis" resultType="com.linkwechat.domain.kf.vo.WeKfSceneAnalysisVo">
+        select
+            (select count(1) from we_kf_pool ) visit_cnt,
+            (select count(1) from we_kf_pool where session_start_time is not null ) as consult_cnt,
+            (select count(1) from we_kf_pool where user_id is not null ) as reception_cnt,
+            (select count(1) from we_kf_pool where date_format(create_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_visit_cnt,
+            (select count(1) from we_kf_pool where date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_visit_cnt,
+            (select count(1) from we_kf_pool where session_start_time is not null and date_format(create_time ,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') ) as td_consult_cnt,
+            (select count(1) from we_kf_pool where session_start_time is not null and date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d')) as yd_consult_cnt,
+            (select count(1) from we_kf_pool where user_id is not null and date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')) as td_reception_cnt,
+            (select count(1) from we_kf_pool where user_id is not null and date_format(create_time,'%Y-%m-%d') = date_format(date_sub(curdate(),interval 1 day),'%Y-%m-%d') ) as yd_reception_cnt
+    </select>
+
+    <select id="getSceneCustomerRealCnt" resultType="com.linkwechat.domain.kf.vo.WeKfSceneRealCntVo">
+        SELECT x_time,
+        @visit_total := @visit_total + visit_cnt             AS visit_total_cnt,
+        @consult_total := @consult_total + consult_cnt       AS consult_total_cnt,
+        @reception_total := @reception_total + reception_cnt AS reception_total_cnt,
+        visit_cnt   as td_visit_cnt,
+        consult_cnt as td_consult_cnt,
+        reception_cnt as td_reception_cnt
+        FROM (
+        SELECT date_list.`date`                    AS x_time,
+        IFNULL(real_data.visit_num, 0)   AS visit_cnt,
+        IFNULL(real_data.consult_num, 0)   AS consult_cnt,
+        IFNULL(real_data.reception_num, 0) AS reception_cnt
+        FROM (
+        select `date`
+        from sys_dim_date
+        where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) AS date_list
+        LEFT JOIN (
+        SELECT DATE_FORMAT(wkp.create_time, '%Y-%m-%d')                               DAY,
+        count(1)                                                            AS visit_num,
+        sum(CASE WHEN wkp.session_start_time is not null THEN 1 ELSE 0 END) AS consult_num,
+        sum(CASE WHEN wkp.user_id is not null THEN 1 ELSE 0 END)            AS reception_num
+        FROM we_kf_pool wkp
+        where 1=1
+        <if test="scenes != null and scenes.size() > 0">
+            and wkp.scene in
+            <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                #{scene}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        GROUP BY DAY,
+        (
+        SELECT
+        @visit_total := (SELECT count(1)
+        FROM we_kf_pool wkp
+        <where>
+            <if test="scenes != null and scenes.size() > 0">
+                and wkp.scene in
+                <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                    #{scene}
+                </foreach>
+            </if>
+            <if test="openKfIds != null and openKfIds.size() > 0">
+                and wkp.open_kf_id in
+                <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                    #{openKfId}
+                </foreach>
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and wkp.user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime}, '%Y-%m-%d'))
+        </where>
+        ),
+        (SELECT
+        @consult_total := (SELECT count(1)
+        FROM we_kf_pool wkp where wkp.session_start_time is not null
+        <if test="scenes != null and scenes.size() > 0">
+            and wkp.scene in
+            <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                #{scene}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;  DATE_FORMAT(#{beginTime}, '%Y-%m-%d'))),
+        (SELECT @reception_total := (SELECT count(1)
+        FROM we_kf_pool wkp where wkp.user_id is not null
+        <if test="scenes != null and scenes.size() > 0">
+            and wkp.scene in
+            <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                #{scene}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime}, '%Y-%m-%d')))) AS real_data
+        ON date_list.`date` = real_data.day) AS RESULT
+        ORDER BY x_time asc
+    </select>
+
+    <select id="getSceneCustomerRealPageCnt" resultType="com.linkwechat.domain.kf.vo.WeKfSceneRealCntVo">
+        SELECT x_time,
+        @visit_total := @visit_total - visit_cnt             AS visit_total_cnt,
+        @consult_total := @consult_total - consult_cnt       AS consult_total_cnt,
+        @reception_total := @reception_total - reception_cnt AS reception_total_cnt,
+        visit_cnt   as td_visit_cnt,
+        consult_cnt as td_consult_cnt,
+        reception_cnt as td_reception_cnt
+        FROM (
+        SELECT date_list.`date`                    AS x_time,
+        IFNULL(real_data.visit_num, 0)   AS visit_cnt,
+        IFNULL(real_data.consult_num, 0)   AS consult_cnt,
+        IFNULL(real_data.reception_num, 0) AS reception_cnt
+        FROM (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) AS date_list
+        LEFT JOIN (
+        SELECT DATE_FORMAT(wkp.create_time, '%Y-%m-%d')                               DAY,
+        count(1)                                                            AS visit_num,
+        sum(CASE WHEN wkp.session_start_time is not null THEN 1 ELSE 0 END) AS consult_num,
+        sum(CASE WHEN wkp.user_id is not null THEN 1 ELSE 0 END)            AS reception_num
+        FROM we_kf_pool wkp
+        where 1=1
+        <if test="scenes != null and scenes.size() > 0">
+            and wkp.scene in
+            <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                #{scene}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        GROUP BY DAY,
+        (
+            SELECT
+            @visit_total := (SELECT count(1)
+            FROM we_kf_pool wkp
+            <where>
+                <if test="scenes != null and scenes.size() > 0">
+                    and wkp.scene in
+                    <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                        #{scene}
+                    </foreach>
+                </if>
+                <if test="openKfIds != null and openKfIds.size() > 0">
+                    and wkp.open_kf_id in
+                    <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                        #{openKfId}
+                    </foreach>
+                </if>
+                <if test="userIds != null and userIds.size() > 0">
+                    and wkp.user_id in
+                    <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                        #{userId}
+                    </foreach>
+                </if>
+                and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;=
+                DATE_FORMAT(#{endTime}, '%Y-%m-%d'))
+            </where>
+        ),
+        (SELECT
+        @consult_total := (SELECT count(1)
+        FROM we_kf_pool wkp where wkp.session_start_time is not null
+        <if test="scenes != null and scenes.size() > 0">
+            and wkp.scene in
+            <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                #{scene}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d'))),
+        (SELECT @reception_total := (SELECT count(1)
+        FROM we_kf_pool wkp where wkp.user_id is not null
+        <if test="scenes != null and scenes.size() > 0">
+            and wkp.scene in
+            <foreach item="scene" collection="scenes" index="index" open="(" separator="," close=")">
+                #{scene}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d')))) AS real_data
+        ON date_list.`date` = real_data.day) AS RESULT
+        ORDER BY x_time desc
+    </select>
+
+    <select id="getSceneCustomerVisitRank" resultType="com.linkwechat.domain.kf.vo.WeKfSceneRankCntVo">
+        select
+            count(1) as total,
+            wkp.scene ,
+            ifnull((select wks.name from we_kf_scenes wks where wks.scenes = wkp.scene limit 1),'未知来源') scene_name
+        from we_kf_pool wkp
+        <where>
+            <if test="beginTime != null">
+                and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+        </where>
+        group by wkp.scene
+        order by total desc limit 5
+    </select>
+
+    <select id="getSceneCustomerConsultRank" resultType="com.linkwechat.domain.kf.vo.WeKfSceneRankCntVo">
+        select
+            count(1) as total,
+            wkp.scene,
+        ifnull((select wks.name from we_kf_scenes wks where wks.scenes = wkp.scene limit 1),'未知来源') scene_name
+        from we_kf_pool wkp where wkp.session_start_time is not null and wkp.scene is not null
+        <if test="beginTime != null">
+            and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null">
+            and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+        group by wkp.scene
+        order by total desc limit 5
+    </select>
+    <select id="getConsultCustomerAnalysis"
+            resultType="com.linkwechat.domain.kf.vo.WeKfConsultAnalysisVo">
+        select
+        (select count(1) from we_kf_pool where session_start_time is not null) as  consult_cnt,
+        (select count(1) from we_kf_pool where user_id is not null ) as reception_cnt,
+        (select
+        ifnull(sum(case when end_time is null then 0 else 1 end),0)
+        from
+        (select
+        min(case when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and  wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        from
+        we_kf_pool wkp
+        left join
+        we_kf_msg wkm on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        group by wkp.id,wkp.open_kf_id,wkp.external_userid) as aa) as reply_cnt,
+        (SELECT
+        ifnull(AVG(timestampdiff(second, ifnull(session_start_time, 0), ifnull(session_end_time, 0))),0)
+        FROM
+        we_kf_pool) as avg_consult_duration,
+        (select
+        ifnull(AVG(timestampdiff(second, start_time, end_time)),0)
+        from
+        (
+        SELECT
+        min(case when wkm.send_time &gt;= wkp.session_start_time then wkm.send_time end) start_time,
+        min(case when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and  wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        FROM
+        we_kf_pool wkp
+        left join
+        we_kf_msg wkm on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        GROUP BY
+        wkp.id,wkp.open_kf_id,wkp.external_userid
+        ) as aa) as avg_consult_reply_duration
+    </select>
+
+    <select id="getConsultUserReplyRank" resultType="com.linkwechat.domain.kf.vo.WeKfConsultRankCntVo">
+        select
+        (select su.user_name from sys_user su where su.we_user_id = aa.user_id limit 1) as user_name,
+        sum(case when end_time is null then 0 else 1 end ) as total
+        from
+        (select
+        wkp.user_id,
+        min(case when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and  wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        from
+        we_kf_pool wkp
+        left join  we_kf_msg wkm on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        where 1=1
+        and wkp.user_id is not null
+        <if test="beginTime != null">
+            and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null">
+            and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+
+        group by wkp.id,wkp.open_kf_id,wkp.external_userid) aa group by user_id order by total desc limit 5
+    </select>
+    <select id="getConsultUserAvgReplyDurationRank"
+            resultType="com.linkwechat.domain.kf.vo.WeKfConsultRankCntVo">
+        select
+        (select su.user_name from sys_user su where su.we_user_id = aa.user_id limit 1) as user_name,
+        ifnull(avg(timestampdiff(second, start_time, end_time)),0) as total
+        from
+        (select
+        wkp.user_id,
+        min(case when wkm.send_time >= wkp.session_start_time then wkm.send_time end) start_time,
+        min(case when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and  wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        from
+        we_kf_pool wkp
+        left join we_kf_msg wkm on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        where 1=1
+        and wkp.user_id is not null
+        <if test="beginTime != null">
+            and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null">
+            and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+        group by wkp.id,wkp.open_kf_id,wkp.external_userid) aa group by user_id order by total desc limit 5
+    </select>
+
+    <select id="getReplyRealCnt" resultType="com.linkwechat.domain.kf.vo.WeKfConsultRealCntVo">
+        SELECT x_time,
+        @reply_total := ifnull(@reply_total,0) + reply_cnt       AS reply_total_cnt,
+        reply_cnt
+        FROM (SELECT date_list.`date`                    AS x_time,
+        IFNULL(real_data.reply_num, 0) AS reply_cnt
+        FROM (
+            select `date`
+            from sys_dim_date
+            where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) AS date_list
+        LEFT JOIN (select date_format(aa.create_time, '%Y-%m-%d')           DAY,
+        sum(case when end_time is null then 0 else 1 end) reply_num
+        from (select wkm.create_time,
+        min(case
+        when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and
+        wkm.send_time &lt;= wkp.session_end_time
+        then wkm.send_time end) as end_time
+        from we_kf_pool wkp
+        left join
+        we_kf_msg wkm
+        on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        where 1=1
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by wkp.id, wkp.open_kf_id, wkp.external_userid) as aa
+        group by DAY,
+        (SELECT @reply_total := (select
+        sum(case when end_time is null then 0 else 1 end) reply_num
+        from
+        (select wkm.create_time,
+        min(case when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        from we_kf_pool wkp left join we_kf_msg wkm on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        where 1=1
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt; DATE_FORMAT(#{beginTime}, '%Y-%m-%d')
+        group by wkp.id, wkp.open_kf_id, wkp.external_userid) as aa))) AS real_data
+        ON date_list.`date` = real_data.day
+        ORDER BY DAY ASC) AS RESULT
+        ORDER BY x_time asc
+    </select>
+
+    <select id="getReplyRealPageCnt" resultType="com.linkwechat.domain.kf.vo.WeKfConsultRealCntVo">
+        SELECT x_time,
+        @reply_total := ifnull(@reply_total,0) - reply_cnt       AS reply_total_cnt,
+        reply_cnt
+        FROM (SELECT date_list.`date`                    AS x_time,
+        IFNULL(real_data.reply_num, 0) AS reply_cnt
+        FROM (
+        select `date`
+        from sys_dim_date
+        where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        ) AS date_list
+        LEFT JOIN (select date_format(aa.create_time, '%Y-%m-%d')           DAY,
+        sum(case when end_time is null then 0 else 1 end) reply_num
+        from (select wkm.create_time,
+        min(case
+        when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and
+        wkm.send_time &lt;= wkp.session_end_time
+        then wkm.send_time end) as end_time
+        from we_kf_pool wkp
+        left join
+        we_kf_msg wkm
+        on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        where 1=1
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and DATE_FORMAT(wkp.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        group by wkp.id, wkp.open_kf_id, wkp.external_userid) as aa
+        group by DAY,
+        (SELECT @reply_total := (select
+        sum(case when end_time is null then 0 else 1 end) reply_num
+        from
+        (select wkm.create_time,
+        min(case when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        from we_kf_pool wkp left join we_kf_msg wkm on wkp.corp_id = wkm.corp_id and wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        where 1=1
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        and DATE_FORMAT(wkp.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+        group by wkp.id, wkp.open_kf_id, wkp.external_userid) as aa))) AS real_data
+        ON date_list.`date` = real_data.day
+        ORDER BY DAY ASC) AS RESULT
+        ORDER BY x_time desc
+    </select>
+
+
+    <select id="getReplyRealDurationCnt" resultType="com.linkwechat.domain.kf.vo.WeKfConsultDurationVo">
+        SELECT date_list.`date` AS x_time,
+        IFNULL(real_data.avg_consult_duration, 0) AS avg_consult_duration,
+        IFNULL(real_data.avg_consult_reply_duration, 0) AS avg_consult_reply_duration
+        from (select `date`
+        from sys_dim_date
+        where `date` &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+        and `date` &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')) AS date_list
+        left join
+        (select aa.day,
+        aa.avg_consult_duration,
+        AVG(timestampdiff(second, ifnull(aa.start_time, 0),
+        ifnull(aa.end_time, 0))) as avg_consult_reply_duration
+        from (
+        select date_format(wkp.create_time, '%Y-%m-%d') as day,
+        AVG(timestampdiff(second, ifnull(wkp.session_start_time, 0),
+        ifnull(wkp.session_end_time, 0))) as avg_consult_duration,
+        min(case when wkm.send_time &gt;= wkp.session_start_time then wkm.send_time end) start_time,
+        min(case
+        when wkm.origin = 5 and wkm.send_time &gt;= wkp.session_start_time and
+        wkm.send_time &lt;= wkp.session_end_time then wkm.send_time end) as end_time
+        from we_kf_pool wkp
+        left join
+        we_kf_msg wkm on wkp.open_kf_id = wkm.open_kf_id and wkp.external_userid = wkm.external_userid
+        <if test="openKfIds != null and openKfIds.size() > 0">
+            and wkp.open_kf_id in
+            <foreach item="openKfId" collection="openKfIds" index="index" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        <if test="userIds != null and userIds.size() > 0">
+            and wkp.user_id in
+            <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        group by wkp.open_kf_id, wkp.external_userid
+        ) as aa
+        group by day) AS real_data
+        ON date_list.`date` = real_data.day
+        order by x_time desc
+    </select>
+
+
+</mapper>

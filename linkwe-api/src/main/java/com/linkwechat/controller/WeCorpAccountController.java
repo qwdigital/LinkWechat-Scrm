@@ -7,14 +7,11 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.fegin.QwCorpClient;
-import com.linkwechat.fegin.ShopSystemConfigClient;
 import com.linkwechat.service.IWeCorpAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.Optional;
 
 
 @RestController
@@ -28,8 +25,6 @@ public class WeCorpAccountController extends BaseController {
     private LinkWeChatConfig linkWeChatConfig;
 
 
-    @Resource
-    private ShopSystemConfigClient shopSystemConfigClient;
 
     @Autowired
     private  QwCorpClient qwCorpClient;
@@ -125,9 +120,7 @@ public class WeCorpAccountController extends BaseController {
             if (StringUtils.isNotBlank(weCorpAccount.getShopMaEncodingaeskey())) {
                 jsonObject.put("wechat_ma_encodingaeskey", weCorpAccount.getShopMaEncodingaeskey().trim());
             }
-            if (!jsonObject.isEmpty()) {
-                shopSystemConfigClient.saveOrUpdate(jsonObject.toJSONString());
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("商城系统-小程序配置失败！！！");

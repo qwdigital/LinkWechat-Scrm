@@ -7,6 +7,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeCustomerTrajectory;
 import com.linkwechat.domain.WeGroupMember;
@@ -59,12 +60,16 @@ public class WeGroupChatController extends BaseController {
      */
     @GetMapping("/page/list")
     public TableDataInfo<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
-        startPage();
-        TableDataInfo dataTable = getDataTable(weGroupService.getPageList(query));
+        List<LinkGroupChatListVo> pageList = weGroupService.getPageList(query, TableSupport.buildPageRequest());
+        TableDataInfo dataTable = getDataTable(pageList);
 
         dataTable.setLastSyncTime(
                 iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
         );//最近同步时间
+
+        dataTable.setTotal(
+                weGroupService.countWeGroupListIds(query)
+        );
 
         return dataTable;
     }

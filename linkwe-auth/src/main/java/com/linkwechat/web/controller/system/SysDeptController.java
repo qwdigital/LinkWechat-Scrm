@@ -1,6 +1,8 @@
 package com.linkwechat.web.controller.system;
 
-import cn.hutool.core.util.ArrayUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.UserConstants;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.controller.BaseController;
@@ -54,11 +56,12 @@ public class SysDeptController extends BaseController {
 
     /**
      * 根据部门id批量获取部门
+     *
      * @param deptIds
      * @return
      */
     @GetMapping("/findSysDeptByIds")
-    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds")String deptIds){
+    public AjaxResult<List<SysDept>> findSysDeptByIds(@RequestParam(value = "deptIds") String deptIds) {
 
 
         return AjaxResult.success(
@@ -157,20 +160,14 @@ public class SysDeptController extends BaseController {
 //    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
     @PutMapping
     @ApiOperation(value = "修改部门")
-    public AjaxResult edit(@Validated @RequestBody SysDept dept)
-    {
+    public AjaxResult edit(@Validated @RequestBody SysDept dept) {
         Long deptId = dept.getDeptId();
         deptService.checkDeptDataScope(deptId);
-        if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept)))
-        {
+        if (UserConstants.NOT_UNIQUE.equals(deptService.checkDeptNameUnique(dept))) {
             return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        }
-        else if (dept.getParentId().equals(deptId))
-        {
+        } else if (dept.getParentId().equals(deptId)) {
             return AjaxResult.error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
-        }
-        else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0)
-        {
+        } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0) {
             return AjaxResult.error("该部门包含未停用的子部门！");
         }
         dept.setUpdateBy(SecurityUtils.getUserName());
@@ -223,4 +220,25 @@ public class SysDeptController extends BaseController {
         deptService.callbackUpdate(query);
         return AjaxResult.success();
     }
+
+    /**
+     * 获取部门列表，不做数据权限校验
+     *
+     * @param
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/17 9:59
+     */
+    @PostMapping("/list/without/permission")
+    @ApiOperation(value = "企业企微部门列表-不做数据权限校验")
+    public AjaxResult getListWithOutPermission(@RequestBody SysDept dept) {
+        LambdaQueryWrapper<SysDept> queryWrapper = Wrappers.lambdaQuery(SysDept.class);
+        queryWrapper.eq(SysDept::getDelFlag, Constants.COMMON_STATE);
+        //查询条件扩展
+        queryWrapper.eq(dept.getDeptId() != null, SysDept::getDeptId, dept.getDeptId());
+        List<SysDept> list = deptService.list(queryWrapper);
+        return AjaxResult.success(list);
+    }
+
+
 }

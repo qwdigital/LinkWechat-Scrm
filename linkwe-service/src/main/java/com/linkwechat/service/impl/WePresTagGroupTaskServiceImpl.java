@@ -1,13 +1,10 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
-import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.CustomException;
@@ -24,6 +21,7 @@ import com.linkwechat.domain.taggroup.WePresTagGroupTaskStat;
 import com.linkwechat.domain.taggroup.WePresTagGroupTaskTag;
 import com.linkwechat.domain.taggroup.vo.WePresTagGroupTaskVo;
 import com.linkwechat.domain.taggroup.vo.WePresTagTaskListVo;
+import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.*;
@@ -75,6 +73,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -265,11 +264,11 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateFollowerTaskStatus(Long taskId, String followerId) {
-            // 更新所有对应客户的已送达为1
-            LambdaUpdateWrapper<WePresTagGroupTaskStat> statLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-            statLambdaUpdateWrapper.eq(WePresTagGroupTaskStat::getTaskId, taskId)
-                    .in(WePresTagGroupTaskStat::getUserId,followerId).set(WePresTagGroupTaskStat::getSent, 1);
-            return taskStatMapper.update(null, statLambdaUpdateWrapper);
+        // 更新所有对应客户的已送达为1
+        LambdaUpdateWrapper<WePresTagGroupTaskStat> statLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        statLambdaUpdateWrapper.eq(WePresTagGroupTaskStat::getTaskId, taskId)
+                .in(WePresTagGroupTaskStat::getUserId, followerId).set(WePresTagGroupTaskStat::getSent, 1);
+        return taskStatMapper.update(null, statLambdaUpdateWrapper);
     }
 
     @Override
@@ -323,15 +322,15 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
 
                 List<WeCustomer> externalIds = new ArrayList<>();
-                if(task.getSendScope().equals(0)){ //全部客户
+                if (task.getSendScope().equals(0)) { //全部客户
                     externalIds = iWeCustomerService.list();
-                }else{ //部分客户
-                    externalIds=iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                            .in(WeCustomer::getExternalUserid,task.getExternalUserIds()));
+                } else { //部分客户
+                    externalIds = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                            .in(WeCustomer::getExternalUserid, task.getExternalUserIds()));
                 }
 
                 //查询当前员工下的
-                List<String> followerIds =  externalIds.stream().map(WeCustomer::getAddUserId).distinct().collect(Collectors.toList());
+                List<String> followerIds = externalIds.stream().map(WeCustomer::getAddUserId).distinct().collect(Collectors.toList());
 
                 if (StringUtils.isEmpty(followerIds)) {
                     throw new WeComException("消息无法推送，找不到符合筛选条件的员工");
@@ -354,7 +353,8 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                     return stat;
                 }).collect(Collectors.toList());
                 taskStatMapper.batchSave(statList);
-                weMessagePushService.pushMessageSelfH5(followerIds, "【任务动态】<br/> 您有一项「标签建群」任务待完成，请尽快处理", MessageNoticeType.TAG.getType(),true);
+                weMessagePushService.pushMessageSelfH5(followerIds, "【任务动态】<br/> 您有一项「标签建群」任务待完成，请尽快处理", MessageNoticeType.TAG.getType(), true);
+
             }
         } catch (Exception e) {
             log.error("============> 老客标签建群任务发送失败, 任务明细: {}", task);

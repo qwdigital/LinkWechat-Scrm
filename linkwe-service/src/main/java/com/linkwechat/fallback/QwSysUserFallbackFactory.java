@@ -85,6 +85,11 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
     }
 
     @Override
+    public AjaxResult<List<SysUser>> findSysUser(SysUserQuery query) {
+        return null;
+    }
+
+    @Override
     public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds, String positions) {
         return null;
     }

@@ -203,6 +203,12 @@ public class LinkWeChatConfig {
      */
     private String shortLinkDomainName;
 
+
+    /**
+     * 获客助手短链
+     */
+    private String customerShortLinkDomainName;
+
     /**
      * 短链小程序地址
      */
@@ -228,6 +234,16 @@ public class LinkWeChatConfig {
      * 朋友圈移动端列表页
      */
     private String momentsUrl;
+
+    /**
+     * 线索中心移动端-待办任务-线索长时间未跟进-详情页
+     */
+    private String leadsDetailUrl;
+
+    /**
+     * 线索中心移动端-待办任务-线索约定事项待跟进-详情页
+     */
+    private String leadsCovenantWaitFollowUpUrl;
 
 
     public String getName() {
@@ -432,9 +448,6 @@ public class LinkWeChatConfig {
     public void setDataSynchInterval(int dataSynchInterval) {
         this.dataSynchInterval = dataSynchInterval;
     }
-
-
-
 
 
 }

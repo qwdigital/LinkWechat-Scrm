@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeSopExecuteTargetAttachmentsMapper">
+
+    <select id="findWeSopPushTaskDto" resultType="com.linkwechat.domain.sop.dto.WeSopPushTaskDto">
+        SELECT
+            wsb.send_type,
+            wset.execute_we_user_id,
+            wset.target_id,
+            wset.target_type,
+            wseta.sop_attachment_id,
+            wsb.id  as sop_base_id,
+            wseta.push_start_time,
+            wseta.push_end_time,
+            wseta.id as excuteTargetAttachId
+        FROM
+            we_sop_execute_target_attachments wseta
+                LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id
+                LEFT JOIN we_sop_base wsb ON wset.sop_base_id = wsb.id
+        WHERE wsb.del_flag=0  and wsb.sop_state=1 and wset.execute_state=1
+          <if test="targetType !=null">
+              AND wset.target_type=#{targetType}
+          </if>
+          <if test="sendType !=null">
+              AND wsb.send_type=#{sendType}
+          </if>
+
+            <choose>
+                <when test="isExpiringSoon">
+                    AND    timestampdiff(MINUTE,NOW(),wseta.push_end_time) BETWEEN 0 AND 10 AND wseta.is_tip !=2
+                </when>
+                <otherwise>
+                    AND to_days(wseta.push_start_time) = to_days(now()) AND wseta.is_tip=0
+                </otherwise>
+            </choose>
+
+    </select>
+
+    <select id="findWeSopPushTaskDtoBySopId" resultType="com.linkwechat.domain.sop.dto.WeSopPushTaskDto">
+        SELECT
+            wsb.send_type,
+            wset.execute_we_user_id,
+            wset.target_id,
+            wset.target_type,
+            wseta.sop_attachment_id,
+            wsb.id  as sop_base_id,
+            wseta.push_start_time,
+            wseta.push_end_time,
+            wseta.id as excuteTargetAttachId
+        FROM
+        we_sop_execute_target_attachments wseta
+        LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id and wset.del_flag=0 and wset.execute_state=1
+        LEFT JOIN we_sop_base wsb ON wset.sop_base_id = wsb.id
+        WHERE wsb.del_flag=0 and wsb.del_flag=0 and wsb.send_type=1
+        and  date_format(NOW(),'%Y-%m-%d %H:%i:%S') BETWEEN wseta.push_start_time AND  wseta.push_end_time 	and wseta.msg_id is  NULL
+        <if test="sopBaseId !=null">
+            AND wsb.id=#{sopBaseId}
+        </if>
+    </select>
+
+    <select id="findWeSopPushTaskDtoByWeUserId" resultType="com.linkwechat.domain.sop.dto.WeSopPushTaskDto">
+        SELECT
+            wsb.send_type,
+            wset.execute_we_user_id,
+            wset.target_id,
+            wset.target_type,
+            wseta.sop_attachment_id,
+            wsb.id as sop_base_id,
+            wseta.push_start_time,
+            wseta.push_end_time,
+            wseta.id as excuteTargetAttachId
+        FROM
+            we_sop_execute_target_attachments wseta
+                LEFT JOIN we_sop_execute_target wset ON wset.id = wseta.execute_target_id
+                LEFT JOIN we_sop_base wsb ON wset.sop_base_id = wsb.id
+        WHERE
+              wsb.del_flag=0
+          and wsb.sop_state=1
+          and wset.execute_state=1
+          AND to_days(wseta.push_start_time) = to_days(now())
+          AND wseta.is_tip=0
+        <if test="targetType !=null">
+            AND wset.target_type = #{targetType}
+        </if>
+        <if test="sendType !=null">
+            AND wsb.send_type = #{sendType}
+        </if>
+        <if test="weUserId !=null and weUserId!=''">
+            AND wset.execute_we_user_id = #{weUserId}
+        </if>
+    </select>
+</mapper>

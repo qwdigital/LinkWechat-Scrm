@@ -1,9 +1,6 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -17,12 +14,9 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.CustomException;
-import com.linkwechat.common.utils.DateUtils;
-import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
-import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.material.ao.PurePoster;
 import com.linkwechat.domain.material.ao.WePoster;
 import com.linkwechat.domain.material.ao.WePosterFontAO;
@@ -33,7 +27,6 @@ import com.linkwechat.domain.material.query.ContentDetailQuery;
 import com.linkwechat.domain.material.query.LinkMediaQuery;
 import com.linkwechat.domain.material.vo.*;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
-import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeMaterialService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -130,8 +122,8 @@ public class WeMaterialController extends BaseController {
     @ApiOperation("H5端发送获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(String url, String type, String name) {
 
-        if(StringUtils.isEmpty(name)){
-            name= SnowFlakeUtil.nextId().toString();
+        if (StringUtils.isEmpty(name)) {
+            name = SnowFlakeUtil.nextId().toString();
         }
 
         WeMediaVo weMediaDto = materialService.uploadTemporaryMaterial(url, type,

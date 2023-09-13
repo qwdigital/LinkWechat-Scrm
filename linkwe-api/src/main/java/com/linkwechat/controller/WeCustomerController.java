@@ -1,6 +1,7 @@
 package com.linkwechat.controller;
 
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.Constants;
@@ -13,6 +14,7 @@ import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.CustomerAddWay;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
@@ -27,6 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +78,35 @@ public class WeCustomerController extends BaseController {
         );//去重客户数
 
         return dataTable;
+    }
+
+
+    /**
+     * 客户数据导出
+     *
+     * @param query 请求参数
+     * @author WangYX
+     * @date 2023/08/23 14:00
+     */
+    @ApiOperation("客户数据导出")
+    @GetMapping("/export")
+    public void export(WeCustomersQuery query) {
+        query.setDelFlag(Constants.COMMON_STATE);
+        List<WeCustomersVo> list = weCustomerService.findWeCustomerList(query, null);
+        try {
+            String fileName = URLEncoder.encode("客户信息表_" + System.currentTimeMillis(), "UTF-8").replaceAll("\\+", "%20");
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+
+            long currentTimeMillis = System.currentTimeMillis();
+            EasyExcel.write(response.getOutputStream(), WeCustomersVo.class).sheet().doWrite(list);
+            System.out.println("耗时:" + (System.currentTimeMillis() - currentTimeMillis));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

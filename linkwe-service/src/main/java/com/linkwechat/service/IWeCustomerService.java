@@ -95,6 +95,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     void synchWeCustomerByAddIds(List<String> followUserIds);
 
 
+
     /**
      * 构建离职待分配客户
      *
@@ -331,4 +332,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param externalUserIds
      */
     List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
+
+
+
+
+
 }

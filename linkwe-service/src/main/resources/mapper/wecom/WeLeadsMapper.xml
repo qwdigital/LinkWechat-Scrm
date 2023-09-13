@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsMapper">
+
+    <select id="seaLeadsList" resultType="com.linkwechat.domain.leads.leads.vo.WeLeadsVO">
+        SELECT
+        t1.id,
+        t1.name,
+        t1.sex,
+        t1.leads_status,
+        t1.labels_ids,
+        t1.create_time,
+        t1.update_time,
+        t2.follower_name as preFollowerName
+        FROM we_leads t1
+        LEFT JOIN we_leads_follower t2 ON t1.id = t2.leads_id AND t2.is_latest = 1 AND t1.leads_status = 0
+        WHERE t1.leads_status IN (0, 3)
+        <if test="name!=null and name!=''">
+            AND t1.name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="seaId!=null">
+            AND t1.sea_id = #{seaId}
+        </if>
+    </select>
+
+    <!-- 线索列表 -->
+    <select id="leadsList" resultType="com.linkwechat.domain.leads.leads.vo.WeLeadsVO">
+        SELECT
+        t1.id,
+        t1.sea_id,
+        t1.name,
+        t1.phone,
+        t1.source,
+        t1.leads_status,
+        t2.follower_name as preFollowerName
+        FROM
+        we_leads t1
+        left join we_leads_follower t2 on t1.id = t2.leads_id and is_latest = 1
+        WHERE
+        t1.sea_id = #{seaId}
+        and t1.del_flag = 0
+        <if test="name!=null and name!=''">AND t1.name like concat('%',#{name},'%')</if>
+        <if test="phone!=null and phone!=''">AND t1.phone like concat('%',#{phone},'%')</if>
+        <if test="leadsStatus!=null">AND t1.leads_status = #{leadsStatus}</if>
+        ORDER BY
+        create_time DESC
+    </select>
+</mapper>

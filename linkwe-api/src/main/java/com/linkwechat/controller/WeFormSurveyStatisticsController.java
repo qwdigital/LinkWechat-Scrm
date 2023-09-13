@@ -13,7 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.annotation.Log;
-import com.linkwechat.common.constant.SiteStasConstants;
+import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.vo.SysAreaVo;
@@ -384,10 +384,10 @@ public class WeFormSurveyStatisticsController extends BaseController {
         }
 
         //PV
-        String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, belongId, dataSource);
+        String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, belongId, dataSource);
         redisTemplate.opsForValue().increment(pvKey);
         //IP
-        String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, belongId, dataSource);
+        String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, belongId, dataSource);
         log.info("请求的IP地址：{}", weFormSiteStasQuery.getIpAddr());
         redisTemplate.opsForSet().add(ipKey, weFormSiteStasQuery.getIpAddr());
 
@@ -655,12 +655,12 @@ public class WeFormSurveyStatisticsController extends BaseController {
                     String[] split = channelsName.split(",");
                     for (String channelName : split) {
                         //PV
-                        String pvKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
+                        String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
                         if (!redisTemplate.hasKey(pvKey)) {
                             redisTemplate.opsForValue().set(pvKey, collect.get(weFormSurveyCatalogue.getId()) != null ? collect.get(weFormSurveyCatalogue.getId()) : 0);
                         }
                         //IP
-                        String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channelName);
+                        String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channelName);
                         if (!redisTemplate.hasKey(ipKey)) {
                             redisTemplate.opsForSet().add(ipKey, "");
                         }

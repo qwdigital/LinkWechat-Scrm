@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLxQrCodeMapper">
+
+
+
+    <resultMap type="com.linkwechat.domain.WeLxQrCode" id="WeLxQrCodeResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="businessId" column="business_id" jdbcType="VARCHAR"/>
+        <result property="businessData" column="business_data" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="scanNum" column="scan_num" jdbcType="INTEGER"/>
+        <result property="configId" column="config_id" jdbcType="VARCHAR"/>
+        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="linkPath" column="link_path" jdbcType="VARCHAR"/>
+        <result property="imageUrl" column="image_url" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap type="com.linkwechat.domain.qr.vo.WeLxQrCodeDetailVo" id="WeLxQrCodeDetailResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="businessId" column="business_id" jdbcType="VARCHAR"/>
+        <result property="businessData" column="business_data" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="scanNum" column="scan_num" jdbcType="INTEGER"/>
+        <result property="configId" column="config_id" jdbcType="VARCHAR"/>
+        <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="linkPath" column="link_path" jdbcType="VARCHAR"/>
+        <result property="imageUrl" column="image_url" jdbcType="VARCHAR"/>
+        <collection property="qrUserInfos" ofType="com.linkwechat.domain.qr.vo.WeLxQrScopeUserVo">
+            <result property="scopeType" column="scope_type" jdbcType="INTEGER"/>
+            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+            <result property="party" column="party" jdbcType="VARCHAR"/>
+            <result property="position" column="position" jdbcType="VARCHAR"/>
+        </collection>
+        <collection property="qrAttachments" ofType="com.linkwechat.domain.qr.WeQrAttachments">
+            <result property="msgType" column="msg_type" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+            <result property="linkUrl" column="link_url" jdbcType="VARCHAR"/>
+            <result property="mediaId" column="media_id" jdbcType="VARCHAR"/>
+            <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+            <result property="appId" column="app_id" jdbcType="VARCHAR"/>
+            <result property="realType" column="real_type" jdbcType="INTEGER"/>
+            <result property="materialId" column="material_id" jdbcType="BIGINT"/>
+        </collection>
+        <collection property="qrTags" ofType="com.linkwechat.domain.tag.vo.WeTagVo">
+            <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+            <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectWeLxQrCodeVo">
+        select id,
+               name,
+               type,
+               business_id,
+               business_data,
+               state,
+               scan_num,
+               config_id,
+               qr_code,
+               link_path,
+               image_url,
+               create_by,
+               create_by_id,
+               create_time,
+               update_by,
+               update_by_id,
+               update_time,
+               del_flag
+        from we_lx_qr_code
+    </sql>
+
+    <sql id="selectLxQrCodeDetailVo">
+        select wlqc.id,
+               wlqc.name,
+               wlqc.type,
+               wlqc.state,
+               wlqc.business_id,
+               wlqc.business_data,
+               wlqc.scan_num,
+               wlqc.config_id,
+               wlqc.qr_code,
+               wlqc.link_path,
+               wlqc.image_url,
+               wlqs.scope_type,
+               wlqs.user_id,
+               wlqs.party,
+               wlqs.position,
+               wqtr.tag_id,
+               wt.name as tag_name,
+               wqa.msg_type,
+               wqa.content,
+               wqa.title,
+               wqa.description,
+               wqa.pic_url,
+               wqa.link_url,
+               wqa.media_id,
+               wqa.file_url,
+               wqa.app_id,
+               wqa.real_type,
+               wqa.material_id
+        from we_lx_qr_code wlqc
+                 left join we_lx_qr_scope wlqs on wlqs.qr_id = wlqc.id and wlqs.del_flag = 0
+                 left join we_qr_attachments wqa on wqa.qr_id = wlqc.id and wqa.business_type = 3 and wqa.del_flag = 0
+                 left join we_qr_tag_rel wqtr on wqtr.qr_id = wlqc.id and wqtr.business_type = 3 and wqtr.del_flag = 0
+                 left join we_tag wt on wt.tag_id = wqtr.tag_id and wt.del_flag = 0
+    </sql>
+
+    <select id="getQrDetail" resultMap="WeLxQrCodeDetailResult">
+        <include refid="selectLxQrCodeDetailVo"/>
+        where wlqc.id = #{id}
+    </select>
+
+
+    <select id="getWeQrCodeListStatistics" resultType="com.linkwechat.domain.qr.vo.WeLxQrCodeSheetVo">
+        select t.date_time, ifnull(c.num, 0) as today_num
+        from (select date as date_time
+              from sys_dim_date
+              where `date` &gt;= DATE_FORMAT(#{beginTime}
+                  , '%Y-%m-%d')
+                and `date` &lt;= DATE_FORMAT(#{endTime}
+                  , '%Y-%m-%d')
+             ) t
+                 left join
+             (select date_format(add_time, '%Y-%m-%d') as date_time, count(1) as num
+              from we_customer
+              where state = #{state}
+              group by add_time) c on t.date_time = c.date_time
+        order by  t.date_time desc
+    </select>
+
+    <select id="getQrDetailByState" resultMap="WeLxQrCodeDetailResult">
+        <include refid="selectLxQrCodeDetailVo"/>
+        where wlqc.state = #{state} and wlqc.del_flag = 0
+    </select>
+
+</mapper>

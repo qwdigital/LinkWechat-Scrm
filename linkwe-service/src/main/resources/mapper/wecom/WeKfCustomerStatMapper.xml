@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfCustomerStatMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeKfCustomerStat" id="WeKfCustomerStatResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="dateTime" column="date_time" jdbcType="VARCHAR"/>
+                <result property="sessionCnt" column="session_cnt" jdbcType="INTEGER"/>
+                <result property="evaluateCnt" column="evaluate_cnt" jdbcType="INTEGER"/>
+                <result property="goodCnt" column="good_cnt" jdbcType="INTEGER"/>
+                <result property="commonCnt" column="common_cnt" jdbcType="INTEGER"/>
+                <result property="badCnt" column="bad_cnt" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeKfCustomerStatVo">
+        select id, date_time, session_cnt, evaluate_cnt, good_cnt, common_cnt, bad_cnt, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_kf_customer_stat
+    </sql>
+
+</mapper>

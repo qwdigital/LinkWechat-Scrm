@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsSeaRuleRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.leads.sea.entity.WeLeadsSeaRuleRecord">
+        <id column="id" property="id"/>
+        <result column="sea_id" property="seaId"/>
+        <result column="is_auto_recovery" property="isAutoRecovery"/>
+        <result column="first" property="first"/>
+        <result column="version" property="version"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_by_id" property="createById"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , sea_id, is_auto_recovery, first, version, create_time,create_by,create_by_id
+    </sql>
+
+</mapper>

@@ -1,8 +1,14 @@
 package com.linkwechat.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.domain.WeCustomerLink;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeCustomerLinkCount;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
 * @author robin
@@ -10,6 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 * @createDate 2023-07-04 17:41:13
 */
 public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
+
+
+    /**
+     * 获取相关链接下的客户
+     * @param weCustomerLinkCount
+     * @return
+     */
+    List<WeCustomerLinkCount> findLinkWeCustomer(WeCustomerLinkCount weCustomerLinkCount);
 
 
     /**
@@ -26,6 +40,22 @@ public interface IWeCustomerLinkService extends IService<WeCustomerLink> {
      * @return
      */
     WeCustomerLink findWeCustomerLinkById(Long id);
+
+
+
+    /**
+     *
+     * @param shortUrl
+     * @return
+     */
+    JSONObject getShort2LongUrl(String shortUrl);
+
+
+    /**
+     * 删除获客链接
+     * @param ids
+     */
+    void removeLink(List<Long> ids);
 
 
 

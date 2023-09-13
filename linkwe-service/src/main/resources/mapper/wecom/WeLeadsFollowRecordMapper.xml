@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsFollowRecordMapper">
+
+    <select id="seaLeadsTrend" resultType="com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord">
+        SELECT
+        t1.id,
+        t1.sea_id,
+        t1.we_leads_id,
+        t1.record_status,
+        t1.create_time,
+        t1.follow_user_id
+        FROM
+        we_leads_follow_record t1
+        LEFT JOIN we_leads_follower t2 ON t1.follow_user_id = t2.id
+        WHERE
+        t1.record_status IN ( 0, 1 )
+        <if test="seaId!=null">AND t1.sea_id = #{seaId}</if>
+        <if test="weUserId!=null and weUserId!=''">AND t2.follower_we_user_id = #{weUserId}</if>
+        <if test="beginTime!=null and beginTime!='' and endTime!=null and endTime!=''">
+            AND date_format( t1.create_time, '%Y-%m-%d' ) BETWEEN #{beginTime} AND #{endTime}
+        </if>
+    </select>
+
+    <select id="getCustomerRank" resultType="com.linkwechat.domain.leads.sea.vo.WeLeadsSeaEmployeeRankVO">
+        SELECT t2.follower_name as userName,
+        count(t1.id) AS todayFollowNum
+        FROM we_leads_follow_record t1
+        LEFT JOIN we_leads_follower t2 ON t1.follow_user_id = t2.id
+        WHERE t1.record_status = 3
+        <if test="beginTime!=null and beginTime!='' and endTime!=null and endTime!=''">
+            AND date_format(t1.create_time, '%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+        </if>
+        GROUP BY t2.follower_id
+        ORDER BY todayFollowNum DESC LIMIT 5
+    </select>
+
+
+    <select id="list" resultType="com.linkwechat.domain.leads.record.entity.WeLeadsFollowRecord">
+        SELECT
+        t1.id,
+        t1.sea_id,
+        t1.we_leads_id,
+        t1.record_status,
+        t1.create_time,
+        t1.follow_user_id
+        FROM
+        we_leads_follow_record t1
+        LEFT JOIN we_leads_follower t2 ON t1.follow_user_id = t2.id
+        <where>
+            <if test="seaId!=null">AND t1.sea_id = #{seaId}</if>
+            <if test="createTime!=null and createTime!=''">AND date_format( t1.create_time, '%Y-%m-%d' ) =
+                #{createTime}
+            </if>
+            <if test="weUserId!=null and weUserId!=''">AND t2.follower_we_user_id = #{weUserId}</if>
+            <if test="recordStatus!=null">AND t1.record_status = #{recordStatus}</if>
+        </where>
+    </select>
+
+</mapper>
