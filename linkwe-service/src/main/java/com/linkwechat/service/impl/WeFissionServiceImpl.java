@@ -279,120 +279,128 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     @Override
     public WeFissionInviterPoster findFissionPoster(String unionid, String fissionId) throws Exception {
 
-        WeFissionInviterPoster weFissionInviterPoster = iWeFissionInviterPosterService.getOne(new LambdaQueryWrapper<WeFissionInviterPoster>()
+        WeFissionInviterPoster weFissionInviterPoster=new WeFissionInviterPoster();
+
+        List<WeFissionInviterPoster> weFissionInviterPosters = iWeFissionInviterPosterService.list(new LambdaQueryWrapper<WeFissionInviterPoster>()
                 .eq(WeFissionInviterPoster::getInviterId, unionid)
                 .eq(WeFissionInviterPoster::getFissionId, fissionId));
 
 
-        WeFissionInviterRecord weFissionInviterRecord = this.builderInviterRecord(unionid, fissionId);
+        if(CollectionUtil.isNotEmpty(weFissionInviterPosters)){
+             weFissionInviterPoster =weFissionInviterPosters.stream().findFirst().get();
 
-        if(null != weFissionInviterRecord){
+             WeFissionInviterRecord weFissionInviterRecord = this.builderInviterRecord(unionid, fissionId);
+
+            if(null != weFissionInviterRecord){
 
 
 
-            if(null == weFissionInviterPoster){ //为空,重新构建裂变海报
-                weFissionInviterPoster=new WeFissionInviterPoster();
-                weFissionInviterPoster.setFissionId(Long.parseLong(fissionId));
-                weFissionInviterPoster.setInviterId(unionid);
-                WeFission weFission = this.getById(fissionId);
-                if(null != weFission&&StringUtils.isNotEmpty(weFission.getPosterUrl())){
+                if(null == weFissionInviterPoster){ //为空,重新构建裂变海报
+                    weFissionInviterPoster=new WeFissionInviterPoster();
+                    weFissionInviterPoster.setFissionId(Long.parseLong(fissionId));
+                    weFissionInviterPoster.setInviterId(unionid);
+                    WeFission weFission = this.getById(fissionId);
+                    if(null != weFission&&StringUtils.isNotEmpty(weFission.getPosterUrl())){
 
-                    //任务宝
-                    if(TaskFissionType.USER_FISSION.getCode()
-                            .equals(weFission.getFassionType())){
-                        String weUserIds=null;String deptIds=null;String positions=null;
+                        //任务宝
+                        if(TaskFissionType.USER_FISSION.getCode()
+                                .equals(weFission.getFassionType())){
+                            String weUserIds=null;String deptIds=null;String positions=null;
 
-                        WeSopExecuteUserConditVo addWeUser = weFission.getAddWeUserOrGroupCode().getAddWeUser();
+                            WeSopExecuteUserConditVo addWeUser = weFission.getAddWeUserOrGroupCode().getAddWeUser();
 
-                        if(null != addWeUser){
-                            WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit = addWeUser.getExecuteUserCondit();
-                            if(null != executeUserCondit){
-                                List<String> weUserIdss = executeUserCondit.getWeUserIds();
-                                if(CollectionUtil.isNotEmpty(weUserIdss)){
-                                    weUserIds=StringUtils.join(weUserIdss,",");
+                            if(null != addWeUser){
+                                WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit = addWeUser.getExecuteUserCondit();
+                                if(null != executeUserCondit){
+                                    List<String> weUserIdss = executeUserCondit.getWeUserIds();
+                                    if(CollectionUtil.isNotEmpty(weUserIdss)){
+                                        weUserIds=StringUtils.join(weUserIdss,",");
+                                    }
+                                }
+
+                                WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit = addWeUser.getExecuteDeptCondit();
+                                if(null != executeDeptCondit){
+                                    List<String> deptIdss = executeDeptCondit.getDeptIds();
+                                    if(CollectionUtil.isNotEmpty(deptIdss)){
+                                        deptIds=StringUtils.join(deptIdss,",");
+                                    }
+                                    List<String> posts = executeDeptCondit.getPosts();
+                                    if(CollectionUtil.isNotEmpty(posts)){
+                                        positions=StringUtils.join(posts,",");
+                                    }
                                 }
                             }
 
-                            WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit = addWeUser.getExecuteDeptCondit();
-                            if(null != executeDeptCondit){
-                                List<String> deptIdss = executeDeptCondit.getDeptIds();
-                                if(CollectionUtil.isNotEmpty(deptIdss)){
-                                    deptIds=StringUtils.join(deptIdss,",");
+
+                            AjaxResult<List<String>> listAjaxResult
+                                    = qwSysUserClient.screenConditWeUser(weUserIds,deptIds,positions);
+                            if(null != listAjaxResult){
+                                List<String> addWeUserIds = listAjaxResult.getData();
+
+                                if(CollectionUtil.isEmpty(addWeUserIds)){
+                                    throw new WeComException("当前添加的员工不存在或为无效员工");
                                 }
-                                List<String> posts = executeDeptCondit.getPosts();
-                                if(CollectionUtil.isNotEmpty(posts)){
-                                    positions=StringUtils.join(posts,",");
+                                WeAddWayVo weAddWayVo = iWeQrCodeService.createQrbyWeUserIds(
+                                        addWeUserIds,
+                                        WeConstans.FISSION_PREFIX_RWB + weFissionInviterRecord.getId()
+                                );
+
+                                if(weAddWayVo.getErrCode() !=null && WeConstans.WE_SUCCESS_CODE.equals(weAddWayVo.getErrCode())) {
+
+                                    weFissionInviterPoster.setState(WeConstans.FISSION_PREFIX_RWB + weFissionInviterRecord.getId());
+                                    if(weAddWayVo != null){
+
+                                        WeMaterial material = materialService.builderPosterWeMaterial( weAddWayVo.getQrCode(),weFission.getPosterId());
+                                        if(null != material){
+                                            weFissionInviterPoster.setFissionPosterUrl(material.getMaterialUrl());
+                                        }
+                                        weFissionInviterPoster.setConfig(weAddWayVo.getConfigId());
+                                    }
+
+                                }else{
+                                    throw new WeComException(weAddWayVo.getErrMsg());
                                 }
+
                             }
-                        }
 
 
-                        AjaxResult<List<String>> listAjaxResult
-                                = qwSysUserClient.screenConditWeUser(weUserIds,deptIds,positions);
-                        if(null != listAjaxResult){
-                            List<String> addWeUserIds = listAjaxResult.getData();
+                            //群裂变
+                        }else if(TaskFissionType.GROUP_FISSION.getCode()
+                                .equals(weFission.getFassionType())){
 
-                            if(CollectionUtil.isEmpty(addWeUserIds)){
-                                throw new WeComException("当前添加的员工不存在或为无效员工");
-                            }
-                            WeAddWayVo weAddWayVo = iWeQrCodeService.createQrbyWeUserIds(
-                                    addWeUserIds,
-                                    WeConstans.FISSION_PREFIX_RWB + weFissionInviterRecord.getId()
-                            );
+                            WeGroupCode weGroupCode = weFission.getAddWeUserOrGroupCode().getAddGroupCode();
 
-                            if(weAddWayVo.getErrCode() !=null && WeConstans.WE_SUCCESS_CODE.equals(weAddWayVo.getErrCode())) {
+                            weGroupCode.setState(WeConstans.FISSION_PREFIX_QLB + weFissionInviterRecord.getId());
 
-                                weFissionInviterPoster.setState(WeConstans.FISSION_PREFIX_RWB + weFissionInviterRecord.getId());
-                                if(weAddWayVo != null){
 
-                                    WeMaterial material = materialService.builderPosterWeMaterial( weAddWayVo.getQrCode(),weFission.getPosterId());
+                            WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(weGroupCode);
+
+                            if(null != addJoinWayVo){
+                                WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
+                                if(joinWay != null){
+
+                                    weFissionInviterPoster.setState(weGroupCode.getState());
+                                    weFissionInviterPoster.setConfig(joinWay.getConfig_id());
+
+                                    WeMaterial material = materialService.builderPosterWeMaterial( joinWay.getQr_code(),weFission.getPosterId());
                                     if(null != material){
                                         weFissionInviterPoster.setFissionPosterUrl(material.getMaterialUrl());
                                     }
-                                    weFissionInviterPoster.setConfig(weAddWayVo.getConfigId());
                                 }
 
-                            }else{
-                                throw new WeComException(weAddWayVo.getErrMsg());
+
                             }
-
-                        }
-
-
-                        //群裂变
-                    }else if(TaskFissionType.GROUP_FISSION.getCode()
-                            .equals(weFission.getFassionType())){
-
-                        WeGroupCode weGroupCode = weFission.getAddWeUserOrGroupCode().getAddGroupCode();
-
-                        weGroupCode.setState(WeConstans.FISSION_PREFIX_QLB + weFissionInviterRecord.getId());
-
-
-                        WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(weGroupCode);
-
-                        if(null != addJoinWayVo){
-                            WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
-                            if(joinWay != null){
-
-                                weFissionInviterPoster.setState(weGroupCode.getState());
-                                weFissionInviterPoster.setConfig(joinWay.getConfig_id());
-
-                                WeMaterial material = materialService.builderPosterWeMaterial( joinWay.getQr_code(),weFission.getPosterId());
-                                if(null != material){
-                                    weFissionInviterPoster.setFissionPosterUrl(material.getMaterialUrl());
-                                }
-                            }
-
 
                         }
 
                     }
 
+
+                    //入库
+                    iWeFissionInviterPosterService.save(weFissionInviterPoster);
                 }
 
 
-                //入库
-                iWeFissionInviterPosterService.save(weFissionInviterPoster);
             }
 
 
