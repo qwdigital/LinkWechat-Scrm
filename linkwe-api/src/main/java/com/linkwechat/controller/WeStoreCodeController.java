@@ -424,8 +424,11 @@ public class WeStoreCodeController extends BaseController {
     public AjaxResult  importData(MultipartFile file) throws Exception {
         ExcelUtil<WeStoreCode> util = new ExcelUtil<WeStoreCode>(WeStoreCode.class);
         List<WeStoreCode> weStoreCode = util.importExcel(file.getInputStream());
+
         String tip=new String("成功导入{0}条");
         if(CollectionUtil.isNotEmpty(weStoreCode)){
+
+
             //过滤字段为空的数据
             List<WeStoreCode> deduplicationWeStoreCode = weStoreCode.stream().filter(s -> StringUtils.isNotEmpty(s.getStoreName())
                     && StringUtils.isNotEmpty(s.getArea()) && StringUtils.isNotEmpty(s.getAddress()) ).collect(Collectors.toList());

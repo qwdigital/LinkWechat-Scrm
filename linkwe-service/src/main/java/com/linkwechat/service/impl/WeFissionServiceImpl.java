@@ -279,15 +279,14 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
     @Override
     public WeFissionInviterPoster findFissionPoster(String unionid, String fissionId) throws Exception {
 
-        WeFissionInviterPoster weFissionInviterPoster=new WeFissionInviterPoster();
+        WeFissionInviterPoster weFissionInviterPoster=null;
 
         List<WeFissionInviterPoster> weFissionInviterPosters = iWeFissionInviterPosterService.list(new LambdaQueryWrapper<WeFissionInviterPoster>()
                 .eq(WeFissionInviterPoster::getInviterId, unionid)
                 .eq(WeFissionInviterPoster::getFissionId, fissionId));
 
 
-        if(CollectionUtil.isNotEmpty(weFissionInviterPosters)){
-             weFissionInviterPoster =weFissionInviterPosters.stream().findFirst().get();
+        if(CollectionUtil.isEmpty(weFissionInviterPosters)){
 
              WeFissionInviterRecord weFissionInviterRecord = this.builderInviterRecord(unionid, fissionId);
 
@@ -402,6 +401,10 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
             }
+
+
+        }else{
+            weFissionInviterPoster =weFissionInviterPosters.stream().findFirst().get();
 
 
         }
