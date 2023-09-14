@@ -2,6 +2,8 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.entity.SysUser;
@@ -11,6 +13,7 @@ import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.resolver.PlaceholderResolver;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.operation.query.WeOperationCustomerQuery;
@@ -85,13 +88,23 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
                 chatIds = pageList.stream().map(LinkGroupChatListVo::getChatId).collect(Collectors.toList());
             }
         } else {
-            WeGroupChatQuery query = new WeGroupChatQuery();
-            query.setUserIds(SecurityUtils.getLoginUser().getSysUser().getWeUserId());
-            List<LinkGroupChatListVo> linkGroupChatListVos = weGroupService.selectWeGroupListByApp(query);
-            if (CollectionUtil.isNotEmpty(linkGroupChatListVos)) {
-                chatIds = linkGroupChatListVos.stream().map(LinkGroupChatListVo::getChatId).collect(Collectors.toList());
-            }
+//            WeGroupChatQuery query = new WeGroupChatQuery();
+//            query.setUserIds(SecurityUtils.getLoginUser().getSysUser().getWeUserId());
+//            List<LinkGroupChatListVo> linkGroupChatListVos = weGroupService.selectWeGroupListByApp(query);
 
+            if(StringUtils.isNotEmpty(SecurityUtils.getLoginUser().getSysUser().getWeUserId())){
+                List<WeGroup> weGroups = weGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                        .eq(WeGroup::getOwner, SecurityUtils.getLoginUser().getSysUser().getWeUserId()));
+
+                log.error("==========:"+ SecurityUtils.getLoginUser().getSysUser().getWeUserId());
+
+
+
+                log.error("==========:"+ JSONUtil.toJsonStr(weGroups));
+                if (CollectionUtil.isNotEmpty(weGroups)) {
+                    chatIds = weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList());
+                }
+            }
         }
 
         return weOperationCenterMapper.getGroupAnalysisByApp(chatIds);
