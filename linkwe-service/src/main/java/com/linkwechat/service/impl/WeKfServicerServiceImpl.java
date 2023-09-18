@@ -85,7 +85,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
             Set<String> userIdSet = servicers.stream().map(WeKfUser::getUserId).filter(StringUtils::isNotEmpty).collect(Collectors.toSet());
             Set<Long> deptIdSet = servicers.stream().map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> userId2NameMap = new HashMap<>();
-            Map<Integer, String> deptId2NameMap = new HashMap<>();
+            Map<Long, String> deptId2NameMap = new HashMap<>();
             if (CollectionUtil.isNotEmpty(userIdSet)) {
                 SysUserQuery userQuery = new SysUserQuery();
                 userQuery.setWeUserIds(new ArrayList<>(userIdSet));
@@ -105,7 +105,7 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 try {
                     List<SysDeptVo> sysDeptList = qwSysDeptClient.getListByDeptIds(sysDeptQuery).getData();
                     if (CollectionUtil.isNotEmpty(sysDeptList)) {
-                        Map<Integer, String> deptMap = sysDeptList.stream().collect(Collectors.toMap(item -> item.getDeptId().intValue(), item -> item.getDeptName(), (key1, key2) -> key2));
+                        Map<Long, String> deptMap = sysDeptList.stream().collect(Collectors.toMap(SysDeptVo::getDeptId, SysDeptVo::getDeptName, (key1, key2) -> key2));
                         deptId2NameMap.putAll(deptMap);
                     }
                 } catch (Exception e) {
