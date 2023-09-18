@@ -36,7 +36,7 @@ public class WeUpgradeServiceConfigVo extends WeResultVo {
         /**
          * 专员部门列表
          */
-        private List<Integer> departmentList;
+        private List<Integer> departmentIdList;
     }
 
     @Data
