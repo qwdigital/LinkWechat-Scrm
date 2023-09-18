@@ -379,7 +379,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                                 .owner_filter(WeOwnerFilterEntity.builder()
                                         .userid_list(ListUtil.toList(k))
                                         .build())
-                                .status_filter(1)
+                                .status_filter(0)
                                 .build());
 
                         if(CollectionUtil.isNotEmpty(weGroups)){
@@ -436,7 +436,7 @@ public class WeLeaveUserServiceImpl extends ServiceImpl<SysLeaveUserMapper,SysLe
                             leaveUser.setWeUserId(sysUser.getWeUserId());
 
                         }else{
-                            leaveUser.setUserName("@企微成员");
+                            leaveUser.setUserName("@离职成员:"+k);
                             List<WeCorpAccount> weCorpAccounts = iWeCorpAccountService.list();
 
                             if(CollectionUtil.isNotEmpty(weCorpAccounts)){

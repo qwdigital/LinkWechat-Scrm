@@ -22,7 +22,7 @@
         update_by= values(update_by),
         update_by_id= values(update_by_id),
         state= values(state),del_flag= values(del_flag),
-        `type`= values(`type`)
+        `type`= values(`type`);
     </insert>
 
 

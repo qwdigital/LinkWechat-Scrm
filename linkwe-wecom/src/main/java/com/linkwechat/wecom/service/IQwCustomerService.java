@@ -3,9 +3,11 @@ package com.linkwechat.wecom.service;
 
 
 import com.dtflys.forest.annotation.JSONBody;
+import com.dtflys.forest.annotation.Var;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.UpdateCustomerRemarkQuery;
 import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
+import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
@@ -25,6 +27,7 @@ import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.WeBatchCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
+import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatDetailVo;
@@ -394,4 +397,12 @@ public interface IQwCustomerService {
      * @return
      */
     WeResultVo updateCustomerRemark(UpdateCustomerRemarkQuery query);
+
+
+    /**
+     * 根据员工id获取客户列表id
+     * @param query
+     * @return
+     */
+    WeCustomerListVo getCustomerList(WeCustomerListQuery query);
 }

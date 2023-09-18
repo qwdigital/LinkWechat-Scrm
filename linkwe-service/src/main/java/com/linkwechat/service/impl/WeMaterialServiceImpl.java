@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -332,7 +333,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                 poster.setSampleImgPath(fileEntity.getUrl());
             }
             WeMaterial material = generateMaterialFromPoster(poster);
-            material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
+            material.setPosterSubassembly(JSONUtil.toJsonStr(poster.getPosterSubassemblyList()));
+//            material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
             return material;
 
         } catch (Exception e) {
@@ -586,7 +588,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     public String mediaGet(String media_id, String fileType, String extentType) {
         byte[] data = mediaClient.mediaGet(new WeMediaQuery(media_id)).getData();
         String fileName = String.valueOf(SnowFlakeUtil.nextId());
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain", data);
+//        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain", data);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "image/jpeg", data);
         try {
             WeMaterialFileVo weMaterialFileVO = this.uploadWeMaterialFile(mockMultipartFile, fileType);
             return weMaterialFileVO.getMaterialUrl();

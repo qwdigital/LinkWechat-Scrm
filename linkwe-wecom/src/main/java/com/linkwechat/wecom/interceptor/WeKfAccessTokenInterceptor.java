@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
@@ -66,6 +67,13 @@ public class WeKfAccessTokenInterceptor extends WeForestInterceptor implements I
      */
     @Override
     public void onSuccess(WeResultVo resultVo, ForestRequest forestRequest, ForestResponse forestResponse) {
+        WeErrorCodeEnum weErrorCodeEnum = WeErrorCodeEnum.parseEnum(resultVo.getErrCode());
+        if(null != weErrorCodeEnum){
+            if(!resultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                saveWeErrorMsg(weErrorCodeEnum,forestRequest);
+            }
+            resultVo.setErrMsg(weErrorCodeEnum.getErrorMsg());
+        }
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
     }
 

@@ -589,4 +589,18 @@ public class SysUserController extends BaseController {
     }
 
 
+    /**
+     * 根据id查询指定员工
+     * @param query
+     * @return
+     */
+    @PostMapping("/findSysUser")
+    public AjaxResult<List<SysUser>> findSysUser(@RequestBody SysUserQuery query){
+        return AjaxResult.success(
+                userService.list(new LambdaQueryWrapper<SysUser>()
+                        .in(SysUser::getWeUserId,query.getWeUserIds()))
+        );
+    }
+
+
 }

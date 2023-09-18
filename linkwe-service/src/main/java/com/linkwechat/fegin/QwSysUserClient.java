@@ -108,6 +108,15 @@ public interface QwSysUserClient {
 
 
     /**
+     * 根据员工条件查询员工
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/user/findSysUser")
+    AjaxResult<List<SysUser>> findSysUser(@RequestBody SysUserQuery query);
+
+
+    /**
      * 根据职位等条件筛选员工
      * @param weUserIds
      * @param deptIds

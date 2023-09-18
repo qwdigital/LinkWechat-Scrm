@@ -1,5 +1,8 @@
 package com.linkwechat.wecom.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -187,6 +191,7 @@ public class QwAccessTokenServiceImpl implements IQwAccessTokenService {
                 weAccessToken = weCorpTokenVo.getAccessToken();
                 redisService.setCacheObject(weAgentTokenKey, weCorpTokenVo.getAccessToken(), weCorpTokenVo.getExpiresIn(), TimeUnit.SECONDS);
             }
+
         }
         return weAccessToken;
     }

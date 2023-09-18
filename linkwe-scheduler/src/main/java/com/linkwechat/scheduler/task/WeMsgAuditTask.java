@@ -87,24 +87,30 @@ public class WeMsgAuditTask {
         }
 
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(corpId);
-        if (corpAccount == null) {
-            log.info("无有效企业----------------->");
-            return;
+        if (corpAccount != null) {
+
+
+            if(redisService.keyIsExists("we:chat:seq:" + corpAccount.getCorpId())){
+                seqLong = (Long) redisService.getCacheObject("we:chat:seq:" + corpAccount.getCorpId());
+            }else {
+                LambdaQueryWrapper<WeChatContactMsg> wrapper = new LambdaQueryWrapper<WeChatContactMsg>().orderByDesc(WeChatContactMsg::getSeq).last("limit 1");
+                WeChatContactMsg weChatContactMsg = weChatContactMsgService.getOne(wrapper);
+                if (weChatContactMsg != null) {
+                    seqLong = weChatContactMsg.getSeq();
+                }
+            }
+            if(StringUtils.isNotEmpty(corpAccount.getCorpId()) && StringUtils.isNotEmpty(corpAccount.getChatSecret()) && StringUtils.isNotEmpty(corpAccount.getFinancePrivateKey())){
+                FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
+                financeService.setRedisService(redisService);
+                financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), "" ,data.toJSONString()));
+                log.info("会话存档定时任务执行完成----------------->");
+            }
+
+
+
         }
 
-        if(redisService.keyIsExists("we:chat:seq:" + corpAccount.getCorpId())){
-            seqLong = (Long) redisService.getCacheObject("we:chat:seq:" + corpAccount.getCorpId());
-        }else {
-            LambdaQueryWrapper<WeChatContactMsg> wrapper = new LambdaQueryWrapper<WeChatContactMsg>().orderByDesc(WeChatContactMsg::getSeq).last("limit 1");
-            WeChatContactMsg weChatContactMsg = weChatContactMsgService.getOne(wrapper);
-            if (weChatContactMsg != null) {
-                seqLong = weChatContactMsg.getSeq();
-            }
-        }
-        FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
-        financeService.setRedisService(redisService);
-        financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), "" ,data.toJSONString()));
-        log.info("会话存档定时任务执行完成----------------->");
+
     }
 
 
