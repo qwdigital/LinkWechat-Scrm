@@ -386,17 +386,17 @@ public class WeKfInfoServiceImpl extends ServiceImpl<WeKfInfoMapper, WeKfInfo> i
             Set<Long> deptIdSet = kfList.stream().map(QwKfListVo::getUserIdList).flatMap(Collection::stream).map(WeKfUser::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> userId2NameMap = new HashMap<>();
             Map<Long, String> deptId2NameMap = new HashMap<>();
-            if(CollectionUtil.isNotEmpty(userIdSet)){
+            if (CollectionUtil.isNotEmpty(userIdSet)) {
                 SysUserQuery userQuery = new SysUserQuery();
                 userQuery.setWeUserIds(new ArrayList<>(userIdSet));
                 try {
-                    List<SysUser> sysUserList = qwSysUserClient.findSysUser(userQuery).getData();
-                    if(CollectionUtil.isNotEmpty(sysUserList)){
-                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUser::getWeUserId, SysUser::getUserName, (key1, key2) -> key2));
+                    List<SysUserVo> sysUserList = qwSysUserClient.getUserListByWeUserIds(userQuery).getData();
+                    if (CollectionUtil.isNotEmpty(sysUserList)) {
+                        Map<String, String> userMap = sysUserList.stream().collect(Collectors.toMap(SysUserVo::getWeUserId, SysUserVo::getUserName, (key1, key2) -> key2));
                         userId2NameMap.putAll(userMap);
                     }
                 } catch (Exception e) {
-                    log.error("换取用户名称失败：userQuery：{}",JSONObject.toJSONString(userQuery),e);
+                    log.error("换取用户名称失败：userQuery：{}", JSONObject.toJSONString(userQuery), e);
                 }
             }
             if(CollectionUtil.isNotEmpty(deptIdSet)){
