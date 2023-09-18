@@ -76,7 +76,8 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
 
 
                 }else if(ObjectUtil.equal(WeMsgTypeEnum.NEWS.getMessageType(), messageTemplate.getMsgType())
-                        ||ObjectUtil.equal(WeMsgTypeEnum.POSTERS.getMessageType(), messageTemplate.getMsgType())){//文章或海报
+                        ||ObjectUtil.equal(WeMsgTypeEnum.POSTERS.getMessageType(), messageTemplate.getMsgType())
+                ||ObjectUtil.equal(WeMsgTypeEnum.MURL.getMessageType(), messageTemplate.getMsgType())){//文章或海报，链接
                     String linkUrl=domain+ "/#/metrialDetail?materiaId=" + messageTemplate.getMaterialId();
 
                     Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),

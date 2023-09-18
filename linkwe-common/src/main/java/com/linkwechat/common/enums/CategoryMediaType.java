@@ -28,7 +28,8 @@ public enum CategoryMediaType {
     SOPTLP(16,"SOP模板"),
     QFTLP(17,"群发模板"),
 
-    ZLBDURL(18,"智能表单");
+    ZLBDURL(18,"智能表单"),
+    MURL(19,"外链");
 
 
     private final Integer type;
@@ -70,6 +71,9 @@ public enum CategoryMediaType {
         result.add(new SideMaterialType( POSTER.getType(),POSTER.getName(),8));
 
         result.add(new SideMaterialType( ZLBDURL.getType(),ZLBDURL.getName(),9));
+
+        result.add(new SideMaterialType( MURL.getType(),MURL.getName(),10));
+
         result = result.stream().sorted(Comparator.comparing(SideMaterialType::getSort)).collect(Collectors.toList());
 
         return result;
