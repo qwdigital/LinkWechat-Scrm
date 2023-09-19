@@ -77,7 +77,13 @@ public enum MessageType {
     /**
      * 海报
      */
-    POSTERS("13","posters","海报")
+    POSTERS("13","posters","海报"),
+
+
+    /**
+     * 外链
+     */
+    MURL("14","murl","外链")
 
     ;
     /**

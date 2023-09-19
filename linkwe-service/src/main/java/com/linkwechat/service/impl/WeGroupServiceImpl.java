@@ -225,6 +225,10 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
 
                     if(CollectionUtil.isNotEmpty(weGroupMembers)){
+                        iWeGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
+                                .notIn(WeGroupMember::getUserId,weGroupMembers.stream().map(WeGroupMember::getUserId)
+                                        .collect(Collectors.toList()))
+                                .eq(WeGroupMember::getChatId,chatId));
                         iWeGroupMemberService.insertBatch(weGroupMembers);
                     }
 

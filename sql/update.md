@@ -1022,3 +1022,11 @@ ALTER TABLE `we_customer` MODIFY COLUMN `phone` varchar(100) CHARACTER SET utf8m
 
 
   ```
+
+---
+### ● 日期：2023.09.19
+  ```
+ALTER TABLE we_kf_info MODIFY COLUMN end_content TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '自动结束提醒内容';
+ALTER TABLE `we_group_member` ADD UNIQUE INDEX `index`(`chat_id`, `user_id`) USING BTREE COMMENT '客群id与群成员id构建唯一索引';
+  ```
+
