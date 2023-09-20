@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
@@ -101,6 +102,9 @@ public class SysUserController extends BaseController {
 
     @Autowired
     private IWeStrackStageService iWeStrackStageService;
+
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
 
     /**
@@ -429,6 +433,7 @@ public class SysUserController extends BaseController {
     public AjaxResult<WxUser> getWxInfo() {
         WxLoginUser wxLoginUser = SecurityUtils.getWxLoginUser();
         WxUser customerInfo = wxUserService.getCustomerInfo(wxLoginUser.getOpenId(), wxLoginUser.getUnionId());
+        customerInfo.setEnableFilePreview(linkWeChatConfig.isEnableFilePreview());
         return AjaxResult.success(customerInfo);
     }
 

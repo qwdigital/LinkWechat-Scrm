@@ -42,6 +42,11 @@ public class LinkWeChatConfig {
      * 是否是演示环境 true:是 false:不是
      */
     private boolean demoEnviron=false;
+
+    /**
+     * 是否开启文件预览 true:开启 false:不开启
+     */
+    private boolean enableFilePreview=true;
     /**
      * 上传路径
      */
@@ -450,4 +455,11 @@ public class LinkWeChatConfig {
     }
 
 
+    public boolean isEnableFilePreview() {
+        return enableFilePreview;
+    }
+
+    public void setEnableFilePreview(boolean enableFilePreview) {
+        this.enableFilePreview = enableFilePreview;
+    }
 }
