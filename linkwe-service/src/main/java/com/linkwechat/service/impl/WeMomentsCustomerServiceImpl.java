@@ -68,26 +68,13 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
     public long estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request) {
         WeCustomersQuery weCustomersQuery=new WeCustomersQuery();
 
-        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(null, StrUtil.join(",",request.getPosts()), StrUtil.join(",", request.getDeptIds()));
-
-        if(null != request){
-            List<SysUser> sysUsers = result.getData();
-            if(CollectionUtil.isNotEmpty(sysUsers)){
-
-                if (CollectionUtil.isEmpty(request.getUserIds())) {
-                    request.setUserIds(new ArrayList<>());
-                }
-
-                request.getUserIds().addAll(
-                        sysUsers.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
-                );
-            }
-        }
         //查询员工不为空
         if(CollectionUtil.isNotEmpty(request.getUserIds())){
             weCustomersQuery.setUserIds(
                     String.join(",", request.getUserIds())
             );
+        }else{
+            request.setUserIds(new ArrayList<>());
         }
 
         //查询标签不为空
@@ -95,6 +82,19 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
             weCustomersQuery.setTagIds(
                     String.join(",", request.getCustomerTag())
             );
+        }
+
+
+        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(null, StrUtil.join(",",request.getPosts()), StrUtil.join(",", request.getDeptIds()));
+
+        if(null != request){
+            List<SysUser> sysUsers = result.getData();
+            if(CollectionUtil.isNotEmpty(sysUsers)){
+
+                request.getUserIds().addAll(
+                        sysUsers.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+                );
+            }
         }
 
 
