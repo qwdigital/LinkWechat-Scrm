@@ -103,7 +103,7 @@ public class WeMomentsTaskController extends BaseController {
     @ApiOperation("预估客户数量")
     @PostMapping("/estimate/num")
     public AjaxResult getEstimateCustomerNum(@Validated @RequestBody WeMomentsTaskEstimateCustomerNumRequest request) {
-        Integer integer = weMomentsCustomerService.estimateCustomerNum(request);
+        long integer = weMomentsCustomerService.estimateCustomerNum(request);
         return AjaxResult.success(integer);
     }
 

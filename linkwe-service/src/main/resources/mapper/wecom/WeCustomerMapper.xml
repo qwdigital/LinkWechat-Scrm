@@ -9,6 +9,9 @@
     <select id="findWeCustomerListIds" resultType="java.lang.String">
         SELECT wcr.id FROM we_customer wcr
        <where>
+            <if test="weCustomerList.isJoinBlacklist != null">
+                AND wcr.is_join_blacklist=#{weCustomerList.isJoinBlacklist}
+            </if>
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>
@@ -199,6 +202,7 @@
         wc.email,
         wc.address,
         wc.qq,
+        wc.is_join_blacklist as isJoinBlacklist,
         wc.position,
         wc.corp_name as corpName,
         wc.other_descr as otherDescr,

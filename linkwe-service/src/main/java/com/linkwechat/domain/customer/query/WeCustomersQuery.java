@@ -75,4 +75,16 @@ public class WeCustomersQuery {
     private String phone;
 
 
+    /**
+     * 客户id，多个使用逗号隔开
+     */
+    private String customerIds;
+
+
+    /**
+     * 0:加入黑名单;1:不加入黑名单;
+     */
+    private Integer isJoinBlacklist;
+
+
 }
