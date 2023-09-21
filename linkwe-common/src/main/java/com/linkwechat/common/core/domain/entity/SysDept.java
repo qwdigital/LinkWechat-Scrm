@@ -71,7 +71,7 @@ public class SysDept extends BaseEntity {
      */
     @ApiModelProperty(value = "显示顺序")
     @TableField("order_num")
-    private Integer orderNum;
+    private Long orderNum;
 
     /**
      * 负责人
@@ -132,7 +132,7 @@ public class SysDept extends BaseEntity {
     }
 
     @NotBlank(message = "显示顺序不能为空")
-    public Integer getOrderNum() {
+    public Long getOrderNum() {
         return orderNum;
     }
 
