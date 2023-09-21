@@ -459,7 +459,6 @@
         birthday,
         corp_name,
         `position`,
-        is_open_chat,
         create_time,
         create_by,
         add_user_id,
@@ -481,7 +480,7 @@
         ) values
         <foreach collection="weCustomers" item="item" index="index" separator=",">
             (#{item.id},#{item.externalUserid},#{item.customerName},#{item.avatar},#{item.customerType},#{item.gender}, #{item.unionid},#{item.birthday},
-            #{item.corpName},#{item.position},#{item.isOpenChat}, #{item.createTime},
+            #{item.corpName},#{item.position}, #{item.createTime},
             #{item.createBy},#{item.addUserId},#{item.addTime},#{item.qq},#{item.email},#{item.address},#{item.phone},#{item.addMethod},#{item.delFlag},
             #{item.state},#{item.updateBy},#{item.updateTime},#{item.otherDescr},#{item.remarkName},#{item.createById},#{item.updateById},
              #{item.tagIds}
@@ -496,7 +495,6 @@
         birthday=IFNULL(VALUES(birthday), we_customer.birthday),
         corp_name=IFNULL(VALUES(corp_name), we_customer.corp_name),
         `position`=IFNULL(VALUES(`position`), we_customer.position),
-        is_open_chat=IFNULL(VALUES(is_open_chat), we_customer.is_open_chat),
         add_user_id=IFNULL(VALUES(add_user_id), we_customer.add_user_id),
         add_time=IFNULL(VALUES(add_time),we_customer.add_time),
         qq=IFNULL(VALUES(qq), we_customer.qq),
