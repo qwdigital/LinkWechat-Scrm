@@ -118,4 +118,11 @@ public class WxUser extends BaseEntity implements Serializable {
     @TableField("del_flag")
     private Integer delFlag;
 
+
+    /**
+     * 是否开启文件预览 true:开启 false:不开启
+     */
+    @TableField(exist = false)
+    private boolean enableFilePreview;
+
 }

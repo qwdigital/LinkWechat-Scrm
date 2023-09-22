@@ -15,6 +15,7 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto.CustomerList;
@@ -64,34 +65,71 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
 
 
     @Override
-    public Integer estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request) {
-        if (request.getScopeType().equals(0)) {
-            //全部客户
-            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
-            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-            queryWrapper.ne(WeCustomer::getTrackState, 5);
-            return weCustomerService.count(queryWrapper);
-        } else {
-            //通过条件筛选
-            List<SysUser> sysUsers = weMomentsUserService.getMomentsTaskExecuteUser(request.getScopeType(), request.getDeptIds(), request.getPosts(), request.getUserIds());
-            List<String> collect = sysUsers.stream().map(SysUser::getWeUserId).distinct().collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
-                //标签数量不为0时，获取标签对应的客户数量
-                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(request.getCustomerTag(), collect);
-                weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-                return CollectionUtil.isNotEmpty(weUserIds) ? weUserIds.size() : 0;
-            }
-            //通过条件筛选出的员工数据为0，且没有客户标签时
-            if (CollectionUtil.isEmpty(sysUsers)) {
-                return 0;
-            }
-            //员工数据不为0时，获取全部的客户数量
-            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
-            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-            queryWrapper.ne(WeCustomer::getTrackState, 5);
-            queryWrapper.in(WeCustomer::getAddUserId, collect);
-            return weCustomerService.count(queryWrapper);
+    public long estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request) {
+        WeCustomersQuery weCustomersQuery=new WeCustomersQuery();
+
+        //查询员工不为空
+        if(CollectionUtil.isNotEmpty(request.getUserIds())){
+            weCustomersQuery.setUserIds(
+                    String.join(",", request.getUserIds())
+            );
+        }else{
+            request.setUserIds(new ArrayList<>());
         }
+
+        //查询标签不为空
+        if(CollectionUtil.isNotEmpty(request.getCustomerTag())){
+            weCustomersQuery.setTagIds(
+                    String.join(",", request.getCustomerTag())
+            );
+        }
+
+
+        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(null, StrUtil.join(",",request.getPosts()), StrUtil.join(",", request.getDeptIds()));
+
+        if(null != request){
+            List<SysUser> sysUsers = result.getData();
+            if(CollectionUtil.isNotEmpty(sysUsers)){
+
+                request.getUserIds().addAll(
+                        sysUsers.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+                );
+            }
+        }
+
+
+
+
+
+
+       return weCustomerService.countWeCustomerList(weCustomersQuery);
+//        if (request.getScopeType().equals(0)) {
+//            //全部客户
+//            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+//            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+//            queryWrapper.ne(WeCustomer::getTrackState, 5);
+//            return weCustomerService.count(queryWrapper);
+//        } else {
+//            //通过条件筛选
+//            List<SysUser> sysUsers = weMomentsUserService.getMomentsTaskExecuteUser(request.getScopeType(), request.getDeptIds(), request.getPosts(), request.getUserIds());
+//            List<String> collect = sysUsers.stream().map(SysUser::getWeUserId).distinct().collect(Collectors.toList());
+//            if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
+//                //标签数量不为0时，获取标签对应的客户数量
+//                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(request.getCustomerTag(), collect);
+//                weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
+//                return CollectionUtil.isNotEmpty(weUserIds) ? weUserIds.size() : 0;
+//            }
+//            //通过条件筛选出的员工数据为0，且没有客户标签时
+//            if (CollectionUtil.isEmpty(sysUsers)) {
+//                return 0;
+//            }
+//            //员工数据不为0时，获取全部的客户数量
+//            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
+//            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
+//            queryWrapper.ne(WeCustomer::getTrackState, 5);
+//            queryWrapper.in(WeCustomer::getAddUserId, collect);
+//            return weCustomerService.count(queryWrapper);
+//        }
     }
 
     @Override

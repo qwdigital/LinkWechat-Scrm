@@ -19,10 +19,8 @@ import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeCorpAccount;
-import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.WeCustomerTrajectory;
-import com.linkwechat.domain.WeUnionidExternalUseridRelation;
+import com.linkwechat.domain.*;
+import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.material.entity.WeContentTalk;
 import com.linkwechat.domain.material.entity.WeContentViewRecord;
 import com.linkwechat.domain.material.entity.WeMaterial;
@@ -38,6 +36,7 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +72,14 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
      */
     @Resource
     private WeCustomerTrajectoryMapper weCustomerTrajectoryMapper;
+
+
+    @Resource
+    private IWeCustomerService iWeCustomerService;
+
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
 
     @Override
@@ -272,28 +279,6 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         SysUser data = JSONObject.parseObject(s, SysUser.class);
 
 
-        //获取员工对应的企业信息
-//        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-//        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
-
-//        //1.根据openId和unionId获取客户的ExternalUserId
-//        WeUnionidExternalUseridRelation weUnionidExternalUseridRelation = weUnionidExternalUseridRelationService.get(weContentViewRecordQuery.getOpenid(), weContentViewRecordQuery.getUnionid());
-//        //2.根据ExternalUserId获取客户信息
-//        WeCustomer weCustomer = null;
-//        if (ObjectUtil.isNotEmpty(weUnionidExternalUseridRelation)) {
-//            String externalUserid = weUnionidExternalUseridRelation.getExternalUserid();
-//            if (StringUtils.isNotBlank(externalUserid)) {
-//                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-//                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
-//                queryWrapper.eq(WeCustomer::getExternalUserid, externalUserid);
-//                queryWrapper.last("limit 1");
-//                List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
-//                if (weCustomers != null && weCustomers.size() > 0) {
-//                    weCustomer = weCustomers.get(0);
-//                }
-//            }
-//        }
-//
 
         //根据unionId获取客户
         WeCustomer weCustomer = null;
@@ -364,6 +349,23 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         sb.append(minutes != 0L ? minutes + "分" : "");
         sb.append(second != 0L ? second + "秒" : "");
 
+
+        //给客户打标签
+        if(ObjectUtil.isNotEmpty(weCustomer)){
+            if(StringUtils.isNotEmpty(weMaterial.getTagIds())){
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .in(WeTag::getTagId, weMaterial.getTagIds().split(",")));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    iWeCustomerService.makeLabel(WeMakeCustomerTag.builder()
+                            .addTag(weTags)
+                            .userId(weCustomer.getAddUserId())
+                            .source(false)
+                            .externalUserid(weCustomer.getExternalUserid())
+                            .build());
+                }
+            }
+
+        }
 
         //4.发送应用通知消息。由RabbitMQ进行解耦
         if (ObjectUtil.isNotEmpty(weCustomer)) {

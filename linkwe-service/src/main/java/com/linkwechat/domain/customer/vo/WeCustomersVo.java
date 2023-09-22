@@ -5,6 +5,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.converter.BlackListConverter;
 import com.linkwechat.converter.CustomerAddWayConverter;
 import com.linkwechat.converter.CustomerTrackStateConverter;
 import com.linkwechat.converter.CustomerTypeConverter;
@@ -196,6 +197,13 @@ public class WeCustomersVo {
      */
     @ExcelProperty(value = "所在省市县", index = 16)
     private String area;
+
+
+    /**
+     * 0:加入黑名单;1:不加入黑名单;
+     */
+    @ExcelProperty(value = "是否加入黑名单", index = 2, converter = BlackListConverter.class)
+    private Integer isJoinBlacklist;
 
 
 }
