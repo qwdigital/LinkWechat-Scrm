@@ -104,8 +104,9 @@
             </foreach>
         </if>
         <if test="query.groupName != null  and query.groupName != ''">
-            AND  CONCAT( IFNULL(wg.group_name,''),IFNULL(su.user_name,''))
-            LIKE CONCAT('%',#{query.groupName,jdbcType=VARCHAR},'%')
+            AND wg.group_name  LIKE CONCAT('%',#{query.groupName,jdbcType=VARCHAR},'%')
+--             AND  CONCAT( IFNULL(wg.group_name,''),IFNULL(su.user_name,''))
+--             LIKE CONCAT('%',#{query.groupName,jdbcType=VARCHAR},'%')
         </if>
 
         <if test="query.groupLeaderName != null  and query.groupLeaderName != ''">
