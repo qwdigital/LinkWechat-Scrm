@@ -29,7 +29,7 @@ public class WeDeptEntity {
     /**
      * 在父部门中的次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
      */
-    private Integer order;
+    private Long order;
 
     /**
      * 部门id，32位整型，指定时必须大于1。若不填该参数，将自动生成id

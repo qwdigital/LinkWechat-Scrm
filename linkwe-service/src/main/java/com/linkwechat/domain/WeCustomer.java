@@ -200,4 +200,9 @@ public class WeCustomer extends BaseEntity {
      */
     private String customerFullName;
 
+    /**
+     * 0:加入黑名单;1:不加入黑名单;
+     */
+    private Integer isJoinBlacklist;
+
 }

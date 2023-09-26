@@ -59,6 +59,7 @@
     <select id="selectListByLkQuery" resultType="com.linkwechat.domain.material.vo.WeMaterialNewVo">
         select
         t.*,
+        (SELECT GROUP_CONCAT(wt.name) from we_tag wt WHERE  FIND_IN_SET(wt.tag_id,t.tag_ids)) as tagNames,
         tt.name as categoryName,
         (
         SELECT count( 1 ) FROM we_content_send_record t1

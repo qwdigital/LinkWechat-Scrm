@@ -42,7 +42,7 @@ public class WeUserDetailVo extends WeResultVo {
     /**
      * 部门内的排序值，默认为0
      */
-    private List<Integer> order;
+    private List<Long> order;
 
 
     /**
