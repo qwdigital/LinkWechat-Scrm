@@ -1037,6 +1037,6 @@ ALTER TABLE `we_group_member` ADD UNIQUE INDEX `index`(`chat_id`, `user_id`) USI
 ALTER TABLE `we_customer` ADD COLUMN `is_join_blacklist` tinyint(4) NULL DEFAULT 1 COMMENT '0:加入黑名单;1:不加入黑名单;' AFTER `add_user_leave`;
 ALTER TABLE `we_customer` MODIFY COLUMN `add_user_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER `del_flag`;
 ALTER TABLE `we_material` ADD COLUMN `tag_ids` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '标签id' AFTER `type`;
-
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2468, '系统监控', 2185, 9, 'system', NULL, 1, 'M', '0', '0', NULL, 'app', 'admin', NULL, '2023-08-26 16:41:35', NULL, NULL, NULL, '');
 
   ```
