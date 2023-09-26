@@ -287,6 +287,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 
 
             List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getAddUserId,data.getWeUserId())
                     .eq(WeCustomer::getUnionid, weContentViewRecordQuery.getUnionid()));
 
             if (CollectionUtil.isNotEmpty(weCustomers)) {
@@ -324,7 +325,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //非企业客户
             weContentViewRecord.setIsCustomer(0);
         }
-        int insert = weContentViewRecordMapper.insert(weContentViewRecord);
+         weContentViewRecordMapper.insert(weContentViewRecord);
 
 
         //素材信息
