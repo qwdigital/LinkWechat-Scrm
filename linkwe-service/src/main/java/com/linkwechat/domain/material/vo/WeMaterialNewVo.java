@@ -16,6 +16,11 @@ public class WeMaterialNewVo extends WeMaterial {
     private Integer sendNum;
     private Integer viewNum;
     private Integer viewByNum;
+
+    private String tagIds;
+
+
+    private String tagNames;
     //如果素材为表单类型则有该字段
 //    private Long formSurveyId;
 //    //为表单类型当前字段为表单名称

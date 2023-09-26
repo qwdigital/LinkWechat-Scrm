@@ -104,8 +104,7 @@
             </foreach>
         </if>
         <if test="query.groupName != null  and query.groupName != ''">
-            AND  CONCAT( IFNULL(wg.group_name,''),IFNULL(su.user_name,''))
-            LIKE CONCAT('%',#{query.groupName,jdbcType=VARCHAR},'%')
+            AND wg.group_name  LIKE CONCAT('%',#{query.groupName},'%')
         </if>
 
         <if test="query.groupLeaderName != null  and query.groupLeaderName != ''">
@@ -132,7 +131,7 @@
         <if test="query.tagIds != null and query.tagIds !=''">
             AND wt.`id` in
             <foreach item="tagId" index="index" collection="query.tagIds.split(',')" open="(" separator="," close=")">
-                #{query.tagId}
+                #{tagId}
             </foreach>
         </if>
         GROUP BY wg.id

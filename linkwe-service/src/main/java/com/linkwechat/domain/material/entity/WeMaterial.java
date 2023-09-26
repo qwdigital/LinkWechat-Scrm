@@ -163,4 +163,10 @@ public class WeMaterial extends BaseEntity {
     @TableField(exist = false)
     private List<WeMaterialImgAo> weMaterialImgAoList;
 
+
+    /**
+     * 标签id，多个使用逗号隔开
+     */
+    private String tagIds;
+
 }
