@@ -149,6 +149,8 @@ public class WeQrAddQuery {
         }
         weQrCode.setConfigId(configId);
         weQrCode.setQrCode(qrCode);
+        weQrCode.setQrWelcomeOpen(this.qrWelcomeOpen);
+        weQrCode.setQrPriorityUserWelcome(this.qrPriorityUserWelcome);
         return weQrCode;
     }
 
