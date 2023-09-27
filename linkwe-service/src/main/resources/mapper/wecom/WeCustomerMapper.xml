@@ -644,8 +644,8 @@
         from we_customer
         where id in (select id
         from we_customer where state=#{state}
-        <if test="beginTime != null "><!-- 开始时间检索 -->
-            and date_format(add_time,'%y-%m-%d') &gt;= date_format(#{beginTime},'%y-%m-%d')
+        <if test="startTime != null "><!-- 开始时间检索 -->
+            and date_format(add_time,'%y-%m-%d') &gt;= date_format(#{startTime},'%y-%m-%d')
         </if>
         <if test="endTime != null "><!-- 结束时间检索 -->
             and date_format(add_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
