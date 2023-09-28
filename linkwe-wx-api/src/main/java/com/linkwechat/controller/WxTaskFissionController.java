@@ -41,6 +41,8 @@ public class WxTaskFissionController extends BaseController {
     public AjaxResult<WeFissionInviterPoster> findFissionPoster(String unionid, String fissionId) throws Exception {
 
 
+
+
         return AjaxResult.success(
                 iWeFissionService.findFissionPoster(unionid, fissionId)
         );
