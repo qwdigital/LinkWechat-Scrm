@@ -438,4 +438,16 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     public void callbackUpdate(SysDeptQuery query) {
         callbackAdd(query);
     }
+
+    @Override
+    public boolean isRoot(Long deptId) {
+        if(deptId != null){
+            SysDept sysDept = this.getById(deptId);
+            if(null != sysDept && new Long(0).equals(sysDept.getParentId())){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
 }

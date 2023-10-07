@@ -164,4 +164,11 @@ public interface ISysDeptService extends IService<SysDept> {
      * @param query
      */
     void callbackUpdate(SysDeptQuery query);
+
+    /**
+     * 判断当前节点是不是跟节点
+     * @param deptId
+     * @return
+     */
+    boolean isRoot(Long deptId);
 }

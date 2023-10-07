@@ -223,7 +223,7 @@
             AND sur.role_id = #{sysUser.roleId}
         </if>
         <if test="sysUser.deptId != null">
-            AND ud.dept_id= #{sysUser.deptId}
+            AND FIND_IN_SET(sysUser.deptId,d.ancestors)
         </if>
 
         GROUP BY u.we_user_id
@@ -262,7 +262,7 @@
             AND sur.role_id = #{roleId}
         </if>
         <if test="deptId  != null">
-            AND ud.dept_id= #{deptId}
+            AND FIND_IN_SET(deptId,d.ancestors)
         </if>
 
 
