@@ -143,6 +143,11 @@ public class WeProductController extends BaseController {
         List<WeProduct> list = weProductService.list(queryWrapper);
         TableDataInfo dataTable = getDataTable(list);
         List<WeProductVo> weProductVos = BeanUtil.copyToList(list, WeProductVo.class);
+
+        weProductVos.forEach(o -> {
+            o.setPrice(new BigDecimal(o.getPrice()).divide(BigDecimal.valueOf(100L)).toString());
+        });
+
         dataTable.setRows(weProductVos);
         return dataTable;
     }
