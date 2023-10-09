@@ -49,8 +49,8 @@ public class SynchRecordAop {
                     .eq(WeSynchRecord::getSynchType, annotationLog.synchType())
                     .between(WeSynchRecord::getSynchTime, DateUtils.getBeforeByMinute(linkWeChatConfig.getDataSynchInterval())
                             , DateUtils.getBeforeByHourTime(0)));
-            if (CollectionUtil.isNotEmpty(weSynchRecords) && weSynchRecords.size() > 1) {
-                throw new CustomException("由于企业微信开放平台的限制，" + linkWeChatConfig.getDataSynchInterval() + "分钟内不得重复同步操作");
+            if (CollectionUtil.isNotEmpty(weSynchRecords)) {
+                throw new CustomException("由于企业微信开放平台的限制，" + linkWeChatConfig.getDataSynchInterval() + "分钟内不得重复同步操作",-1);
             }
         }
     }

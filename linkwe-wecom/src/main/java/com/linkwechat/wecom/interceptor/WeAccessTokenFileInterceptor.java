@@ -4,10 +4,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.config.WeComeProxyConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -16,6 +19,7 @@ import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
+import com.linkwechat.wecom.utils.ForestProxyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +34,21 @@ import java.util.Map;
 @Component
 public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements Interceptor<Object> {
 
+
+
+
     /**
      * 该方法在请求发送之前被调用, 若返回false则不会继续发送请求
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
+
+         setProxy(request);
+
+
+        ForestProxyUtils.setProxy(null,null,0,null,null);
+
+
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }

@@ -62,14 +62,15 @@ public class QwChatMsgQiRuleListener {
     @RabbitListener(queues = "${wecom.mq.queue.chat-msg-qi-rule:Qu_ChatMsgQiRule}")
     public void subscribe(String msg, Channel channel, Message message) throws IOException {
         try {
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             log.info("会话规则拦截消息：msg:{}", msg);
 
             msgQiRuleHandler(JSONObject.parseObject(msg));
 
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+
         } catch (Exception e) {
             log.error("会话存档消息监听-消息处理失败 msg:{},error:{}", msg, e);
-            channel.basicNack(message.getMessageProperties().getDeliveryTag(), true, true);
+//            channel.basicNack(message.getMessageProperties().getDeliveryTag(), true, true);
         }
     }
 

@@ -96,11 +96,11 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
         WeShortLink weShortLink = new WeShortLink();
         BeanUtil.copyProperties(query, weShortLink);
 
-        Integer jumpType = weShortLink.getJumpType();
-
-        Integer touchType = weShortLink.getTouchType();
-
-        Integer type = weShortLink.getType();
+//        Integer jumpType = weShortLink.getJumpType();
+//
+//        Integer touchType = weShortLink.getTouchType();
+//
+//        Integer type = weShortLink.getType();
 
         if (save(weShortLink)) {
             String encode = Base62NumUtil.encode(weShortLink.getId());

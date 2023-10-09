@@ -33,7 +33,7 @@ public class MimeTypeUtils {
             // 压缩文件
             "rar", "zip", "gz", "bz2",
             // 视频格式
-            "mp4", "avi", "rmvb",
+            "mp4", "avi", "rmvb","amr",
             // pdf
             "pdf"};
 
