@@ -1041,7 +1041,7 @@ INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`
 
   ```
 ---
-### ● 日期：2023.10.07
+### ● 日期：2023.10.09
   ```
 INSERT INTO `we_substitute_customer_order_catalogue` (`id`, `name`, `sort`, `is_fixed`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1686684373675925504, '订单信息', 0, 1, '2023-08-02 18:24:26', '2023-08-02 18:24:26', 'admin', 'admin', 1, 1, 0);
 INSERT INTO `we_substitute_customer_order_catalogue` (`id`, `name`, `sort`, `is_fixed`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1686684407914029056, '商品信息', 1, 1, '2023-08-02 18:24:35', '2023-08-02 18:24:35', 'admin', 'admin', 1, 1, 0);
@@ -1067,7 +1067,7 @@ INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_
 INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_id`, `name`, `code`, `type`, `is_require`, `expound`, `value`, `sort`, `is_fixed`, `is_money`, `is_to_time`, `is_multiple_choice`, `is_more`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1687015505588060160, 1686684460279914496, '回款时间', 'returnedDate', 3, 1, '请选择时间', NULL, 17, 1, 0, 1, 0, NULL, '2023-08-03 16:20:14', '2023-08-03 16:20:14', 'admin', 'admin', 1, 1, 0);
 INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_id`, `name`, `code`, `type`, `is_require`, `expound`, `value`, `sort`, `is_fixed`, `is_money`, `is_to_time`, `is_multiple_choice`, `is_more`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1687015583602114560, 1686684460279914496, '打款人', 'payer', 0, 1, '请填写打款人名称', NULL, 18, 1, 0, 0, 0, NULL, '2023-08-03 16:20:33', '2023-08-03 16:20:33', 'admin', 'admin', 1, 1, 0);
 INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_id`, `name`, `code`, `type`, `is_require`, `expound`, `value`, `sort`, `is_fixed`, `is_money`, `is_to_time`, `is_multiple_choice`, `is_more`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1687015747247079424, 1686684460279914496, '回款凭证', 'returnedReceipt', 7, 0, NULL, NULL, 19, 1, 0, 0, 0, 1, '2023-08-03 16:21:12', '2023-08-03 16:21:12', 'admin', 'admin', 1, 1, 0);
-
+UPDATE sys_menu set visible=1 where menu_name = '知识中心';
 
   ```
 

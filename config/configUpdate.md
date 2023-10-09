@@ -34,3 +34,20 @@
           yshop-mall: yshop-mall
   
   ```
+### ● 日期：2023.10.09
+  ```
+   ● linkwe-common.yml
+      linkwechat:
+         fincaceProxyConfig:
+            proxy: ""  #使用代理的请求，需要传入代理的链接。如：socks5://10.0.0.1:8081 或者 http://10.0.0.1:8081
+            paswd: ""  #代理账号密码，需要传入代理的账号密码。如 user_name:passwd_123
+   ● linkwe-common.yml
+      linkwechat:
+         weComeProxyConfig:
+            startProxy: false #是否开启代理 true开启 false不开启,如果为false,则proxyIp,proxyPort,proxyUserName,proxyPassword需要配置。
+            proxyIp: "" #代理服务器的ip
+            #代理服务器端口
+            proxyPort: 0  
+            proxyUserName: "" #代理服务器账号
+            proxyPassword: "" #代理服务器密码
+  ```
