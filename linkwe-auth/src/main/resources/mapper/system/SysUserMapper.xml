@@ -663,5 +663,6 @@
                 and su.sex = #{sex}
             </if>
         </where>
+        GROUP BY su.we_user_id
     </select>
 </mapper> 
