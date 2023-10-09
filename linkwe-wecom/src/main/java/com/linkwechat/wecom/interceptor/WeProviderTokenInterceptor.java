@@ -34,6 +34,7 @@ public class WeProviderTokenInterceptor extends WeForestInterceptor implements I
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
+        setProxy(request);
         iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         String token = iQwAccessTokenService.findProviderAccessToken(getCorpId(request));
         request.replaceOrAddQuery("provider_access_token", token);

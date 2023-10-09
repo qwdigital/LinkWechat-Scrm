@@ -42,6 +42,7 @@ public class WeiXinAccessTokenInterceptor extends WeForestInterceptor implements
 
     @Override
     public boolean beforeExecute(ForestRequest request){
+        setProxy(request);
         if(wxCommonClient == null){
             wxCommonClient = SpringUtils.getBean(WxCommonClient.class);
         }

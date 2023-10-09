@@ -40,6 +40,7 @@ public class WxAppletAccessTokenInterceptor extends WeForestInterceptor implemen
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
+        setProxy(request);
         if (wxCommonClient == null) {
             wxCommonClient = SpringUtils.getBean(WxCommonClient.class);
         }

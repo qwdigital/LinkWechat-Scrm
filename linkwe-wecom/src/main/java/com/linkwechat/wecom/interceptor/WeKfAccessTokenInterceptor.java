@@ -31,6 +31,7 @@ public class WeKfAccessTokenInterceptor extends WeForestInterceptor implements I
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
+        setProxy(request);
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }
