@@ -94,12 +94,13 @@ public class QwKfChatMsgTimeOutListener {
 
     private void kfChatSessionTimeOutHandler(WeKfMsgTaskQuery query) {
         WeKfPool kfPoolInfo = weKfPoolService.getById(query.getPoolId());
-        log.info("-------------处理客户未回复超时消息 kfPoolInfo:{}", JSONObject.toJSONString(kfPoolInfo));
-        if (kfPoolInfo == null || ObjectUtil.equal(kfPoolInfo.getStatus(), WeKfStatusEnum.STAR_OR_END.getType())) {
+        log.debug("-------------处理客户未回复超时消息 kfPoolInfo:{}", JSONObject.toJSONString(kfPoolInfo));
+        if (kfPoolInfo == null || ObjectUtil.equal(kfPoolInfo.getStatus(), WeKfStatusEnum.ACCESS_POOL.getType())
+                || ObjectUtil.equal(kfPoolInfo.getStatus(), WeKfStatusEnum.STAR_OR_END.getType())) {
             return;
         }
         WeKfInfo weKfInfo = weKfInfoService.getKfDetailByOpenKfId(query.getCorpId(), query.getOpenKfId());
-        log.info("-------------处理客户未回复超时消息 weKfInfo:{}", JSONObject.toJSONString(weKfInfo));
+        log.debug("-------------处理客户未回复超时消息 weKfInfo:{}", JSONObject.toJSONString(weKfInfo));
         if (weKfInfo == null) {
             return;
         }
