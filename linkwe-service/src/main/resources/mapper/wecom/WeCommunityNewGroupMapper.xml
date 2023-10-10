@@ -22,6 +22,9 @@
                create_time,
                update_by,
                update_time,
+               link_title,
+               link_desc,
+               link_cover_url,
                del_flag
         FROM we_community_new_group
     </sql>

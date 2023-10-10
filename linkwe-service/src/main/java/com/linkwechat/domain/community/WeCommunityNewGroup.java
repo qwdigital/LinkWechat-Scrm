@@ -41,6 +41,22 @@ public class WeCommunityNewGroup extends BaseEntity {
      */
     private Long emplCodeId;
 
+
+    /**
+     * 链接标题
+     */
+    private String linkTitle;
+
+    /**
+     * 链接描述
+     */
+    private String linkDesc;
+
+    /**
+     * 链接封面
+     */
+    private String linkCoverUrl;
+
     /**
      * 0 未删除 1 已删除
      */

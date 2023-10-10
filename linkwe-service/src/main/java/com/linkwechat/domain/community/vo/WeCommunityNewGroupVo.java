@@ -87,6 +87,21 @@ public class WeCommunityNewGroupVo extends BaseEntity {
     private String actualGroupName;
 
     /**
+     * 链接标题
+     */
+    private String linkTitle;
+
+    /**
+     * 链接描述
+     */
+    private String linkDesc;
+
+    /**
+     * 链接封面
+     */
+    private String linkCoverUrl;
+
+    /**
      * 创建时间
      */
      @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
