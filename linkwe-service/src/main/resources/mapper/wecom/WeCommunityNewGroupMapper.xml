@@ -54,7 +54,9 @@
     </select>
 
     <select id="getWelcomeMsgByState" parameterType="String" resultMap="WelcomeMsgResult">
-        select wec.id,wgc.code_url, wec.welcome_msg,wect.tag_id,wect.tag_name
+        select wec.id,wgc.code_url, wec.welcome_msg,wect.tag_id,wect.tag_name, wcng.link_title,
+               wcng.link_desc,
+               wcng.link_cover_url
         from we_emple_code wec
                  left join we_emple_code_tag wect on wec.id = wect.emple_code_id and wect.del_flag = 0
                  left join we_community_new_group wcng on wec.id = wcng.empl_code_id
@@ -68,6 +70,9 @@
         <result property="id" column="id"/>
         <result property="codeUrl" column="code_url"/>
         <result property="welcomeMsg" column="welcome_msg"/>
+        <result property="linkTitle" column="link_title"/>
+        <result property="linkDesc" column="link_desc"/>
+        <result property="linkCoverUrl" column="link_cover_url"/>
         <collection property="tagList" ofType="com.linkwechat.domain.tag.vo.WeTagVo">
             <result property="tagId" column="tag_id"/>
             <result property="tagName" column="tag_name"/>

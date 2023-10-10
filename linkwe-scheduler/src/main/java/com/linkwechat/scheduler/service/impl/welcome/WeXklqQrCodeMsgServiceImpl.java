@@ -1,6 +1,5 @@
 package com.linkwechat.scheduler.service.impl.welcome;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo;
@@ -44,6 +43,13 @@ public class WeXklqQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
             imageAtt.setMsgType(MessageType.IMAGE.getMessageType());
             imageAtt.setPicUrl(welcomeMsgByState.getCodeUrl());
             templates.add(imageAtt);
+
+            WeMessageTemplate linkTpl = new WeMessageTemplate();
+            linkTpl.setMsgType(MessageType.LINK.getMessageType());
+            linkTpl.setTitle(welcomeMsgByState.getLinkTitle());
+            linkTpl.setPicUrl(welcomeMsgByState.getLinkCoverUrl());
+            linkTpl.setDescription(welcomeMsgByState.getLinkDesc());
+            templates.add(linkTpl);
             makeCustomerTag(query.getExternalUserID(), query.getUserID(), welcomeMsgByState.getTagList());
         }
 
