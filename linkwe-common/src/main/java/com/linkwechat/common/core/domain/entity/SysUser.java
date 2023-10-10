@@ -338,6 +338,11 @@ public class SysUser extends BaseEntity {
     @TableField("is_open_daily")
     private Integer openDaily;
 
+    /**
+     * 是否按照跟节点查询所有数据来查询，默认不是
+     */
+    private boolean checkIsRoot=false;
+
 
     public SysUser(Long userId) {
         this.userId = userId;
@@ -382,6 +387,14 @@ public class SysUser extends BaseEntity {
     @JsonProperty
     public String getPassword() {
         return password;
+    }
+
+    public boolean isCheckIsRoot() {
+        return checkIsRoot;
+    }
+
+    public void setCheckIsRoot(boolean checkIsRoot) {
+        this.checkIsRoot = checkIsRoot;
     }
 
     @Override
