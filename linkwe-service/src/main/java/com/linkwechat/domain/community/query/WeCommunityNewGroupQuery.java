@@ -47,4 +47,20 @@ public class WeCommunityNewGroupQuery {
      * 是否跳过验证自动加好友
      */
     private Boolean skipVerify = true;
+
+
+    /**
+     * 链接标题
+     */
+    private String linkTitle;
+
+    /**
+     * 链接描述
+     */
+    private String linkDesc;
+
+    /**
+     * 链接封面
+     */
+    private String linkCoverUrl;
 }
