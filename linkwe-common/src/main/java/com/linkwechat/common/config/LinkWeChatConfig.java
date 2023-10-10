@@ -251,6 +251,14 @@ public class LinkWeChatConfig {
     private String leadsCovenantWaitFollowUpUrl;
 
 
+
+    private WeComeProxyConfig weComeProxyConfig;
+
+
+
+    private FincaceProxyConfig fincaceProxyConfig;
+
+
     public String getName() {
         return name;
     }
@@ -461,5 +469,21 @@ public class LinkWeChatConfig {
 
     public void setEnableFilePreview(boolean enableFilePreview) {
         this.enableFilePreview = enableFilePreview;
+    }
+
+    public WeComeProxyConfig getWeComeProxyConfig() {
+        return weComeProxyConfig;
+    }
+
+    public void setWeComeProxyConfig(WeComeProxyConfig weComeProxyConfig) {
+        this.weComeProxyConfig = weComeProxyConfig;
+    }
+
+    public FincaceProxyConfig getFincaceProxyConfig() {
+        return fincaceProxyConfig;
+    }
+
+    public void setFincaceProxyConfig(FincaceProxyConfig fincaceProxyConfig) {
+        this.fincaceProxyConfig = fincaceProxyConfig;
     }
 }

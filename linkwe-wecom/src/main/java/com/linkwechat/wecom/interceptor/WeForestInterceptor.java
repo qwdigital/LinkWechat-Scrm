@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.config.WeComeProxyConfig;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeErrorMsg;
@@ -13,6 +15,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.service.IWeCorpAccountService;
 import com.linkwechat.service.IWeErrorMsgService;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
+import com.linkwechat.wecom.utils.ForestProxyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +42,9 @@ public abstract class WeForestInterceptor{
 
     @Value("${wecom.error-code-retry}")
     protected String errorCodeRetry;
+
+    @Autowired
+    protected LinkWeChatConfig linkWeChatConfig;
 
 
     protected String getCorpId(ForestRequest request) {
@@ -70,5 +76,21 @@ public abstract class WeForestInterceptor{
                         .weParams(JSONObject.toJSONString(forestRequest.getArguments()))
                         .build()
         );
+    }
+
+
+    protected void setProxy(ForestRequest request){
+        WeComeProxyConfig weComeProxyConfig
+                = linkWeChatConfig.getWeComeProxyConfig();
+        if(null != weComeProxyConfig){
+            if(weComeProxyConfig.isStartProxy()&&StringUtils.isNotEmpty(weComeProxyConfig.getProxyIp())){
+
+                ForestProxyUtils.setProxy(request,weComeProxyConfig.getProxyIp(),weComeProxyConfig.getProxyPort(),
+                        weComeProxyConfig.getProxyPassword(), weComeProxyConfig.getProxyUserName());
+
+            }
+        }
+
+
     }
 }

@@ -54,6 +54,9 @@ public class QwChatMsgAuditListener {
     @Resource
     private QwFileClient qwFileClient;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.chat-msg-audit:Qu_ChatMsgAudit}")
     public void subscribe(String msg, Channel channel, Message message) {
@@ -213,7 +216,10 @@ public class QwChatMsgAuditListener {
 
         if(null != corpAccount){
 
-            FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
+            FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey(),
+                    linkWeChatConfig.getFincaceProxyConfig().getProxy(),
+                    linkWeChatConfig.getFincaceProxyConfig().getPaswd()
+            );
 
             String filePath = getFilePath(msgType);
             JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))

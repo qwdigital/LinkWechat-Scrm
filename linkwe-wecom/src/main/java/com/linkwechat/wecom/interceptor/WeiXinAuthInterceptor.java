@@ -39,6 +39,7 @@ public class WeiXinAuthInterceptor extends WeForestInterceptor implements Interc
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
+        setProxy(request);
         Object openId = request.getQuery("openid");
         if (openId != null) {
             String accessToken = findAccessToken(String.valueOf(openId));

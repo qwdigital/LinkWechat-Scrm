@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.thread.WeMsgAuditThreadExecutor;
@@ -72,6 +73,10 @@ public class WeMsgAuditTask {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
+
 
     /**
      * 会话拉取定时任务
@@ -117,7 +122,8 @@ public class WeMsgAuditTask {
 
 
             if(StringUtils.isNotEmpty(corpAccount.getCorpId()) && StringUtils.isNotEmpty(corpAccount.getChatSecret()) && StringUtils.isNotEmpty(corpAccount.getFinancePrivateKey())){
-                FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
+                FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey(),
+                        linkWeChatConfig.getFincaceProxyConfig().getProxy(),linkWeChatConfig.getFincaceProxyConfig().getPaswd());
                 financeService.setRedisService(redisService);
                 financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), "" ,data.toJSONString()));
                 log.info("会话存档定时任务执行完成----------------->");

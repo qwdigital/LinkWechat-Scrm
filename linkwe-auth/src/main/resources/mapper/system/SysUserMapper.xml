@@ -222,10 +222,19 @@
         <if test="sysUser.roleId != null ">
             AND sur.role_id = #{sysUser.roleId}
         </if>
-        <if test="sysUser.deptId != null">
-            AND FIND_IN_SET(#{sysUser.deptId},d.ancestors) or d.dept_id=#{sysUser.deptId}
-        </if>
 
+        <choose>
+            <when test="sysUser.checkIsRoot">
+                <if test="sysUser.deptId != null">
+                    AND FIND_IN_SET(#{sysUser.deptId},d.ancestors) or d.dept_id=#{sysUser.deptId}
+                </if>
+            </when>
+            <otherwise>
+                <if test="sysUser.deptId != null">
+                    AND ud.dept_id= #{sysUser.deptId}
+                </if>
+            </otherwise>
+        </choose>
         GROUP BY u.we_user_id
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
@@ -261,9 +270,19 @@
         <if test="roleId != null ">
             AND sur.role_id = #{roleId}
         </if>
-        <if test="deptId  != null">
-            AND FIND_IN_SET(#{deptId},d.ancestors) or d.dept_id=#{deptId}
-        </if>
+
+        <choose>
+            <when test="checkIsRoot">
+                <if test="deptId != null">
+                    AND FIND_IN_SET(#{deptId},d.ancestors) or d.dept_id=#{deptId}
+                </if>
+            </when>
+            <otherwise>
+                <if test="deptId != null">
+                    AND ud.dept_id= #{deptId}
+                </if>
+            </otherwise>
+        </choose>
 
     </select>
 
@@ -609,9 +628,9 @@
 
         from sys_user su
 
-        inner join sys_user_dept sud on sud.user_id = su.user_id and sud.del_flag = 0
-        inner join sys_dept sd on sd.dept_id = sud.dept_id and sd.del_flag = 0
-        inner join sys_user_role sr on sr.user_id = su.user_id
+        left join sys_user_dept sud on sud.user_id = su.user_id and sud.del_flag = 0
+        left join sys_dept sd on sd.dept_id = sud.dept_id and sd.del_flag = 0
+        left join sys_user_role sr on sr.user_id = su.user_id
         <where>
             and su.del_flag = 0
             <if test="userId != null">
@@ -663,5 +682,6 @@
                 and su.sex = #{sex}
             </if>
         </where>
+        GROUP BY su.we_user_id
     </select>
 </mapper> 

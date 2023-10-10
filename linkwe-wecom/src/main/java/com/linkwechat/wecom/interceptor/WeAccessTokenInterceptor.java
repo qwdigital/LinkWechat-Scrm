@@ -15,6 +15,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
+import com.linkwechat.wecom.utils.ForestProxyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,7 @@ public class WeAccessTokenInterceptor extends WeForestInterceptor implements Int
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
+        setProxy(request);
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }

@@ -114,7 +114,7 @@ public class SysUserController extends BaseController {
     @ApiOperation(value = "用户列表")
     public TableDataInfo list(SysUser user) {
 
-        if(iSysDeptService.isRoot(user.getDeptId())){ //判断是不是跟节点，如果是查询条件为查询所有部门下的包括本部门的数据
+        if(user.isCheckIsRoot()&&iSysDeptService.isRoot(user.getDeptId())){ //判断是不是跟节点，如果是查询条件为查询所有部门下的包括本部门的数据
             user.setDeptId(null);
         }
         List<UserVo> userVos = userService.selectUserVoList(user, TableSupport.buildPageRequest());
