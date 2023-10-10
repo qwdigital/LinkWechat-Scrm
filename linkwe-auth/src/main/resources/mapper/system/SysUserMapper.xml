@@ -270,9 +270,19 @@
         <if test="roleId != null ">
             AND sur.role_id = #{roleId}
         </if>
-        <if test="deptId  != null">
-            AND FIND_IN_SET(#{deptId},d.ancestors) or d.dept_id=#{deptId}
-        </if>
+
+        <choose>
+            <when test="checkIsRoot">
+                <if test="deptId != null">
+                    AND FIND_IN_SET(#{deptId},d.ancestors) or d.dept_id=#{deptId}
+                </if>
+            </when>
+            <otherwise>
+                <if test="deptId != null">
+                    AND ud.dept_id= #{deptId}
+                </if>
+            </otherwise>
+        </choose>
 
     </select>
 
