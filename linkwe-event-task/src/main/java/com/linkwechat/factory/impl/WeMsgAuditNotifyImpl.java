@@ -3,6 +3,7 @@ package com.linkwechat.factory.impl;
 import cn.hutool.core.util.XmlUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
@@ -43,6 +44,9 @@ public class WeMsgAuditNotifyImpl implements WeCallBackEventFactory {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
     @Override
     public void eventHandle(String message) {
         WeBackBaseVo weBackBaseVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackBaseVo.class);
@@ -66,7 +70,8 @@ public class WeMsgAuditNotifyImpl implements WeCallBackEventFactory {
                 seqLong = weChatContactMsg.getSeq();
             }
         }
-        FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
+        FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey(),
+                linkWeChatConfig.getFincaceProxyConfig().getProxy(),linkWeChatConfig.getFincaceProxyConfig().getPaswd());
         financeService.setRedisService(redisService);
         financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(),"" ,data.toJSONString()));
         log.info("会话存档定时任务执行完成----------------->");
