@@ -1068,7 +1068,7 @@ INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_
 INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_id`, `name`, `code`, `type`, `is_require`, `expound`, `value`, `sort`, `is_fixed`, `is_money`, `is_to_time`, `is_multiple_choice`, `is_more`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1687015583602114560, 1686684460279914496, '打款人', 'payer', 0, 1, '请填写打款人名称', NULL, 18, 1, 0, 0, 0, NULL, '2023-08-03 16:20:33', '2023-08-03 16:20:33', 'admin', 'admin', 1, 1, 0);
 INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_id`, `name`, `code`, `type`, `is_require`, `expound`, `value`, `sort`, `is_fixed`, `is_money`, `is_to_time`, `is_multiple_choice`, `is_more`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1687015747247079424, 1686684460279914496, '回款凭证', 'returnedReceipt', 7, 0, NULL, NULL, 19, 1, 0, 0, 0, 1, '2023-08-03 16:21:12', '2023-08-03 16:21:12', 'admin', 'admin', 1, 1, 0);
 UPDATE sys_menu set visible=1 where menu_name = '知识中心';
-
+INSERT INTO `we_leads_sea_base_settings` (`id`, `max_claim`, `stock_max_claim`, `create_time`, `create_by`, `create_by_id`, `update_time`, `update_by`, `update_by_id`, `del_flag`) VALUES (1, 1, 8, '2023-07-17 17:18:13', NULL, NULL, '2023-10-10 16:13:34', 'lw', 168, 0);
   ```
 
 
