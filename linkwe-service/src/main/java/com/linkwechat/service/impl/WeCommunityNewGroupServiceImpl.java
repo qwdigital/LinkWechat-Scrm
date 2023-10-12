@@ -7,12 +7,15 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.WeComeStateContants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeEmpleCodeType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.uuid.UUID;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeTag;
@@ -24,7 +27,13 @@ import com.linkwechat.domain.community.vo.WeCommunityNewGroupVo;
 import com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo;
 import com.linkwechat.domain.community.vo.WeGroupCodeVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatAddJoinWayQuery;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
+import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeCommunityNewGroupMapper;
 import com.linkwechat.mapper.WeGroupCodeMapper;
 import com.linkwechat.mapper.WeTagMapper;
@@ -35,6 +44,8 @@ import org.springframework.stereotype.Service;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,17 +78,18 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     private IWeCustomerService iWeCustomerService;
 
 
+    @Autowired
+    private QwCustomerClient qwCustomerClient;
+
+
+
+
 
 
     @Override
     @Transactional
     public void add(WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
 
-        //检查群活码是否存在
-        WeGroupCode weGroupCode = weGroupCodeMapper.selectById(weCommunityNewGroupQuery.getGroupCodeId());
-        if (!Optional.ofNullable(weGroupCode).isPresent()) {
-            throw new WeComException("群活码不存在！");
-        }
         // 获取员工活码相关信息
         WeEmpleCode weEmpleCode = getWeEmpleCode(weCommunityNewGroupQuery);
 
@@ -99,13 +111,47 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
                     // 批量保存活码使用员工
                     iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
 
+
                     // 保存新客自动拉群信息
                     WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
-                    communityNewGroup.setGroupCodeId(weGroupCode.getId());
-                    communityNewGroup.setEmplCodeName(weCommunityNewGroupQuery.getCodeName());
-                    communityNewGroup.setEmplCodeId(weEmpleCode.getId());
+                    communityNewGroup.setState(
+                            WeComeStateContants.XKLQ_STATE + UUID.get16UUID()
+                    );
+                    //配置进群方式
+                    WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
+                            WeGroupCode.builder()
+                                    .autoCreateRoom(weCommunityNewGroupQuery.getAutoCreateRoom())
+                                    .roomBaseId(weCommunityNewGroupQuery.getRoomBaseId())
+                                    .roomBaseName(weCommunityNewGroupQuery.getRoomBaseName())
+                                    .chatIdList(weCommunityNewGroupQuery.getChatIdList())
+                                    .state(communityNewGroup.getState())
+                                    .build()
+                    );
 
-                    save(communityNewGroup);
+                    if(null != addJoinWayVo && null != addJoinWayVo.getJoin_way()
+                            && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())){
+
+                        communityNewGroup.setConfigId(addJoinWayVo.getJoin_way().getConfig_id());
+
+                        communityNewGroup.setCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
+                        communityNewGroup.setEmplCodeName(weCommunityNewGroupQuery.getCodeName());
+                        communityNewGroup.setEmplCodeId(weEmpleCode.getId());
+                        communityNewGroup.setLinkTitle(weCommunityNewGroupQuery.getLinkTitle());
+                        communityNewGroup.setLinkDesc(weCommunityNewGroupQuery.getLinkDesc());
+                        communityNewGroup.setLinkCoverUrl(weCommunityNewGroupQuery.getLinkCoverUrl());
+                        communityNewGroup.setChatIdList(weCommunityNewGroupQuery.getChatIdList());
+                        communityNewGroup.setAutoCreateRoom(weCommunityNewGroupQuery.getAutoCreateRoom());
+                        communityNewGroup.setRoomBaseId(weCommunityNewGroupQuery.getRoomBaseId());
+                        communityNewGroup.setRoomBaseName(weCommunityNewGroupQuery.getRoomBaseName());
+
+                        save(communityNewGroup);
+
+                    }else{
+                        throw new WeComException(WeErrorCodeEnum.parseEnum(addJoinWayVo.getErrCode().intValue()).getErrorMsg());
+                    }
+
+
+
                 }
             }else{
                 throw new WeComException("创建活码失败");
@@ -138,13 +184,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         if (StringUtils.isNull(communityNewGroup)) {
             throw new WeComException("新客拉群信息不存在！");
         }
-        // 检查群活码是否存在
-        WeGroupCode weGroupCode = weGroupCodeMapper.selectById(weCommunityNewGroupQuery.getGroupCodeId());
-        if (null == weGroupCode) {
-            throw new WeComException("群活码不存在！");
-        }
 
-        communityNewGroup.setGroupCodeId(weCommunityNewGroupQuery.getGroupCodeId());
+
         try {
             // 更新员工活码以及其对应的 "联系我" 配置
             WeEmpleCode weEmplCode = iWeEmpleCodeService.getById(communityNewGroup.getEmplCodeId());
@@ -159,7 +200,28 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             throw new WeComException("员工活码更新失败");
         }
         communityNewGroup.setEmplCodeName(weCommunityNewGroupQuery.getCodeName());
-         updateById(communityNewGroup);
+
+        WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
+                WeGroupChatUpdateJoinWayQuery.builder()
+                        .config_id(weCommunityNewGroupQuery.getConfigId())
+                        .scene(2)
+                        .auto_create_room(weCommunityNewGroupQuery.getAutoCreateRoom())
+                        .room_base_id(weCommunityNewGroupQuery.getRoomBaseId())
+                        .room_base_name(weCommunityNewGroupQuery.getRoomBaseName())
+                        .chat_id_list(Arrays.asList(weCommunityNewGroupQuery.getChatIdList().split(",")))
+                        .state(weCommunityNewGroupQuery.getState())
+                        .build()
+        ).getData();
+
+        if(null != weResultVo && weResultVo.getErrCode()
+                .equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
+
+            updateById(communityNewGroup);
+
+        }else{
+            throw new WeComException(WeErrorCodeEnum.parseEnum(weResultVo.getErrCode().intValue()).getErrorMsg());
+        }
+
 
 
     }

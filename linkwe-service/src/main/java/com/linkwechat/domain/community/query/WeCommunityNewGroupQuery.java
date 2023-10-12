@@ -1,5 +1,6 @@
 package com.linkwechat.domain.community.query;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
@@ -38,6 +39,9 @@ public class WeCommunityNewGroupQuery {
     @NotNull(message = "群活码不能为空")
     private Long groupCodeId;
 
+
+
+
     /**
      * 标签id列表
      */
@@ -63,4 +67,43 @@ public class WeCommunityNewGroupQuery {
      * 链接封面
      */
     private String linkCoverUrl;
+
+    /**
+     * 群活码企微信的configId
+     */
+    private String configId;
+
+    /**
+     * 渠道标识
+     */
+    private String state;
+
+
+    /**
+     * 实际群id，多个实用逗号隔开
+     */
+    private String chatIdList;
+
+    /**
+     * 客群名称，多个使用逗号隔开
+     */
+    @TableField(exist = false)
+    private String groupNames;
+
+    /**
+     * 当群满了后，是否自动新建群。0-否；1-是。 默认为0
+     */
+    private Integer autoCreateRoom;
+
+
+    /**
+     * 自动建群的群名前缀，当auto_create_room为1时有效。最长40个utf8字符
+     */
+    private String roomBaseName;
+
+
+    /**
+     * 自动建群的群起始序号，当auto_create_room为1时有效
+     */
+    private Integer roomBaseId;
 }
