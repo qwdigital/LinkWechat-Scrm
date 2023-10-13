@@ -15,37 +15,25 @@ public class WeCommunityNewGroupQuery {
 
     @TableId
     private Long id;
+
     /**
      * 活码名称
      */
     @NotNull(message = "活码名不能为空")
     private String codeName;
 
-    /**
-     * 指定的员工(id)
-     */
-    @NotNull(message = "使用员工不能为空")
-    private List<String> emplList;
 
     /**
-     * 欢迎语
+     * 多个员工id，使用逗号隔开。
      */
-    @NotNull(message = "欢迎语不能为空")
-    private String welcomeMsg;
-
-    /**
-     * 群活码ID
-     */
-    @NotNull(message = "群活码不能为空")
-    private Long groupCodeId;
-
-
+    private String emplList;
 
 
     /**
-     * 标签id列表
+     * 标签id，多个使用逗号隔开
      */
-    private List<String> tagList;
+    private String tagList;
+
 
     /**
      * 是否跳过验证自动加好友
@@ -54,29 +42,16 @@ public class WeCommunityNewGroupQuery {
 
 
     /**
-     * 链接标题
+     * 员工活码configId
      */
-    private String linkTitle;
+    private String emplCodeConfigId;
+
 
     /**
-     * 链接描述
+     * 加群引导语
      */
-    private String linkDesc;
-
-    /**
-     * 链接封面
-     */
-    private String linkCoverUrl;
-
-    /**
-     * 群活码企微信的configId
-     */
-    private String configId;
-
-    /**
-     * 渠道标识
-     */
-    private String state;
+    @NotNull(message = "欢迎语不能为空")
+    private String welcomeMsg;
 
 
     /**
@@ -84,11 +59,6 @@ public class WeCommunityNewGroupQuery {
      */
     private String chatIdList;
 
-    /**
-     * 客群名称，多个使用逗号隔开
-     */
-    @TableField(exist = false)
-    private String groupNames;
 
     /**
      * 当群满了后，是否自动新建群。0-否；1-是。 默认为0
@@ -106,4 +76,43 @@ public class WeCommunityNewGroupQuery {
      * 自动建群的群起始序号，当auto_create_room为1时有效
      */
     private Integer roomBaseId;
+
+
+
+    /**
+     * 群活码企微信的configId
+     */
+    private String groupCodeConfigId;
+
+    /**
+     * 群活码渠道标识
+     */
+    private String groupCodeState;
+
+
+    /**
+     * 群活码图片地址
+     */
+    private String groupCodeUrl;
+
+
+
+    /**
+     * 链接标题
+     */
+    private String linkTitle;
+
+    /**
+     * 链接描述
+     */
+    private String linkDesc;
+
+    /**
+     * 链接封面
+     */
+    private String linkCoverUrl;
+
+
+
+
 }

@@ -22,8 +22,8 @@ public class WeCommunityNewGroupVo extends BaseEntity {
      */
     private String codeName;
 
-    @JsonIgnore
-    private Long groupCodeId;
+//    @JsonIgnore
+//    private Long groupCodeId;
 
     @JsonIgnore
     private Long emplCodeId;
@@ -39,12 +39,16 @@ public class WeCommunityNewGroupVo extends BaseEntity {
     @TableField(exist = false)
     private String welcomeMsg;
 
-    /**
-     * 群活码信息
-     */
-    @TableField(exist = false)
-    private WeGroupCodeVo groupCodeInfo;
+//    /**
+//     * 群活码信息
+//     */
+//    @TableField(exist = false)
+//    private WeGroupCodeVo groupCodeInfo;
 
+    /**
+     * 群活码url
+     */
+    private String codeUrl;
     /**
      * 员工信息
      */
@@ -100,6 +104,12 @@ public class WeCommunityNewGroupVo extends BaseEntity {
      * 链接封面
      */
     private String linkCoverUrl;
+
+
+    /**
+     * 实际群id，多个实用逗号隔开
+     */
+    private String chatIdList;
 
     /**
      * 创建时间

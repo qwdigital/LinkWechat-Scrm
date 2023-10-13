@@ -25,13 +25,19 @@ public interface IWeEmpleCodeService extends IService<WeEmpleCode> {
 
 
 
+//    /**
+//     * 修改员工活码
+//     *
+//     * @param weEmpleCode 员工活码
+//     * @return 结果
+//     */
+//    void updateWeEmpleCode(WeEmpleCode weEmpleCode);
+
     /**
-     * 修改员工活码
-     *
-     * @param weEmpleCode 员工活码
-     * @return 结果
+     * 更新员工活码
+     * @param weEmpleCode
      */
-    void updateWeEmpleCode(WeEmpleCode weEmpleCode);
+    void updateWeContactWay(WeEmpleCode weEmpleCode);
 
 
 

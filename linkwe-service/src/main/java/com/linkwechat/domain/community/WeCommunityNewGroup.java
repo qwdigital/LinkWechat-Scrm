@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 
 /**
  * 新客自动拉群
@@ -27,46 +29,58 @@ public class WeCommunityNewGroup extends BaseEntity {
     @TableId
     private Long id;
 
-    /**
-     * 员工活码名称
-     */
-    private String emplCodeName;
-
-//    /**
-//     * 群活码id
-//     */
-//    private Long groupCodeId;
 
     /**
-     * 员工活码id
+     * 活码名称
      */
-    private Long emplCodeId;
+    private String codeName;
 
 
     /**
-     * 链接标题
+     * 多个员工id，使用逗号隔开。
      */
-    private String linkTitle;
+    private String emplList;
+
 
     /**
-     * 链接描述
+     * 标签id，多个使用逗号隔开
      */
-    private String linkDesc;
+    private String tagList;
+
+
+
 
     /**
-     * 链接封面
+     * 是否跳过验证自动加好友
      */
-    private String linkCoverUrl;
+    private Boolean skipVerify = true;
+
 
     /**
-     * 群活码企微信的configId
+     * 员工活码图片地址
      */
-    private String configId;
+    private String emplCodeUrl;
+
 
     /**
-     * 渠道标识
+     * 员工活码渠道标识
      */
-    private String state;
+    private String emplCodeState;
+
+
+    /**
+     * 员工活码configId
+     */
+    private String emplCodeConfigId;
+
+
+
+    /**
+     * 加群引导语
+     */
+    @NotNull(message = "欢迎语不能为空")
+    private String welcomeMsg;
+
 
 
     /**
@@ -94,13 +108,74 @@ public class WeCommunityNewGroup extends BaseEntity {
 
 
     /**
-     * 群码地址
+     * 群活码企微信的configId
      */
-    private String codeUrl;
+    private String groupCodeConfigId;
+
+    /**
+     * 群活码渠道标识
+     */
+    private String groupCodeState;
+
+
+    /**
+     * 群活码图片地址
+     */
+    private String groupCodeUrl;
+
 
     /**
      * 0 未删除 1 已删除
      */
     @TableLogic
-    private int delFlag;
+    private Integer delFlag;
+
+
+
+
+    /**
+     * 链接标题
+     */
+    private String linkTitle;
+
+    /**
+     * 链接描述
+     */
+    private String linkDesc;
+
+    /**
+     * 链接封面
+     */
+    private String linkCoverUrl;
+
+
+    /**
+     * 标签名，多个使用逗号隔开
+     */
+    @TableField(exist = false)
+    private String tagNames;
+
+
+    /**
+     * 群名，多个使用逗号隔开
+     */
+    @TableField(exist = false)
+    private String groupNames;
+
+
+    /**
+     * 添加客户数
+     */
+    @TableField(exist = false)
+    private int addCustomerNumber;
+
+
+    /**
+     * 进群客户数
+     */
+    @TableField(exist = false)
+    private int joinGroupNumber;
+
+
+
 }
