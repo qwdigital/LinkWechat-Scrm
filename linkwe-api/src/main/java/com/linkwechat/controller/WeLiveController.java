@@ -55,7 +55,7 @@ public class WeLiveController extends BaseController {
      * @return
      */
     @PostMapping("/addOrUpdate")
-    public AjaxResult  addOrUpdate(@RequestBody WeLive weLive){
+    public AjaxResult  addOrUpdate(@RequestBody WeLive weLive) throws ParseException {
         iWeLiveService.addOrUpdate(weLive);
         return AjaxResult.success();
     }
