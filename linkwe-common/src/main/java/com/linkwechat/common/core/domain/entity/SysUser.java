@@ -341,6 +341,7 @@ public class SysUser extends BaseEntity {
     /**
      * 是否按照跟节点查询所有数据来查询，默认不是
      */
+    @TableField(exist = false)
     private boolean checkIsRoot=false;
 
 

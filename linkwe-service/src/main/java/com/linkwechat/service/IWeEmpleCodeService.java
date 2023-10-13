@@ -12,7 +12,7 @@ public interface IWeEmpleCodeService extends IService<WeEmpleCode> {
      * @param weEmpleCode 员工活码实体类
      * @return 企微接口参数实体类
      */
-     WeAddWayVo getWeContactWay(WeEmpleCode weEmpleCode);
+    WeAddWayVo getWeContactWay(WeEmpleCode weEmpleCode);
 
 
     /**
