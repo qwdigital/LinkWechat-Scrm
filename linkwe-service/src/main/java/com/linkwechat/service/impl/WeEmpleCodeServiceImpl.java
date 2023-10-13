@@ -46,7 +46,6 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
     @Override
     public WeAddWayVo getWeContactWay(WeEmpleCode weEmpleCode) {
 
-
         return qwCustomerClient.addContactWay(this.getWeAddWayQuery(weEmpleCode)).getData();
     }
 
@@ -108,67 +107,71 @@ public class WeEmpleCodeServiceImpl extends ServiceImpl<WeEmpleCodeMapper, WeEmp
         return weEmpleCode;
     }
 
-
-
-    /**
-     * 修改员工活码
-     *
-     * @param weEmpleCode 员工活码
-     * @return 结果
-     */
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateWeEmpleCode(WeEmpleCode weEmpleCode) {
-
-        if(StringUtils.isEmpty(weEmpleCode.getState())){
-            weEmpleCode.setState(String.valueOf(weEmpleCode.getId()));
-        }
-
-
-
-        AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.updateContactWay(this.getWeAddWayQuery(weEmpleCode));
-        if(null != weResultVoAjaxResult){
-            WeResultVo weResultVo = weResultVoAjaxResult.getData();
-
-            if(weResultVo !=null &&  weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
-                if (this.updateById(weEmpleCode)) {
-                    if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
-
-                        //移除原有的记录
-                        if(iWeEmpleCodeUseScopService.remove(new LambdaQueryWrapper<WeEmpleCodeUseScop>()
-                                .eq(WeEmpleCodeUseScop::getEmpleCodeId,weEmpleCode.getId()))){
-
-                            weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                            iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
-
-                        }
-
-                    }
-                    if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
-
-                        //有id的更新
-                        iWeEmpleCodeTagService.remove(new LambdaQueryWrapper<WeEmpleCodeTag>()
-                                .eq(WeEmpleCodeTag::getEmpleCodeId,weEmpleCode.getId()));
-
-
-                        weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
-                        weEmpleCode.getWeEmpleCodeTags().stream().forEach(k->{
-                            k.setEmpleCodeId(weEmpleCode.getId());
-                            k.setId(SnowFlakeUtil.nextId());
-                        });
-
-                        iWeEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
-
-
-                    }
-                }
-            }
-
-        }
-
-
-
+    public void updateWeContactWay(WeEmpleCode weEmpleCode) {
+        qwCustomerClient.updateContactWay(this.getWeAddWayQuery(weEmpleCode));
     }
 
+
+//    /**
+//     * 修改员工活码
+//     *
+//     * @param weEmpleCode 员工活码
+//     * @return 结果
+//     */
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public void updateWeEmpleCode(WeEmpleCode weEmpleCode) {
+//
+//        if(StringUtils.isEmpty(weEmpleCode.getState())){
+//            weEmpleCode.setState(String.valueOf(weEmpleCode.getId()));
+//        }
+//
+//
+//
+//        AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.updateContactWay(this.getWeAddWayQuery(weEmpleCode));
+//        if(null != weResultVoAjaxResult){
+//            WeResultVo weResultVo = weResultVoAjaxResult.getData();
+//
+//            if(weResultVo !=null &&  weResultVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
+//                if (this.updateById(weEmpleCode)) {
+//                    if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeUseScops())) {
+//
+//                        //移除原有的记录
+//                        if(iWeEmpleCodeUseScopService.remove(new LambdaQueryWrapper<WeEmpleCodeUseScop>()
+//                                .eq(WeEmpleCodeUseScop::getEmpleCodeId,weEmpleCode.getId()))){
+//
+//                            weEmpleCode.getWeEmpleCodeUseScops().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+//                            iWeEmpleCodeUseScopService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeUseScops());
+//
+//                        }
+//
+//                    }
+//                    if (CollectionUtil.isNotEmpty(weEmpleCode.getWeEmpleCodeTags())) {
+//
+//                        //有id的更新
+//                        iWeEmpleCodeTagService.remove(new LambdaQueryWrapper<WeEmpleCodeTag>()
+//                                .eq(WeEmpleCodeTag::getEmpleCodeId,weEmpleCode.getId()));
+//
+//
+//                        weEmpleCode.getWeEmpleCodeTags().forEach(item -> item.setEmpleCodeId(weEmpleCode.getId()));
+//                        weEmpleCode.getWeEmpleCodeTags().stream().forEach(k->{
+//                            k.setEmpleCodeId(weEmpleCode.getId());
+//                            k.setId(SnowFlakeUtil.nextId());
+//                        });
+//
+//                        iWeEmpleCodeTagService.saveOrUpdateBatch(weEmpleCode.getWeEmpleCodeTags());
+//
+//
+//                    }
+//                }
+//            }
+//
+//        }
+//
+//
+//
+//    }
+//
 
 }

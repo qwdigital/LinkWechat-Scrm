@@ -37,5 +37,5 @@ public interface WeCommunityNewGroupMapper extends BaseMapper<WeCommunityNewGrou
    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup);
 
 
-   WeCommunityWeComeMsgVo getWelcomeMsgByState(@Param("state") String state);
+
 }

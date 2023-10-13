@@ -23,12 +23,20 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
 
 
     /**
+     * 根据主键获取详情
+     * @param id
+     * @return
+     */
+    WeCommunityNewGroup findWeCommunityNewGroupById(String id);
+
+
+    /**
      * 查询新客自动拉群列表
      *
      * @param weCommunityNewGroup 新科拉群过滤条件
      * @return WeCommunityNewGroupVo
      */
-    List<WeCommunityNewGroupVo> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup);
+    List<WeCommunityNewGroup> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup);
 
 
 
@@ -41,5 +49,4 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
     void updateWeCommunityNewGroup(WeCommunityNewGroupQuery weCommunityNewGroupQuery);
 
 
-    WeCommunityWeComeMsgVo getWelcomeMsgByState(String state);
 }

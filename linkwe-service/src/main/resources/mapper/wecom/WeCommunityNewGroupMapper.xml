@@ -17,7 +17,6 @@
         SELECT id,
                empl_code_name as codeName,
                empl_code_id as emplCodeId,
-               group_code_id as groupCodeId,
                create_by,
                create_time,
                update_by,
@@ -25,6 +24,8 @@
                link_title,
                link_desc,
                link_cover_url,
+               chat_id_list,
+               code_url,
                del_flag
         FROM we_community_new_group
     </sql>
@@ -53,21 +54,14 @@
         order by create_time desc
     </select>
 
-    <select id="getWelcomeMsgByState" parameterType="String" resultMap="WelcomeMsgResult">
-        select wec.id,wgc.code_url, wec.welcome_msg,wect.tag_id,wect.tag_name
-        from we_emple_code wec
-                 left join we_emple_code_tag wect on wec.id = wect.emple_code_id and wect.del_flag = 0
-                 left join we_community_new_group wcng on wec.id = wcng.empl_code_id
-                 left join we_group_code wgc on wcng.group_code_id = wgc.id
-        where 1=1
-          and wec.state = #{state}
-          and wec.del_flag = 0
-    </select>
 
     <resultMap type="com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo" id="WelcomeMsgResult">
         <result property="id" column="id"/>
         <result property="codeUrl" column="code_url"/>
         <result property="welcomeMsg" column="welcome_msg"/>
+        <result property="linkTitle" column="link_title"/>
+        <result property="linkDesc" column="link_desc"/>
+        <result property="linkCoverUrl" column="link_cover_url"/>
         <collection property="tagList" ofType="com.linkwechat.domain.tag.vo.WeTagVo">
             <result property="tagId" column="tag_id"/>
             <result property="tagName" column="tag_name"/>

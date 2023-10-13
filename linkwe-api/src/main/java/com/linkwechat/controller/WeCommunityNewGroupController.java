@@ -40,15 +40,10 @@ public class WeCommunityNewGroupController extends BaseController {
     private IWeCommunityNewGroupService iWeCommunityNewGroupService;
 
 
-    @Autowired
-    private IWeEmpleCodeService iWeEmpleCodeService;
-
-
-
     /**
      * 新增新客自动拉群
      */
-    @PostMapping("/")
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody @Validated WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
 
         iWeCommunityNewGroupService.add(weCommunityNewGroupQuery);
@@ -69,8 +64,7 @@ public class WeCommunityNewGroupController extends BaseController {
         WeCommunityNewGroup weCommunityNewGroup = iWeCommunityNewGroupService.getById(id);
 
         if(null != weCommunityNewGroup){
-            WeEmpleCode empleCode = iWeEmpleCodeService.selectWeEmpleCodeById(weCommunityNewGroup.getEmplCodeId());
-            FileUtils.downloadFile(empleCode.getQrCode(), response.getOutputStream());
+            FileUtils.downloadFile(weCommunityNewGroup.getEmplCodeUrl(), response.getOutputStream());
         }
     }
 
@@ -91,11 +85,10 @@ public class WeCommunityNewGroupController extends BaseController {
             List<FileUtils.FileEntity> fileList=new ArrayList<>();
 
             weCommunityNewGroups.stream().forEach(k->{
-                WeEmpleCode weEmpleCode = iWeEmpleCodeService.getById(k.getEmplCodeId());
                 fileList.add(
                         FileUtils.FileEntity.builder()
-                                .fileName(weEmpleCode.getScenario())
-                                .url(weEmpleCode.getQrCode())
+                                .fileName(k.getCodeName())
+                                .url(k.getEmplCodeUrl())
                                 .suffix(".jpg")
                                 .build()
                 );
@@ -109,9 +102,9 @@ public class WeCommunityNewGroupController extends BaseController {
      * 查询新客自动拉群列表
      */
     @GetMapping("/list")
-    public TableDataInfo<List<WeCommunityNewGroupVo>> list(WeCommunityNewGroup weCommunityNewGroup) {
+    public TableDataInfo<List<WeCommunityNewGroup>> list(WeCommunityNewGroup weCommunityNewGroup) {
         startPage();
-        List<WeCommunityNewGroupVo> communityNewGroupVos = iWeCommunityNewGroupService.selectWeCommunityNewGroupList(weCommunityNewGroup);
+        List<WeCommunityNewGroup> communityNewGroupVos = iWeCommunityNewGroupService.selectWeCommunityNewGroupList(weCommunityNewGroup);
         return getDataTable(communityNewGroupVos);
     }
 
@@ -120,21 +113,19 @@ public class WeCommunityNewGroupController extends BaseController {
      * 获取新客自动拉群详细信息
      */
     @GetMapping(value = "/{id}")
-    public AjaxResult<WeCommunityNewGroupVo> getInfo(@PathVariable("id") String id) {
-        List<WeCommunityNewGroupVo> communityNewGroupVos = iWeCommunityNewGroupService.selectWeCommunityNewGroupList(WeCommunityNewGroup.builder()
-                        .id(Long.valueOf(id))
-                .build());
+    public AjaxResult<WeCommunityNewGroup> findWeCommunityNewGroupById(@PathVariable("id") String id) {
+        WeCommunityNewGroup weCommunityNewGroup
+                = iWeCommunityNewGroupService.findWeCommunityNewGroupById(id);
 
-        return AjaxResult.success(communityNewGroupVos.stream().findFirst().get());
+        return AjaxResult.success(weCommunityNewGroup);
     }
 
     /**
      * 修改新客自动拉群
      */
     @Log(title = "新客自动拉群", businessType = BusinessType.UPDATE)
-    @PutMapping("/{id}")
-    public AjaxResult edit(@PathVariable("id") String id,@RequestBody @Validated WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
-        weCommunityNewGroupQuery.setId(Long.valueOf(id));
+    @PutMapping("/edit")
+    public AjaxResult edit(@RequestBody WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
         iWeCommunityNewGroupService.updateWeCommunityNewGroup(weCommunityNewGroupQuery);
         return AjaxResult.success();
     }
