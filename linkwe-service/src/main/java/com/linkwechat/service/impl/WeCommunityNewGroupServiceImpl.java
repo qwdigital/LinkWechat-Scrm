@@ -17,6 +17,9 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTabCountVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTableVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTrendCountVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@SuppressWarnings("all")
 public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGroupMapper, WeCommunityNewGroup> implements IWeCommunityNewGroupService {
 
 
@@ -67,24 +71,22 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
     @Override
     @Transactional
-    public void add(WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+    public  void add(WeCommunityNewGroup communityNewGroup) {
 
         //获取员工活码
         String emplCodeState=WelcomeMsgTypeEnum.WE_QR_XKLQ_PREFIX.getType() + UUID.get16UUID();
         WeAddWayVo weContactWay =  qwCustomerClient.addContactWay(WeAddWayQuery.builder()
-                        .type(2)
-                        .scene(2)
-                        .state(emplCodeState)
-                        .user(ListUtil.toList(weCommunityNewGroupQuery.getEmplList().split(",")))
-                        .skip_verify(weCommunityNewGroupQuery.getSkipVerify())
+                .type(2)
+                .scene(2)
+                .state(emplCodeState)
+                .user(ListUtil.toList(communityNewGroup.getEmplList().split(",")))
+                .skip_verify(communityNewGroup.getSkipVerify())
                 .build()).getData();
 
         if(null != weContactWay){
             if(StringUtils.isNotEmpty(weContactWay.getConfigId())&&StringUtils.isNotEmpty(weContactWay.getQrCode())){
 
                 // 保存新客自动拉群信息
-                WeCommunityNewGroup communityNewGroup = new WeCommunityNewGroup();
-                BeanUtils.copyBeanProp(communityNewGroup,weCommunityNewGroupQuery);
                 communityNewGroup.setEmplCodeUrl(weContactWay.getQrCode());
                 communityNewGroup.setEmplCodeConfigId(weContactWay.getConfigId());
                 communityNewGroup.setEmplCodeState(emplCodeState);
@@ -97,10 +99,10 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
                 //配置进群方式
                 WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
                         WeGroupCode.builder()
-                                .autoCreateRoom(weCommunityNewGroupQuery.getAutoCreateRoom())
-                                .roomBaseId(weCommunityNewGroupQuery.getRoomBaseId())
-                                .roomBaseName(weCommunityNewGroupQuery.getRoomBaseName())
-                                .chatIdList(weCommunityNewGroupQuery.getChatIdList())
+                                .autoCreateRoom(communityNewGroup.getAutoCreateRoom())
+                                .roomBaseId(communityNewGroup.getRoomBaseId())
+                                .roomBaseName(communityNewGroup.getRoomBaseName())
+                                .chatIdList(communityNewGroup.getChatIdList())
                                 .state(communityNewGroup.getGroupCodeState())
                                 .build()
                 );
@@ -133,7 +135,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     public WeCommunityNewGroup findWeCommunityNewGroupById(String id) {
         WeCommunityNewGroup weCommunityNewGroup = this.getById(id);
 
-       this.getCompleteEmplCodeInfo(weCommunityNewGroup);
+        this.getCompleteEmplCodeInfo(weCommunityNewGroup);
 
 
         return weCommunityNewGroup;
@@ -153,31 +155,22 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateWeCommunityNewGroup(WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+    public void updateWeCommunityNewGroup(WeCommunityNewGroup communityNewGroup) {
 
         //更新群活码相关
-        WeCommunityNewGroup weCommunityNewGroup = this.getById(weCommunityNewGroupQuery.getId());
+        WeCommunityNewGroup weCommunityNewGroup = this.getById(communityNewGroup.getId());
         if(null == weCommunityNewGroup){
             throw new WeComException("新客拉群信息不存在！");
         }
-        weCommunityNewGroup.setCodeName(weCommunityNewGroupQuery.getCodeName());
-        weCommunityNewGroup.setEmplList(weCommunityNewGroupQuery.getEmplList());
-        weCommunityNewGroup.setTagList(weCommunityNewGroupQuery.getTagList());
-        weCommunityNewGroup.setSkipVerify(weCommunityNewGroupQuery.getSkipVerify());
-        weCommunityNewGroup.setWelcomeMsg(weCommunityNewGroupQuery.getWelcomeMsg());
-        weCommunityNewGroup.setChatIdList(weCommunityNewGroupQuery.getChatIdList());
-        weCommunityNewGroup.setAutoCreateRoom(weCommunityNewGroupQuery.getAutoCreateRoom());
-        weCommunityNewGroup.setRoomBaseName(weCommunityNewGroupQuery.getRoomBaseName());
-        weCommunityNewGroup.setRoomBaseId(weCommunityNewGroupQuery.getRoomBaseId());
 
 
         //更新员工活码
         WeResultVo resultVo = qwCustomerClient.updateContactWay(WeAddWayQuery.builder()
                 .type(2)
                 .scene(2)
-                .config_id(weCommunityNewGroupQuery.getEmplCodeConfigId())
-                .user(ListUtil.toList(weCommunityNewGroupQuery.getEmplList().split(",")))
-                .skip_verify(weCommunityNewGroupQuery.getSkipVerify())
+                .config_id(communityNewGroup.getEmplCodeConfigId())
+                .user(ListUtil.toList(communityNewGroup.getEmplList().split(",")))
+                .skip_verify(communityNewGroup.getSkipVerify())
                 .build()).getData();
 
         if(!resultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
@@ -186,14 +179,14 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
 
         //更新群活码
-         WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
+        WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
                 WeGroupChatUpdateJoinWayQuery.builder()
-                        .config_id(weCommunityNewGroupQuery.getGroupCodeConfigId())
+                        .config_id(communityNewGroup.getGroupCodeConfigId())
                         .scene(2)
-                        .auto_create_room(weCommunityNewGroupQuery.getAutoCreateRoom())
-                        .room_base_id(weCommunityNewGroupQuery.getRoomBaseId())
-                        .room_base_name(weCommunityNewGroupQuery.getRoomBaseName())
-                        .chat_id_list(Arrays.asList(weCommunityNewGroupQuery.getChatIdList().split(",")))
+                        .auto_create_room(communityNewGroup.getAutoCreateRoom())
+                        .room_base_id(communityNewGroup.getRoomBaseId())
+                        .room_base_name(communityNewGroup.getRoomBaseName())
+                        .chat_id_list(Arrays.asList(communityNewGroup.getChatIdList().split(",")))
                         .build()
         ).getData();
 
@@ -207,6 +200,27 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             throw new WeComException(WeErrorCodeEnum.parseEnum(weResultVo.getErrCode().intValue()).getErrorMsg());
         }
 
+    }
+
+    @Override
+    public WeCommunityNewGroupTabCountVo countTab(String id) {
+        WeCommunityNewGroup weCommunityNewGroup = this.getById(id);
+
+        return this.baseMapper.countTab(weCommunityNewGroup);
+    }
+
+    @Override
+    public List<WeCommunityNewGroupTrendCountVo> findTrendCountVo(WeCommunityNewGroup newGroup) {
+        WeCommunityNewGroup weCommunityNewGroup = this.getById(newGroup.getId());
+        weCommunityNewGroup.setBeginTime(newGroup.getBeginTime());
+        weCommunityNewGroup.setEndTime(newGroup.getEndTime());
+
+        return this.baseMapper.findTrendCountVo(weCommunityNewGroup);
+    }
+
+    @Override
+    public List<WeCommunityNewGroupTableVo> findWeCommunityNewGroupTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+        return this.baseMapper.findWeCommunityNewGroupTable(weCommunityNewGroupQuery);
     }
 
 

@@ -2,31 +2,26 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.linkwechat.common.annotation.Log;
-import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.file.FileUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
-import com.linkwechat.domain.community.WeEmpleCode;
 import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
-import com.linkwechat.domain.community.vo.WeCommunityNewGroupVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTabCountVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTableVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTrendCountVo;
+import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.service.IWeCommunityNewGroupService;
-import com.linkwechat.service.IWeEmpleCodeService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -44,9 +39,9 @@ public class WeCommunityNewGroupController extends BaseController {
      * 新增新客自动拉群
      */
     @PostMapping("/add")
-    public AjaxResult add(@RequestBody @Validated WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+    public AjaxResult add(@RequestBody WeCommunityNewGroup communityNewGroup) {
 
-        iWeCommunityNewGroupService.add(weCommunityNewGroupQuery);
+        iWeCommunityNewGroupService.add(communityNewGroup);
         return AjaxResult.success();
     }
 
@@ -58,7 +53,6 @@ public class WeCommunityNewGroupController extends BaseController {
      * @param id       待下载员工活码
      * @param response 响应
      */
-    @Log(title = "员工活码下载", businessType = BusinessType.OTHER)
     @GetMapping("/download")
     public void download(String id, HttpServletResponse response) throws IOException {
         WeCommunityNewGroup weCommunityNewGroup = iWeCommunityNewGroupService.getById(id);
@@ -75,7 +69,6 @@ public class WeCommunityNewGroupController extends BaseController {
      * @param ids      新客自动拉群ids
      * @param response 输出
      */
-    @Log(title = "员工活码批量下载", businessType = BusinessType.OTHER)
     @GetMapping("/downloadBatch")
     public void downloadBatch(Long[] ids, HttpServletResponse response) throws IOException {
         List<WeCommunityNewGroup> weCommunityNewGroups = iWeCommunityNewGroupService.listByIds(ListUtil.toList(ids));
@@ -123,22 +116,74 @@ public class WeCommunityNewGroupController extends BaseController {
     /**
      * 修改新客自动拉群
      */
-    @Log(title = "新客自动拉群", businessType = BusinessType.UPDATE)
     @PutMapping("/edit")
-    public AjaxResult edit(@RequestBody WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
-        iWeCommunityNewGroupService.updateWeCommunityNewGroup(weCommunityNewGroupQuery);
+    public AjaxResult edit(@RequestBody WeCommunityNewGroup communityNewGroup) {
+        iWeCommunityNewGroupService.updateWeCommunityNewGroup(communityNewGroup);
         return AjaxResult.success();
     }
 
     /**
      * 删除新客自动拉群
      */
-    @Log(title = "新客自动拉群", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids) {
         iWeCommunityNewGroupService.removeByIds(ListUtil.toList(ids));
 
         return AjaxResult.success();
+    }
+
+
+    /**
+     * 获取头部统计
+     * @param id
+     * @return
+     */
+    @GetMapping("/countTab/{id}")
+    public AjaxResult<WeCommunityNewGroupTabCountVo> countTab(@PathVariable String id){
+        return AjaxResult.success(
+                iWeCommunityNewGroupService.countTab(id)
+        );
+    }
+
+
+    /**
+     * 数据趋势
+     * @param newGroup
+     * @return
+     */
+    @GetMapping("/findTrendCountVo")
+    public AjaxResult<List<WeCommunityNewGroupTrendCountVo>> findTrendCountVo(WeCommunityNewGroup newGroup){
+        return AjaxResult.success(
+                iWeCommunityNewGroupService.findTrendCountVo(newGroup)
+        );
+    }
+
+
+    /**
+     * 数据明细
+     * @param weCommunityNewGroupQuery
+     * @return
+     */
+    @GetMapping("/findWeCommunityNewGroupTable")
+    public TableDataInfo<List<WeCommunityNewGroupTableVo>> findWeCommunityNewGroupTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery){
+        startPage();
+
+        return getDataTable(
+                iWeCommunityNewGroupService.findWeCommunityNewGroupTable(weCommunityNewGroupQuery)
+        );
+    }
+
+
+    /**
+     * 数据明细导出
+     */
+    @GetMapping("/exprotWeCommunityNewGroupTable")
+    public void exprotWeCommunityNewGroupTable(){
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCommunityNewGroupTableVo.class,
+                iWeCommunityNewGroupService.findWeCommunityNewGroupTable(new WeCommunityNewGroupQuery())
+                ,"新客拉群-数据明细"
+        );
     }
 
 }
