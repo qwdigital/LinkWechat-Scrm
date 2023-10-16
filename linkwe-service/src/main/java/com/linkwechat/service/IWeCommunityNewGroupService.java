@@ -2,6 +2,12 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
+import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTabCountVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTableVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTrendCountVo;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
@@ -42,6 +48,31 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
      * @return 结果
      */
     void updateWeCommunityNewGroup(WeCommunityNewGroup communityNewGroup);
+
+
+
+    /**
+     * 获取头部统计
+     * @param id
+     * @return
+     */
+    WeCommunityNewGroupTabCountVo countTab(String id);
+
+
+    /**
+     * 获取折线统计
+     * @param newGroup
+     * @return
+     */
+    List<WeCommunityNewGroupTrendCountVo> findTrendCountVo(WeCommunityNewGroup newGroup);
+
+
+    /**
+     * 获取相关客户
+     * @param weCommunityNewGroupQuery
+     * @return
+     */
+    List<WeCommunityNewGroupTableVo> findWeCommunityNewGroupTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery);
 
 
 }
