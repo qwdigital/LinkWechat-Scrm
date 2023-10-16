@@ -203,7 +203,7 @@
         left join sys_user_dept ud on u.user_id = ud.user_id
         left join sys_dept d on ud.dept_id = d.dept_id
         left join sys_user_role sur on sur.user_id=u.user_id
-        where u.del_flag = 0 and u.is_user_leave=0
+        where u.is_user_leave=0
         <if test="sysUser.userName != null and sysUser.userName != ''">
             AND u.user_name like concat('%', #{sysUser.userName}, '%')
         </if>
@@ -222,10 +222,19 @@
         <if test="sysUser.roleId != null ">
             AND sur.role_id = #{sysUser.roleId}
         </if>
-        <if test="sysUser.deptId != null">
-            AND FIND_IN_SET(#{sysUser.deptId},d.ancestors) or d.dept_id=#{sysUser.deptId}
-        </if>
-
+        <choose>
+            <when test="sysUser.checkIsRoot">
+                <if test="sysUser.deptId != null">
+                    AND FIND_IN_SET(#{sysUser.deptId},d.ancestors) or d.dept_id=#{sysUser.deptId}
+                </if>
+            </when>
+            <otherwise>
+                <if test="sysUser.deptId != null">
+                    AND ud.dept_id= #{sysUser.deptId}
+                </if>
+            </otherwise>
+        </choose>
+        AND u.del_flag = 0
         GROUP BY u.we_user_id
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
@@ -242,7 +251,7 @@
         left join sys_user_dept ud on u.we_user_id = ud.we_user_id
         left join sys_dept d on ud.dept_id = d.dept_id
         left join sys_user_role sur on sur.user_id=u.user_id
-        where u.del_flag = 0
+        where u.is_user_leave=0
         <if test="userName != null and userName != ''">
             AND u.user_name like concat('%', #{userName}, '%')
         </if>
@@ -261,10 +270,20 @@
         <if test="roleId != null ">
             AND sur.role_id = #{roleId}
         </if>
-        <if test="deptId  != null">
-            AND FIND_IN_SET(#{deptId},d.ancestors) or d.dept_id=#{deptId}
-        </if>
 
+        <choose>
+            <when test="checkIsRoot">
+                <if test="deptId != null">
+                    AND FIND_IN_SET(#{deptId},d.ancestors) or d.dept_id=#{deptId}
+                </if>
+            </when>
+            <otherwise>
+                <if test="deptId != null">
+                    AND ud.dept_id= #{deptId}
+                </if>
+            </otherwise>
+        </choose>
+       AND u.del_flag = 0
     </select>
 
     <select id="selectUserList" parameterType="com.linkwechat.common.core.domain.entity.SysUser"

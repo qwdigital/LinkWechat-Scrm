@@ -2,6 +2,8 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.live.WeLive;
+
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -15,7 +17,7 @@ public interface IWeLiveService extends IService<WeLive> {
      * 新增或编辑直播
      * @param weLive
      */
-    void addOrUpdate(WeLive weLive);
+    void addOrUpdate(WeLive weLive) throws ParseException;
 
     /**
      *  直播列表查询
