@@ -2,12 +2,7 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
-import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
-import com.linkwechat.domain.community.vo.WeCommunityNewGroupVo;
-import com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo;
-
 import java.util.List;
-import java.util.Optional;
 
 /**
  *  新客自动拉群
@@ -16,10 +11,10 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
     /**
      * 添加新客自动拉群信息
      *
-     * @param weCommunityNewGroupQuery 信息
+     * @param communityNewGroup 信息
      * @return 结果
      */
-    void add(WeCommunityNewGroupQuery weCommunityNewGroupQuery);
+    void add(WeCommunityNewGroup communityNewGroup);
 
 
     /**
@@ -43,10 +38,10 @@ public interface IWeCommunityNewGroupService extends IService<WeCommunityNewGrou
     /**
      * 修改新客自动拉群
      *
-     * @param weCommunityNewGroupQuery 信息
+     * @param communityNewGroup 信息
      * @return 结果
      */
-    void updateWeCommunityNewGroup(WeCommunityNewGroupQuery weCommunityNewGroupQuery);
+    void updateWeCommunityNewGroup(WeCommunityNewGroup communityNewGroup);
 
 
 }

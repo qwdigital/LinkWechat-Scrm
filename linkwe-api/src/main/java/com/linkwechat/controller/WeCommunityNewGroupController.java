@@ -2,31 +2,19 @@ package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.linkwechat.common.annotation.Log;
-import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
-import com.linkwechat.domain.community.WeEmpleCode;
-import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
-import com.linkwechat.domain.community.vo.WeCommunityNewGroupVo;
 import com.linkwechat.service.IWeCommunityNewGroupService;
-import com.linkwechat.service.IWeEmpleCodeService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -44,9 +32,9 @@ public class WeCommunityNewGroupController extends BaseController {
      * 新增新客自动拉群
      */
     @PostMapping("/add")
-    public AjaxResult add(@RequestBody @Validated WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+    public AjaxResult add(@RequestBody WeCommunityNewGroup communityNewGroup) {
 
-        iWeCommunityNewGroupService.add(weCommunityNewGroupQuery);
+        iWeCommunityNewGroupService.add(communityNewGroup);
         return AjaxResult.success();
     }
 
@@ -125,8 +113,8 @@ public class WeCommunityNewGroupController extends BaseController {
      */
     @Log(title = "新客自动拉群", businessType = BusinessType.UPDATE)
     @PutMapping("/edit")
-    public AjaxResult edit(@RequestBody WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
-        iWeCommunityNewGroupService.updateWeCommunityNewGroup(weCommunityNewGroupQuery);
+    public AjaxResult edit(@RequestBody WeCommunityNewGroup communityNewGroup) {
+        iWeCommunityNewGroupService.updateWeCommunityNewGroup(communityNewGroup);
         return AjaxResult.success();
     }
 

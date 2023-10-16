@@ -4,69 +4,69 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeCommunityNewGroupMapper">
 
-    <select id="findUserNameByUserIds" resultType="java.util.HashMap">
-        SELECT we_user_id,user_name FROM sys_user where user_id in
-        <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
-    </select>
+<!--    <select id="findUserNameByUserIds" resultType="java.util.HashMap">-->
+<!--        SELECT we_user_id,user_name FROM sys_user where user_id in-->
+<!--        <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">-->
+<!--            #{userId}-->
+<!--        </foreach>-->
+<!--    </select>-->
 
 
 
-    <sql id="selectSql">
-        SELECT id,
-               empl_code_name as codeName,
-               empl_code_id as emplCodeId,
-               create_by,
-               create_time,
-               update_by,
-               update_time,
-               link_title,
-               link_desc,
-               link_cover_url,
-               chat_id_list,
-               code_url,
-               del_flag
-        FROM we_community_new_group
-    </sql>
+<!--    <sql id="selectSql">-->
+<!--        SELECT id,-->
+<!--               empl_code_name as codeName,-->
+<!--               empl_code_id as emplCodeId,-->
+<!--               create_by,-->
+<!--               create_time,-->
+<!--               update_by,-->
+<!--               update_time,-->
+<!--               link_title,-->
+<!--               link_desc,-->
+<!--               link_cover_url,-->
+<!--               chat_id_list,-->
+<!--               code_url,-->
+<!--               del_flag-->
+<!--        FROM we_community_new_group-->
+<!--    </sql>-->
 
-    <select id="selectWeCommunityNewGroupList" resultType="com.linkwechat.domain.community.vo.WeCommunityNewGroupVo">
-        <include refid="selectSql"/>
-        <where>
-            del_flag = 0
-            <if test="null != id">
-                AND id=#{id}
-            </if>
-            <if test="emplCodeName !=null and emplCodeName !=''">
-                AND empl_code_name LIKE CONCAT("%",#{emplCodeName},"%")
-            </if>
-            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
-            </if>
+<!--    <select id="selectWeCommunityNewGroupList" resultType="com.linkwechat.domain.community.vo.WeCommunityNewGroupVo">-->
+<!--        <include refid="selectSql"/>-->
+<!--        <where>-->
+<!--            del_flag = 0-->
+<!--            <if test="null != id">-->
+<!--                AND id=#{id}-->
+<!--            </if>-->
+<!--            <if test="emplCodeName !=null and emplCodeName !=''">-->
+<!--                AND empl_code_name LIKE CONCAT("%",#{emplCodeName},"%")-->
+<!--            </if>-->
+<!--            <if test="beginTime != null and beginTime != ''">&lt;!&ndash; 开始时间检索 &ndash;&gt;-->
+<!--                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')-->
+<!--            </if>-->
 
-            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
-            </if>
-            <if test="createBy!=null and createBy!=''">
-                AND create_by LIKE CONCAT("%",#{createBy},"%")
-            </if>
-        </where>
-        order by create_time desc
-    </select>
+<!--            <if test="endTime != null and endTime != ''">&lt;!&ndash; 结束时间检索 &ndash;&gt;-->
+<!--                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')-->
+<!--            </if>-->
+<!--            <if test="createBy!=null and createBy!=''">-->
+<!--                AND create_by LIKE CONCAT("%",#{createBy},"%")-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        order by create_time desc-->
+<!--    </select>-->
 
 
-    <resultMap type="com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo" id="WelcomeMsgResult">
-        <result property="id" column="id"/>
-        <result property="codeUrl" column="code_url"/>
-        <result property="welcomeMsg" column="welcome_msg"/>
-        <result property="linkTitle" column="link_title"/>
-        <result property="linkDesc" column="link_desc"/>
-        <result property="linkCoverUrl" column="link_cover_url"/>
-        <collection property="tagList" ofType="com.linkwechat.domain.tag.vo.WeTagVo">
-            <result property="tagId" column="tag_id"/>
-            <result property="tagName" column="tag_name"/>
-        </collection>
-    </resultMap>
+<!--    <resultMap type="com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo" id="WelcomeMsgResult">-->
+<!--        <result property="id" column="id"/>-->
+<!--        <result property="codeUrl" column="code_url"/>-->
+<!--        <result property="welcomeMsg" column="welcome_msg"/>-->
+<!--        <result property="linkTitle" column="link_title"/>-->
+<!--        <result property="linkDesc" column="link_desc"/>-->
+<!--        <result property="linkCoverUrl" column="link_cover_url"/>-->
+<!--        <collection property="tagList" ofType="com.linkwechat.domain.tag.vo.WeTagVo">-->
+<!--            <result property="tagId" column="tag_id"/>-->
+<!--            <result property="tagName" column="tag_name"/>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
 
 
 </mapper>
