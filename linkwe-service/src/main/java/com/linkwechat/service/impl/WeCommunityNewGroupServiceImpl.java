@@ -17,6 +17,9 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTabCountVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTableVo;
+import com.linkwechat.domain.community.vo.WeCommunityNewGroupTrendCountVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
@@ -197,6 +200,27 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
             throw new WeComException(WeErrorCodeEnum.parseEnum(weResultVo.getErrCode().intValue()).getErrorMsg());
         }
 
+    }
+
+    @Override
+    public WeCommunityNewGroupTabCountVo countTab(String id) {
+        WeCommunityNewGroup weCommunityNewGroup = this.getById(id);
+
+        return this.baseMapper.countTab(weCommunityNewGroup);
+    }
+
+    @Override
+    public List<WeCommunityNewGroupTrendCountVo> findTrendCountVo(WeCommunityNewGroup newGroup) {
+        WeCommunityNewGroup weCommunityNewGroup = this.getById(newGroup.getId());
+        weCommunityNewGroup.setBeginTime(newGroup.getBeginTime());
+        weCommunityNewGroup.setEndTime(newGroup.getEndTime());
+
+        return this.baseMapper.findTrendCountVo(weCommunityNewGroup);
+    }
+
+    @Override
+    public List<WeCommunityNewGroupTableVo> findWeCommunityNewGroupTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+        return this.baseMapper.findWeCommunityNewGroupTable(weCommunityNewGroupQuery);
     }
 
 
