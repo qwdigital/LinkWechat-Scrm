@@ -46,8 +46,6 @@ public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements
          setProxy(request);
 
 
-        ForestProxyUtils.setProxy(null,null,0,null,null);
-
 
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
