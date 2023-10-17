@@ -1,18 +1,23 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.community.vo.WeCommunityTaskEmplVo;
+import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.taggroup.WePresTagGroupTask;
@@ -22,10 +27,16 @@ import com.linkwechat.domain.taggroup.WePresTagGroupTaskTag;
 import com.linkwechat.domain.taggroup.vo.WePresTagGroupTaskVo;
 import com.linkwechat.domain.taggroup.vo.WePresTagTaskListVo;
 import com.linkwechat.domain.task.query.WeTasksRequest;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.WeCancelGroupMsgSendQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
+import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,52 +79,81 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Autowired
     private IWeMessagePushService weMessagePushService;
 
-    @Resource
-    private QwSysUserClient qwSysUserClient;
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
 
 
+    @Autowired
+    private IWeGroupCodeService iWeGroupCodeService;
+
+    @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
+    @Autowired
+    private QwCustomerClient qwCustomerClient;
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(WePresTagGroupTask task) {
-        int rows = this.baseMapper.insert(task);
-        if (rows > 0) {
-            // 保存标签对象
-            if (CollectionUtil.isNotEmpty(task.getTagList())) {
-                List<WePresTagGroupTaskTag> taskTagList = task.getTagList().stream().map(id -> {
-                    WePresTagGroupTaskTag taskTag = new WePresTagGroupTaskTag();
-                    taskTag.setTaskId(task.getTaskId());
-                    taskTag.setTagId(id);
-                    taskTag.setCreateBy(task.getCreateBy());
-                    taskTag.setUpdateBy(SecurityUtils.getUserName());
-                    taskTag.setCreateById(SecurityUtils.getUserId());
-                    taskTag.setUpdateById(SecurityUtils.getUserId());
-                    taskTag.setUpdateTime(new Date());
-                    taskTag.setCreateTime(new Date());
-                    return taskTag;
-                }).collect(Collectors.toList());
-                taskTagMapper.batchBindsTaskTags(taskTagList);
+
+
+        //配置进群方式
+        WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
+                WeGroupCode.builder()
+                        .autoCreateRoom(task.getAutoCreateRoom())
+                        .roomBaseId(task.getRoomBaseId())
+                        .roomBaseName(task.getRoomBaseName())
+                        .chatIdList(task.getChatIdList())
+                        .state(task.getGroupCodeState())
+                        .build()
+        );
+
+
+        if(null != addJoinWayVo && null != addJoinWayVo.getJoin_way()
+                && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())){
+
+            task.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
+
+            task.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
+
+            if(this.save(task)){
+                //群发消息通知
+                WeAddGroupMessageQuery messageQuery=new WeAddGroupMessageQuery();
+                messageQuery.setChatType(1);
+                messageQuery.setIsTask(0);
+                messageQuery.setCurrentUserInfo(SecurityUtils.getLoginUser());
+                messageQuery.setSenderList(task.getSenderList());
+                List<WeMessageTemplate> templates = new ArrayList<>();
+                WeMessageTemplate textAtt = new WeMessageTemplate();
+                textAtt.setMsgType(MessageType.TEXT.getMessageType());
+                textAtt.setContent(task.getWelcomeMsg());
+                templates.add(textAtt);
+                WeMessageTemplate linkTpl = new WeMessageTemplate();
+                linkTpl.setMsgType(MessageType.LINK.getMessageType());
+                linkTpl.setTitle(task.getLinkTitle());
+                linkTpl.setPicUrl(task.getLinkCoverUrl());
+                linkTpl.setDescription(task.getLinkDesc());
+                templates.add(linkTpl);
+                messageQuery.setAttachmentsList(templates);
+                messageQuery.setMsgSource(6);
+                if (ObjectUtil.equal(0, messageQuery.getIsTask()) && messageQuery.getSendTime() == null) {
+                    //todo 立即发送
+                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeGroupMsgRk(), JSONObject.toJSONString(messageQuery));
+                }
+
+
             }
 
-            // 保存员工信息
-            if (CollectionUtil.isNotEmpty(task.getScopeList())) {
-                List<WePresTagGroupTaskScope> wePresTagGroupTaskScopeList = task.getScopeList().stream().map(id -> {
-                    WePresTagGroupTaskScope sc = new WePresTagGroupTaskScope();
-                    sc.setTaskId(task.getTaskId());
-                    sc.setWeUserId(id);
-                    sc.setCreateBy(task.getCreateBy());
-                    sc.setUpdateBy(SecurityUtils.getUserName());
-                    sc.setCreateById(SecurityUtils.getUserId());
-                    sc.setUpdateById(SecurityUtils.getUserId());
-                    sc.setUpdateTime(new Date());
-                    sc.setCreateTime(new Date());
-                    return sc;
-                }).collect(Collectors.toList());
-                taskScopeMapper.batchBindsTaskScopes(wePresTagGroupTaskScopeList);
-            }
+        }else{
+            throw new WeComException(WeErrorCodeEnum.parseEnum(addJoinWayVo.getErrCode().intValue()).getErrorMsg());
         }
+
         this.sendMessage(task);
 
     }
@@ -140,82 +180,74 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean batchRemoveTaskByIds(Long[] idList) {
-        List<Long> ids = Arrays.asList(idList);
+    public void batchRemoveTaskByIds(Long[] idList) {
+        List<WePresTagGroupTask> wePresTagGroupTasks = this.listByIds(Arrays.asList(idList));
+        if(CollectionUtil.isNotEmpty(wePresTagGroupTasks)){
 
-        // 解除关联的标签
-        LambdaUpdateWrapper<WePresTagGroupTaskTag> tagUpdateWrapper = new LambdaUpdateWrapper<>();
-        tagUpdateWrapper.in(WePresTagGroupTaskTag::getTaskId, ids);
-        tagUpdateWrapper.set(WePresTagGroupTaskTag::getDelFlag, 1);
-        iWePresTagGroupTaskTagService.update(tagUpdateWrapper);
-
-        // 解除关联的员工
-        LambdaUpdateWrapper<WePresTagGroupTaskScope> scopeUpdateWrapper = new LambdaUpdateWrapper<>();
-        scopeUpdateWrapper.in(WePresTagGroupTaskScope::getTaskId, ids);
-        scopeUpdateWrapper.set(WePresTagGroupTaskScope::getDelFlag, 1);
-        iWePresTagGroupTaskScopeService.update(scopeUpdateWrapper);
-
-        // 删除其用户统计
-        LambdaUpdateWrapper<WePresTagGroupTaskStat> statUpdateWrapper = new LambdaUpdateWrapper<>();
-        statUpdateWrapper.in(WePresTagGroupTaskStat::getTaskId, ids);
-        statUpdateWrapper.set(WePresTagGroupTaskStat::getDelFlag, 1);
-        iWePresTagGroupTaskStatService.update(statUpdateWrapper);
-
-        // 最后删除task
-        LambdaUpdateWrapper<WePresTagGroupTask> taskUpdateWrapper = new LambdaUpdateWrapper<>();
-        taskUpdateWrapper.in(WePresTagGroupTask::getTaskId, ids);
-        taskUpdateWrapper.set(WePresTagGroupTask::getDelFlag, 1);
-        return update(taskUpdateWrapper);
+            wePresTagGroupTasks.stream().forEach(task->{
+                //停止原有群发，构建新群发
+                if(StringUtils.isNotEmpty(task.getMsgId())){
+                    qwCustomerClient.cancelGroupMsgSend(WeCancelGroupMsgSendQuery.builder().msgid(task.getMsgId()).build());
+                }
+                this.removeById(task.getId());
+            });
+        }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateTask(WePresTagGroupTask task) {
+    public void updateTask(WePresTagGroupTask task) {
 
-        if (isNameOccupied(task)) {
-            throw new CustomException("任务名已存在");
-        }
-        int rows = baseMapper.updateById(task);
-        if (rows > 0) {
-            // 更新标签 - 先删除旧标签
-            LambdaUpdateWrapper<WePresTagGroupTaskTag> taskTagQueryWrapper = new LambdaUpdateWrapper<>();
-            taskTagQueryWrapper.eq(WePresTagGroupTaskTag::getTaskId, task.getTaskId())
-                    .set(WePresTagGroupTaskTag::getDelFlag, 1);
-            taskTagMapper.update(null, taskTagQueryWrapper);
-            // 更新标签 - 再添加新标签
-            List<String> tagIdList = task.getTagList();
-            if (CollectionUtil.isNotEmpty(tagIdList)) {
-                List<WePresTagGroupTaskTag> wePresTagGroupTaskTagList = tagIdList.stream().map(id -> {
-                    WePresTagGroupTaskTag taskTag = new WePresTagGroupTaskTag();
-                    taskTag.setTaskId(task.getTaskId());
-                    taskTag.setTagId(id);
-                    taskTag.setCreateBy(task.getCreateBy());
-                    taskTag.setCreateTime(new Date());
-                    return taskTag;
-                }).collect(Collectors.toList());
-                taskTagMapper.batchBindsTaskTags(wePresTagGroupTaskTagList);
+        //更新群活码
+        WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
+                WeGroupChatUpdateJoinWayQuery.builder()
+                        .config_id(task.getGroupCodeConfigId())
+                        .scene(2)
+                        .auto_create_room(task.getAutoCreateRoom())
+                        .room_base_id(task.getRoomBaseId())
+                        .room_base_name(task.getRoomBaseName())
+                        .chat_id_list(Arrays.asList(task.getChatIdList().split(",")))
+                        .build()
+        ).getData();
+
+
+        if(null != weResultVo && weResultVo.getErrCode()
+                .equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
+
+            if(updateById(task)){
+                //停止原有群发，构建新群发
+                if(StringUtils.isNotEmpty(task.getMsgId())){
+                    qwCustomerClient.cancelGroupMsgSend(WeCancelGroupMsgSendQuery.builder().msgid(task.getMsgId()).build());
+                }
+                //群发消息通知
+                WeAddGroupMessageQuery messageQuery=new WeAddGroupMessageQuery();
+                messageQuery.setChatType(1);
+                messageQuery.setIsTask(0);
+                messageQuery.setCurrentUserInfo(SecurityUtils.getLoginUser());
+                messageQuery.setSenderList(task.getSenderList());
+                List<WeMessageTemplate> templates = new ArrayList<>();
+                WeMessageTemplate textAtt = new WeMessageTemplate();
+                textAtt.setMsgType(MessageType.TEXT.getMessageType());
+                textAtt.setContent(task.getWelcomeMsg());
+                templates.add(textAtt);
+                WeMessageTemplate linkTpl = new WeMessageTemplate();
+                linkTpl.setMsgType(MessageType.LINK.getMessageType());
+                linkTpl.setTitle(task.getLinkTitle());
+                linkTpl.setPicUrl(task.getLinkCoverUrl());
+                linkTpl.setDescription(task.getLinkDesc());
+                templates.add(linkTpl);
+                messageQuery.setAttachmentsList(templates);
+                messageQuery.setMsgSource(6);
+                if (ObjectUtil.equal(0, messageQuery.getIsTask()) && messageQuery.getSendTime() == null) {
+                    //todo 立即发送
+                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeGroupMsgRk(), JSONObject.toJSONString(messageQuery));
+                }
             }
 
-            // 先解除旧的员工绑定信息
-            LambdaUpdateWrapper<WePresTagGroupTaskScope> scopeQueryWrapper = new LambdaUpdateWrapper<>();
-            scopeQueryWrapper.eq(WePresTagGroupTaskScope::getTaskId, task.getTaskId())
-                    .set(WePresTagGroupTaskScope::getDelFlag, 1);
-            taskScopeMapper.update(null, scopeQueryWrapper);
-
-            // 再重新绑定员工信息
-            List<String> userIdList = task.getScopeList();
-            if (CollectionUtil.isNotEmpty(userIdList)) {
-                List<WePresTagGroupTaskScope> wePresTagGroupTaskScopeList = userIdList.stream().map(id -> {
-                    WePresTagGroupTaskScope sc = new WePresTagGroupTaskScope();
-                    sc.setTaskId(task.getTaskId());
-                    sc.setWeUserId(id);
-                    sc.setCreateBy(task.getCreateBy());
-                    return sc;
-                }).collect(Collectors.toList());
-                taskScopeMapper.batchBindsTaskScopes(wePresTagGroupTaskScopeList);
-            }
+        }else{
+            throw new WeComException(WeErrorCodeEnum.parseEnum(weResultVo.getErrCode().intValue()).getErrorMsg());
         }
-        return rows;
+
     }
 
 

@@ -87,4 +87,10 @@ public class WeCustomersQuery {
     private Integer isJoinBlacklist;
 
 
+    /**
+     * 1:包含全部选中标签 2:包含其中一个标签 3:不包含选中标签
+     */
+    private Integer isContain;
+
+
 }

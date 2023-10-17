@@ -50,7 +50,7 @@ public interface IWePresTagGroupTaskService extends IService<WePresTagGroupTask>
      * @param idList 任务id列表
      * @return 删除的行数
      */
-    boolean batchRemoveTaskByIds(Long[] idList);
+    void batchRemoveTaskByIds(Long[] idList);
 
     /**
      * 更新老客户标签建群任务
@@ -58,7 +58,7 @@ public interface IWePresTagGroupTaskService extends IService<WePresTagGroupTask>
      * @param task 待更新任务
      * @return 更新条数
      */
-    int updateTask(WePresTagGroupTask task);
+    void updateTask(WePresTagGroupTask task);
 
 
     void updateTaskAndSendMsg(WePresTagGroupTask task) throws WeComException;
