@@ -93,4 +93,10 @@ public class WeCustomersQuery {
     private Integer isContain;
 
 
+    /**
+     * 添加人名称
+     */
+    private String userNames;
+
+
 }
