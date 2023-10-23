@@ -42,7 +42,7 @@ public class WePresTagGroupTaskStat extends BaseEntity {
     private String externalUserid;
 
     /**
-     * 是否送达(1:送达 0:未送达)
+     * 0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败
      */
     private Integer sent;
 

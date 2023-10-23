@@ -32,8 +32,10 @@ import com.linkwechat.domain.taggroup.vo.*;
 import com.linkwechat.domain.task.query.WeTasksRequest;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
 import com.linkwechat.domain.wecom.query.customer.msg.WeCancelGroupMsgSendQuery;
+import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
+import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.*;
@@ -41,6 +43,7 @@ import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -319,6 +322,32 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Override
     public List<WePresTagGroupTaskTableVo> findWePresTagGroupTaskTable(WePresTagGroupTaskQuery wePresTagGroupTaskQuery) {
         return this.baseMapper.findWePresTagGroupTaskTable(wePresTagGroupTaskQuery);
+    }
+
+    @Override
+    @Async
+    public void synchExecuteResult(String id) {
+        List<WePresTagGroupTaskStat> tagGroupTaskStats = iWePresTagGroupTaskStatService.list(new LambdaQueryWrapper<WePresTagGroupTaskStat>()
+                .eq(WePresTagGroupTaskStat::getTaskId, id));
+        if(CollectionUtil.isNotEmpty(tagGroupTaskStats)){
+            tagGroupTaskStats.stream().forEach(k->{
+
+                WeGetGroupMsgListQuery listQuery=new WeGetGroupMsgListQuery();
+                listQuery.setMsgid(k.getMsgId());
+                listQuery.setUserid(k.getUserId());
+
+                WeGroupMsgListVo groupMsgSendResult = qwCustomerClient.getGroupMsgSendResult(listQuery).getData();
+
+                Optional.ofNullable(groupMsgSendResult).map(WeGroupMsgListVo::getSendList).orElseGet(ArrayList::new).forEach(sendResult -> {
+
+                    //设置任务执行状态
+                    k.setSent(sendResult.getStatus());
+                });
+
+            });
+            iWePresTagGroupTaskStatService.updateBatchById(tagGroupTaskStats);
+        }
+
     }
 
 

@@ -83,6 +83,13 @@ public interface IWePresTagGroupTaskService extends IService<WePresTagGroupTask>
     List<WePresTagGroupTaskTableVo> findWePresTagGroupTaskTable(WePresTagGroupTaskQuery wePresTagGroupTaskQuery);
 
 
+    /**
+     * 同步发送结果
+     * @param id
+     */
+     void synchExecuteResult(String id);
+
+
 //    void updateTaskAndSendMsg(WePresTagGroupTask task) throws WeComException;
 //
 //    /**

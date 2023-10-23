@@ -9,13 +9,14 @@ import com.linkwechat.domain.taggroup.WePresTagGroupTask;
 import com.linkwechat.domain.taggroup.query.WePresTagGroupTaskQuery;
 import com.linkwechat.domain.taggroup.vo.*;
 import com.linkwechat.service.IWePresTagGroupTaskService;
-import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@Api(tags = "老客标签建群接口")
+/**
+ * 老客标签建群接口
+ */
 @RestController
 @RequestMapping(value = "/communityPresTagGroup")
 public class WeCommunityPresTagGroupController extends BaseController {
@@ -128,22 +129,23 @@ public class WeCommunityPresTagGroupController extends BaseController {
         );
     }
 
-//    /**
-//     * 根据老客标签建群id及过滤条件，获取其统计信息
-//     */
-//    @GetMapping(path = "/stat/{id}")
-//    public TableDataInfo<List<WePresTagGroupTaskStat>> getStatInfo(
-//            @PathVariable("id") Long id,
-//            @RequestParam(value = "customerName", required = false) String customerName,
-//            @RequestParam(value = "isInGroup", required = false) Integer isInGroup,
-//            @RequestParam(value = "isSent", required = false) Integer isSent
-//    ) {
-//        WePresTagGroupTask task = taskService.getById(id);
-//        startPage();
-//        List<WePresTagGroupTaskStat> stats = taskService.getTaskStat(id, customerName, isInGroup, isSent,
-//                task.getSendType());
-//        return getDataTable(stats);
-//    }
+
+
+    /**
+     * 同步发送结果
+     * @param id
+     * @return
+     */
+    @GetMapping("/synchExecuteResult/{id}")
+    public AjaxResult synchExecuteResult(@PathVariable String id){
+        taskService.synchExecuteResult(id);
+
+        return AjaxResult.success();
+
+    }
+
+
+
 
 
 
