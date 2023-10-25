@@ -64,7 +64,7 @@ public class WeCorpAccountController extends BaseController {
         if (iWeCorpAccountService.saveOrUpdate(weCorpAccount)) {
             qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
             //商城配置
-            saveOrUpdateShopConfig(weCorpAccount);
+//            saveOrUpdateShopConfig(weCorpAccount);
         }
 
         iWeCorpAccountService.addOrUpdate(weCorpAccount);
@@ -95,46 +95,46 @@ public class WeCorpAccountController extends BaseController {
         return AjaxResult.success("操作成功", iWeCorpAccountService.getCustomerChurnNoticeSwitch());
     }
 
-    /**
-     * 商城配置
-     *
-     * @param weCorpAccount
-     */
-    private void saveOrUpdateShopConfig(WeCorpAccount weCorpAccount) {
-        //商城系统新增或修改
-        try {
-            JSONObject jsonObject = new JSONObject();
-            //小程序配置
-            if (StringUtils.isNotBlank(weCorpAccount.getShopAppId())) {
-                jsonObject.put("wxapp_appId", weCorpAccount.getShopAppId().trim());
-            }
-            if (StringUtils.isNotBlank(weCorpAccount.getShopSecret())) {
-                jsonObject.put("wxapp_secret", weCorpAccount.getShopSecret().trim());
-            }
-            //支付配置
-            if (StringUtils.isNotBlank(weCorpAccount.getMerChantNumber())) {
-                jsonObject.put("wxpay_mchId", weCorpAccount.getMerChantNumber().trim());
-            }
-            if (StringUtils.isNotBlank(weCorpAccount.getMerChantSecret())) {
-                jsonObject.put("wxpay_mchKey", weCorpAccount.getMerChantSecret().trim());
-            }
-            if (StringUtils.isNotBlank(weCorpAccount.getCertP12Url())) {
-                jsonObject.put("wxpay_keyPath", weCorpAccount.getCertP12Url().trim());
-            }
-            //小程序消息消息推送配置
-            if (StringUtils.isNotBlank(weCorpAccount.getShopMaToken())) {
-                jsonObject.put("wechat_ma_token", weCorpAccount.getShopMaToken().trim());
-            }
-            if (StringUtils.isNotBlank(weCorpAccount.getShopMaEncodingaeskey())) {
-                jsonObject.put("wechat_ma_encodingaeskey", weCorpAccount.getShopMaEncodingaeskey().trim());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("商城系统-小程序配置失败！！！");
-        }
-    }
-
+//    /**
+//     * 商城配置
+//     *
+//     * @param weCorpAccount
+//     */
+//    private void saveOrUpdateShopConfig(WeCorpAccount weCorpAccount) {
+//        //商城系统新增或修改
+//        try {
+//            JSONObject jsonObject = new JSONObject();
+//            //小程序配置
+//            if (StringUtils.isNotBlank(weCorpAccount.getShopAppId())) {
+//                jsonObject.put("wxapp_appId", weCorpAccount.getShopAppId().trim());
+//            }
+//            if (StringUtils.isNotBlank(weCorpAccount.getShopSecret())) {
+//                jsonObject.put("wxapp_secret", weCorpAccount.getShopSecret().trim());
+//            }
+//            //支付配置
+//            if (StringUtils.isNotBlank(weCorpAccount.getMerChantNumber())) {
+//                jsonObject.put("wxpay_mchId", weCorpAccount.getMerChantNumber().trim());
+//            }
+//            if (StringUtils.isNotBlank(weCorpAccount.getMerChantSecret())) {
+//                jsonObject.put("wxpay_mchKey", weCorpAccount.getMerChantSecret().trim());
+//            }
+//            if (StringUtils.isNotBlank(weCorpAccount.getCertP12Url())) {
+//                jsonObject.put("wxpay_keyPath", weCorpAccount.getCertP12Url().trim());
+//            }
+//            //小程序消息消息推送配置
+//            if (StringUtils.isNotBlank(weCorpAccount.getShopMaToken())) {
+//                jsonObject.put("wechat_ma_token", weCorpAccount.getShopMaToken().trim());
+//            }
+//            if (StringUtils.isNotBlank(weCorpAccount.getShopMaEncodingaeskey())) {
+//                jsonObject.put("wechat_ma_encodingaeskey", weCorpAccount.getShopMaEncodingaeskey().trim());
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("商城系统-小程序配置失败！！！");
+//        }
+//    }
+//
 
     /**
      * 设置默认欢迎语

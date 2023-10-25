@@ -78,6 +78,10 @@ public class WeDefaultWelcomeMsg extends BaseEntity {
     private Integer realType;
 
 
+    private Long materialId;
+
+
+
 
 
 
