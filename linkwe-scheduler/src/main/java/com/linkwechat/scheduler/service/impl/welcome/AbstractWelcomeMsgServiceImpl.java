@@ -66,15 +66,13 @@ public class AbstractWelcomeMsgServiceImpl implements IWelcomeMsgService {
         WeWelcomeMsgQuery welcomeMsg = new WeWelcomeMsgQuery();
         welcomeMsg.setWelcome_code(query.getWelcomeCode());
         welcomeMsg.setCorpid(query.getToUserName());
-        if (CollectionUtil.isNotEmpty(attachments)) {
-            weMaterialService.msgTplToMediaId(attachments);
-        } else { //设置默认欢迎语
+
+        if(CollectionUtil.isEmpty(attachments)){ //为空则设置默认欢迎语
             attachments.addAll(iWeDefaultWelcomeMsgService.findWeMessageTemplates());
-//            WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
-//            weMessageTemplate.setMsgType(MessageType.TEXT.getMessageType());
-//            weMessageTemplate.setContent(welcomeMsgDefault);
-//            attachments.add(weMessageTemplate);
         }
+
+        //图片转化企业微信media_id
+        weMaterialService.msgTplToMediaId(attachments);
 
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId, query.getUserID())
                 .eq(WeCustomer::getExternalUserid, query.getExternalUserID()).eq(WeCustomer::getDelFlag, Constants.COMMON_STATE).last("limit 1"));

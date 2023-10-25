@@ -42,12 +42,14 @@ public class WeDefaultWelcomeMsgServiceImpl extends ServiceImpl<WeDefaultWelcome
         List<WeMessageTemplate> messageTemplates=new ArrayList<>();
         List<WeDefaultWelcomeMsg> weDefaultWelcomeMsgs = this.list();
         if(CollectionUtil.isNotEmpty(weDefaultWelcomeMsgs)){
-            messageTemplates = Optional.ofNullable(weDefaultWelcomeMsgs)
-                    .orElseGet(ArrayList::new).stream().map(weDefaultWelcomeMsg -> {
-                        WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
-                        BeanUtil.copyProperties(weMessageTemplate, weDefaultWelcomeMsg);
-                        return weMessageTemplate;
-                    }).collect(Collectors.toList());
+            weDefaultWelcomeMsgs.stream().forEach(weDefaultWelcomeMsg->{
+
+                WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
+
+                BeanUtil.copyProperties(weDefaultWelcomeMsg, weMessageTemplate);
+                messageTemplates.add(weMessageTemplate);
+            });
+
         }
         return messageTemplates;
     }
