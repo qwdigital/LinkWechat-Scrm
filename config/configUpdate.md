@@ -51,3 +51,9 @@
             proxyUserName: "" #代理服务器账号
             proxyPassword: "" #代理服务器密码
   ```
+### ● 日期：2023.10.26
+  ```
+    ● linkwe-common.yml
+        wecom:
+          移除
+          welcome-msg-default: 您好，欢迎关注LinkWechat,如果对您有帮助，麻烦在码云上帮我们点个star，谢谢！
