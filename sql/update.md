@@ -1070,5 +1070,27 @@ INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_
 UPDATE sys_menu set visible=1 where menu_name = '知识中心';
 INSERT INTO `we_leads_sea_base_settings` (`id`, `max_claim`, `stock_max_claim`, `create_time`, `create_by`, `create_by_id`, `update_time`, `update_by`, `update_by_id`, `del_flag`) VALUES (1, 1, 8, '2023-07-17 17:18:13', NULL, NULL, '2023-10-10 16:13:34', 'lw', 168, 0);
   ```
-
+---
+### ● 日期：2023.10.26
+  ```
+CREATE TABLE `we_default_welcome_msg`  (
+`id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+`msg_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '消息类型 文本:text 图片:image 图文:link 小程序:miniprogram 视频:video 文件:file ',
+`content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '消息内容',
+`title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息标题',
+`description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息描述',
+`file_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件路径',
+`link_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息链接',
+`pic_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息图片地址',
+`app_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '小程序appid',
+`create_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '创建人',
+`create_by_id` bigint(11) NULL DEFAULT NULL COMMENT '创建人id',
+`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '更新人',
+`update_by_id` bigint(11) NULL DEFAULT NULL COMMENT '更新人id',
+`material_id` bigint(20) NULL DEFAULT NULL COMMENT '素材id',
+`update_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+`real_type` tinyint(2) NULL DEFAULT NULL COMMENT '素材真实类型',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1717156930562121731 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '默认欢迎语附件' ROW_FORMAT = Dynamic;
 
