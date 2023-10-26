@@ -93,7 +93,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
                 //构造群活码相关
                 communityNewGroup.setGroupCodeState(
-                        WelcomeMsgTypeEnum.WE_QR_XKLQ_PREFIX + UUID.get16UUID()
+                        WelcomeMsgTypeEnum.WE_QR_XKLQ_PREFIX.getType() + UUID.get16UUID()
                 );
 
                 //配置进群方式
