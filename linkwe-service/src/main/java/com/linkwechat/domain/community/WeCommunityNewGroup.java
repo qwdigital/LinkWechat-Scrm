@@ -177,5 +177,12 @@ public class WeCommunityNewGroup extends BaseEntity {
     private int joinGroupNumber;
 
 
+    /**
+     * 使用员工名称，多个使用逗号隔开
+     */
+    @TableField(exist = false)
+    private String emplNames;
+
+
 
 }
