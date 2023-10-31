@@ -6,6 +6,8 @@ import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -27,6 +29,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeCommunityNewGroupMapper;
 import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +66,10 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
     @Autowired
     private IWeGroupMemberService iWeGroupMemberService;
+
+
+    @Autowired
+    private QwSysUserClient qwSysUserClient;
 
 
 
@@ -232,6 +239,23 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     private void getCompleteEmplCodeInfo(WeCommunityNewGroup weCommunityNewGroup) {
 
         if(null != weCommunityNewGroup){
+
+            if(StringUtils.isNotEmpty(weCommunityNewGroup.getEmplList())){
+                //设置使用员工名称
+                AjaxResult<List<SysUser>> allSysUser
+                        = qwSysUserClient.findAllSysUser(weCommunityNewGroup.getEmplList(), null, null);
+                if(null != allSysUser && CollectionUtil.isNotEmpty(allSysUser.getData())){
+                    List<SysUser> sysUsers = allSysUser.getData();
+                    if(CollectionUtil.isNotEmpty(sysUsers)){
+                        weCommunityNewGroup.setEmplNames(
+                                sysUsers.stream().map(SysUser::getUserName).collect(Collectors.joining(","))
+                        );
+                    }
+
+                }
+            }
+
+
 
             //设置群名
             List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
