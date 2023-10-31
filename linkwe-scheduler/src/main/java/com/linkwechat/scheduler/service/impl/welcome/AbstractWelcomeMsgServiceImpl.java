@@ -21,10 +21,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.scheduler.service.IWelcomeMsgService;
-import com.linkwechat.service.IWeCommunityNewGroupService;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeMaterialService;
-import com.linkwechat.service.IWeQrCodeService;
+import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,22 +55,24 @@ public class AbstractWelcomeMsgServiceImpl implements IWelcomeMsgService {
     private LinkWeChatConfig linkWeChatConfig;
 
 
-    @Value("${wecom.welcome-msg-default}")
-    protected String welcomeMsgDefault;
+//    @Value("${wecom.welcome-msg-default}")
+//    protected String welcomeMsgDefault;
+
+    @Autowired
+    private IWeDefaultWelcomeMsgService iWeDefaultWelcomeMsgService;
 
     @Override
     public void sendWelcomeMsg(WeBackCustomerVo query, List<WeMessageTemplate> attachments) {
         WeWelcomeMsgQuery welcomeMsg = new WeWelcomeMsgQuery();
         welcomeMsg.setWelcome_code(query.getWelcomeCode());
         welcomeMsg.setCorpid(query.getToUserName());
-        if (CollectionUtil.isNotEmpty(attachments)) {
-            weMaterialService.msgTplToMediaId(attachments);
-        } else {
-            WeMessageTemplate weMessageTemplate = new WeMessageTemplate();
-            weMessageTemplate.setMsgType(MessageType.TEXT.getMessageType());
-            weMessageTemplate.setContent(welcomeMsgDefault);
-            attachments.add(weMessageTemplate);
+
+        if(CollectionUtil.isEmpty(attachments)){ //为空则设置默认欢迎语
+            attachments.addAll(iWeDefaultWelcomeMsgService.findWeMessageTemplates());
         }
+
+        //图片转化企业微信media_id
+        weMaterialService.msgTplToMediaId(attachments);
 
         WeCustomer weCustomer = weCustomerService.getOne(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId, query.getUserID())
                 .eq(WeCustomer::getExternalUserid, query.getExternalUserID()).eq(WeCustomer::getDelFlag, Constants.COMMON_STATE).last("limit 1"));
