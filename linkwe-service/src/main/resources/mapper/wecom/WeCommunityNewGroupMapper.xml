@@ -79,6 +79,9 @@
             we_customer wc
                 LEFT JOIN we_group_member wgm ON wc.external_userid=wgm.user_id
         <where>
+           <if test="query.state != null and query.state !=''">
+                and wc.state = #{query.state}
+           </if>
            <if test="query.customerName != null and query.customerName !='' ">
              and  wc.customer_name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
            </if>

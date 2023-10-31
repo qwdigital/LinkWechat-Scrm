@@ -227,6 +227,14 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
 
     @Override
     public List<WeCommunityNewGroupTableVo> findWeCommunityNewGroupTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery) {
+        WeCommunityNewGroup weCommunityNewGroup = this.getById(weCommunityNewGroupQuery.getId());
+
+        //设置新客拉群渠道标识
+        if(null != weCommunityNewGroup){
+            weCommunityNewGroupQuery.setState(weCommunityNewGroup.getEmplCodeState());
+        }
+
+
         return this.baseMapper.findWeCommunityNewGroupTable(weCommunityNewGroupQuery);
     }
 

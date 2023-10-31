@@ -178,10 +178,10 @@ public class WeCommunityNewGroupController extends BaseController {
      * 数据明细导出
      */
     @GetMapping("/exprotWeCommunityNewGroupTable")
-    public void exprotWeCommunityNewGroupTable(){
+    public void exprotWeCommunityNewGroupTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery){
         LwExcelUtil.exprotForWeb(
                 ServletUtils.getResponse(), WeCommunityNewGroupTableVo.class,
-                iWeCommunityNewGroupService.findWeCommunityNewGroupTable(new WeCommunityNewGroupQuery())
+                iWeCommunityNewGroupService.findWeCommunityNewGroupTable(weCommunityNewGroupQuery)
                 ,"新客拉群-数据明细"
         );
     }

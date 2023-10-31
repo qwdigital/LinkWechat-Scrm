@@ -16,6 +16,12 @@ public class WeCommunityNewGroupQuery {
 
 
     /**
+     * 新客拉群主键
+     */
+    private String id;
+
+
+    /**
      * 客户名称
      */
     private String customerName;
@@ -55,6 +61,11 @@ public class WeCommunityNewGroupQuery {
      * 群id
      */
     private String chatId;
+
+    /**
+     * 渠道标识
+     */
+    private  String state;
 
 //    @TableId
 //    private Long id;
