@@ -144,12 +144,14 @@ public class WePresTagGroupTask extends BaseEntity {
     /**
      * 触发客户数
      */
+    @TableField(exist = false)
     private int touchWeCustomerNumber;
 
 
     /**
      * 进群客户数
      */
+    @TableField(exist = false)
     private int joinGroupCustomerNumber;
 
 

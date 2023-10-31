@@ -16,6 +16,9 @@ public class WeCustomersQuery {
     //0-未知 1-男性 2-女性
     private Integer gender;
 
+    //查询多个性别，用逗号隔开
+    private String genders;
+
     //跟踪状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
     private Integer trackState;
 
@@ -24,6 +27,9 @@ public class WeCustomersQuery {
 
     //客户类型 1:微信用户，2:企业用户
     private Integer customerType;
+
+    //查询多个客户类型用逗号隔开
+    private String customerTypes;
 
     //客户id
     private String externalUserid;
