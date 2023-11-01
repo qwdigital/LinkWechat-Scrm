@@ -66,7 +66,7 @@ public class WeAddFormSurveyAnswerQuery {
      * 微信unionID
      */
     @ApiModelProperty(value = "微信unionID")
-    @NotEmpty(message = "用户ID不能为空")
+//    @NotEmpty(message = "用户ID不能为空")
     private String unionId;
 
 
