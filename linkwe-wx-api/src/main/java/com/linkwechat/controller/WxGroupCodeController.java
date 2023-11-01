@@ -1,7 +1,9 @@
 package com.linkwechat.controller;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
+import com.linkwechat.service.IWeCommunityNewGroupService;
 import com.linkwechat.service.IWeGroupCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,9 @@ public class WxGroupCodeController {
     @Autowired
     private IWeGroupCodeService groupCodeService;
 
+    @Autowired
+    private IWeCommunityNewGroupService iWeCommunityNewGroupService;
+
 
     /**
      * 获取群活码详情
@@ -29,4 +34,18 @@ public class WxGroupCodeController {
                 groupCodeService.getById(id)
         );
     }
+
+
+    /**
+     * 获取新客自动拉群详细信息
+     */
+    @GetMapping(value = "/findWeCommunityNewGroupById/{id}")
+    public AjaxResult<WeCommunityNewGroup> findWeCommunityNewGroupById(@PathVariable("id") String id) {
+        WeCommunityNewGroup weCommunityNewGroup
+                = iWeCommunityNewGroupService.findWeCommunityNewGroupById(id);
+
+        return AjaxResult.success(weCommunityNewGroup);
+    }
+
+
 }
