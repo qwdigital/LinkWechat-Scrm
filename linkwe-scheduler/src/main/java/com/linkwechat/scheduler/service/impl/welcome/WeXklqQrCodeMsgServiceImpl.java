@@ -62,6 +62,7 @@ public class WeXklqQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
             linkTpl.setTitle(weCommunityNewGroup.getLinkTitle());
             linkTpl.setPicUrl(weCommunityNewGroup.getLinkCoverUrl());
             linkTpl.setDescription(weCommunityNewGroup.getLinkDesc());
+            linkTpl.setLinkUrl(weCommunityNewGroup.getCommunityNewGroupUrl());
             templates.add(linkTpl);
 
 

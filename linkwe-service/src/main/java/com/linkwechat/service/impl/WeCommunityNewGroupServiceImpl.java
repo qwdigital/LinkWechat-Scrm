@@ -5,12 +5,14 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
 import com.linkwechat.common.utils.uuid.UUID;
@@ -36,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,6 +76,10 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     private QwSysUserClient qwSysUserClient;
 
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
+
 
 
 
@@ -79,6 +87,12 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     @Override
     @Transactional
     public  void add(WeCommunityNewGroup communityNewGroup) {
+
+        String communityNewGroupUrl = linkWeChatConfig.getCommunityNewGroupUrl();
+
+        if(StringUtils.isEmpty(communityNewGroupUrl)){
+            throw new WeComException("新客拉群H5链接未配置");
+        }
 
         //获取员工活码
         String emplCodeState=WelcomeMsgTypeEnum.WE_QR_XKLQ_PREFIX.getType() + UUID.get16UUID();
@@ -120,6 +134,10 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
                     communityNewGroup.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
 
                     communityNewGroup.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
+
+
+                    communityNewGroup.setId(SnowFlakeUtil.nextId());
+                    communityNewGroup.setCommunityNewGroupUrl(MessageFormat.format(communityNewGroupUrl, communityNewGroup.getId().toString()));
 
                     save(communityNewGroup);
 
