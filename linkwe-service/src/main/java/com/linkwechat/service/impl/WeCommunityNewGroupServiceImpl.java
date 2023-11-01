@@ -292,14 +292,17 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
                 );
             }
 
-            //设置标签名
-            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                    .in(WeTag::getTagId, weCommunityNewGroup.getTagList().split(",")));
-            if(CollectionUtil.isNotEmpty(weTags)){
-                weCommunityNewGroup.setTagNames(
-                        String.join(",",weTags.stream().map(WeTag::getName).collect(Collectors.toList()))
-                );
+            if(StringUtils.isNotEmpty( weCommunityNewGroup.getTagList())){
+                //设置标签名
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .in(WeTag::getTagId, weCommunityNewGroup.getTagList().split(",")));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    weCommunityNewGroup.setTagNames(
+                            String.join(",",weTags.stream().map(WeTag::getName).collect(Collectors.toList()))
+                    );
+                }
             }
+
 
 
             //设置添加客户数
