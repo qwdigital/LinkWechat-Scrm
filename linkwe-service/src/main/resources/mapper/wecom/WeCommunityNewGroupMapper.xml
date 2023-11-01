@@ -67,17 +67,21 @@
             wc.avatar,
             wc.customer_name,
             wc.customer_type,
-            wc.external_userid as externalUserid,
+            wc.external_userid AS externalUserid,
             wc.add_user_id,
             wc.add_time,
             wc.gender,
-            IF(ISNULL(wgm.chat_id),0,1) as isJoinGroup,
+            IF(ISNULL( wgm.chat_id ), 0, 1) AS isJoinGroup,
             wgm.chat_id,
             wgm.join_time,
-            (SELECT GROUP_CONCAT(wg.group_name) from we_group wg where wg.chat_id=wgm.chat_id) as groupName
-        FROM
+            wgm.quit_scene,
+            (
+            wg.group_name
+            ) AS groupName
+            FROM
             we_customer wc
-                LEFT JOIN we_group_member wgm ON wc.external_userid=wgm.user_id
+        LEFT JOIN we_group_member wgm ON wc.external_userid = wgm.user_id  and wgm.quit_scene not IN(0,1)
+        LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
         <where>
            <if test="query.state != null and query.state !=''">
                 and wc.state = #{query.state}
