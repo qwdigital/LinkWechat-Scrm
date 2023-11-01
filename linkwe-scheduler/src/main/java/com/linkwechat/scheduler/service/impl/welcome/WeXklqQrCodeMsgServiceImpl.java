@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.enums.MessageType;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo;
@@ -67,19 +68,22 @@ public class WeXklqQrCodeMsgServiceImpl extends AbstractWelcomeMsgServiceImpl {
 
 
             //设置标签
-            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                    .in(WeTag::getTagId, weCommunityNewGroup.getTagList().split(",")));
-            if(CollectionUtil.isNotEmpty(weTags)){
-                List<WeTagVo> weTagVos=new ArrayList<>();
-                weTags.stream().forEach(weTag -> {
-                    weTagVos.add(WeTagVo.builder()
-                                    .tagId(weTag.getTagId())
-                                    .tagName(weTag.getName())
-                            .build());
+            if(StringUtils.isNotEmpty(weCommunityNewGroup.getTagList())){
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .in(WeTag::getTagId, weCommunityNewGroup.getTagList().split(",")));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    List<WeTagVo> weTagVos=new ArrayList<>();
+                    weTags.stream().forEach(weTag -> {
+                        weTagVos.add(WeTagVo.builder()
+                                .tagId(weTag.getTagId())
+                                .tagName(weTag.getName())
+                                .build());
 
-                });
-                makeCustomerTag(query.getExternalUserID(), query.getUserID(),weTagVos);
+                    });
+                    makeCustomerTag(query.getExternalUserID(), query.getUserID(),weTagVos);
+                }
             }
+
 
 
 
