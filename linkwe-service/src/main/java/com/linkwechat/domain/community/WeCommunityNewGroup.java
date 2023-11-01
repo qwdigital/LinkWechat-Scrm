@@ -150,6 +150,12 @@ public class WeCommunityNewGroup extends BaseEntity {
 
 
     /**
+     * 新客h5具体页面
+     */
+    private String communityNewGroupUrl;
+
+
+    /**
      * 标签名，多个使用逗号隔开
      */
     @TableField(exist = false)
