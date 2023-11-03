@@ -638,6 +638,10 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         }
     }
 
+    @Override
+    public List<WeGroup> findGroupByUserId(String chatUserId, String state) {
+        return this.baseMapper.findGroupByUserId(chatUserId,state);
+    }
 
 
 }
