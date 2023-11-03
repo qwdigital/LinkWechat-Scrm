@@ -10,6 +10,7 @@ import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
+import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
 import com.linkwechat.domain.community.vo.WeCommunityNewGroupTabCountVo;
@@ -17,6 +18,7 @@ import com.linkwechat.domain.community.vo.WeCommunityNewGroupTableVo;
 import com.linkwechat.domain.community.vo.WeCommunityNewGroupTrendCountVo;
 import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.service.IWeCommunityNewGroupService;
+import com.linkwechat.service.IWeGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +35,9 @@ public class WeCommunityNewGroupController extends BaseController {
 
     @Autowired
     private IWeCommunityNewGroupService iWeCommunityNewGroupService;
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
 
     /**
@@ -185,5 +190,27 @@ public class WeCommunityNewGroupController extends BaseController {
                 ,"新客拉群-数据明细"
         );
     }
+
+
+    /**
+     * 获取当前客户对应的群
+     * @param weCommunityNewGroupQuery
+     * @return
+     */
+    @GetMapping("/findWeCommunityNewGroupChatTable")
+    public TableDataInfo<WeGroup> findWeCommunityNewGroupChatTable(WeCommunityNewGroupQuery weCommunityNewGroupQuery){
+        List<WeGroup> weGroups =new ArrayList<>();
+        WeCommunityNewGroup weCommunityNewGroup = iWeCommunityNewGroupService.getById(weCommunityNewGroupQuery.getId());
+        if(null != weCommunityNewGroup){
+            startPage();
+            weGroups=iWeGroupService
+                    .findGroupByUserId(weCommunityNewGroupQuery.getExternalUserid()
+                            , weCommunityNewGroup.getGroupCodeState());
+        }
+
+        return getDataTable(weGroups);
+    }
+
+
 
 }

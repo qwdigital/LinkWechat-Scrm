@@ -250,6 +250,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         //设置新客拉群渠道标识
         if(null != weCommunityNewGroup){
             weCommunityNewGroupQuery.setState(weCommunityNewGroup.getEmplCodeState());
+            weCommunityNewGroupQuery.setGroupState(weCommunityNewGroup.getGroupCodeState());
         }
 
 

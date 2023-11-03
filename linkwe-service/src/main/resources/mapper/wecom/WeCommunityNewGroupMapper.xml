@@ -71,17 +71,10 @@
             wc.add_user_id,
             wc.add_time,
             wc.gender,
-            IF(ISNULL( wgm.chat_id ), 0, 1) AS isJoinGroup,
-            wgm.chat_id,
-            wgm.join_time,
-            wgm.quit_scene,
-            (
-            wg.group_name
-            ) AS groupName
-            FROM
-            we_customer wc
-        LEFT JOIN we_group_member wgm ON wc.external_userid = wgm.user_id  and wgm.quit_scene not IN(0,1)
-        LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+            (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState} and wgm.quit_scene not IN (0,1)) as joinGroupNumber,
+            IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState}  and wgm.quit_scene not IN (0,1))>0,1,0) as isJoinGroup
+        FROM
+        we_customer wc
         <where>
            <if test="query.state != null and query.state !=''">
                 and wc.state = #{query.state}
@@ -93,19 +86,10 @@
           <if test="query.startAddTime != null and query.startAddTime !='' and query.endAddTime != null and query.endAddTime !='' ">
               AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
           </if>
-          <if test="query.chatId !=null and query.chatId !=''">
-              AND wgm.chat_id != #{query.chatId}
-          </if>
-          <if test="query.startJoinTime != null and query.startJoinTime !='' and query.endJoinTime != null and query.endJoinTime !='' ">
-             AND  date_format(wgm.join_time,'%Y-%m-%d') BETWEEN #{query.startJoinTime} AND #{query.endJoinTime}
-          </if>
           <choose>
               <when test="query.isJoinGroup != null">
                 <if test="query.isJoinGroup ==1 ">
-                    and wgm.chat_id IS NOT NULL
-                </if>
-                <if test="query.isJoinGroup ==0">
-                    and wgm.chat_id IS NULL
+                    HAVING(joinGroupNumber)>0
                 </if>
               </when>
           </choose>

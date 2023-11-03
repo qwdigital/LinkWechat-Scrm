@@ -63,9 +63,21 @@ public class WeCommunityNewGroupQuery {
     private String chatId;
 
     /**
-     * 渠道标识
+     * 客户渠道标识
      */
     private  String state;
+
+
+    /**
+     * 群渠道标识
+     */
+    private String groupState;
+
+
+    /**
+     * 客户id
+     */
+    private String externalUserid;
 
 //    @TableId
 //    private Long id;
