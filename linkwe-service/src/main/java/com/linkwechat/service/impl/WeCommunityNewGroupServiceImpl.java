@@ -183,10 +183,10 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     public void updateWeCommunityNewGroup(WeCommunityNewGroup communityNewGroup) {
 
         //更新群活码相关
-        WeCommunityNewGroup weCommunityNewGroup = this.getById(communityNewGroup.getId());
-        if(null == weCommunityNewGroup){
-            throw new WeComException("新客拉群信息不存在！");
-        }
+//        WeCommunityNewGroup weCommunityNewGroup = this.getById(communityNewGroup.getId());
+//        if(null == weCommunityNewGroup){
+//            throw new WeComException("新客拉群信息不存在！");
+//        }
 
 
         //更新员工活码
@@ -219,7 +219,7 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
         if(null != weResultVo && weResultVo.getErrCode()
                 .equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
 
-            updateById(weCommunityNewGroup);
+            updateById(communityNewGroup);
 
         }else{
             throw new WeComException(WeErrorCodeEnum.parseEnum(weResultVo.getErrCode().intValue()).getErrorMsg());
