@@ -4,72 +4,98 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeCommunityNewGroupMapper">
 
-    <select id="findUserNameByUserIds" resultType="java.util.HashMap">
-        SELECT we_user_id,user_name FROM sys_user where user_id in
-        <foreach collection="userIds" item="userId" index="index" open="(" close=")" separator=",">
-            #{userId}
-        </foreach>
+
+
+    <select id="countTab" resultType="com.linkwechat.domain.community.vo.WeCommunityNewGroupTabCountVo">
+        SELECT
+            (
+                SELECT
+                    count(*)
+                FROM
+                    we_customer where state=#{newGroup.emplCodeState}
+            ) as addCustomerNumber,
+            (
+                SELECT
+                    count(*)
+                FROM
+                    we_customer where date_format(add_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and state=#{newGroup.emplCodeState}
+            ) as tdAddCustomerNumber,
+            (
+                SELECT
+                    count(*)
+                FROM we_group_member where state=#{newGroup.groupCodeState}
+            ) as joinGroupCustomerNumber,
+            (
+                SELECT
+                    count(*)
+                FROM we_group_member WHERE date_format(join_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and state=#{newGroup.groupCodeState}
+            ) as tdJoinGroupCustomerNumber
+    </select>
+
+
+    <select id="findTrendCountVo" resultType="com.linkwechat.domain.community.vo.WeCommunityNewGroupTrendCountVo">
+        SELECT
+            sdd.date,
+            (
+                SELECT
+                    count(*)
+                FROM
+                    we_customer wc
+                WHERE
+                        DATE_FORMAT( wc.add_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
+                  AND wc.state = #{newGroup.emplCodeState}
+            ) AS addCustomerNumber,
+            (
+                SELECT
+                    count(*)
+                FROM
+                    we_group_member wgm
+                WHERE
+                        DATE_FORMAT( wgm.join_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
+                  AND wgm.state = #{newGroup.groupCodeState}
+            ) AS joinGroupCustomerNumber
+        FROM
+            sys_dim_date sdd
+        WHERE
+            DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN #{newGroup.beginTime} AND #{newGroup.endTime}
     </select>
 
 
 
-    <sql id="selectSql">
-        SELECT id,
-               empl_code_name as codeName,
-               empl_code_id as emplCodeId,
-               group_code_id as groupCodeId,
-               create_by,
-               create_time,
-               update_by,
-               update_time,
-               del_flag
-        FROM we_community_new_group
-    </sql>
-
-    <select id="selectWeCommunityNewGroupList" resultType="com.linkwechat.domain.community.vo.WeCommunityNewGroupVo">
-        <include refid="selectSql"/>
+    <select id="findWeCommunityNewGroupTable" resultType="com.linkwechat.domain.community.vo.WeCommunityNewGroupTableVo">
+        SELECT
+            wc.avatar,
+            wc.customer_name,
+            wc.customer_type,
+            wc.external_userid AS externalUserid,
+            wc.add_user_id,
+            wc.add_time,
+            wc.gender,
+            (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState} and wgm.quit_scene not IN (0,1)) as joinGroupNumber,
+            IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState}  and wgm.quit_scene not IN (0,1))>0,1,0) as isJoinGroup
+        FROM
+        we_customer wc
         <where>
-            del_flag = 0
-            <if test="null != id">
-                AND id=#{id}
-            </if>
-            <if test="emplCodeName !=null and emplCodeName !=''">
-                AND empl_code_name LIKE CONCAT("%",#{emplCodeName},"%")
-            </if>
-            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
-            </if>
+           <if test="query.state != null and query.state !=''">
+                and wc.state = #{query.state}
+           </if>
+           <if test="query.customerName != null and query.customerName !='' ">
+             and  wc.customer_name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
+           </if>
 
-            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
-            </if>
-            <if test="createBy!=null and createBy!=''">
-                AND create_by LIKE CONCAT("%",#{createBy},"%")
-            </if>
+          <if test="query.startAddTime != null and query.startAddTime !='' and query.endAddTime != null and query.endAddTime !='' ">
+              AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
+          </if>
+          <choose>
+              <when test="query.isJoinGroup != null">
+                <if test="query.isJoinGroup ==1 ">
+                    HAVING(joinGroupNumber)>0
+                </if>
+              </when>
+          </choose>
+
         </where>
-        order by create_time desc
     </select>
-
-    <select id="getWelcomeMsgByState" parameterType="String" resultMap="WelcomeMsgResult">
-        select wec.id,wgc.code_url, wec.welcome_msg,wect.tag_id,wect.tag_name
-        from we_emple_code wec
-                 left join we_emple_code_tag wect on wec.id = wect.emple_code_id and wect.del_flag = 0
-                 left join we_community_new_group wcng on wec.id = wcng.empl_code_id
-                 left join we_group_code wgc on wcng.group_code_id = wgc.id
-        where 1=1
-          and wec.state = #{state}
-          and wec.del_flag = 0
-    </select>
-
-    <resultMap type="com.linkwechat.domain.community.vo.WeCommunityWeComeMsgVo" id="WelcomeMsgResult">
-        <result property="id" column="id"/>
-        <result property="codeUrl" column="code_url"/>
-        <result property="welcomeMsg" column="welcome_msg"/>
-        <collection property="tagList" ofType="com.linkwechat.domain.tag.vo.WeTagVo">
-            <result property="tagId" column="tag_id"/>
-            <result property="tagName" column="tag_name"/>
-        </collection>
-    </resultMap>
 
 
 </mapper>
