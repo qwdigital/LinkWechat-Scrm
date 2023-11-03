@@ -1069,7 +1069,7 @@ INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_
 INSERT INTO `we_substitute_customer_order_catalogue_property` (`id`, `catalogue_id`, `name`, `code`, `type`, `is_require`, `expound`, `value`, `sort`, `is_fixed`, `is_money`, `is_to_time`, `is_multiple_choice`, `is_more`, `create_time`, `update_time`, `create_by`, `update_by`, `update_by_id`, `create_by_id`, `del_flag`) VALUES (1687015747247079424, 1686684460279914496, '回款凭证', 'returnedReceipt', 7, 0, NULL, NULL, 19, 1, 0, 0, 0, 1, '2023-08-03 16:21:12', '2023-08-03 16:21:12', 'admin', 'admin', 1, 1, 0);
 UPDATE sys_menu set visible=1 where menu_name = '知识中心';
 INSERT INTO `we_leads_sea_base_settings` (`id`, `max_claim`, `stock_max_claim`, `create_time`, `create_by`, `create_by_id`, `update_time`, `update_by`, `update_by_id`, `del_flag`) VALUES (1, 1, 8, '2023-07-17 17:18:13', NULL, NULL, '2023-10-10 16:13:34', 'lw', 168, 0);
-  ```
+
 ---
 ### ● 日期：2023.10.26
   ```
@@ -1093,4 +1093,54 @@ CREATE TABLE `we_default_welcome_msg`  (
 `real_type` tinyint(2) NULL DEFAULT NULL COMMENT '素材真实类型',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1717156930562121731 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '默认欢迎语附件' ROW_FORMAT = Dynamic;
+```
+---
+### ● 日期：2023.10.03
+  ```
+ALTER TABLE `we_community_new_group` ADD COLUMN `code_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '活码名称' AFTER `id`;
 
+ALTER TABLE `we_community_new_group` ADD COLUMN `empl_list` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '多个员工id,使用逗号隔开' AFTER `code_name`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `tag_list` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标签id，多个使用逗号隔开' AFTER `empl_list`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `skip_verify` tinyint(4) NULL DEFAULT 1 COMMENT '客户添加时无需经过确认自动成为好友:1:是;0:否' AFTER `tag_list`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `community_new_group_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '新客h5具体页面\n' AFTER `skip_verify`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `empl_code_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '员工活码地址' AFTER `community_new_group_url`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `empl_code_state` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '员工活码渠道标识' AFTER `empl_code_url`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `empl_code_config_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '员工活码configId' AFTER `empl_code_state`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `welcome_msg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '加群引导语' AFTER `empl_code_config_id`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `chat_id_list` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '实际群id，多个使用逗号隔开' AFTER `welcome_msg`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `auto_create_room` tinyint(1) NULL DEFAULT 0 COMMENT '当群满了后，是否自动新建群。0-否；1-是。 默认为0' AFTER `chat_id_list`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `room_base_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '自动建群的群名前缀，当auto_create_room为1时有效。最长40个utf8字符' AFTER `auto_create_room`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `room_base_id` int(11) NULL DEFAULT NULL COMMENT '自动建群的群起始序号，当auto_create_room为1时有效' AFTER `room_base_name`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `group_code_config_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群活码企微信的configId\n' AFTER `room_base_id`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `group_code_state` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群活码渠道标识\n' AFTER `group_code_config_id`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `group_code_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群活码图片地址\n' AFTER `group_code_state`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `link_title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '链接标题' AFTER `group_code_url`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `link_desc` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '链接描述' AFTER `link_title`;
+
+ALTER TABLE `we_community_new_group` ADD COLUMN `link_cover_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '链接封面' AFTER `link_desc`;
+
+ALTER TABLE `we_community_new_group` DROP COLUMN `empl_code_name`;
+
+ALTER TABLE `we_community_new_group` DROP COLUMN `group_code_id`;
+
+ALTER TABLE `we_community_new_group` DROP COLUMN `empl_code_id`;
+UPDATE `sys_menu` SET `menu_name` = '新客拉群', `parent_id` = 2100, `order_num` = 10, `path` = 'newCustomer', `component` = 'Layout', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-12-30 21:29:50', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-11-01 10:29:22', `remark` = '' WHERE `menu_id` = 2101;
+UPDATE `sys_menu` SET `menu_name` = '{新增}', `parent_id` = 2101, `order_num` = 20, `path` = 'aev', `component` = 'communityOperating/newCustomer/aev', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-12-31 19:36:24', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-10-31 17:18:53', `remark` = '' WHERE `menu_id` = 2106;
+UPDATE `sys_menu` SET `menu_name` = '列表', `parent_id` = 2101, `order_num` = 5, `path` = 'list', `component` = 'communityOperating/newCustomer/list', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = NULL, `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-02-28 18:25:24', `update_by` = NULL, `update_by_id` = NULL, `update_time` = NULL, `remark` = '' WHERE `menu_id` = 2375;
+UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2101, `order_num` = 10, `path` = 'detail', `component` = 'communityOperating/newCustomer/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = NULL, `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-10-31 17:16:48', `update_by` = NULL, `update_by_id` = NULL, `update_time` = NULL, `remark` = '' WHERE `menu_id` = 2475;

@@ -121,6 +121,14 @@ public class WeGroup extends BaseEntity implements Serializable {
     @TableLogic
     private Integer delFlag;
 
+
+    /**
+     * 入群时间
+     */
+    @TableField(exist = false)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date joinTime;
+
     public void transformQwParams(WeGroupChatDetailVo.GroupChatDetail detail) {
         this.chatId = detail.getChatId();
         this.groupName = StringUtils.isNotEmpty(detail.getName())? detail.getName() : "@微信群";

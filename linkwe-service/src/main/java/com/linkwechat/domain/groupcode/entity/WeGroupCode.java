@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -20,6 +19,9 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("we_group_code")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeGroupCode extends BaseEntity {
     private static final long serialVersionUID = 1L;
 

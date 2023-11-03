@@ -402,5 +402,22 @@
         GROUP BY wg.chat_id
     </select>
 
+    <select id="findGroupByUserId" resultType="com.linkwechat.domain.WeGroup">
+        SELECT
+            wg.*,
+            wgm.join_time
+        FROM
+            we_group wg
+                LEFT JOIN we_group_member wgm on wg.chat_id=wgm.chat_id
+        where
+            wgm.quit_scene IS  NULL
+            <if test="chatUserId != null and chatUserId !=''">
+               and wgm.user_id = #{chatUserId}
+            </if>
+            <if test="state != null and state !=''">
+                AND wgm.state = #{state}
+            </if>
+    </select>
+
 
 </mapper>
