@@ -142,6 +142,15 @@ public interface IWeGroupService extends IService<WeGroup> {
     void changeGroup(String chatId, String updateDetail);
 
 
+    /**
+     * 根据群员id获取群id
+     * @param chatUserId
+     * @param state
+     * @return
+     */
+    List<WeGroup> findGroupByUserId(String chatUserId,String state);
+
+
 
 
 }

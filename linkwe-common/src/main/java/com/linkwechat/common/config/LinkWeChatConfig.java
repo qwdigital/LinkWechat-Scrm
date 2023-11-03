@@ -64,6 +64,10 @@ public class LinkWeChatConfig {
     private String seasRedirectUrl;
 
 
+    /**
+     * 新客拉群h5地址
+     */
+    private String communityNewGroupUrl;
 
     /**
      * 老客标签建群地址
