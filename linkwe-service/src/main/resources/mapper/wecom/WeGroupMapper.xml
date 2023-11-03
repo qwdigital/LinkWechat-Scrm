@@ -408,7 +408,7 @@
             wgm.join_time
         FROM
             we_group wg
-                LEFT JOIN we_group_member wgm
+                LEFT JOIN we_group_member wgm on wg.chat_id=wgm.chat_id
         where
             wgm.quit_scene NOT IN (0,1)
             <if test="chatUserId != null and chatUserId !=''">
