@@ -9,4 +9,10 @@ public class WeComeStateContants {
      * 群活码渠道标识前缀
      */
     public final static String QHM_STATE="qhm_";
+
+
+    /**
+     * 新客拉群渠道标识前缀
+     */
+    public final static String XKLQ_STATE="xklq_";
 }
