@@ -4,6 +4,11 @@ import lombok.Data;
 
 @Data
 public class WePresTagGroupTaskQuery {
+
+    /**
+     * 主键
+     */
+    private String id;
     /**
      * 客户名称
      */
@@ -44,4 +49,16 @@ public class WePresTagGroupTaskQuery {
      * 群id
      */
     private String chatId;
+
+
+    /**
+     * 客户id
+     */
+    private String externalUserid;
+
+
+    /**
+     * 渠道标识
+     */
+    private String state;
 }

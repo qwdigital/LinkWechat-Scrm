@@ -5,13 +5,19 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
+import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.community.WeCommunityNewGroup;
+import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
 import com.linkwechat.domain.taggroup.WePresTagGroupTask;
 import com.linkwechat.domain.taggroup.query.WePresTagGroupTaskQuery;
 import com.linkwechat.domain.taggroup.vo.*;
+import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWePresTagGroupTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +29,9 @@ public class WeCommunityPresTagGroupController extends BaseController {
 
     @Autowired
     private IWePresTagGroupTaskService taskService;
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
 
     /**
@@ -143,6 +152,26 @@ public class WeCommunityPresTagGroupController extends BaseController {
         return AjaxResult.success();
 
     }
+
+    /**
+     * 获取当前客户对应的群
+     * @param wePresTagGroupTaskQuery
+     * @return
+     */
+    @GetMapping("/findWeCommunityNewGroupChatTable")
+    public TableDataInfo<WeGroup> findWeCommunityNewGroupChatTable(WePresTagGroupTaskQuery wePresTagGroupTaskQuery){
+        List<WeGroup> weGroups =new ArrayList<>();
+        WePresTagGroupTask wePresTagGroupTask = taskService.getById(wePresTagGroupTaskQuery.getId());
+        if(null != wePresTagGroupTask){
+            startPage();
+            weGroups=iWeGroupService
+                    .findGroupByUserId(wePresTagGroupTaskQuery.getExternalUserid()
+                            , wePresTagGroupTask.getGroupCodeState());
+        }
+
+        return getDataTable(weGroups);
+    }
+
 
 
 

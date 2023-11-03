@@ -3,6 +3,7 @@ package com.linkwechat.domain.taggroup.vo;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.converter.SexConverter;
 import com.linkwechat.common.converter.WhetherConverter;
@@ -61,22 +62,28 @@ public class WePresTagGroupTaskTableVo {
     private Integer gender;
 
 
-    /**
-     * 群id
-     */
-    private String chatId;
+//    /**
+//     * 群id
+//     */
+//    private String chatId;
+//
+//    /**
+//     * 入群时间
+//     */
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+//    private Date joinTime;
+//
+//
+//    /**
+//     * 群名称
+//     */
+//    private String groupName;
 
     /**
-     * 入群时间
+     * 进群数
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date joinTime;
-
-
-    /**
-     * 群名称
-     */
-    private String groupName;
+    @ExcelProperty(value = "进群数")
+    private int joinGroupNumber;
 
 
     /**

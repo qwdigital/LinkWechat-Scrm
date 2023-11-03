@@ -321,6 +321,10 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
     @Override
     public List<WePresTagGroupTaskTableVo> findWePresTagGroupTaskTable(WePresTagGroupTaskQuery wePresTagGroupTaskQuery) {
+        WePresTagGroupTask wePresTagGroupTask = this.getById(wePresTagGroupTaskQuery.getId());
+        if(null != wePresTagGroupTask){
+            wePresTagGroupTaskQuery.setState(wePresTagGroupTask.getGroupCodeState());
+        }
         return this.baseMapper.findWePresTagGroupTaskTable(wePresTagGroupTaskQuery);
     }
 
