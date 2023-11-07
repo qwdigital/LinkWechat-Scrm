@@ -43,7 +43,7 @@
                     we_pres_tag_group_stat ws
                 WHERE
                         DATE_FORMAT( ws.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
-                ws.sent=1 and  ws.task_id=#{task.id}
+               and ws.sent=1 and  ws.task_id=#{task.id}
             ) AS touchWeCustomerNumber,
             (
                 SELECT
