@@ -585,11 +585,15 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                     .equals(weFission.getFassionType())){
                                 messageQuery.setChatType(2);
                                 WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
-                                List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
-                                        .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
-                                                ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
+                                List<WeGroup> weGroups = new ArrayList<>();
+                                if(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds())){
+                                    weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                                            .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
+                                                    ListUtil.toList(executeUserOrGroup.getWeUserIds().split(","))));
+                                }else{
+                                    weGroups=iWeGroupService.list();
+                                }
                                 if(CollectionUtil.isNotEmpty(weGroups)){
-
                                     senderInfos.add(
                                             WeAddGroupMessageQuery
                                                     .SenderInfo
