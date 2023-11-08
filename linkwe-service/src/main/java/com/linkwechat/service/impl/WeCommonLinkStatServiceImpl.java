@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.mapper.WeCommonLinkStatMapper;
 import com.linkwechat.domain.WeCommonLinkStat;
 import com.linkwechat.service.IWeCommonLinkStatService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -21,7 +20,9 @@ public class WeCommonLinkStatServiceImpl extends ServiceImpl<WeCommonLinkStatMap
 
 
     @Override
-    public List<WeCommonLinkStat> getStatByShortId(Long shortId) {
-        return list(new LambdaQueryWrapper<WeCommonLinkStat>().eq(WeCommonLinkStat::getShortId,shortId));
+    public List<WeCommonLinkStat> getStatByShortId(Long shortId, String type) {
+        return list(new LambdaQueryWrapper<WeCommonLinkStat>()
+                .eq(WeCommonLinkStat::getShortId,shortId)
+                .eq(WeCommonLinkStat::getType,type));
     }
 }

@@ -13,5 +13,5 @@ import java.util.List;
  */
 public interface IWeCommonLinkStatService extends IService<WeCommonLinkStat> {
 
-    List<WeCommonLinkStat> getStatByShortId(Long shortId);
+    List<WeCommonLinkStat> getStatByShortId(Long shortId, String type);
 }

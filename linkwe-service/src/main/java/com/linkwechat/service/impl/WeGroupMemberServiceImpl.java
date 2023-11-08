@@ -2,11 +2,13 @@ package com.linkwechat.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import com.linkwechat.mapper.WeGroupMemberMapper;
 import com.linkwechat.service.IWeGroupMemberService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,5 +49,10 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
     @Override
     public void physicalDelete(String chatId, String userId) {
         this.baseMapper.physicalDelete(chatId,userId);
+    }
+
+    @Override
+    public List<WeGroupChannelCountVo> getMemberNumByState(String state, Date startTime, Date endTime) {
+        return this.baseMapper.getMemberNumByState(state,startTime,endTime);
     }
 }

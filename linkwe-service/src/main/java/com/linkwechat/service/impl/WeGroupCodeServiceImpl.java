@@ -3,21 +3,35 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.base.Joiner;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeComeStateContants;
 import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.UUID;
+import com.linkwechat.domain.WeCommonLinkStat;
 import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupcode.query.WeMakeGroupCodeTagQuery;
 import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
+import com.linkwechat.domain.qr.WeQrCode;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatAddJoinWayQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatJoinWayQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
@@ -26,9 +40,7 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeGroupCodeMapper;
-import com.linkwechat.service.IWeGroupCodeService;
-import com.linkwechat.service.IWeGroupCodeTagRelService;
-import com.linkwechat.service.IWeTagService;
+import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +62,17 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
     @Autowired
     private IWeGroupCodeTagRelService iWeGroupCodeTagRelService;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private IWeGroupMemberService weGroupMemberService;
+
+    @Autowired
+    private IWeCommonLinkStatService weCommonLinkStatService;
 
 
     @Override
@@ -75,7 +98,11 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
     //设置群码统计相关数据
     private void setCountData(List<WeGroupCode> weGroupCodes){
         if(CollectionUtil.isNotEmpty(weGroupCodes)){
-            weGroupCodes.stream().forEach(k->{
+            weGroupCodes.forEach(k->{
+
+                String encode = Base62NumUtil.encode(k.getId());
+                k.setQrShortLink(linkWeChatConfig.getQrGroupShortLinkDomainName() + encode);
+
                 List<WeGroupChatInfoVo> weGroupChatInfoVo = this.baseMapper.findWeGroupChatInfoVo(k.getChatIdList(), k.getState());
                 if(CollectionUtil.isNotEmpty(weGroupChatInfoVo)){
 
@@ -278,6 +305,197 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
         return addJoinWayVo;
     }
 
+    @Override
+    public JSONObject getShort2LongUrl(String shortUrl) {
+        long id = Base62NumUtil.decode(shortUrl);
+        JSONObject resObj = new JSONObject();
+        WeGroupCode groupCode = getById(id);
+        if (Objects.isNull(groupCode)) {
+            resObj.put("errorMsg", "无效链接");
+            return resObj;
+        }
+        resObj.put("type",0);
+
+        if (StringUtils.isNotEmpty(groupCode.getCodeUrl())) {
+            resObj.put("qrCode", groupCode.getCodeUrl());
+        }
+        return resObj;
+    }
+
+    @Override
+    public WeGroupCode getDetail(String id) {
+        WeGroupCode groupCode = getById(id);
+        String encode = Base62NumUtil.encode(groupCode.getId());
+        groupCode.setQrShortLink(linkWeChatConfig.getQrGroupShortLinkDomainName() + encode);
+        return groupCode;
+    }
+
+    @Override
+    public WeQrCodeScanCountVo getWeQrCodeScanTotalCount(WeGroupCode weGroupCode) {
+
+        WeQrCodeScanCountVo weQrCodeScanCountVo = new WeQrCodeScanCountVo();
+        WeGroupCode weQrCode = getById(weGroupCode.getId());
+        if(Objects.isNull(weQrCode)){
+            throw new WeComException("无效群活码ID");
+        }
+        List<WeGroupChannelCountVo> memberNumByState = weGroupMemberService.getMemberNumByState(weQrCode.getState(),null,null);
+
+        if(CollectionUtil.isNotEmpty(memberNumByState)){
+            //累计扫码次数
+            int totalNum = memberNumByState.stream().mapToInt(WeGroupChannelCountVo::getMemberNumber).sum();
+            weQrCodeScanCountVo.setTotal(totalNum);
+            //今日扫码次数
+            int todayNum = memberNumByState.stream().filter(item -> ObjectUtil.equal(item.getDate(), DateUtil.today())).mapToInt(WeGroupChannelCountVo::getMemberNumber).sum();
+            weQrCodeScanCountVo.setToday(todayNum);
+        }
+
+        String shortUrl = Base62NumUtil.encode(weGroupCode.getId());
+        //今日PV
+        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "gqr:" + shortUrl);
+        weQrCodeScanCountVo.setTodayLinkVisitsTotal(todayPvNum);
+        //今日UV
+        Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "gqr:" + shortUrl);
+        weQrCodeScanCountVo.setTodayLinkVisitsPeopleTotal(todayUvNum.intValue());
+
+        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId(),"gqr");
+        if(CollectionUtil.isNotEmpty(statList)){
+            int pvNum = statList.stream().mapToInt(WeCommonLinkStat::getPvNum).sum();
+            weQrCodeScanCountVo.setLinkVisitsTotal(pvNum + todayPvNum);
+
+            int uvNum = statList.stream().mapToInt(WeCommonLinkStat::getUvNum).sum();
+            weQrCodeScanCountVo.setLinkVisitsPeopleTotal(uvNum + todayUvNum.intValue());
+        }
+
+        return weQrCodeScanCountVo;
+    }
+
+    @Override
+    public List<WeQrCodeScanLineCountVo> getWeQrCodeScanLineCount(WeGroupCode weGroupCode) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCountList = new LinkedList<>();
+        WeGroupCode weQrCode = getById(weGroupCode.getId());
+        if(Objects.isNull(weQrCode)){
+            throw new WeComException("无效群活码ID");
+        }
+        DateTime startTime = StringUtils.isNotBlank(weGroupCode.getBeginTime())?DateUtil.parseDateTime(weGroupCode.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
+        DateTime endTime = StringUtils.isNotBlank(weGroupCode.getEndTime())?DateUtil.parseDateTime(weGroupCode.getEndTime()):DateUtil.date();
+        List<WeGroupChannelCountVo> memberNumByState = weGroupMemberService.getMemberNumByState(weQrCode.getState(),startTime,endTime);
+        List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
+
+        Map<String, List<WeGroupChannelCountVo>> memberListMap = new HashMap<>();
+
+        if(CollectionUtil.isNotEmpty(memberNumByState)){
+            memberListMap = memberNumByState.stream().collect(Collectors.groupingBy(WeGroupChannelCountVo::getDate));
+        }
+
+
+        Map<String, List<WeCommonLinkStat>> statListMap = new HashMap<>();
+
+        String shortUrl = Base62NumUtil.encode(weGroupCode.getId());
+        //今日PV
+        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl);
+        //今日UV
+        Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "gqr:" + shortUrl);
+
+        WeCommonLinkStat weCommonLinkStat = new WeCommonLinkStat();
+        weCommonLinkStat.setDateTime(DateUtil.date());
+        weCommonLinkStat.setPvNum(todayPvNum);
+        weCommonLinkStat.setUvNum(todayUvNum.intValue());
+        statListMap.put(DateUtil.today(), Collections.singletonList(weCommonLinkStat));
+
+        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId(), "gqr");
+        if(CollectionUtil.isNotEmpty(statList)){
+            statListMap = statList.stream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getDateTime())));
+        }
+
+        for (DateTime dateTime : dateTimes) {
+            WeQrCodeScanLineCountVo weQrCodeScanLineCountVo = new WeQrCodeScanLineCountVo();
+            weQrCodeScanLineCountVo.setDateTime(dateTime.toDateStr());
+
+            if(memberListMap.containsKey(dateTime.toDateStr())){
+                //扫码次数
+                int todayNum = memberListMap.get(dateTime.toDateStr()).stream().mapToInt(WeGroupChannelCountVo::getMemberNumber).sum();
+                weQrCodeScanLineCountVo.setToday(todayNum);
+            }
+
+            if(statListMap.containsKey(dateTime.toDateStr())){
+                int pvNum = statListMap.get(dateTime.toDateStr()).stream().mapToInt(WeCommonLinkStat::getPvNum).sum();
+                weQrCodeScanLineCountVo.setTodayLinkVisitsTotal(pvNum);
+
+                int uvNum = statListMap.get(dateTime.toDateStr()).stream().mapToInt(WeCommonLinkStat::getUvNum).sum();
+                weQrCodeScanLineCountVo.setTodayLinkVisitsPeopleTotal(uvNum + todayUvNum.intValue());
+            }
+            weQrCodeScanCountList.add(weQrCodeScanLineCountVo);
+        }
+        return weQrCodeScanCountList;
+    }
+
+    @Override
+    public List<WeQrCodeScanLineCountVo> getWeQrCodeScanSheetCount(WeGroupCode weGroupCode) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCountList = new LinkedList<>();
+        WeGroupCode weQrCode = getById(weGroupCode.getId());
+        if(Objects.isNull(weQrCode)){
+            throw new WeComException("无效群活码ID");
+        }
+        DateTime startTime = StringUtils.isNotBlank(weGroupCode.getBeginTime())?DateUtil.parseDateTime(weGroupCode.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
+        DateTime endTime = StringUtils.isNotBlank(weGroupCode.getEndTime())?DateUtil.parseDateTime(weGroupCode.getEndTime()):DateUtil.date();
+        List<WeGroupChannelCountVo> memberNumByState = weGroupMemberService.getMemberNumByState(weQrCode.getState(),null,endTime);
+        List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
+
+        Map<String, List<WeGroupChannelCountVo>> memberListMap = new HashMap<>();
+
+        if(CollectionUtil.isNotEmpty(memberNumByState)){
+            memberListMap = memberNumByState.stream().collect(Collectors.groupingBy(WeGroupChannelCountVo::getDate));
+        }
+
+
+        Map<String, List<WeCommonLinkStat>> statListMap = new HashMap<>();
+
+        String shortUrl = Base62NumUtil.encode(weGroupCode.getId());
+        //今日PV
+        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "gqr:" + shortUrl);
+        //今日UV
+        Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "gqr:" + shortUrl);
+
+        WeCommonLinkStat weCommonLinkStat = new WeCommonLinkStat();
+        weCommonLinkStat.setDateTime(DateUtil.date());
+        weCommonLinkStat.setPvNum(todayPvNum);
+        weCommonLinkStat.setUvNum(todayUvNum.intValue());
+        statListMap.put(DateUtil.today(), Collections.singletonList(weCommonLinkStat));
+
+        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId(), "qr");
+        if(CollectionUtil.isNotEmpty(statList)){
+            statListMap = statList.stream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getDateTime())));
+        }
+
+        for (DateTime dateTime : dateTimes) {
+            WeQrCodeScanLineCountVo weQrCodeScanLineCountVo = new WeQrCodeScanLineCountVo();
+            weQrCodeScanLineCountVo.setDateTime(dateTime.toDateStr());
+
+            int totalNum = memberNumByState.stream().filter(item -> DateUtil.compare(DateUtil.parseDate(item.getDate()), dateTime) <= 0).mapToInt(WeGroupChannelCountVo::getMemberNumber).sum();
+            weQrCodeScanLineCountVo.setTotal(totalNum);
+
+            int totalPvNum = statList.stream().filter(item -> DateUtil.compare(item.getDateTime(), dateTime) <= 0).mapToInt(WeCommonLinkStat::getPvNum).sum();
+            weQrCodeScanLineCountVo.setLinkVisitsTotal(totalPvNum);
+            int totalUvNum = statList.stream().filter(item -> DateUtil.compare(item.getDateTime(), dateTime) <= 0).mapToInt(WeCommonLinkStat::getUvNum).sum();
+            weQrCodeScanLineCountVo.setLinkVisitsPeopleTotal(totalUvNum);
+
+            if(memberListMap.containsKey(dateTime.toDateStr())){
+                //扫码次数
+                int todayNum = memberListMap.get(dateTime.toDateStr()).stream().mapToInt(WeGroupChannelCountVo::getMemberNumber).sum();
+                weQrCodeScanLineCountVo.setToday(todayNum);
+            }
+
+            if(statListMap.containsKey(dateTime.toDateStr())){
+                int pvNum = statListMap.get(dateTime.toDateStr()).stream().mapToInt(WeCommonLinkStat::getPvNum).sum();
+                weQrCodeScanLineCountVo.setTodayLinkVisitsTotal(pvNum);
+
+                int uvNum = statListMap.get(dateTime.toDateStr()).stream().mapToInt(WeCommonLinkStat::getUvNum).sum();
+                weQrCodeScanLineCountVo.setTodayLinkVisitsPeopleTotal(uvNum + todayUvNum.intValue());
+            }
+            weQrCodeScanCountList.add(weQrCodeScanLineCountVo);
+        }
+        return weQrCodeScanCountList;
+    }
 
 
 }

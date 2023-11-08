@@ -42,7 +42,10 @@ public class WeShortLinkCommonStatisticTask {
         log.info("短链通用统计--------------------------start");
         Collection<String> keys = redisService.keys(WeConstans.WE_SHORT_LINK_COMMON_KEY + "*");
         for (String key : keys) {
-            String shortUrl = key.substring(key.lastIndexOf(":") + 1);
+
+            String[] split = key.split(":");
+            String shortUrl = split[split.length -1];
+            String prefix = split[split.length -2];
             long shortLinkId = Base62NumUtil.decode(shortUrl);
             WeCommonLinkStat shortLinkStat = map.get(shortLinkId);
             if (Objects.isNull(shortLinkStat)) {
@@ -50,6 +53,7 @@ public class WeShortLinkCommonStatisticTask {
                 shortLinkStat.setDateTime(DateUtil.parseDate(DateUtil.today()));
             }
             shortLinkStat.setShortId(shortLinkId);
+            shortLinkStat.setType(prefix);
 
             if (key.contains(WeConstans.PV)) {
                 Integer pvNum = redisService.getCacheObject(key);

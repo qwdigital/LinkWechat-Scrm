@@ -232,6 +232,10 @@ public class LinkWeChatConfig {
      */
     private String qrShortLinkDomainName;
 
+    /**
+     * 群活码短链域名
+     */
+    private String qrGroupShortLinkDomainName;
 
     public String getName() {
         return name;

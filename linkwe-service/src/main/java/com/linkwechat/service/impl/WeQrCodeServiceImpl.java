@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base62;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -10,7 +9,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -29,17 +27,12 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.common.utils.ip.IpUtils;
 import com.linkwechat.common.utils.sql.SqlUtil;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCommonLinkStat;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.WeShortLink;
-import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
-import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
 import com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo;
-import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.WeQrCode;
 import com.linkwechat.domain.qr.query.WeQrAddQuery;
@@ -48,18 +41,14 @@ import com.linkwechat.domain.qr.query.WeQrUserInfoQuery;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
-import com.linkwechat.domain.wecom.query.weixin.WxJumpWxaQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
-import com.linkwechat.domain.wecom.vo.weixin.WxJumpWxaVo;
 import com.linkwechat.fegin.QwCustomerClient;
-import com.linkwechat.fegin.QxAppletClient;
 import com.linkwechat.mapper.WeQrCodeMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -68,7 +57,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * 活码信息表(WeQrCode)$desc
@@ -662,7 +650,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "qr:" + shortUrl);
         weQrCodeScanCountVo.setTodayLinkVisitsPeopleTotal(todayUvNum.intValue());
 
-        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId());
+        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId(),"qr");
         if(CollectionUtil.isNotEmpty(statList)){
             int pvNum = statList.stream().mapToInt(WeCommonLinkStat::getPvNum).sum();
             weQrCodeScanCountVo.setLinkVisitsTotal(pvNum + todayPvNum);
@@ -707,7 +695,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         weCommonLinkStat.setUvNum(todayUvNum.intValue());
         statListMap.put(DateUtil.today(), Collections.singletonList(weCommonLinkStat));
 
-        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId());
+        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId(), "qr");
         if(CollectionUtil.isNotEmpty(statList)){
             statListMap = statList.stream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getDateTime())));
         }
@@ -767,7 +755,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         weCommonLinkStat.setUvNum(todayUvNum.intValue());
         statListMap.put(DateUtil.today(), Collections.singletonList(weCommonLinkStat));
 
-        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId());
+        List<WeCommonLinkStat> statList = weCommonLinkStatService.getStatByShortId(weQrCode.getId(), "qr");
         if(CollectionUtil.isNotEmpty(statList)){
             statListMap = statList.stream().collect(Collectors.groupingBy(item -> DateUtil.formatDate(item.getDateTime())));
         }

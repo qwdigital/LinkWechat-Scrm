@@ -5,12 +5,15 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomerTrajectory;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
+import com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatVo;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatListQuery;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -121,8 +124,4 @@ public interface IWeGroupService extends IService<WeGroup> {
      * @param updateDetail 变更类型
      */
     void changeGroup(String chatId, String updateDetail);
-
-
-
-
 }
