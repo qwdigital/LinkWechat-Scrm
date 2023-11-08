@@ -768,9 +768,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
             }
 
-
             weGroupMap.putAll(
-                    weGroups.stream().collect(Collectors.groupingBy(LinkGroupChatListVo::getOwner))
+                    weGroups.stream().distinct().collect(Collectors.groupingBy(LinkGroupChatListVo::getOwner))
             );
         }
 
