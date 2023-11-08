@@ -202,7 +202,7 @@ public class WeCustomersVo {
     /**
      * 0:加入黑名单;1:不加入黑名单;
      */
-    @ExcelProperty(value = "是否加入黑名单", index = 2, converter = BlackListConverter.class)
+    @ExcelProperty(value = "是否加入黑名单", index = 18, converter = BlackListConverter.class)
     private Integer isJoinBlacklist;
 
 

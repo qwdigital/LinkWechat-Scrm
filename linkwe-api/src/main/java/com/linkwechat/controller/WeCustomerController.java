@@ -103,21 +103,6 @@ public class WeCustomerController extends BaseController {
                 ServletUtils.getResponse(), WeCustomersVo.class,weCustomersVos,"客户信息表_" + System.currentTimeMillis()
         );
 
-//
-//        try {
-//            String fileName = URLEncoder.encode("客户信息表_" + System.currentTimeMillis(), "UTF-8").replaceAll("\\+", "%20");
-//            HttpServletResponse response = ServletUtils.getResponse();
-//            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//            response.setCharacterEncoding("utf-8");
-//            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-//
-//            long currentTimeMillis = System.currentTimeMillis();
-//            EasyExcel.write(response.getOutputStream(), WeCustomersVo.class).sheet().doWrite(list);
-//            System.out.println("耗时:" + (System.currentTimeMillis() - currentTimeMillis));
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
 
