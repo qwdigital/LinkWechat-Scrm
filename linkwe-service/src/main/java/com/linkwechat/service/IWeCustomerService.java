@@ -6,6 +6,7 @@ import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeCustomerTrackRecord;
+import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
@@ -332,6 +333,14 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @param externalUserIds
      */
     List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(List<String> externalUserIds);
+
+
+    /**
+     * 通过客户id为当前客户打标签(如果是多个员工添加该客户都需打标签)
+     * @param exId
+     * @param weTags
+     */
+    void makeTagWeCustomer(String exId, List<WeTag> weTags);
 
 
 

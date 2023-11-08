@@ -306,24 +306,29 @@ public class WeKfServicerServiceImpl extends ServiceImpl<WeKfServicerMapper, WeK
                 }
             }
             vo.setUserList(userVos);
-            //客户群
-            List<String> chatIdList = groupChatRange.getChatIdList();
-            if (CollectionUtil.isNotEmpty(chatIdList)) {
-                LambdaQueryWrapper<WeGroup> queryWrapper = Wrappers.lambdaQuery(WeGroup.class);
-                queryWrapper.eq(WeGroup::getDelFlag, Constants.COMMON_STATE);
-                queryWrapper.in(WeGroup::getChatId, chatIdList);
-                List<WeGroup> list = weGroupService.list(queryWrapper);
-                if (CollectionUtil.isNotEmpty(list)) {
-                    List<WeGroupSimpleVo> weGroupSimpleVos = new ArrayList<>();
-                    for (WeGroup weGroup : list) {
-                        WeGroupSimpleVo weGroupSimpleVo = new WeGroupSimpleVo();
-                        weGroupSimpleVo.setChatId(weGroup.getChatId());
-                        weGroupSimpleVo.setName(weGroup.getGroupName());
-                        weGroupSimpleVos.add(weGroupSimpleVo);
+
+            if(null != groupChatRange){
+                //客户群
+                List<String> chatIdList = groupChatRange.getChatIdList();
+                if (CollectionUtil.isNotEmpty(chatIdList)) {
+                    LambdaQueryWrapper<WeGroup> queryWrapper = Wrappers.lambdaQuery(WeGroup.class);
+                    queryWrapper.eq(WeGroup::getDelFlag, Constants.COMMON_STATE);
+                    queryWrapper.in(WeGroup::getChatId, chatIdList);
+                    List<WeGroup> list = weGroupService.list(queryWrapper);
+                    if (CollectionUtil.isNotEmpty(list)) {
+                        List<WeGroupSimpleVo> weGroupSimpleVos = new ArrayList<>();
+                        for (WeGroup weGroup : list) {
+                            WeGroupSimpleVo weGroupSimpleVo = new WeGroupSimpleVo();
+                            weGroupSimpleVo.setChatId(weGroup.getChatId());
+                            weGroupSimpleVo.setName(weGroup.getGroupName());
+                            weGroupSimpleVos.add(weGroupSimpleVo);
+                        }
+                        vo.setGroupList(weGroupSimpleVos);
                     }
-                    vo.setGroupList(weGroupSimpleVos);
                 }
             }
+
+
         }
 
         //缓存key

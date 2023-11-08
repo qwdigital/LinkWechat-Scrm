@@ -1518,6 +1518,27 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
     }
 
+    @Override
+    public void makeTagWeCustomer(String exId, List<WeTag> weTags) {
+        List<WeCustomer> weCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
+                .eq(WeCustomer::getExternalUserid, exId));
+        if(CollectionUtil.isNotEmpty(weCustomers)){
+            weCustomers.stream().forEach(weCustomer -> {
+                WeMakeCustomerTag weMakeCustomerTag=new WeMakeCustomerTag();
+                weMakeCustomerTag.setExternalUserid(exId);
+                weMakeCustomerTag.setUserId(weCustomer.getAddUserId());
+                weMakeCustomerTag.setAddTag(weTags);
+                weMakeCustomerTag.setIsCompanyTag(true);
+                weMakeCustomerTag.setRecord(false);
+                weMakeCustomerTag.setSource(false);
+                this.makeLabel(weMakeCustomerTag);
+
+            });
+
+
+        }
+
+    }
 
 
 }

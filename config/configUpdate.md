@@ -57,3 +57,10 @@
         wecom:
           移除
           welcome-msg-default: 您好，欢迎关注LinkWechat,如果对您有帮助，麻烦在码云上帮我们点个star，谢谢！
+  ```
+### ● 日期：2023.11.03
+  ```
+    ● linkwe-common.yml
+        linkwechat:
+          #新增
+          communityNewGroupUrl: ${linkwechat.h5Domain}/#/groupCode?type=newCustomerGroup&id={0} #新客拉群H5链接
