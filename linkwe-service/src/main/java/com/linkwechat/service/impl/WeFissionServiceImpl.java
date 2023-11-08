@@ -41,6 +41,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -500,14 +501,14 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         //发送通知逻辑
                         if(weFission.getIsTip().equals(new Integer(2))){
 
-                        WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-                        messageQuery.setIsAll(false);
-                        messageQuery.setMsgSource(4);
-                        messageQuery.setIsTask(0);
-                        messageQuery.setLoginUser(SecurityUtils.getLoginUser());
+                            WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
+                            messageQuery.setIsAll(false);
+                            messageQuery.setMsgSource(4);
+                            messageQuery.setIsTask(0);
+                            messageQuery.setLoginUser(SecurityUtils.getLoginUser());
 
-                        messageQuery.setBusinessIds(weFission.getId().toString());
-                        messageQuery.setSendTime(null);
+                            messageQuery.setBusinessIds(weFission.getId().toString());
+                            messageQuery.setSendTime(null);
 
                             List<WeMessageTemplate> attachmentsList=new ArrayList<>();
 
@@ -545,14 +546,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             );
 
 
-//                        if(weFission.getFassionStartTime()//定时发送,活动时间
-//                                .after(new Date())){
-//                            messageQuery.setSendTime(weFission.getFassionStartTime());
-//                            messageQuery.setIsTask(1);
-//                        }else{ //立即发送
-//                            messageQuery.setIsTask(0);
-//                        }
-
                             //构建群发时间
                             List<WeAddGroupMessageQuery.SenderInfo> senderInfos = new ArrayList<>();
 
@@ -579,13 +572,19 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                                             });
                                 }
+
+                                messageQuery.setSenderList(senderInfos);
+
+                                weFission.setIsTip(1);
+                                //通知员工群发
+                                iWeMessagePushService.officialPushMessage(messageQuery);
+
                                 //群裂变
-                            }
-                            else if(TaskFissionType.GROUP_FISSION.getCode()
+                            } else if(TaskFissionType.GROUP_FISSION.getCode()
                                     .equals(weFission.getFassionType())){
                                 messageQuery.setChatType(2);
                                 WeGroupMessageExecuteUsertipVo executeUserOrGroup = weFission.getExecuteUserOrGroup();
-                                List<WeGroup> weGroups = new ArrayList<>();
+                                List<WeGroup> weGroups =new ArrayList<>();
                                 if(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds())){
                                     weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
                                             .in(executeUserOrGroup != null && StringUtils.isNotEmpty(executeUserOrGroup.getWeUserIds()), WeGroup::getOwner,
@@ -593,23 +592,38 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                 }else{
                                     weGroups=iWeGroupService.list();
                                 }
+
+
                                 if(CollectionUtil.isNotEmpty(weGroups)){
-                                    senderInfos.add(
-                                            WeAddGroupMessageQuery
-                                                    .SenderInfo
-                                                    .builder()
-                                                    .userId(executeUserOrGroup.getWeUserIds())
-                                                    .chatList(weGroups.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
-                                                    .build()
-                                    );
+                                    Map<String, List<WeGroup>> weGroupMap
+                                            = weGroups.stream().collect(Collectors.groupingBy(WeGroup::getOwner));
+
+                                    weGroupMap.forEach((k,v)->{
+                                        senderInfos.clear();
+                                        senderInfos.add(
+                                                WeAddGroupMessageQuery
+                                                        .SenderInfo
+                                                        .builder()
+                                                        .userId(k)
+                                                        .chatList(v.stream().map(WeGroup::getChatId).collect(Collectors.toList()))
+                                                        .build()
+                                        );
+
+                                        messageQuery.setSenderList(senderInfos);
+
+                                        weFission.setIsTip(1);
+                                        //通知员工群发
+                                        iWeMessagePushService.officialPushMessage(messageQuery);
+
+
+                                    });
+
                                 }
+
+
                             }
 
-                            messageQuery.setSenderList(senderInfos);
 
-                            weFission.setIsTip(1);
-                            //通知员工群发
-                            iWeMessagePushService.officialPushMessage(messageQuery);
                         }
 
 
@@ -621,6 +635,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                 });
 
 
+
+                this.updateBatchById(weFissions);
 
 
             }
@@ -646,7 +662,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
     }
-
 
     private void handleFissionRecord(String fissionInviterRecordId,WeFissionInviterRecordSub weFissionInviterRecordSub){
 
