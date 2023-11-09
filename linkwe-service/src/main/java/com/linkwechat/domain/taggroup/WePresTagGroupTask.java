@@ -19,7 +19,7 @@ import java.util.List;
 @ApiModel
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("we_pres_tag_group")
+@TableName(value="we_pres_tag_group",autoResultMap = true)
 public class WePresTagGroupTask extends BaseEntity {
 
 
