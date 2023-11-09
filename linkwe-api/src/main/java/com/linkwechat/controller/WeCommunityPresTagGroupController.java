@@ -1,24 +1,32 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.taggroup.WePresTagGroupTask;
 import com.linkwechat.domain.taggroup.query.WePresTagGroupTaskQuery;
 import com.linkwechat.domain.taggroup.vo.*;
 import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWePresTagGroupTaskService;
+import com.linkwechat.service.IWeTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 老客标签建群接口
@@ -32,6 +40,10 @@ public class WeCommunityPresTagGroupController extends BaseController {
 
     @Autowired
     private IWeGroupService iWeGroupService;
+
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
 
     /**
@@ -59,6 +71,18 @@ public class WeCommunityPresTagGroupController extends BaseController {
     @GetMapping(path = "/{id}")
     public AjaxResult<WePresTagGroupTask> findWePresTagGroupById(@PathVariable("id") Long id) {
         WePresTagGroupTask taskVo = taskService.getTaskById(id);
+        if(null != taskVo){
+            WeCustomersQuery weCustomersQuery = taskVo.getWeCustomersQuery();
+            if(null != weCustomersQuery && StringUtils.isNotEmpty(weCustomersQuery.getTagIds())){
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .in(WeTag::getTagId, weCustomersQuery.getTagIds().split(",")));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    weCustomersQuery.setTagNames(
+                            weTags.stream().map(WeTag::getName).collect(Collectors.joining(","))
+                    );
+                }
+            }
+        }
 
         return AjaxResult.success(taskVo);
     }

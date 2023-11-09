@@ -105,5 +105,10 @@ public class WeCustomersQuery implements Serializable {
      */
     private String userNames;
 
+    /**
+     * 标签名，多个逗号隔开
+     */
+    private String tagNames;
+
 
 }
