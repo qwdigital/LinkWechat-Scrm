@@ -245,51 +245,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             //跟进人批量更新获取同步
             this.synchWeCustomerByAddIds(weUserIds);
 
-            //单个客户获取同步逻辑
-//            weUserIds.stream().forEach(weUserId->{
-//
-//                AjaxResult<WeCustomerListVo> ajaxResult = qwCustomerClient.getCustomerList(WeCustomerListQuery.builder()
-//                        .userid(weUserId)
-//                        .build());
-//
-//                if(null != ajaxResult && ajaxResult.getData() != null
-//                        && CollectionUtil.isNotEmpty(ajaxResult.getData().getExternalUserId())){
-//
-//
-//                    List<List<String>> partition = ListUtil.partition(ajaxResult.getData().getExternalUserId(), 100);
-//
-//                    for(List<String> exids: partition){
-//
-//
-//                        exids.stream().forEach(extId->{
-//
-//                            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
-//                            List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
-//                            this.getBySingleUser(extId, null, weCustomerDetailVos);
-//
-//                            if (CollectionUtil.isNotEmpty(weCustomerDetailVos)) {
-//                                this.weFlowerCustomerHandle(weCustomerDetailVos, currentTenantSysUser);
-//                            }
-//
-//
-//                        });
-//
-//
-//
-//                    }
-//
-//
-//
-//
-//
-//
-//
-//                }
-//
-//
-//
-//            });
-
 
         }
 
