@@ -24,6 +24,7 @@ import com.linkwechat.common.constant.LeadsCenterConstants;
 import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.enums.SexEnums;
 import com.linkwechat.common.enums.leads.leads.LeadsStatusEnum;
 import com.linkwechat.common.enums.leads.record.FollowBackModeEnum;
 import com.linkwechat.common.enums.leads.record.ImportSourceTypeEnum;
@@ -705,7 +706,15 @@ public class WeLeadsServiceImpl extends ServiceImpl<WeLeadsMapper, WeLeads> impl
         for (Map<String, Object> row : rows) {
             List<Object> data = ListUtils.newArrayList();
             for (WeLeadsTemplateSettings head : settings) {
-                data.add(row.get(head.getTableEntryId()));
+                if(new String("sex").equals(head.getTableEntryId())){ //默认性别单独处理
+                    Object o = row.get(head.getTableEntryId());
+                    if(null != o){
+                        data.add(SexEnums.ofByCode((Integer) o).get().getInfo());
+                    }
+                }else{
+                    data.add(row.get(head.getTableEntryId()));
+                }
+
             }
             list.add(data);
         }
