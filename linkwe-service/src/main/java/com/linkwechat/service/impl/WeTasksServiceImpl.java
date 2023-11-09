@@ -8,8 +8,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-//import com.alibaba.fastjson.JSONObject;
-import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -148,7 +147,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
                 .weUserId(weUserId)
                 .type(WeTasksTitleEnum.LEADS_LONG_TIME_NOT_FOLLOW_UP.getCode())
                 .title(WeTasksTitleEnum.LEADS_LONG_TIME_NOT_FOLLOW_UP.getTitle())
-                .content(new JSONObject().put("客户", name).toString())
+                .content(new cn.hutool.json.JSONObject().put("客户", name).toString())
                 .sendTime(dateTime.toLocalDateTime())
                 .url(leadsDetailUrl)
                 .status(0)
@@ -215,7 +214,7 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
             messageTemplate.setMsgType(WeMsgTypeEnum.TASKCARD.getMessageType());
             messageTemplate.setTitle(WeTasksTitleEnum.LEADS_LONG_TIME_NOT_FOLLOW_UP.getTitle());
             //描述
-            com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(weTasks.getContent());
+           JSONObject jsonObject = JSONObject.parseObject(weTasks.getContent());
             String desc = StrUtil.format(MessageConstants.LEADS_LONG_TIME_NOT_FOLLOW_UP, DateUtil.date().toDateStr(), jsonObject.get("客户"));
             messageTemplate.setDescription(desc);
 
