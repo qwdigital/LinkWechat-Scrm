@@ -169,7 +169,8 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
         List<WePresTagGroupTask> groupTasks = this.list(new LambdaQueryWrapper<WePresTagGroupTask>()
                 .like(StringUtils.isNotEmpty(groupTask.getTaskName())
                         , WePresTagGroupTask::getTaskName,
-                        groupTask.getTaskName()));
+                        groupTask.getTaskName())
+                .orderByDesc(WePresTagGroupTask::getCreateTime));
         if(CollectionUtil.isNotEmpty(groupTasks)){
 
             groupTasks.forEach(this::getTaskCodeInfo);
