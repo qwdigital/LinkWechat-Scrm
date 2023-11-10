@@ -7,13 +7,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.WeComeStateContants;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.uuid.UUID;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
@@ -122,9 +125,8 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())){
 
             task.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
-
+            task.setGroupCodeState(WeComeStateContants.BQJQ_STATE + UUID.get16UUID());
             task.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
-
             if(this.save(task)){
                 //群发消息通知
                 WeAddGroupMessageQuery messageQuery=new WeAddGroupMessageQuery();
