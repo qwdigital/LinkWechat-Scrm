@@ -15,6 +15,12 @@
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>
+            <if test="weCustomerList.genders !=null and weCustomerList.genders !=''">
+                AND wcr.gender in
+                <foreach collection="weCustomerList.genders.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="weCustomerList.trackState !=null">
                 AND wcr.track_state=#{weCustomerList.trackState}
             </if>
@@ -26,6 +32,13 @@
             <if test="weCustomerList.customerType !=null">
                 AND wcr.customer_type=#{weCustomerList.customerType}
             </if>
+
+               <if test="weCustomerList.customerTypes !=null and weCustomerList.customerTypes !=''">
+                   AND wcr.customer_type in
+                   <foreach collection="weCustomerList.customerTypes.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                       #{item}
+                   </foreach>
+               </if>
 
             <if test="weCustomerList.externalUserid !=null">
                 AND wcr.external_userid=#{weCustomerList.externalUserid}
