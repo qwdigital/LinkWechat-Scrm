@@ -2,6 +2,7 @@ package com.linkwechat.domain.leads.leads.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
 import lombok.Data;
@@ -61,6 +62,7 @@ public class WeLeads extends BaseEntity {
     /**
      * 删除标识
      */
+    @TableLogic
     private Integer delFlag;
 
     /**
@@ -130,5 +132,6 @@ public class WeLeads extends BaseEntity {
      */
     @TableField(value = "bind_customer_time")
     private Date bindCustomerTime;
+
 
 }
