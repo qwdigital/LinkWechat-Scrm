@@ -51,11 +51,27 @@
                     #{item}
                 </foreach>
             </if>
+
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
-                    AND FIND_IN_SET(#{tagId},wcr.tag_ids)
-                </foreach>
+                <choose>
+                    <when test="weCustomerList.isContain == 2">
+                        OR FIND_IN_SET(#{tagId},wcr.tag_ids)
+                    </when>
+                    <when test="weCustomerList.isContain == 3">
+                        <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                            AND !FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        </foreach>
+                    </when>
+
+                    <otherwise>
+                        <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                            AND FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        </foreach>
+                    </otherwise>
+                </choose>
             </if>
+
+
             <if test="weCustomerList.noTagCheck">
                 AND ISNULL(wcr.tag_ids) or LENGTH(TRIM(wcr.tag_ids)) =0
             </if>
