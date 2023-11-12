@@ -99,6 +99,10 @@ public class WePresTagGroupTask extends BaseEntity {
     private String linkCoverUrl;
 
 
+    /**
+     * 实际链接
+     */
+    private String tagRedirectUrl;
 
     /**
      * 0 未删除 1 已删除

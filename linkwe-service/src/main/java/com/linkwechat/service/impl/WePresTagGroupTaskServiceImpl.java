@@ -1,12 +1,14 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.WeComeStateContants;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.MessageType;
@@ -15,6 +17,7 @@ import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.UUID;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
@@ -51,6 +54,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,9 +108,20 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Autowired
     IWeGroupService iWeGroupService;
 
+
+    @Autowired
+    LinkWeChatConfig linkWeChatConfig;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(WePresTagGroupTask task) {
+
+
+        String tagRedirectUrl = linkWeChatConfig.getTagRedirectUrl();
+
+        if(StringUtils.isEmpty(tagRedirectUrl)){
+            throw new WeComException("老客标签建群H5链接未配置");
+        }
 
 
         //配置进群方式
@@ -127,13 +142,21 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             task.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
             task.setGroupCodeState(WeComeStateContants.BQJQ_STATE + UUID.get16UUID());
             task.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
+            task.setId(SnowFlakeUtil.nextId());
+            task.setTagRedirectUrl(MessageFormat.format(tagRedirectUrl, task.getId().toString()));
             if(this.save(task)){
                 //群发消息通知
                 WeAddGroupMessageQuery messageQuery=new WeAddGroupMessageQuery();
                 messageQuery.setChatType(1);
                 messageQuery.setIsTask(0);
                 messageQuery.setCurrentUserInfo(SecurityUtils.getLoginUser());
-                messageQuery.setSenderList(task.getSenderList());
+                List<WeAddGroupMessageQuery.SenderInfo> senderInfos=new ArrayList<>();
+                WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                senderInfo.setUserId("haon");
+                senderInfo.setCustomerList(ListUtil.toList("wmbhUTLgAAXk6UIvbU9XaCZuPq17zOIA","wmbhUTLgAALohIZCHUega3fzMhsUvUSA"));
+                senderInfos.add(senderInfo);
+
+                messageQuery.setSenderList(senderInfos);
                 List<WeMessageTemplate> templates = new ArrayList<>();
                 WeMessageTemplate textAtt = new WeMessageTemplate();
                 textAtt.setMsgType(MessageType.TEXT.getMessageType());
@@ -148,6 +171,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 messageQuery.setAttachmentsList(templates);
                 messageQuery.setMsgSource(6);
                 if (ObjectUtil.equal(0, messageQuery.getIsTask()) && messageQuery.getSendTime() == null) {
+
                     //todo 立即发送
                     rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeGroupMsgRk(), JSONObject.toJSONString(messageQuery));
                 }
@@ -219,7 +243,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Override
     public WePresTagGroupTask getTaskById(Long taskId) {
         WePresTagGroupTask groupTask = this.getById(taskId);
-       this.getTaskCodeInfo(groupTask);
+        this.getTaskCodeInfo(groupTask);
         return groupTask;
     }
 
@@ -245,10 +269,10 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                         });
 
                     }
-                        //停止原有群发，构建新群发
-                        this.removeByIds(
-                                tagGroupTaskStats.stream().map(WePresTagGroupTaskStat::getId).collect(Collectors.toList())
-                        );
+                    //停止原有群发，构建新群发
+                    this.removeByIds(
+                            tagGroupTaskStats.stream().map(WePresTagGroupTaskStat::getId).collect(Collectors.toList())
+                    );
                 }
             });
         }
