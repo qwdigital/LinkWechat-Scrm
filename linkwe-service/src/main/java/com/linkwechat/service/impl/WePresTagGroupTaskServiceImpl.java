@@ -275,6 +275,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                     );
                 }
             });
+            this.removeByIds(ListUtil.toList(idList));
         }
     }
 
