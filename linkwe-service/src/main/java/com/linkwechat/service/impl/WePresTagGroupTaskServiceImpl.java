@@ -167,6 +167,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 linkTpl.setTitle(task.getLinkTitle());
                 linkTpl.setPicUrl(task.getLinkCoverUrl());
                 linkTpl.setDescription(task.getLinkDesc());
+                linkTpl.setLinkUrl(task.getTagRedirectUrl());
                 templates.add(linkTpl);
                 messageQuery.setAttachmentsList(templates);
                 messageQuery.setMsgSource(6);
