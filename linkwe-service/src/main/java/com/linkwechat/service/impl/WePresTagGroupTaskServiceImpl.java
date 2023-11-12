@@ -26,6 +26,7 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.vo.WeCommunityTaskEmplVo;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -112,6 +113,8 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
     @Autowired
     LinkWeChatConfig linkWeChatConfig;
 
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(WePresTagGroupTask task) {
@@ -150,13 +153,9 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 messageQuery.setChatType(1);
                 messageQuery.setIsTask(0);
                 messageQuery.setCurrentUserInfo(SecurityUtils.getLoginUser());
-                List<WeAddGroupMessageQuery.SenderInfo> senderInfos=new ArrayList<>();
-                WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
-                senderInfo.setUserId("haon");
-                senderInfo.setCustomerList(ListUtil.toList("wmbhUTLgAAXk6UIvbU9XaCZuPq17zOIA","wmbhUTLgAALohIZCHUega3fzMhsUvUSA"));
-                senderInfos.add(senderInfo);
 
-                messageQuery.setSenderList(senderInfos);
+                messageQuery.setSenderList(task.getIsAll()?iWeCustomerService.findLimitSenderInfoWeCustomerList():task.getSenderList());
+
                 List<WeMessageTemplate> templates = new ArrayList<>();
                 WeMessageTemplate textAtt = new WeMessageTemplate();
                 textAtt.setMsgType(MessageType.TEXT.getMessageType());
