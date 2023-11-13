@@ -26,6 +26,7 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.vo.WeCommunityTaskEmplVo;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
@@ -124,6 +125,12 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
         if(StringUtils.isEmpty(tagRedirectUrl)){
             throw new WeComException("老客标签建群H5链接未配置");
+        }
+
+        WeCustomersQuery weCustomersQuery = task.getWeCustomersQuery();
+
+        if(null != weCustomersQuery){
+            task.setIsAll(false);
         }
 
 
