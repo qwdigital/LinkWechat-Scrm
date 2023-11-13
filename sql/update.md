@@ -1205,3 +1205,4 @@ UPDATE `we_leads_template_settings` SET `table_entry_name` = '性别', `table_en
 ALTER TABLE `lw-cloud-bs`.`we_chat_contact_msg` MODIFY COLUMN `to_list` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接收人id（列表）' AFTER `from_id`;
 ALTER TABLE `lw-cloud-bs`.`we_product_order` MODIFY COLUMN `mch_name` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '收款商户名称' AFTER `we_user_name`;
 ALTER TABLE `lw-cloud-bs`.`we_tasks` MODIFY COLUMN `leads_id` bigint(20) NULL DEFAULT NULL AFTER `del_flag`;
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2476, '详情', 2102, 10, 'detail', 'communityOperating/oldCustomer/detail', 1, 'C', '1', '0', NULL, 'code', 'admin', NULL, '2023-11-13 14:12:12', NULL, NULL, NULL, '');
