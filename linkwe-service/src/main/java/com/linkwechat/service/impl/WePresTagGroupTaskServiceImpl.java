@@ -133,6 +133,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             task.setIsAll(false);
         }
 
+        task.setGroupCodeState(WeComeStateContants.BQJQ_STATE + UUID.get16UUID());
 
         //配置进群方式
         WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
@@ -150,7 +151,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())){
 
             task.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
-            task.setGroupCodeState(WeComeStateContants.BQJQ_STATE + UUID.get16UUID());
             task.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
             task.setId(SnowFlakeUtil.nextId());
             task.setTagRedirectUrl(MessageFormat.format(tagRedirectUrl, task.getId().toString()));
