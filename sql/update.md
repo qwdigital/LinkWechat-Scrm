@@ -1144,3 +1144,64 @@ UPDATE `sys_menu` SET `menu_name` = '新客拉群', `parent_id` = 2100, `order_n
 UPDATE `sys_menu` SET `menu_name` = '{新增}', `parent_id` = 2101, `order_num` = 20, `path` = 'aev', `component` = 'communityOperating/newCustomer/aev', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-12-31 19:36:24', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-10-31 17:18:53', `remark` = '' WHERE `menu_id` = 2106;
 UPDATE `sys_menu` SET `menu_name` = '列表', `parent_id` = 2101, `order_num` = 5, `path` = 'list', `component` = 'communityOperating/newCustomer/list', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = NULL, `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-02-28 18:25:24', `update_by` = NULL, `update_by_id` = NULL, `update_time` = NULL, `remark` = '' WHERE `menu_id` = 2375;
 UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2101, `order_num` = 10, `path` = 'detail', `component` = 'communityOperating/newCustomer/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = NULL, `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-10-31 17:16:48', `update_by` = NULL, `update_by_id` = NULL, `update_time` = NULL, `remark` = '' WHERE `menu_id` = 2475;
+
+
+```
+---
+### ● 日期：2023.11.13
+  ```
+drop TABLE we_pres_tag_group;
+drop TABLE we_pres_tag_group_scope;
+drop TABLE we_pres_tag_group_stat;
+drop TABLE we_pres_tag_group_tag;
+CREATE TABLE `we_pres_tag_group` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '老客户标签建群任务id',
+  `task_name` varchar(100) NOT NULL COMMENT '任务名称',
+  `send_type` tinyint(1) DEFAULT '0' COMMENT '发送方式 0: 企业群发 1：个人群发',
+  `group_code_id` bigint(11) DEFAULT NULL COMMENT '群活码id',
+  `send_scope` tinyint(1) NOT NULL DEFAULT '0' COMMENT '发送范围 0: 全部客户 1：部分客户',
+  `send_gender` int(11) NOT NULL DEFAULT '0' COMMENT '发送性别 0: 全部 1： 男 2： 女 3：未知',
+  `cus_begin_time` datetime DEFAULT NULL COMMENT '目标客户被添加起始时间',
+  `cus_end_time` datetime DEFAULT NULL COMMENT '目标客户被添加结束时间',
+  `welcome_msg` varchar(255) NOT NULL COMMENT '加群引导语',
+  `chat_id_list` varchar(255) DEFAULT NULL COMMENT '群id',
+  `message_template_id` bigint(20) DEFAULT NULL COMMENT '群发消息的id',
+  `auto_create_room` tinyint(1) DEFAULT '0' COMMENT '当群满了后，是否自动新建群。0-否；1-是。 默认为0',
+  `tag_redirect_url` varchar(255) DEFAULT NULL COMMENT '实际链接\n',
+  `room_base_name` varchar(255) DEFAULT NULL COMMENT '自动建群的群名前缀，当auto_create_room为1时有效。最长40个utf8字符',
+  `room_base_id` int(11) DEFAULT NULL COMMENT '自动建群的群起始序号，当auto_create_room为1时有效',
+  `group_code_config_id` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码企微信的configId\n',
+  `group_code_state` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码渠道标识\n',
+  `group_code_url` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码图片地址\n',
+  `link_title` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '链接标题',
+  `link_desc` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '链接描述',
+  `link_cover_url` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '链接封面',
+  `is_all` tinyint(4) DEFAULT NULL,
+  `we_customers_query` text COMMENT '客户查询条件\n',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `del_flag` tinyint(4) DEFAULT '0' COMMENT '逻辑删除字段， 0:未删除 1:已删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1723644156355678209 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='老客户标签建群';
+CREATE TABLE `we_pres_tag_group_stat` (
+  `id` bigint(20) NOT NULL COMMENT '主键',
+  `task_id` bigint(20) DEFAULT NULL COMMENT '老客标签建群任务id',
+  `external_userid` varchar(255) DEFAULT NULL COMMENT '客户id',
+  `user_id` varchar(32) DEFAULT NULL COMMENT '跟进者id',
+  `msg_id` varchar(255) DEFAULT NULL COMMENT '消息id ',
+  `sent` tinyint(4) DEFAULT '0' COMMENT '是否送达(0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败\n)',
+  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+  `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+  `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='老客标签建群客户统计表';
+UPDATE `we_leads_template_settings` SET `table_entry_name` = '性别', `table_entry_id` = 'sex', `table_entry_attr` = 1, `data_attr` = 0, `datetime_type` = 0, `max_input_len` = 100, `can_edit` = 1, `is_required` = 0, `create_time` = '2023-08-16 10:14:03', `rank` = 5, `update_time` = '2023-09-10 20:51:37', `create_by` = 'admin', `update_by` = 'lw', `update_by_id` = 168, `create_by_id` = 1, `del_flag` = 0 WHERE `id` = 1691634393458208768;
+ALTER TABLE `lw-cloud-bs`.`we_chat_contact_msg` MODIFY COLUMN `to_list` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接收人id（列表）' AFTER `from_id`;
+ALTER TABLE `lw-cloud-bs`.`we_product_order` MODIFY COLUMN `mch_name` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '收款商户名称' AFTER `we_user_name`;
+ALTER TABLE `lw-cloud-bs`.`we_tasks` MODIFY COLUMN `leads_id` bigint(20) NULL DEFAULT NULL AFTER `del_flag`;

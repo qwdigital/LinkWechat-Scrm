@@ -64,3 +64,11 @@
         linkwechat:
           #新增
           communityNewGroupUrl: ${linkwechat.h5Domain}/#/groupCode?type=newCustomerGroup&id={0} #新客拉群H5链接
+  ```
+### ● 日期：2023.11.13
+  ```
+   ● linkwe-common.yml
+        linkwechat:
+         #修改
+         tagRedirectUrl: ${linkwechat.h5Domain}/#/groupCode?type=oldCustomerGroup&id={0} #老客标签建群H5链接 
+ ```
