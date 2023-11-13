@@ -1,68 +1,56 @@
 package com.linkwechat.domain.taggroup;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * 老客户标签建群客户统计(用于个人群发类型的统计)
  */
-@ApiModel("老客标签建群发送统计对象")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName("we_pres_tag_group_stat")
 public class WePresTagGroupTaskStat extends BaseEntity {
 
-    private static final long serialVersionUID = 504772877084507165L;
+
+    @TableId
+    private Long id;
+
     /**
      * 老客户标签建群任务id
      */
-    @ApiModelProperty("老客户标签建群任务id")
     private Long taskId;
 
-    /**
-     * 客户名称
-     */
-    @ApiModelProperty("客户名称")
-    @TableField(exist = false)
-    private String customerName;
 
     /**
      * 跟进者id
      */
-    @ApiModelProperty("跟进者")
     private String userId;
 
     /**
      * 客户external_id
      */
-    @ApiModelProperty("老客户标签建群任务id")
-    @TableField(value = "external_userid")
-    private String externalUserId;
+    private String externalUserid;
 
     /**
-     * 是否已送达
+     * 0-未发送 1-已发送 2-因客户不是好友导致发送失败 3-因客户已经收到其他群发消息导致发送失败
      */
-    @ApiModelProperty("老客户标签建群任务id")
-    private Integer sent = 0;
+    private Integer sent;
+
 
     /**
-     * 是否已经在群
+     * 企业微信消息id
      */
-    @ApiModelProperty("老客户标签建群任务id")
-    @TableField(exist = false)
-    private Integer inGroup = 0;
+    private String msgId;
 
-    @ApiModelProperty(value = "有效标识", hidden = true)
-    @JsonIgnore
-    private Integer delFlag = 0;
+
 }

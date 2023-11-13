@@ -390,6 +390,10 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
             SpringUtils.getBean("fissionGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
 
 
+        }else if(query.getMsgSource().equals(new Integer(6))){
+            //老客标签建群
+            SpringUtils.getBean("wePresTagGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
+
         } else {
             //公共消息群发逻辑
             SpringUtils.getBean("commonGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
