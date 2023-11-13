@@ -26,6 +26,7 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.vo.WeCommunityTaskEmplVo;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
@@ -126,6 +127,13 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
             throw new WeComException("老客标签建群H5链接未配置");
         }
 
+        WeCustomersQuery weCustomersQuery = task.getWeCustomersQuery();
+
+        if(null != weCustomersQuery){
+            task.setIsAll(false);
+        }
+
+        task.setGroupCodeState(WeComeStateContants.BQJQ_STATE + UUID.get16UUID());
 
         //配置进群方式
         WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
@@ -143,7 +151,6 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())){
 
             task.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
-            task.setGroupCodeState(WeComeStateContants.BQJQ_STATE + UUID.get16UUID());
             task.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
             task.setId(SnowFlakeUtil.nextId());
             task.setTagRedirectUrl(MessageFormat.format(tagRedirectUrl, task.getId().toString()));
@@ -153,7 +160,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 messageQuery.setChatType(1);
                 messageQuery.setIsTask(0);
                 messageQuery.setCurrentUserInfo(SecurityUtils.getLoginUser());
-
+                messageQuery.setBusinessId(task.getId());
                 messageQuery.setSenderList(task.getIsAll()?iWeCustomerService.findLimitSenderInfoWeCustomerList():task.getSenderList());
 
                 List<WeMessageTemplate> templates = new ArrayList<>();
@@ -382,169 +389,4 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
     }
 
-
-//    /**
-//     * 更新任务同时推送消息
-//     *
-//     * @param task
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void updateTaskAndSendMsg(WePresTagGroupTask task) throws WeComException {
-//        try {
-//            this.updateTask(task);
-//            this.sendMessage(task);
-//        } catch (WeComException e) {
-//            throw e;
-//        }
-//
-//    }
-
-//    @Override
-//    public List<WePresTagGroupTaskStat> getTaskStat(Long id, String customerName, Integer isInGroup, Integer isSent,
-//                                                    Integer sendType) {
-//
-//        WePresTagGroupTaskStat query = new WePresTagGroupTaskStat();
-//        query.setTaskId(id);
-//        query.setCustomerName(customerName);
-//        query.setInGroup(isInGroup);
-//        query.setSent(isSent);
-//
-//        // 企业群发统计
-//        if (sendType.equals(0)) {
-//            return taskStatMapper.cropSendResultList(query);
-//        }
-//        // 个人群发统计
-//        else {
-//            return taskStatMapper.singleSendResultList(query);
-//        }
-//    }
-//
-//    @Override
-//    public List<WeCommunityTaskEmplVo> getScopeListByTaskId(Long taskId) {
-//        return taskScopeMapper.getScopeListByTaskId(taskId);
-//    }
-//
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public int updateFollowerTaskStatus(Long taskId, String followerId) {
-//        // 更新所有对应客户的已送达为1
-//        LambdaUpdateWrapper<WePresTagGroupTaskStat> statLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-//        statLambdaUpdateWrapper.eq(WePresTagGroupTaskStat::getTaskId, taskId)
-//                .in(WePresTagGroupTaskStat::getUserId, followerId).set(WePresTagGroupTaskStat::getSent, 1);
-//        return taskStatMapper.update(null, statLambdaUpdateWrapper);
-//    }
-//
-//    @Override
-//    public boolean isNameOccupied(WePresTagGroupTask task) {
-//        Long currentId = Optional.ofNullable(task.getTaskId()).orElse(-1L);
-//        LambdaQueryWrapper<WePresTagGroupTask> queryWrapper = new LambdaQueryWrapper<>();
-//        queryWrapper.eq(WePresTagGroupTask::getDelFlag, 0).eq(WePresTagGroupTask::getTaskName, task.getTaskName());
-//        List<WePresTagGroupTask> queryRes = baseMapper.selectList(queryWrapper);
-//        return !queryRes.isEmpty() && !currentId.equals(queryRes.get(0).getTaskId());
-//    }
-//
-//    @Override
-//    public void sendMessage(WePresTagGroupTask task) throws WeComException {
-//        Integer sendType = task.getSendType();
-//        try {
-//            // 企业群发逻辑
-//            if (sendType.equals(0)) {
-//
-//                List<WeAddGroupMessageQuery.SenderInfo> senderInfoList = baseMapper.selectSenderInfo(task.getTaskId());
-//                if (StringUtils.isEmpty(senderInfoList)) {
-//                    throw new WeComException("找不到符合筛选条件的发送对象");
-//                }
-//                String codeUrl = groupCodeMapper.selectById(task.getGroupCodeId()).getCodeUrl();
-////                WeMediaDto media = materialService.uploadTemporaryMaterial(codeUrl, MediaType.IMAGE.getMediaType(), "临时文件");
-//                List<WeMessageTemplate> attachmentList = Lists.newArrayList();
-//                WeMessageTemplate template = new WeMessageTemplate();
-//                template.setMsgType(MessageType.IMAGE.getMessageType());
-////                template.setMediaId(media.getMedia_id());
-//                template.setPicUrl(codeUrl);
-//                attachmentList.add(template);
-//
-//                List<WeAddGroupMessageQuery.SenderInfo> senderList = senderInfoList.stream().map(sender -> {
-//                    WeAddGroupMessageQuery.SenderInfo info = new WeAddGroupMessageQuery.SenderInfo();
-//                    info.setUserId(sender.getUserId());
-//                    info.setCustomerList(sender.getCustomerList());
-//                    return info;
-//                }).collect(Collectors.toList());
-//                WeAddGroupMessageQuery query = new WeAddGroupMessageQuery();
-//                query.setContent(task.getWelcomeMsg());
-//                query.setSenderList(senderList);
-//                query.setChatType(1);
-//                query.setIsTask(0);
-//                query.setAttachmentsList(attachmentList);
-//
-//                iWeGroupMessageTemplateService.addGroupMsgTemplate(query);
-//                task.setMessageTemplateId(query.getId());
-//                baseMapper.updateById(task);
-//            }
-//            // 个人群发逻辑
-//            else {
-//
-//
-//                List<WeCustomer> externalIds = new ArrayList<>();
-//                if (task.getSendScope().equals(0)) { //全部客户
-//                    externalIds = iWeCustomerService.list();
-//                } else { //部分客户
-//                    externalIds = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-//                            .in(WeCustomer::getExternalUserid, task.getExternalUserIds()));
-//                }
-//
-//                //查询当前员工下的
-//                List<String> followerIds = externalIds.stream().map(WeCustomer::getAddUserId).distinct().collect(Collectors.toList());
-//
-//                if (StringUtils.isEmpty(followerIds)) {
-//                    throw new WeComException("消息无法推送，找不到符合筛选条件的员工");
-//                }
-//
-//                // 删除旧统计对象
-//                LambdaUpdateWrapper<WePresTagGroupTaskStat> updateWrapper = new LambdaUpdateWrapper<>();
-//                updateWrapper.eq(WePresTagGroupTaskStat::getTaskId, task.getTaskId())
-//                        .set(WePresTagGroupTaskStat::getDelFlag, 1);
-//                taskStatMapper.update(null, updateWrapper);
-//
-//                // 保存新的统计对象
-//                List<WePresTagGroupTaskStat> statList = externalIds.stream().map(i -> {
-//                    WePresTagGroupTaskStat stat = new WePresTagGroupTaskStat();
-//                    stat.setTaskId(task.getTaskId());
-//                    stat.setSent(0);
-//                    stat.setUserId(i.getAddUserId());
-//                    stat.setExternalUserId(i.getExternalUserid());
-//                    stat.setCreateBy(task.getCreateBy());
-//                    return stat;
-//                }).collect(Collectors.toList());
-//                taskStatMapper.batchSave(statList);
-//                weMessagePushService.pushMessageSelfH5(followerIds, "【任务动态】<br/> 您有一项「标签建群」任务待完成，请尽快处理", MessageNoticeType.TAG.getType(), true);
-//
-//            }
-//        } catch (Exception e) {
-//            log.error("============> 老客标签建群任务发送失败, 任务明细: {}", task);
-//            log.error("错误信息: {}", e.getMessage());
-//            throw new WeComException(e.getMessage());
-//        }
-//    }
-//
-//    @Override
-//    public List<String> selectExternalIds(Long taskId) {
-//        List<WeCustomer> customers = baseMapper.selectTaskExternalIds(taskId);
-//        return customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public List<String> selectFollowerIdByTaskId(Long taskId) {
-//        return baseMapper.selectTaskFollowerIds(taskId);
-//    }
-//
-//    @Override
-//    public List<WePresTagGroupTaskVo> getFollowerTaskList(String emplId, Integer isDone) {
-//
-//        return baseMapper.getTaskListByFollowerId(emplId, isDone);
-//    }
-//
-//    private List<String> selectExternalIdsByFollowerId(Long taskId, String followerId) {
-//        return baseMapper.selectTaskExternalByFollowerId(taskId, followerId);
-//    }
 }

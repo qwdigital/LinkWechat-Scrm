@@ -70,20 +70,21 @@
         wc.add_user_id,
         wc.add_time,
         wc.gender,
-        (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState} and wgm.quit_scene not IN (0,1)) as joinGroupNumber,
-        IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState}  and wgm.quit_scene not IN (0,1))>0,1,0) as isJoinGroup
+        (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.state} and wgm.quit_scene not IN (0,1)) as joinGroupNumber,
+        IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.state}  and wgm.quit_scene not IN (0,1))>0,1,0) as isJoinGroup
         FROM
-        we_customer wc
+        we_pres_tag_group_stat wptgs
+        LEFT JOIN we_customer wc ON wc.external_userid = wptgs.external_userid AND wc.add_user_id = wptgs.user_id
         <where>
-            <if test="query.state != null and query.state !=''">
-                and wc.state = #{query.state}
+            <if test="query.id != null and query.id !=''">
+                and wptgs.task_id = #{query.id}
             </if>
             <if test="query.customerName != null and query.customerName !='' ">
                 and  wc.customer_name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
             </if>
 
             <if test="query.startAddTime != null and query.startAddTime !='' and query.endAddTime != null and query.endAddTime !='' ">
-                AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
+                AND  date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
             </if>
             <choose>
                 <when test="query.isJoinGroup != null">
