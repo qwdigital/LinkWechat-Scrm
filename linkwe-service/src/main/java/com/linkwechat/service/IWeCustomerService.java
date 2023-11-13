@@ -12,6 +12,7 @@ import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.*;
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -250,19 +251,6 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeCustomer> getCustomerListByCondition(WeCustomersQuery query);
 
 
-//    /**
-//     * 根据员工id获取当前员工下的客户id
-//     * @param weUserId
-//     * @return
-//     */
-//    List<String>  findWeCustomerListExternalUserIdsByAddUserId(String weUserId);
-//
-//
-//    /**
-//     * 根据系统内统一的角色权限获取客户id
-//     * @return
-//     */
-//    List<String> findWeCustomerListExternalUserIds();
 
 
     /**
@@ -336,6 +324,11 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
     /**
+     * 获取当前库中前一万条客户数，主要因为大数据客户场景下，企业微信群发只支持最多1万人
+     * @return
+     */
+    List<WeCustomersVo> findLimitWeCustomerList();
+    /**
      * 通过客户id为当前客户打标签(如果是多个员工添加该客户都需打标签)
      * @param exId
      * @param weTags
@@ -344,6 +337,12 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
 
+
+    /**
+     * 获取群发客户(针对全部)
+     * @return
+     */
+    List<WeAddGroupMessageQuery.SenderInfo> findLimitSenderInfoWeCustomerList();
 
 
 }

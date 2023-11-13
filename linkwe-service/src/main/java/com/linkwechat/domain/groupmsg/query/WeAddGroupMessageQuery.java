@@ -36,7 +36,7 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
     private LoginUser loginUser;
 
 
-    //消息来源 1:通常 2:sop 3:直播 ,4:裂变，5:短链推广
+    //消息来源 1:通常 2:sop 3:直播 ,4:裂变，5:短链推广 6:标签建群
     private Integer msgSource=1;
 
     public void setCurrentUserInfo(LoginUser loginUser) {
@@ -58,6 +58,8 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
 
         @ApiModelProperty("群组列表")
         private List<String> chatList;
+
+
     }
 
 }

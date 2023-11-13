@@ -15,4 +15,9 @@ public class WeComeStateContants {
      * 新客拉群渠道标识前缀
      */
     public final static String XKLQ_STATE="xklq_";
+
+    /**
+     * 标签建群
+     */
+    public final static String BQJQ_STATE="bqjq_";
 }

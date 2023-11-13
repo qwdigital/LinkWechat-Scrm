@@ -1,25 +1,36 @@
 package com.linkwechat.controller;
 
-import com.linkwechat.common.constant.HttpStatus;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
+import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.community.WeCommunityNewGroup;
+import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.taggroup.WePresTagGroupTask;
-import com.linkwechat.domain.taggroup.WePresTagGroupTaskStat;
-import com.linkwechat.domain.taggroup.vo.WePresTagGroupTaskVo;
-import com.linkwechat.domain.taggroup.vo.WePresTagTaskListVo;
+import com.linkwechat.domain.taggroup.query.WePresTagGroupTaskQuery;
+import com.linkwechat.domain.taggroup.vo.*;
+import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWePresTagGroupTaskService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.linkwechat.service.IWeTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Api(tags = "老客标签建群接口")
+/**
+ * 老客标签建群接口
+ */
 @RestController
 @RequestMapping(value = "/communityPresTagGroup")
 public class WeCommunityPresTagGroupController extends BaseController {
@@ -27,69 +38,62 @@ public class WeCommunityPresTagGroupController extends BaseController {
     @Autowired
     private IWePresTagGroupTaskService taskService;
 
+    @Autowired
+    private IWeGroupService iWeGroupService;
+
+
+    @Autowired
+    private IWeTagService iWeTagService;
+
 
     /**
      * 获取老客标签建群列表数据
      */
-    //  @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:list')")
     @GetMapping(path = "/list")
-    @ApiOperation(value = "获取老客标签建群任务分页数据", httpMethod = "GET")
-    public TableDataInfo<List<WePresTagTaskListVo>> getPage(
-            @RequestParam(value = "taskName", required = false) String taskName,
-            @RequestParam(value = "sendType", required = false) Integer sendType,
-            @RequestParam(value = "createBy", required = false) String createBy,
-            @RequestParam(value = "beginTime", required = false) String beginTime,
-            @RequestParam(value = "endTime", required = false) String endTime) {
+    public TableDataInfo<List<WePresTagGroupTask>> list(WePresTagGroupTask groupTask) {
         startPage();
-        List<WePresTagTaskListVo> result = taskService.selectTaskList(taskName, sendType, createBy, beginTime, endTime);
+        List<WePresTagGroupTask> result = taskService.selectTaskList(groupTask);
         return getDataTable(result);
     }
 
     /**
      * 新建老客标签建群任务
      */
-    //   @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:add')")
-    @PostMapping
-    @ApiOperation(value = "新建老客标签建群任务", httpMethod = "POST")
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody @Validated WePresTagGroupTask task) {
-        // 检测任务名是否可用
-        if (taskService.isNameOccupied(task)) {
-            return AjaxResult.error("任务名已存在");
-        }
          taskService.add(task);
         return AjaxResult.success();
     }
 
     /**
-     * 根据获取任务详细信息
+     * 获取根据id详情
      */
-    //  @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:query')")
     @GetMapping(path = "/{id}")
-    @ApiOperation(value = "根据获取任务详细信息", httpMethod = "GET")
-    public AjaxResult getInfo(@PathVariable("id") Long id) {
-        WePresTagGroupTaskVo taskVo = taskService.getTaskById(id);
-        if (StringUtils.isNull(taskVo)) {
-            return AjaxResult.error(HttpStatus.NOT_FOUND, "群活码不存在");
+    public AjaxResult<WePresTagGroupTask> findWePresTagGroupById(@PathVariable("id") Long id) {
+        WePresTagGroupTask taskVo = taskService.getTaskById(id);
+        if(null != taskVo){
+            WeCustomersQuery weCustomersQuery = taskVo.getWeCustomersQuery();
+            if(null != weCustomersQuery && StringUtils.isNotEmpty(weCustomersQuery.getTagIds())){
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .in(WeTag::getTagId, weCustomersQuery.getTagIds().split(",")));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    weCustomersQuery.setTagNames(
+                            weTags.stream().map(WeTag::getName).collect(Collectors.joining(","))
+                    );
+                }
+            }
         }
+
         return AjaxResult.success(taskVo);
     }
 
     /**
      * 更新任务信息
      */
-    //    @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:edit')")
-    @PutMapping(path = "/{id}")
-    @ApiOperation(value = "更新任务信息", httpMethod = "PUT")
-    public AjaxResult update(@PathVariable("id") Long id, @RequestBody @Validated WePresTagGroupTask task) {
+    @PutMapping(path = "/edit")
+    public AjaxResult edit(@RequestBody WePresTagGroupTask task) {
 
-        try {
-            // 保存新任务
-            task.setTaskId(id);
-            task.setUpdateTime(new Date());
-            taskService.updateTaskAndSendMsg(task);
-        } catch (Exception e) {
-            return AjaxResult.error(e.getMessage());
-        }
+        taskService.updateTask(task);
 
         return AjaxResult.success();
     }
@@ -97,27 +101,105 @@ public class WeCommunityPresTagGroupController extends BaseController {
     /**
      * 批量删除老客标签建群任务
      */
-    //   @PreAuthorize("@ss.hasPermi('wecom:communitytagGroup:remove')")
-    @DeleteMapping(path = "/{ids}")
-    @ApiOperation(value = "批量删除老客标签建群任务", httpMethod = "DELETE")
+    @DeleteMapping(path = "/batchRemove/{ids}")
     public AjaxResult batchRemove(@PathVariable("ids") Long[] ids) {
-        return AjaxResult.success(taskService.batchRemoveTaskByIds(ids));
+        taskService.batchRemoveTaskByIds(ids);
+        return AjaxResult.success();
+    }
+
+
+
+    /**
+     * 获取头部统计
+     * @param id
+     * @return
+     */
+    @GetMapping("/countTab/{id}")
+    public AjaxResult<WePresTagGroupTaskTabCountVo> countTab(@PathVariable String id){
+        return AjaxResult.success(
+                taskService.countTab(id)
+        );
+    }
+
+
+    /**
+     * 数据趋势
+     * @param task
+     * @return
+     */
+    @GetMapping("/findTrendCountVo")
+    public AjaxResult<List<WePresTagGroupTaskTrendCountVo>> findTrendCountVo(WePresTagGroupTask task){
+        return AjaxResult.success(
+                taskService.findTrendCountVo(task)
+        );
+    }
+
+
+    /**
+     * 数据明细
+     * @param wePresTagGroupTaskQuery
+     * @return
+     */
+    @GetMapping("/findWePresTagGroupTaskTable")
+    public TableDataInfo<List<WePresTagGroupTaskTableVo>> findWePresTagGroupTaskTable(WePresTagGroupTaskQuery wePresTagGroupTaskQuery){
+        startPage();
+
+        return getDataTable(
+                taskService.findWePresTagGroupTaskTable(wePresTagGroupTaskQuery)
+        );
+    }
+
+
+    /**
+     * 数据明细导出
+     */
+    @GetMapping("/exprotWePresTagGroupTaskTable")
+    public void exprotWePresTagGroupTaskTable(){
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WePresTagGroupTaskTableVo.class,
+                taskService.findWePresTagGroupTaskTable(new WePresTagGroupTaskQuery())
+                ,"老客建群-数据明细"
+        );
+    }
+
+
+
+    /**
+     * 同步发送结果
+     * @param id
+     * @return
+     */
+    @GetMapping("/synchExecuteResult/{id}")
+    public AjaxResult synchExecuteResult(@PathVariable String id){
+        taskService.synchExecuteResult(id);
+
+        return AjaxResult.success();
+
     }
 
     /**
-     * 根据老客标签建群id及过滤条件，获取其统计信息
+     * 获取当前客户对应的群
+     * @param wePresTagGroupTaskQuery
+     * @return
      */
-    @GetMapping(path = "/stat/{id}")
-    public TableDataInfo<List<WePresTagGroupTaskStat>> getStatInfo(
-            @PathVariable("id") Long id,
-            @RequestParam(value = "customerName", required = false) String customerName,
-            @RequestParam(value = "isInGroup", required = false) Integer isInGroup,
-            @RequestParam(value = "isSent", required = false) Integer isSent
-    ) {
-        WePresTagGroupTask task = taskService.getById(id);
-        startPage();
-        List<WePresTagGroupTaskStat> stats = taskService.getTaskStat(id, customerName, isInGroup, isSent,
-                task.getSendType());
-        return getDataTable(stats);
+    @GetMapping("/findWeCommunityNewGroupChatTable")
+    public TableDataInfo<WeGroup> findWeCommunityNewGroupChatTable(WePresTagGroupTaskQuery wePresTagGroupTaskQuery){
+        List<WeGroup> weGroups =new ArrayList<>();
+        WePresTagGroupTask wePresTagGroupTask = taskService.getById(wePresTagGroupTaskQuery.getId());
+        if(null != wePresTagGroupTask){
+            startPage();
+            weGroups=iWeGroupService
+                    .findGroupByUserId(wePresTagGroupTaskQuery.getExternalUserid()
+                            , wePresTagGroupTask.getGroupCodeState());
+        }
+
+        return getDataTable(weGroups);
     }
+
+
+
+
+
+
+
 }
