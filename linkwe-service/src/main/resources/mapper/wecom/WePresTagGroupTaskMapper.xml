@@ -76,8 +76,8 @@
         we_pres_tag_group_stat wptgs
         LEFT JOIN we_customer wc ON wc.external_userid = wptgs.external_userid AND wc.add_user_id = wptgs.user_id
         <where>
-            <if test="query.state != null and query.state !=''">
-                and wc.state = #{query.state}
+            <if test="query.id != null and query.id !=''">
+                and wptgs.task_id = #{query.id}
             </if>
             <if test="query.customerName != null and query.customerName !='' ">
                 and  wc.customer_name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
