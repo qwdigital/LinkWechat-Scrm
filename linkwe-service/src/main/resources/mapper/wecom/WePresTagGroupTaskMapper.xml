@@ -83,7 +83,7 @@
             </if>
 
             <if test="query.startAddTime != null and query.startAddTime !='' and query.endAddTime != null and query.endAddTime !='' ">
-                AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
+                AND  date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
             </if>
             <choose>
                 <when test="query.isJoinGroup != null">
