@@ -5,16 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class WeCustomersQuery {
+public class WeCustomersQuery implements Serializable {
 
     //0-未知 1-男性 2-女性
     private Integer gender;
+
+    //查询多个性别，用逗号隔开
+    private String genders;
 
     //跟踪状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
     private Integer trackState;
@@ -24,6 +28,9 @@ public class WeCustomersQuery {
 
     //客户类型 1:微信用户，2:企业用户
     private Integer customerType;
+
+    //查询多个客户类型用逗号隔开
+    private String customerTypes;
 
     //客户id
     private String externalUserid;
@@ -85,6 +92,23 @@ public class WeCustomersQuery {
      * 0:加入黑名单;1:不加入黑名单;
      */
     private Integer isJoinBlacklist;
+
+
+    /**
+     * 1:包含全部选中标签 2:包含其中一个标签 3:不包含选中标签
+     */
+    private Integer isContain;
+
+
+    /**
+     * 添加人名称
+     */
+    private String userNames;
+
+    /**
+     * 标签名，多个逗号隔开
+     */
+    private String tagNames;
 
 
 }

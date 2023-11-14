@@ -35,6 +35,7 @@ import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.*;
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowInfoEntity;
 import com.linkwechat.domain.wecom.entity.customer.WeCustomerFollowUserEntity;
@@ -244,6 +245,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         if(CollectionUtil.isNotEmpty(weUserIds)){
             //跟进人批量更新获取同步
             this.synchWeCustomerByAddIds(weUserIds);
+
 
 
         }
@@ -729,36 +731,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
             weCustomerDetail.setCompanyTags(companyTags);
             weCustomerDetail.setPersonTags(personTags);
-//            weCustomerDetail.setTagNames(
-//                    Joiner.on(",").join(
-//                            weCustomerList.stream().map(WeCustomersVo::getTagNames).collect(Collectors.toList()).stream().filter(
-//                                    Objects::nonNull
-//                            ).collect(Collectors.toList())
-//                    )
-//            );
-
-
-//            weCustomerDetail.setPersonTags(
-//                    Joiner.on(",").join(
-//                            weCustomerList.stream().map(WeCustomersVo::getPersonTagNames).collect(Collectors.toList()).stream().filter(
-//                                    Objects::nonNull
-//                            ).collect(Collectors.toList())
-//                    )
-//            );
-
-//
-
-
-//
-//            List<WeCustomerDetailInfoVo.TrackUser> trackUsers = new ArrayList<>();
-//
-//            List<WeCustomerDetailInfoVo.TrackStates> trackStates = new ArrayList<>();
-//
-//
-//            weCustomerDetail.setCompanyTags(companyTags);
-//            weCustomerDetail.setPersonTags(personTags);
-//            weCustomerDetail.setTrackUsers(trackUsers);
-//            weCustomerDetail.setTrackStates(trackStates);
         }
 
 
@@ -1473,6 +1445,36 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         return this.baseMapper.getCustomerSimpleInfo(externalUserIds);
     }
 
+    @Override
+    public List<WeCustomersVo> findLimitWeCustomerList() {
+        PageDomain pageDomain = new PageDomain();
+        pageDomain.setPageNum(1);
+        pageDomain.setPageSize(10000);
+        WeCustomersQuery weCustomersQuery = new WeCustomersQuery();
+        weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
+        weCustomersQuery.setIsJoinBlacklist(1);
+        return  this.findWeCustomerList(weCustomersQuery,pageDomain);
+    }
+
+    @Override
+    public List<WeAddGroupMessageQuery.SenderInfo> findLimitSenderInfoWeCustomerList() {
+        List<WeAddGroupMessageQuery.SenderInfo> senderInfos=new ArrayList<>();
+        List<WeCustomersVo> limitWeCustomerList = this.findLimitWeCustomerList();
+        if (CollectionUtil.isNotEmpty(limitWeCustomerList)) {
+            Map<String, List<WeCustomersVo>> customerMap = limitWeCustomerList.stream().collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId));
+            customerMap.forEach((userId, customers) -> {
+                List<String> eids = customers.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList());
+                WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+                senderInfo.setCustomerList(eids);
+                senderInfo.setUserId(userId);
+                senderInfos.add(senderInfo);
+            });
+        } else {
+            throw new WeComException("暂无客户可发送");
+        }
+
+        return senderInfos;
+    }
     @Override
     public void makeTagWeCustomer(String exId, List<WeTag> weTags) {
         List<WeCustomer> weCustomers = this.list(new LambdaQueryWrapper<WeCustomer>()
