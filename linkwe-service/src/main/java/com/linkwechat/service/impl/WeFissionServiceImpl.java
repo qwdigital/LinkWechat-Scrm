@@ -469,7 +469,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
-//                .eq(WeFission::getIsTip,2)
                 .isNotNull(WeFission::getAddWeUserOrGroupCode)
                 .notIn(WeFission::getFassionState, ListUtil.toList(3,4)));
 
@@ -482,11 +481,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                 weFissions.stream().forEach(weFission -> {
 
-//               if(new Date().after(weFission.getFassionStartTime())&&
-//                   new Date().before(weFission.getFassionEndTime())
-//                ) {
-//                    weFission.setFassionState(2);
-//                }
 
                     //如果当前时间在裂变结束时间之前,则裂变结束
                     if(weFission.getFassionEndTime().getTime()<new Date().getTime()){
@@ -636,7 +630,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
 
-                this.updateBatchById(weFissions);
+//                this.updateBatchById(weFissions);
+
 
 
             }
@@ -661,6 +656,11 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
 
+    }
+
+    @Override
+    public void updateBatchFissionIsTipNoSend(List<WeFission> weFissions) {
+        this.baseMapper.updateBatchFissionIsTipNoSend(weFissions);
     }
 
     private void handleFissionRecord(String fissionInviterRecordId,WeFissionInviterRecordSub weFissionInviterRecordSub){

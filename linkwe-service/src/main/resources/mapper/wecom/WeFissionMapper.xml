@@ -225,6 +225,17 @@
         </foreach>
     </update>
 
+    <update id="updateBatchFissionIsTipNoSend">
+        <foreach collection="weFissions" item="item" separator=";">
+            UPDATE we_fission
+            SET
+            is_tip = 2,
+            update_time = NOW()
+            WHERE id=
+            #{item.id}
+        </foreach>
+    </update>
+
 
 
 
