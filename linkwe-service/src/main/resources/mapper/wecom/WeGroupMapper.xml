@@ -189,7 +189,7 @@
         <if test="query.tagIds != null and query.tagIds !=''">
             AND wt.`id` in
             <foreach item="tagId" index="index" collection="query.tagIds.split(',')" open="(" separator="," close=")">
-                #{query.tagId}
+                #{tagId}
             </foreach>
         </if>
 
