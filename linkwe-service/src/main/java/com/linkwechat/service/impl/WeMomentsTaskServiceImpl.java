@@ -59,6 +59,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.sun.tools.corba.se.idl.constExpr.Expression.one;
+
 @Slf4j
 @Service
 public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, WeMomentsTask> implements IWeMomentsTaskService {
@@ -988,74 +990,79 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         //1.判断朋友圈是否已经同步
         LambdaQueryWrapper<WeMomentsTaskRelation> queryWrapper = Wrappers.lambdaQuery(WeMomentsTaskRelation.class);
         queryWrapper.eq(WeMomentsTaskRelation::getMomentId, moment_id);
-        WeMomentsTaskRelation one = weMomentsTaskRelationService.getOne(queryWrapper);
-        if (BeanUtil.isNotEmpty(one)) {
-            //同步过，更新统计的情况
-            //朋友圈Id存在
-            Long momentTaskId = one.getMomentTaskId();
+
+        List<WeMomentsTaskRelation> weMomentsTaskRelations = weMomentsTaskRelationService.list(queryWrapper);
+        if(CollectionUtil.isNotEmpty(weMomentsTaskRelations)){
+            WeMomentsTaskRelation one=weMomentsTaskRelations.stream().findFirst().get();
+            if (BeanUtil.isNotEmpty(one)) {
+                //同步过，更新统计的情况
+                //朋友圈Id存在
+                Long momentTaskId = one.getMomentTaskId();
 
 
-            //1.同步朋友圈发送情况
-            weMomentsUserService.syncUpdateMomentsUser(momentTaskId, moment_id);
-            //3.同步朋友圈附件
-            weMomentsAttachmentsService.syncAddMomentsAttachments(momentTaskId, moment);
-            //2.同步员工发送成功的数据
-            weMomentsCustomerService.syncMomentsCustomerSendSuccess(momentTaskId, moment_id);
-            //3.同步互动数据
-            weMomentsInteracteService.syncUpdateWeMomentsInteract(momentTaskId, moment_id);
-        } else {
-            //没有同步过
-            Integer create_type = moment.getCreate_type();
-            String creator = moment.getCreator();
-            if (StrUtil.isBlank(creator)) {
-                //通过API接口创建的企微群发朋友圈是没有creator
-                //通过企微软件创建的朋友圈，无论是企业还是个人都存在creator
-                //这里判断的目的是防止上个版本的数据，以及从系统创建的数据，因为该版本通过api创建的朋友圈，都会通过JobId来换取数据,不需要从这里同步
-                return;
-            }
-            SysUser sysUser = null;
-            AjaxResult<SysUser> info = qwSysUserClient.getInfo(creator);
-            if (info.getCode() == HttpStatus.SUCCESS) {
-                sysUser = info.getData();
-            }
-            if (BeanUtil.isEmpty(sysUser)) {
-                //创建者不存在，跳过
-                return;
-            }
-            //朋友圈创建来源 0：企业 1：个人
-            if (create_type.equals(0)) {
-                //企微群发
-
-                //创建者存在，说明朋友圈从企微创建，又因为系统中不存在该数据，则直接新增
-                syncAddMomentsRelation(moment, sysUser);
+                //1.同步朋友圈发送情况
+                weMomentsUserService.syncUpdateMomentsUser(momentTaskId, moment_id);
+                //3.同步朋友圈附件
+                weMomentsAttachmentsService.syncAddMomentsAttachments(momentTaskId, moment);
+                //2.同步员工发送成功的数据
+                weMomentsCustomerService.syncMomentsCustomerSendSuccess(momentTaskId, moment_id);
+                //3.同步互动数据
+                weMomentsInteracteService.syncUpdateWeMomentsInteract(momentTaskId, moment_id);
             } else {
-                //个人发表
-                LambdaQueryWrapper<WeMomentsTask> wrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
-                wrapper.in(WeMomentsTask::getSendType, ListUtil.toList(1, 2));
-                wrapper.eq(WeMomentsTask::getScopeType, moment.getVisible_type().equals(1) ? 0 : 1);
-                wrapper.eq(WeMomentsTask::getType, moment.getCreate_type());
-                wrapper.eq(WeMomentsTask::getStatus, 3);
-                wrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
-                //通过企微API发送的数据都没有创建者,通过企微软件创建的数据都存在创建者
-                wrapper.eq(StrUtil.isNotBlank(sysUser.getUserName()), WeMomentsTask::getCreateBy, sysUser.getUserName());
+                //没有同步过
+                Integer create_type = moment.getCreate_type();
+                String creator = moment.getCreator();
+                if (StrUtil.isBlank(creator)) {
+                    //通过API接口创建的企微群发朋友圈是没有creator
+                    //通过企微软件创建的朋友圈，无论是企业还是个人都存在creator
+                    //这里判断的目的是防止上个版本的数据，以及从系统创建的数据，因为该版本通过api创建的朋友圈，都会通过JobId来换取数据,不需要从这里同步
+                    return;
+                }
+                SysUser sysUser = null;
+                AjaxResult<SysUser> info = qwSysUserClient.getInfo(creator);
+                if (info.getCode() == HttpStatus.SUCCESS) {
+                    sysUser = info.getData();
+                }
+                if (BeanUtil.isEmpty(sysUser)) {
+                    //创建者不存在，跳过
+                    return;
+                }
+                //朋友圈创建来源 0：企业 1：个人
+                if (create_type.equals(0)) {
+                    //企微群发
 
-                //保持误差在一分钟以内
-                Long create_time = moment.getCreate_time();
-                DateTime date = DateUtil.date(create_time * 1000);
-                DateTime offset = DateUtil.offset(date, DateField.SECOND, -30);
-                DateTime offset1 = DateUtil.offset(date, DateField.SECOND, 30);
-                wrapper.between(WeMomentsTask::getCreateTime, offset, offset1);
-                wrapper.orderByDesc(WeMomentsTask::getCreateTime);
-                List<WeMomentsTask> weMomentsTasks = weMomentsTaskMapper.selectList(wrapper);
-                if (CollectionUtil.isNotEmpty(weMomentsTasks)) {
-                    //存在，不处理
-                } else {
-                    //不存在，新增
-                    //1.新增朋友圈
+                    //创建者存在，说明朋友圈从企微创建，又因为系统中不存在该数据，则直接新增
                     syncAddMomentsRelation(moment, sysUser);
+                } else {
+                    //个人发表
+                    LambdaQueryWrapper<WeMomentsTask> wrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
+                    wrapper.in(WeMomentsTask::getSendType, ListUtil.toList(1, 2));
+                    wrapper.eq(WeMomentsTask::getScopeType, moment.getVisible_type().equals(1) ? 0 : 1);
+                    wrapper.eq(WeMomentsTask::getType, moment.getCreate_type());
+                    wrapper.eq(WeMomentsTask::getStatus, 3);
+                    wrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
+                    //通过企微API发送的数据都没有创建者,通过企微软件创建的数据都存在创建者
+                    wrapper.eq(StrUtil.isNotBlank(sysUser.getUserName()), WeMomentsTask::getCreateBy, sysUser.getUserName());
+
+                    //保持误差在一分钟以内
+                    Long create_time = moment.getCreate_time();
+                    DateTime date = DateUtil.date(create_time * 1000);
+                    DateTime offset = DateUtil.offset(date, DateField.SECOND, -30);
+                    DateTime offset1 = DateUtil.offset(date, DateField.SECOND, 30);
+                    wrapper.between(WeMomentsTask::getCreateTime, offset, offset1);
+                    wrapper.orderByDesc(WeMomentsTask::getCreateTime);
+                    List<WeMomentsTask> weMomentsTasks = weMomentsTaskMapper.selectList(wrapper);
+                    if (CollectionUtil.isNotEmpty(weMomentsTasks)) {
+                        //存在，不处理
+                    } else {
+                        //不存在，新增
+                        //1.新增朋友圈
+                        syncAddMomentsRelation(moment, sysUser);
+                    }
                 }
             }
         }
+
     }
 
     /**
