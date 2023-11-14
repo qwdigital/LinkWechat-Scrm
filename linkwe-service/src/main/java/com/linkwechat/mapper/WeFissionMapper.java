@@ -84,6 +84,13 @@ public interface WeFissionMapper extends BaseMapper<WeFission> {
      */
     void updateBatchFissionIsTip(@Param("weFissions") List<WeFission> weFissions);
 
+    /**
+     * 更新发送状态为未发送
+     * @param weFissions
+     */
+    void updateBatchFissionIsTipNoSend(@Param("weFissions") List<WeFission> weFissions);
+
+
 }
 
 
