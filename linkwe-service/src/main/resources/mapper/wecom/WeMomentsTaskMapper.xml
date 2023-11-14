@@ -98,9 +98,9 @@
         END AS total
         FROM
         we_moments_task t1
-        WHERE t1.del_flag = 0
+        WHERE t1.del_flag = 0 AND t1.send_type !=1
         <if test="sendType!=null">
-            AND t1.send_type = #{sendType} AND t1.send_type !=1
+            AND t1.send_type = #{sendType}
         </if>
         <if test="status!=null">
             AND t1.status = #{status}
