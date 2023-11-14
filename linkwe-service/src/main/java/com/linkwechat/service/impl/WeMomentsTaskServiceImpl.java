@@ -760,7 +760,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         Long endTime = DateUtil.date().getTime() / 1000;
         MomentsListDetailParamDto query = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).filter_type(filterType).build();
         query.setCursor(null);
-        List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
         getMomentPage(query);
 
 

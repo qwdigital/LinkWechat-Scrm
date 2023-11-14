@@ -58,10 +58,11 @@ public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService
 
 
                  }else{ //发送失败，修改为未发送
-                     iWeFissionService.updateById(WeFission.builder()
-                             .id(Long.parseLong(query.getBusinessIds()))
-                             .isTip(2)
-                             .build());
+                     iWeFissionService.updateBatchFissionIsTipNoSend(
+                             ListUtil.toList(WeFission.builder()
+                                     .id(Long.parseLong(query.getBusinessIds()))
+                                     .build())
+                     );
                  }
 
             });
