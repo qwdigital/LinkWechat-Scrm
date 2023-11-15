@@ -71,4 +71,12 @@
         linkwechat:
          #修改
          tagRedirectUrl: ${linkwechat.h5Domain}/#/groupCode?type=oldCustomerGroup&id={0} #老客标签建群H5链接 
+ 
+   ● linkwe-gateway.yml
+        security:
+          ignore:
+            whites:
+                - /groupCode/findWeCommunityNewGroupById/**
+                - /groupCode/findWePresTagGroupById/**
+ 
  ```
