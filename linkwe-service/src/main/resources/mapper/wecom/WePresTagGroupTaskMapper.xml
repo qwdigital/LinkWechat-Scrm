@@ -75,7 +75,8 @@
         FROM
         we_pres_tag_group_stat wptgs
         LEFT JOIN we_customer wc ON wc.external_userid = wptgs.external_userid AND wc.add_user_id = wptgs.user_id
-        <where>
+        where
+            wptgs.sent=1
             <if test="query.id != null and query.id !=''">
                 and wptgs.task_id = #{query.id}
             </if>
@@ -93,7 +94,6 @@
                     </if>
                 </when>
             </choose>
-        </where>
     </select>
 
 <!--    <resultMap id="WePresTagGroupTaskResult" type="com.linkwechat.domain.taggroup.vo.WePresTagGroupTaskVo">-->

@@ -65,5 +65,10 @@ public class WeGroupChatInfoVo {
      */
     private String groupOwner;
 
+    /**
+     * 关联状态 0-未关联 1-关联
+     */
+    private Integer status;
+
 
 }
