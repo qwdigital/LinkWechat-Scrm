@@ -70,8 +70,8 @@
         wc.add_user_id,
         wc.add_time,
         wc.gender,
-        (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.state} and wgm.quit_scene not IN (0,1)) as joinGroupNumber,
-        IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.state}  and wgm.quit_scene not IN (0,1))>0,1,0) as isJoinGroup
+        (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.state} and wgm.quit_scene IS NULL) as joinGroupNumber,
+        IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.state}  and wgm.quit_scene IS NULL)>0,1,0) as isJoinGroup
         FROM
         we_pres_tag_group_stat wptgs
         LEFT JOIN we_customer wc ON wc.external_userid = wptgs.external_userid AND wc.add_user_id = wptgs.user_id
