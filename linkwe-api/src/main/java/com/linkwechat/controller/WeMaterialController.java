@@ -174,6 +174,7 @@ public class WeMaterialController extends BaseController {
         WeMaterial material = materialService.builderSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
         material.setModuleType(poster.getModuleType());
+        material.setTagIds(poster.getTagIds());
         boolean b = materialService.saveOrUpdate(material);
         WeMaterialVo weMaterialVo = new WeMaterialVo();
         BeanUtils.copyProperties(material, weMaterialVo);
