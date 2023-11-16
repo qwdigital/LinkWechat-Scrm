@@ -1,6 +1,9 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
@@ -17,6 +20,7 @@ import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
+import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.material.ao.PurePoster;
 import com.linkwechat.domain.material.ao.WePoster;
 import com.linkwechat.domain.material.ao.WePosterFontAO;
@@ -28,7 +32,9 @@ import com.linkwechat.domain.material.query.LinkMediaQuery;
 import com.linkwechat.domain.material.vo.*;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
 import com.linkwechat.service.IWeMaterialService;
+import com.linkwechat.service.IWeTagService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +54,9 @@ import java.util.stream.Collectors;
 public class WeMaterialController extends BaseController {
     @Resource
     private IWeMaterialService materialService;
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
     @GetMapping("/material/list")
     @ApiOperation("查询素材列表")
@@ -202,6 +211,7 @@ public class WeMaterialController extends BaseController {
         }
         poster.setMediaType(null);
         WeMaterial material = materialService.builderSimpleImg(poster);
+        material.setTagIds(poster.getTagIds());
         materialService.saveOrUpdate(material);
         return AjaxResult.success(material);
     }
@@ -214,6 +224,16 @@ public class WeMaterialController extends BaseController {
         WePosterVo vo = BeanUtil.copyProperties(material, WePosterVo.class);
         if (StringUtils.isNotBlank(material.getMaterialName())) {
             vo.setTitle(material.getMaterialName());
+        }
+        if(StringUtils.isNotEmpty(vo.getTagIds())){
+            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                    .in(WeTag::getTagId, ListUtil.toList(vo.getTagIds().split(","))));
+            if(CollectionUtil.isNotEmpty(weTags)){
+                vo.setTagNames(
+                        weTags.stream().map(WeTag::getName).collect(Collectors.joining(","))
+                );
+            }
+
         }
         vo.setSampleImgPath(material.getMaterialUrl());
         vo.setBackgroundImgPath(material.getBackgroundImgUrl());

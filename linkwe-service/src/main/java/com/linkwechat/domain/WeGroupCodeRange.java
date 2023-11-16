@@ -51,6 +51,11 @@ public class WeGroupCodeRange extends BaseEntity implements Serializable {
     private String chatId;
 
     /**
+     * 关联状态 0-未关联 1-关联
+     */
+    private Integer status;
+
+    /**
      * 删除标识 0 正常 1 删除
      */
     @ApiModelProperty(value = "删除标识 0 正常 1 删除")
