@@ -43,8 +43,9 @@ public class QwMomentsListener {
     public void momentsExecute(String msg, Channel channel, Message message) {
         try {
             log.info("朋友圈发送任务定时执行处理：msg:{}", msg);
-            momentsExecute(Long.valueOf(msg));
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            momentsExecute(Long.valueOf(msg));
+
         } catch (Exception e) {
             log.error("朋友圈发送任务定时执行失败 msg:{},error:{}", msg, e);
         }
