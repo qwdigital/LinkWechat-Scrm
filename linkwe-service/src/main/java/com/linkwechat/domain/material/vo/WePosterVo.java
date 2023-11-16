@@ -78,4 +78,15 @@ public class WePosterVo extends BaseEntity {
      * 海报组件数组
      */
     private JSONArray posterSubassemblyList;
+
+
+    /**
+     * 标签id，多个使用逗号隔开
+     */
+    private String tagIds;
+
+    /**
+     * 标签名
+     */
+    private String tagNames;
 }
