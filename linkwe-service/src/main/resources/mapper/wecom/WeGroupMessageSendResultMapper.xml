@@ -59,10 +59,10 @@
                 and wc.customer_name like concat('%', #{customerName}, '%')
             </if>
             <if test="userName != null and userName != ''">
-                wu.user_name like concat('%', #{userName}, '%')
+                and wu.user_name like concat('%', #{userName}, '%')
             </if>
             <if test="chatName != null and chatName != ''">
-                wg.group_name like concat('%', #{chatName}, '%')
+                and wg.group_name like concat('%', #{chatName}, '%')
             </if>
             <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(wgmsr.send_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
