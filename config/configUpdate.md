@@ -76,7 +76,7 @@
         security:
           ignore:
             whites:
-                - /groupCode/findWeCommunityNewGroupById/**
-                - /groupCode/findWePresTagGroupById/**
+                - /wx-api/groupCode/findWeCommunityNewGroupById/**
+                - /wx-api/groupCode/findWePresTagGroupById/**
  
  ```
