@@ -14,6 +14,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * 朋友圈监听
@@ -121,25 +122,25 @@ public class QwMomentsListener {
     }
 
 
-    /**
-     * 通过jobId换取momentsId
-     *
-     * @author WangYX
-     * @date 2023/06/09 18:22
-     * @version 2.0.0
-     */
-    @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_JobId_To_MomentsId}")
-    public void getMomentsIdByJobId(String msg, Channel channel, Message message) {
-        try {
-            log.info("通过jobId换取momentsId处理：msg:{}", msg);
-            WeMomentsJobIdToMomentsIdRequest request = JSONObject.parseObject(msg, WeMomentsJobIdToMomentsIdRequest.class);
-            weMomentsTaskService.jobIdToMomentsId(request);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            log.error("通过jobId换取momentsId处理失败 msg:{},error:{}", msg, e);
-        }
-    }
+//    /**
+//     * 通过jobId换取momentsId
+//     *
+//     * @author WangYX
+//     * @date 2023/06/09 18:22
+//     * @version 2.0.0
+//     */
+//    @RabbitHandler
+//    @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_JobId_To_MomentsId}")
+//    public void getMomentsIdByJobId(String msg, Channel channel, Message message) {
+//        try {
+//            log.info("通过jobId换取momentsId处理：msg:{}", msg);
+//            WeMomentsJobIdToMomentsIdRequest request = JSONObject.parseObject(msg, WeMomentsJobIdToMomentsIdRequest.class);
+//            weMomentsTaskService.jobIdToMomentsId(request);
+//            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+//        } catch (Exception e) {
+//            log.error("通过jobId换取momentsId处理失败 msg:{},error:{}", msg, e);
+//        }
+//    }
 
     /**
      * 企微朋友圈互动同步消息监听
@@ -169,7 +170,7 @@ public class QwMomentsListener {
      * @date 2023/06/09 18:25
      * @version 2.0.0
      */
-    private void momentsExecute(Long momentsTaskId) {
+    private void momentsExecute(Long momentsTaskId) throws IOException {
         weMomentsTaskService.sendWeMoments(momentsTaskId);
     }
 

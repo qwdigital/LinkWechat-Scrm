@@ -6,6 +6,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -21,6 +22,7 @@ import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.CategoryMediaType;
@@ -35,6 +37,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.moments.dto.*;
@@ -42,22 +45,31 @@ import com.linkwechat.domain.moments.entity.*;
 import com.linkwechat.domain.moments.query.*;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 import com.linkwechat.domain.msg.QwAppMsgBody;
+import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -91,14 +103,18 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     private IWeMomentsCustomerService weMomentsCustomerService;
     @Resource
     private IWeMomentsInteracteService weMomentsInteracteService;
-    @Resource
-    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-    @Resource
-    private IWeCustomerTrajectoryService iWeCustomerTrajectoryService;
+
     @Resource
     private IWeMomentsEstimateUserService weMomentsEstimateUserService;
     @Resource
     private IWeMomentsEstimateCustomerService weMomentsEstimateCustomerService;
+
+
+    @Autowired
+     private IWeCustomerService iWeCustomerService;
+
+    @Autowired
+    private QwFileClient qwFileClient;
 
     @Override
     public List<WeMomentsTaskVO> selectList(WeMomentsTaskListRequest request) {
@@ -113,13 +129,13 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             throw new ServiceException("朋友圈内容和附件两者不能同时为空！", HttpStatus.BAD_REQUEST);
         }
         //校验任务名称是否重复
-        LambdaQueryWrapper<WeMomentsTask> queryWrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
-        queryWrapper.eq(WeMomentsTask::getName, request.getName());
-        queryWrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
-        List<WeMomentsTask> list = this.list(queryWrapper);
-        if (CollectionUtil.isNotEmpty(list)) {
-            throw new ServiceException("任务名称重复！", HttpStatus.BAD_REQUEST);
-        }
+//        LambdaQueryWrapper<WeMomentsTask> queryWrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
+//        queryWrapper.eq(WeMomentsTask::getName, request.getName());
+//        queryWrapper.eq(WeMomentsTask::getDelFlag, Constants.COMMON_STATE);
+//        List<WeMomentsTask> list = this.list(queryWrapper);
+//        if (CollectionUtil.isNotEmpty(list)) {
+//            throw new ServiceException("任务名称重复！", HttpStatus.BAD_REQUEST);
+//        }
 
         if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
             if (LocalDateTime.now().isAfter(request.getExecuteTime())) {
@@ -134,58 +150,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         }
         //新增
         WeMomentsTask task = BeanUtil.copyProperties(request, WeMomentsTask.class);
-        task.setId(IdUtil.getSnowflake().nextId());
-        task.setIsLwPush(1);
-        task.setCreateById(SecurityUtils.getLoginUser().getSysUser().getUserId());
-        task.setCreateBy(SecurityUtils.getLoginUser().getSysUser().getUserName());
-        task.setCreateTime(new Date());
-        task.setDelFlag(Constants.COMMON_STATE);
-        task.setDeptIds(null);
-        task.setPostIds(null);
-        task.setUserIds(null);
-        task.setCustomerTag(null);
-        task.setLikeTagIds(null);
-        task.setCustomerTag(null);
-
-        //朋友圈类型
-        if (request.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())) {
-            //企业动态
-            task.setType(0);
-        } else {
-            //个人动态
-            task.setType(1);
-        }
-
-        //发送范围为按条件筛选
-        if (request.getScopeType().equals(1)) {
-            //按条件筛选
-            if (CollectionUtil.isNotEmpty(request.getDeptIds())) {
-                task.setDeptIds(JSONObject.toJSONString(request.getDeptIds()));
-            }
-            if (CollectionUtil.isNotEmpty(request.getPosts())) {
-                task.setPostIds(JSONObject.toJSONString(request.getPosts()));
-            }
-            if (CollectionUtil.isNotEmpty(request.getUserIds())) {
-                task.setUserIds(JSONObject.toJSONString(request.getUserIds()));
-            }
-            //客户标签
-            if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
-                task.setCustomerTag(JSONObject.toJSONString(request.getCustomerTag()));
-            }
-        }
-
-        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
-            task.setStatus(1);
-        } else {
-            task.setStatus(2);
-        }
-
-        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
-            assert request.getExecuteEndTime().isAfter(request.getExecuteTime());
-        } else {
-            assert request.getExecuteEndTime().isAfter(LocalDateTime.now());
-        }
-
+        task.setType(request.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())?0:1);
         //点赞标签
         if (CollectionUtil.isNotEmpty(request.getLikeTagIds())) {
             task.setLikeTagIds(JSONObject.toJSONString(request.getLikeTagIds()));
@@ -194,21 +159,162 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         if (CollectionUtil.isNotEmpty(request.getCommentTagIds())) {
             task.setCommentTagIds(JSONObject.toJSONString(request.getCommentTagIds()));
         }
-        this.save(task);
+        task.setSenderList(task.getScopeType()==0?iWeCustomerService.findLimitSenderInfoWeCustomerList():task.getSenderList());
+
+        //任务入库
+        if(this.save(task)){
+            //添加朋友圈附件
+            weMomentsAttachmentsService.addMomentsAttachments(task.getId(), request.getMaterialIds());
+
+
+
+            List<WeAddGroupMessageQuery.SenderInfo> senderList = task.getSenderList();
+
+            if(CollectionUtil.isNotEmpty(senderList)){
+
+                //3.新增预估朋友圈执行员工,以及客户（成员群发）
+                //预估执行员工
+                weMomentsEstimateUserService.batchInsert(task.getId(),
+                        senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.toList()));
+                List<WeMomentsEstimateCustomer> customers = new ArrayList<>();
+                senderList.stream().forEach(k->{
+                    List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                            .in(WeCustomer::getExternalUserid, k.getCustomerList()));
+                    //预估可查看客户
+                    if(CollectionUtil.isNotEmpty(weCustomers)){
+                        for (WeCustomer weCustomer : weCustomers) {
+                            WeMomentsEstimateCustomer weMomentsEstimateCustomer = new WeMomentsEstimateCustomer();
+                            weMomentsEstimateCustomer.setId(IdUtil.getSnowflake().nextId());
+                            weMomentsEstimateCustomer.setMomentsTaskId(task.getId());
+                            weMomentsEstimateCustomer.setWeUserId(weCustomer.getAddUserId());
+                            weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
+                            weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
+                            customers.add(weMomentsEstimateCustomer);
+                        }
+                    }
+                });
+                if(CollectionUtil.isNotEmpty(customers)){
+                    weMomentsEstimateCustomerService.saveBatch(customers);
+                }
+//                if (task.getSendType().equals(WeMomentsTaskSendTypEnum.USER_GROUP_SEND.getCode())) {
+//
+//
+//                }else{
+//
+//
+//
+//
+//
+//
+//
+//                }
+
+
+
+            }
+            //3.新增预估朋友圈执行员工（成员群发）
+//            if (task.getSendType().equals(WeMomentsTaskSendTypEnum.USER_GROUP_SEND.getCode())) {
+
+//                if (CollectionUtil.isNotEmpty(weUserIds)) {
+//                    weMomentsEstimateUserService.batchInsert(weMomentsTask.getId(), weUserIds);
+//                }
+//                WeMomentsTaskEstimateCustomerNumRequest request = new WeMomentsTaskEstimateCustomerNumRequest();
+//                request.setCustomerTag(customerTagIds);
+//                request.setScopeType(weMomentsTask.getScopeType());
+//                request.setUserIds(weUserIds);
+//                List<WeCustomer> weCustomers = weMomentsCustomerService.estimateCustomers(request);
+//                if (CollectionUtil.isNotEmpty(weCustomers)) {
+//                    List<WeMomentsEstimateCustomer> customers = new ArrayList<>();
+//                    for (WeCustomer weCustomer : weCustomers) {
+//                        WeMomentsEstimateCustomer weMomentsEstimateCustomer = new WeMomentsEstimateCustomer();
+//                        weMomentsEstimateCustomer.setId(IdUtil.getSnowflake().nextId());
+//                        weMomentsEstimateCustomer.setMomentsTaskId(weMomentsTask.getId());
+//                        weMomentsEstimateCustomer.setWeUserId(weCustomer.getAddUserId());
+//                        weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
+//                        weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
+//                        customers.add(weMomentsEstimateCustomer);
+//                    }
+//                    weMomentsEstimateCustomerService.saveBatch(customers);
+//                }
+//            }
+        }
+
+
+//        task.setId(IdUtil.getSnowflake().nextId());
+//        task.setIsLwPush(1);
+//        task.setCreateById(SecurityUtils.getLoginUser().getSysUser().getUserId());
+//        task.setCreateBy(SecurityUtils.getLoginUser().getSysUser().getUserName());
+//        task.setCreateTime(new Date());
+//        task.setDelFlag(Constants.COMMON_STATE);
+//        task.setDeptIds(null);
+//        task.setPostIds(null);
+//        task.setUserIds(null);
+//        task.setCustomerTag(null);
+//        task.setLikeTagIds(null);
+//        task.setCustomerTag(null);
+
+        //朋友圈类型
+//        if (request.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())) {
+//            //企业动态
+//            task.setType(0);
+//        } else {
+//            //个人动态
+//            task.setType(1);
+//        }
+
+        //发送范围为按条件筛选
+//        if (request.getScopeType().equals(1)) {
+//            //按条件筛选
+//            if (CollectionUtil.isNotEmpty(request.getDeptIds())) {
+//                task.setDeptIds(JSONObject.toJSONString(request.getDeptIds()));
+//            }
+//            if (CollectionUtil.isNotEmpty(request.getPosts())) {
+//                task.setPostIds(JSONObject.toJSONString(request.getPosts()));
+//            }
+//            if (CollectionUtil.isNotEmpty(request.getUserIds())) {
+//                task.setUserIds(JSONObject.toJSONString(request.getUserIds()));
+//            }
+//            //客户标签
+//            if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
+//                task.setCustomerTag(JSONObject.toJSONString(request.getCustomerTag()));
+//            }
+//        }
+
+//        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
+//            task.setStatus(1);
+//        } else {
+//            task.setStatus(2);
+//        }
+//
+//        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
+//            assert request.getExecuteEndTime().isAfter(request.getExecuteTime());
+//        } else {
+//            assert request.getExecuteEndTime().isAfter(LocalDateTime.now());
+//        }
+
+        //点赞标签
+//        if (CollectionUtil.isNotEmpty(request.getLikeTagIds())) {
+//            task.setLikeTagIds(JSONObject.toJSONString(request.getLikeTagIds()));
+//        }
+        //评论标签
+//        if (CollectionUtil.isNotEmpty(request.getCommentTagIds())) {
+//            task.setCommentTagIds(JSONObject.toJSONString(request.getCommentTagIds()));
+//        }
+//        this.save(task);
 
         //添加朋友圈附件
-        weMomentsAttachmentsService.addMomentsAttachments(task.getId(), request.getMaterialIds());
+//        weMomentsAttachmentsService.addMomentsAttachments(task.getId(), request.getMaterialIds());
 
         //延迟执行
-        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
-            //延迟发送朋友圈
-            delaySendMoments(task);
-        } else {
-            //异步，马上执行
-            immediatelySendMoments(task);
-        }
-        //取消发送朋友圈
-        delayCancelMoments(task);
+//        if (BeanUtil.isNotEmpty(request.getExecuteTime())) {
+//            //延迟发送朋友圈
+//            delaySendMoments(task);
+//        } else {
+//            //异步，马上执行
+//            immediatelySendMoments(task);
+//        }
+//        //取消发送朋友圈
+//        delayCancelMoments(task);
         return task.getId();
     }
 
@@ -255,7 +361,8 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @author WangYX
      * @date 2023/07/05 9:59
      */
-    private void immediatelySendMoments(WeMomentsTask task) {
+    @Override
+    public void immediatelySendMoments(WeMomentsTask task) {
         log.info("异步执行-立即执行发送朋友圈:Id为{}", task.getId());
         //延迟100毫秒
         long intervalTime = 100L;
@@ -380,7 +487,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
 
     @Override
-    public void sendWeMoments(Long weMomentsTaskId) {
+    public void sendWeMoments(Long weMomentsTaskId) throws IOException {
         //任务不存在，不执行
         LambdaQueryWrapper<WeMomentsTask> queryWrapper = Wrappers.lambdaQuery(WeMomentsTask.class);
         queryWrapper.eq(WeMomentsTask::getId, weMomentsTaskId);
@@ -458,109 +565,180 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @author WangYX
      * @date 2023/06/09 18:00
      */
-    private void sendWeMoments(WeMomentsTask weMomentsTask, List<Long> materialIds) {
-        //1.客户标签
-        List<String> customerTagIds = JSONObject.parseArray(weMomentsTask.getCustomerTag(), String.class);
+    private void sendWeMoments(WeMomentsTask weMomentsTask, List<Long> materialIds) throws IOException {
+
+
+        //朋友圈执行成员
+        List<WeMomentsEstimateUser> estimateUsers = weMomentsEstimateUserService.list(new LambdaQueryWrapper<WeMomentsEstimateUser>()
+                .eq(WeMomentsEstimateUser::getMomentsTaskId, weMomentsTask.getId()));
+
+        if(CollectionUtil.isNotEmpty(estimateUsers)){
+
+            //企微发送
+            if (weMomentsTask.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())){
+                List<String> customerTagIds = new ArrayList<>();
+                if(StringUtils.isNotEmpty(weMomentsTask.getCustomerTag())){
+                    customerTagIds = JSONObject.parseArray(weMomentsTask.getCustomerTag(), String.class);
+                }
+
+                MomentsParamDto dto = this.buildMomentsParam(weMomentsTask.getContent(), materialIds, weMomentsTask.getScopeType(), customerTagIds,
+                        estimateUsers.stream().map(WeMomentsEstimateUser::getWeUserId).collect(Collectors.toList()));
+                AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(dto);
+                if (result.getCode() == HttpStatus.SUCCESS) {
+                    MomentsResultDto data = result.getData();
+                    String jobId = data.getJobid();
+
+                    //3.1 保存job和momentId的关联表
+                    DateTime jobIdExpireTime = DateUtil.offsetDay(DateUtil.date(), 1);
+                    WeMomentsTaskRelation build = WeMomentsTaskRelation.builder().id(SnowFlakeUtil.nextId()).momentTaskId(weMomentsTask.getId()).jobId(jobId).jobIdExpire(DateUtil.toLocalDateTime(jobIdExpireTime)).build();
+                    weMomentsTaskRelationService.save(build);
+
+                    //3.2 jobId换取momentsId，延迟2分钟执行
+//                    Long intervalTime = 2 * 60 * 1000L;
+//                    WeMomentsJobIdToMomentsIdRequest request = WeMomentsJobIdToMomentsIdRequest.builder().jobId(jobId).num(1).build();
+//                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
+//                        //注意这里时间可使用long类型,毫秒单位，设置header
+//                        message.getMessageProperties().setHeader("x-delay", intervalTime);
+//                        return message;
+//                    });
+                }
+
+
+            //成员发送
+            }else if(weMomentsTask.getSendType().equals(WeMomentsTaskSendTypEnum.USER_GROUP_SEND.getCode())){
+                //4.成员群发,需要员工在移动端，调用sdk来发送朋友圈
+                //通过应用消息下发提醒
+                WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+                if (BeanUtil.isEmpty(weCorpAccount)) {
+                    throw new ServiceException("企微基础数据未配置！");
+                }
+                List<List<String>> split = CollectionUtil.split( estimateUsers.stream().map(WeMomentsEstimateUser::getWeUserId).collect(Collectors.toList()), 1000);
+                for (List<String> list : split) {
+                    QwAppMsgBody body = new QwAppMsgBody();
+                    body.setCorpId(weCorpAccount.getCorpId());
+                    body.setCorpUserIds(list);
+
+                    //设置消息模板
+                    WeMessageTemplate template = new WeMessageTemplate();
+                    //设置消息内型
+                    template.setMsgType("text");
+                    //设置应用id
+                    template.setAppId(weCorpAccount.getAgentId());
+
+                    String url = StringUtils.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
+                    String content = "【朋友圈营销】<br/> 管理员下发一条【" + weMomentsTask.getName() + "】的朋友圈营销任务，请及时执行 <br/><br/>" +
+                            "<a href='" + url + "'>去处理</a>";
+
+                    template.setContent(content);
+                    body.setMessageTemplates(template);
+                    qwAppSendMsgService.appMsgSend(body);
+                }
+            }
+
+        }
+
+
+
 
         //2.员工
-        List<String> weUserIds = new ArrayList<>();
-        if (weMomentsTask.getScopeType().equals(1)) {
-            if ((BeanUtil.isEmpty(weMomentsTask.getDeptIds()) && BeanUtil.isEmpty(weMomentsTask.getPostIds()) && BeanUtil.isEmpty(weMomentsTask.getUserIds()))
-                    && CollectionUtil.isEmpty(customerTagIds)) {
-                throw new ServiceException("成员来源和客户标签必须二选一！");
-            }
-        }
-        List<Long> deptIdList = JSONObject.parseArray(weMomentsTask.getDeptIds(), Long.class);
-        List<String> postList = JSONObject.parseArray(weMomentsTask.getPostIds(), String.class);
-        List<String> weUserIdList = JSONObject.parseArray(weMomentsTask.getUserIds(), String.class);
-        List<SysUser> momentsTaskExecuteUser = weMomentsUserService.getMomentsTaskExecuteUser(weMomentsTask.getScopeType(), deptIdList, postList, weUserIdList);
-        if (BeanUtil.isNotEmpty(momentsTaskExecuteUser)) {
-            weUserIds = momentsTaskExecuteUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
-            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-        }
-        //标签不为空，通过标签在筛选一次
-        if (CollectionUtil.isNotEmpty(customerTagIds)) {
-            weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(weUserIds, customerTagIds);
-            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-        }
+//        List<String> weUserIds = new ArrayList<>();
+//        if (weMomentsTask.getScopeType().equals(1)) {
+//            if ((BeanUtil.isEmpty(weMomentsTask.getDeptIds()) && BeanUtil.isEmpty(weMomentsTask.getPostIds()) && BeanUtil.isEmpty(weMomentsTask.getUserIds()))
+//                    && CollectionUtil.isEmpty(customerTagIds)) {
+//                throw new ServiceException("成员来源和客户标签必须二选一！");
+//            }
+//        }
+//        List<Long> deptIdList = JSONObject.parseArray(weMomentsTask.getDeptIds(), Long.class);
+//        List<String> postList = JSONObject.parseArray(weMomentsTask.getPostIds(), String.class);
+//        List<String> weUserIdList = JSONObject.parseArray(weMomentsTask.getUserIds(), String.class);
+//        List<SysUser> momentsTaskExecuteUser = weMomentsUserService.getMomentsTaskExecuteUser(weMomentsTask.getScopeType(), deptIdList, postList, weUserIdList);
+//        if (BeanUtil.isNotEmpty(momentsTaskExecuteUser)) {
+//            weUserIds = momentsTaskExecuteUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+//            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
+//        }
+//        //标签不为空，通过标签在筛选一次
+//        if (CollectionUtil.isNotEmpty(customerTagIds)) {
+//            weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(weUserIds, customerTagIds);
+//            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
+//        }
 
         //3.新增预估朋友圈执行员工（成员群发时，才添加）
-        if (weMomentsTask.getSendType().equals(2)) {
-            if (CollectionUtil.isNotEmpty(weUserIds)) {
-                weMomentsEstimateUserService.batchInsert(weMomentsTask.getId(), weUserIds);
-            }
-            WeMomentsTaskEstimateCustomerNumRequest request = new WeMomentsTaskEstimateCustomerNumRequest();
-            request.setCustomerTag(customerTagIds);
-            request.setScopeType(weMomentsTask.getScopeType());
-            request.setUserIds(weUserIds);
-            List<WeCustomer> weCustomers = weMomentsCustomerService.estimateCustomers(request);
-            if (CollectionUtil.isNotEmpty(weCustomers)) {
-                List<WeMomentsEstimateCustomer> customers = new ArrayList<>();
-                for (WeCustomer weCustomer : weCustomers) {
-                    WeMomentsEstimateCustomer weMomentsEstimateCustomer = new WeMomentsEstimateCustomer();
-                    weMomentsEstimateCustomer.setId(IdUtil.getSnowflake().nextId());
-                    weMomentsEstimateCustomer.setMomentsTaskId(weMomentsTask.getId());
-                    weMomentsEstimateCustomer.setWeUserId(weCustomer.getAddUserId());
-                    weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
-                    weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
-                    customers.add(weMomentsEstimateCustomer);
-                }
-                weMomentsEstimateCustomerService.saveBatch(customers);
-            }
-        }
+//        if (weMomentsTask.getSendType().equals(2)) {
+//            if (CollectionUtil.isNotEmpty(weUserIds)) {
+//                weMomentsEstimateUserService.batchInsert(weMomentsTask.getId(), weUserIds);
+//            }
+//            WeMomentsTaskEstimateCustomerNumRequest request = new WeMomentsTaskEstimateCustomerNumRequest();
+//            request.setCustomerTag(customerTagIds);
+//            request.setScopeType(weMomentsTask.getScopeType());
+//            request.setUserIds(weUserIds);
+//            List<WeCustomer> weCustomers = weMomentsCustomerService.estimateCustomers(request);
+//            if (CollectionUtil.isNotEmpty(weCustomers)) {
+//                List<WeMomentsEstimateCustomer> customers = new ArrayList<>();
+//                for (WeCustomer weCustomer : weCustomers) {
+//                    WeMomentsEstimateCustomer weMomentsEstimateCustomer = new WeMomentsEstimateCustomer();
+//                    weMomentsEstimateCustomer.setId(IdUtil.getSnowflake().nextId());
+//                    weMomentsEstimateCustomer.setMomentsTaskId(weMomentsTask.getId());
+//                    weMomentsEstimateCustomer.setWeUserId(weCustomer.getAddUserId());
+//                    weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
+//                    weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
+//                    customers.add(weMomentsEstimateCustomer);
+//                }
+//                weMomentsEstimateCustomerService.saveBatch(customers);
+//            }
+//        }
 
-        //4.企微群发
-        if (weMomentsTask.getSendType().equals(0)) {
-
-            MomentsParamDto dto = this.buildMomentsParam(weMomentsTask.getContent(), materialIds, weMomentsTask.getScopeType(), customerTagIds, weUserIds);
-            AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(dto);
-            if (result.getCode() == HttpStatus.SUCCESS) {
-                MomentsResultDto data = result.getData();
-                String jobId = data.getJobid();
-
-                //3.1 保存job和momentId的关联表
-                DateTime jobIdExpireTime = DateUtil.offsetDay(DateUtil.date(), 1);
-                WeMomentsTaskRelation build = WeMomentsTaskRelation.builder().momentTaskId(weMomentsTask.getId()).jobId(jobId).jobIdExpire(DateUtil.toLocalDateTime(jobIdExpireTime)).build();
-                weMomentsTaskRelationService.save(build);
-
-                //3.2 jobId换取momentsId，延迟2分钟执行
-                Long intervalTime = 2 * 60 * 1000L;
-                WeMomentsJobIdToMomentsIdRequest request = WeMomentsJobIdToMomentsIdRequest.builder().jobId(jobId).num(1).build();
-                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-                    //注意这里时间可使用long类型,毫秒单位，设置header
-                    message.getMessageProperties().setHeader("x-delay", intervalTime);
-                    return message;
-                });
-            }
-        } else {
-            //4.成员群发,需要员工在移动端，调用sdk来发送朋友圈
-            //通过应用消息下发提醒
-            WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
-            if (BeanUtil.isEmpty(weCorpAccount)) {
-                throw new ServiceException("企微基础数据未配置！");
-            }
-            List<List<String>> split = CollectionUtil.split(weUserIds, 1000);
-            for (List<String> list : split) {
-                QwAppMsgBody body = new QwAppMsgBody();
-                body.setCorpId(weCorpAccount.getCorpId());
-                body.setCorpUserIds(list);
-
-                //设置消息模板
-                WeMessageTemplate template = new WeMessageTemplate();
-                //设置消息内型
-                template.setMsgType("text");
-                //设置应用id
-                template.setAppId(weCorpAccount.getAgentId());
-
-                String url = StringUtils.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
-                String content = "【朋友圈营销】<br/> 管理员下发一条【" + weMomentsTask.getName() + "】的朋友圈营销任务，请及时执行 <br/><br/>" +
-                        "<a href='" + url + "'>去处理</a>";
-
-                template.setContent(content);
-                body.setMessageTemplates(template);
-                qwAppSendMsgService.appMsgSend(body);
-            }
-        }
+//        //4.企微群发
+//        if (weMomentsTask.getSendType().equals(0)) {
+//
+//            MomentsParamDto dto = this.buildMomentsParam(weMomentsTask.getContent(), materialIds, weMomentsTask.getScopeType(), customerTagIds, weUserIds);
+//            AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(dto);
+//            if (result.getCode() == HttpStatus.SUCCESS) {
+//                MomentsResultDto data = result.getData();
+//                String jobId = data.getJobid();
+//
+//                //3.1 保存job和momentId的关联表
+//                DateTime jobIdExpireTime = DateUtil.offsetDay(DateUtil.date(), 1);
+//                WeMomentsTaskRelation build = WeMomentsTaskRelation.builder().id(SnowFlakeUtil.nextId()).momentTaskId(weMomentsTask.getId()).jobId(jobId).jobIdExpire(DateUtil.toLocalDateTime(jobIdExpireTime)).build();
+//                weMomentsTaskRelationService.save(build);
+//
+//                //3.2 jobId换取momentsId，延迟2分钟执行
+//                Long intervalTime = 2 * 60 * 1000L;
+//                WeMomentsJobIdToMomentsIdRequest request = WeMomentsJobIdToMomentsIdRequest.builder().jobId(jobId).num(1).build();
+//                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
+//                    //注意这里时间可使用long类型,毫秒单位，设置header
+//                    message.getMessageProperties().setHeader("x-delay", intervalTime);
+//                    return message;
+//                });
+//            }
+//        } else {
+//            //4.成员群发,需要员工在移动端，调用sdk来发送朋友圈
+//            //通过应用消息下发提醒
+//            WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+//            if (BeanUtil.isEmpty(weCorpAccount)) {
+//                throw new ServiceException("企微基础数据未配置！");
+//            }
+//            List<List<String>> split = CollectionUtil.split(weUserIds, 1000);
+//            for (List<String> list : split) {
+//                QwAppMsgBody body = new QwAppMsgBody();
+//                body.setCorpId(weCorpAccount.getCorpId());
+//                body.setCorpUserIds(list);
+//
+//                //设置消息模板
+//                WeMessageTemplate template = new WeMessageTemplate();
+//                //设置消息内型
+//                template.setMsgType("text");
+//                //设置应用id
+//                template.setAppId(weCorpAccount.getAgentId());
+//
+//                String url = StringUtils.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
+//                String content = "【朋友圈营销】<br/> 管理员下发一条【" + weMomentsTask.getName() + "】的朋友圈营销任务，请及时执行 <br/><br/>" +
+//                        "<a href='" + url + "'>去处理</a>";
+//
+//                template.setContent(content);
+//                body.setMessageTemplates(template);
+//                qwAppSendMsgService.appMsgSend(body);
+//            }
+//        }
     }
 
 
@@ -588,7 +766,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @author WangYX
      * @date 2023/06/08 16:05
      */
-    private MomentsParamDto buildMomentsParam(String content, List<Long> materialIds, Integer scopeType, List<String> customerTags, List<String> weUserIds) {
+    private MomentsParamDto buildMomentsParam(String content, List<Long> materialIds, Integer scopeType, List<String> customerTags, List<String> weUserIds) throws IOException {
         MomentsParamDto.MomentsParamDtoBuilder builder = MomentsParamDto.builder();
         //文本内容
         if (StrUtil.isNotBlank(content)) {
@@ -625,11 +803,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
                 //图文
                 if (weMaterial.getMediaType().equals(CategoryMediaType.IMAGE_TEXT.getType().toString())) {
-                    String coverUrl = weMaterial.getCoverUrl();
-                    if (BeanUtil.isEmpty(coverUrl)) {
-                        coverUrl = "https://dev.linkwechat.net/fileUpload/ecd3b3c7-828f-4404-9e5a-6a1a0fefafc6.png";
-                    }
-                    String media_id = weMaterialService.uploadAttachmentMaterial(coverUrl, MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
+                    String media_id = weMaterialService.uploadAttachmentMaterial(weMaterial.getCoverUrl(), MediaType.IMAGE.getMediaType(), 1, SnowFlakeUtil.nextId().toString()).getMediaId();
                     if (StringUtils.isNotEmpty(media_id)) {
                         MomentsParamDto.Link build = new MomentsParamDto.Link();
                         //素材详情地址
@@ -642,9 +816,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
                 //文章
                 if (weMaterial.getMediaType().equals(CategoryMediaType.ARTICLE.getType().toString())) {
-                    if (BeanUtil.isEmpty(weMaterial.getCoverUrl())) {
-                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/ecd3b3c7-828f-4404-9e5a-6a1a0fefafc6.png");
-                    }
                     convertWeChatMaterial(attachments, weMaterial);
                 }
 
@@ -652,16 +823,25 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 if (weMaterial.getMediaType().equals(CategoryMediaType.FILE.getType().toString())) {
                     int indexOf = weMaterial.getMaterialUrl().lastIndexOf(".");
                     String substring = weMaterial.getMaterialUrl().substring(indexOf);
-                    if ("ppt".equals(substring)) {
-                        //ppt
-                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/563331c3-5ad5-4b99-9e06-04a58480698d.png");
-                    } else if ("word".equals(substring)) {
-                        //word
-                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/a66d85bb-28c7-4549-841d-f980848fea06.png");
-                    } else {
-                        //pdf
-                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/5bdeeb73-b09e-45b7-906f-5ff6af265f49.png");
-                    }
+
+                    FileEntity fileEntity = qwFileClient.upload(
+                            new MockMultipartFile(".png", SnowFlakeUtil.nextId()+".png",null,
+                                    new ClassPathResource("/static/image/"+substring+".png").getInputStream())
+                    ).getData();
+
+                    weMaterial.setCoverUrl(
+                            fileEntity.getUrl()
+                    );
+//                    if ("ppt".equals(substring)) {
+//                        //ppt
+//                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/563331c3-5ad5-4b99-9e06-04a58480698d.png");
+//                    } else if ("word".equals(substring)) {
+//                        //word
+//                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/a66d85bb-28c7-4549-841d-f980848fea06.png");
+//                    } else {
+//                        //pdf
+//                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/5bdeeb73-b09e-45b7-906f-5ff6af265f49.png");
+//                    }
                     convertWeChatMaterial(attachments, weMaterial);
                 }
             }
@@ -672,16 +852,17 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
         //设置可见范围
         //部分客户
-        if (scopeType.equals(1)) {
+//        if (scopeType.equals(1)) {
             //部分客户
-            if (CollectionUtil.isNotEmpty(customerTags)) {
-                visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(customerTags.toArray(new String[0])).build());
-            }
+//            if (CollectionUtil.isNotEmpty(customerTags)) {
+//                visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(customerTags.toArray(new String[0])).build());
+//            }
             //指定发送人
             if (CollectionUtil.isNotEmpty(weUserIds)) {
                 visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUserIds.toArray(new String[0])).build());
             }
-        }
+
+//        }
         builder.visible_range(visibleRange);
         return builder.build();
     }
@@ -734,7 +915,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     }
 
 
-    private MomentsParamDto buildMomentsParam(WeMomentsTaskAddRequest request) {
+    private MomentsParamDto buildMomentsParam(WeMomentsTaskAddRequest request) throws IOException {
         List<SysUser> sysUser = this.getSysUser(request);
         List<String> weUserIds = sysUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
         return this.buildMomentsParam(request.getContent(), request.getMaterialIds(), request.getScopeType(), request.getCustomerTag(), weUserIds);
@@ -885,68 +1066,97 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     }
 
     @Override
-    public void jobIdToMomentsId(WeMomentsJobIdToMomentsIdRequest request) {
-        LambdaQueryWrapper<WeMomentsTaskRelation> queryWrapper = Wrappers.lambdaQuery(WeMomentsTaskRelation.class);
-        queryWrapper.eq(WeMomentsTaskRelation::getJobId, request.getJobId());
-        WeMomentsTaskRelation one = weMomentsTaskRelationService.getOne(queryWrapper);
-        if (BeanUtil.isEmpty(one)) {
-            //数据不存在，不执行
-            return;
-        }
-        if (StrUtil.isNotEmpty(one.getMomentId())) {
-            //朋友圈id已经存在，说明已经同步过了，不继续执行。
-            return;
+    public void jobIdToMomentsId(List<WeMomentsTaskRelation> relations) {
+
+//        List<WeMomentsTaskRelation> taskRelations = weMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
+//                .eq(WeMomentsTaskRelation::getJobId, request.getJobId()));
+
+        if(CollectionUtil.isNotEmpty(relations)){
+            relations.stream().forEach(k->{
+                AjaxResult<MomentsCreateResultDto> momentTaskResult = qwMomentsClient.getMomentTaskResult(k.getJobId());
+                        if (momentTaskResult.getCode() == HttpStatus.SUCCESS) {
+                            MomentsCreateResultDto data = momentTaskResult.getData();
+                            if (data.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
+                                MomentsCreateResultDto.Result result = data.getResult();
+                                if(result != null){
+                                   k.setMomentId(result.getMomentId());
+                                }
+                            }
+                        }
+
+            });
+
+            weMomentsTaskRelationService.updateBatchById(relations);
         }
 
-        AjaxResult<MomentsCreateResultDto> momentTaskResult = qwMomentsClient.getMomentTaskResult(request.getJobId());
-        if (momentTaskResult.getCode() == HttpStatus.SUCCESS) {
-            MomentsCreateResultDto data = momentTaskResult.getData();
-            if (!data.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
-                //企微接口返回数据存在异常，不继续执行
-                return;
-            }
-            //任务状态，整型，1表示开始创建任务，2表示正在创建任务中，3表示创建任务已完成
-            if (data.getStatus().equals(3)) {
-                MomentsCreateResultDto.Result result = data.getResult();
-                if (result.getErrCode().equals(0)) {
-                    String momentId = result.getMomentId();
-                    //1.修改朋友圈任务和朋友圈绑定表
-                    one.setMomentId(momentId);
-                    weMomentsTaskRelationService.updateById(one);
-                    //2.同步朋友圈发送情况
-                    weMomentsUserService.syncAddMomentsUser(one.getMomentTaskId(), momentId);
-                    //3.同步朋友圈的客户情况
-                    weMomentsCustomerService.syncAddMomentsCustomer(one.getMomentTaskId(), momentId);
-                    //4.同步员工发送成功的数据
-                    weMomentsCustomerService.syncMomentsCustomerSendSuccess(one.getMomentTaskId(), momentId);
-                    //5.同步互动数据
-                    weMomentsInteracteService.syncUpdateWeMomentsInteract(one.getMomentTaskId(), momentId);
-                }
-            } else {
-                if (request.getNum() <= 3) {
-                    request.setNum(request.getNum() + 1);
-                    Long intervalTime = request.getNum() * 5 * 60 * 1000L;
-                    request.setNum(2);
-                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-                        //注意这里时间可使用long类型,毫秒单位，设置header
-                        message.getMessageProperties().setHeader("x-delay", intervalTime);
-                        return message;
-                    });
-                } else if (request.getNum() <= 12) {
-                    //间隔1小时执行一次
-                    Long intervalTime = 60 * 60 * 1000L;
-                    request.setNum(request.getNum() + 1);
-                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-                        //注意这里时间可使用long类型,毫秒单位，设置header
-                        message.getMessageProperties().setHeader("x-delay", intervalTime);
-                        return message;
-                    });
-                } else {
-                    //TODO 暂不处理
-                    //jobId失效了，如何处理
-                }
-            }
-        }
+
+
+
+
+//        LambdaQueryWrapper<WeMomentsTaskRelation> queryWrapper = Wrappers.lambdaQuery(WeMomentsTaskRelation.class);
+//        queryWrapper.eq(WeMomentsTaskRelation::getJobId, request.getJobId());
+//        WeMomentsTaskRelation one = weMomentsTaskRelationService.getOne(queryWrapper);
+//        if (BeanUtil.isEmpty(one)) {
+//            //数据不存在，不执行
+//            return;
+//        }
+//        if (StrUtil.isNotEmpty(one.getMomentId())) {
+//            //朋友圈id已经存在，说明已经同步过了，不继续执行。
+//            return;
+//        }
+//
+//        AjaxResult<MomentsCreateResultDto> momentTaskResult = qwMomentsClient.getMomentTaskResult(request.getJobId());
+//        if (momentTaskResult.getCode() == HttpStatus.SUCCESS) {
+//            MomentsCreateResultDto data = momentTaskResult.getData();
+//            if (!data.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
+//                //企微接口返回数据存在异常，不继续执行
+//                return;
+//            }
+//            //任务状态，整型，1表示开始创建任务，2表示正在创建任务中，3表示创建任务已完成
+//            if (data.getStatus().equals(3)) {
+//                MomentsCreateResultDto.Result result = data.getResult();
+//                if (result.getErrCode().equals(0)) {
+//                    String momentId = result.getMomentId();
+//                    //1.修改朋友圈任务和朋友圈绑定表
+//                    one.setMomentId(momentId);
+//                    weMomentsTaskRelationService.updateById(one);
+//                    //2.同步朋友圈发送情况
+//                    weMomentsUserService.syncAddMomentsUser(one.getMomentTaskId(), momentId);
+//                    //3.同步朋友圈的客户情况
+//                    weMomentsCustomerService.syncAddMomentsCustomer(one.getMomentTaskId(), momentId);
+//                    //4.同步员工发送成功的数据
+//                    weMomentsCustomerService.syncMomentsCustomerSendSuccess(one.getMomentTaskId(), momentId);
+//                    //5.同步互动数据
+//                    weMomentsInteracteService.syncUpdateWeMomentsInteract(one.getMomentTaskId(), momentId);
+//                }
+//            } else {
+//                if (request.getNum() <= 3) {
+//                    request.setNum(request.getNum() + 1);
+//                    Long intervalTime = request.getNum() * 5 * 60 * 1000L;
+//                    request.setNum(2);
+//                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
+//                        //注意这里时间可使用long类型,毫秒单位，设置header
+//                        message.getMessageProperties().setHeader("x-delay", intervalTime);
+//                        return message;
+//                    });
+//                } else if (request.getNum() <= 12) {
+//                    //间隔1小时执行一次
+//                    Long intervalTime = 60 * 60 * 1000L;
+//                    request.setNum(request.getNum() + 1);
+//                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
+//                        //注意这里时间可使用long类型,毫秒单位，设置header
+//                        message.getMessageProperties().setHeader("x-delay", intervalTime);
+//                        return message;
+//                    });
+//                } else {
+//                    //TODO 暂不处理
+//                    //jobId失效了，如何处理
+//                }
+//            }
+//        }
+
+
+
     }
 
     @Override
