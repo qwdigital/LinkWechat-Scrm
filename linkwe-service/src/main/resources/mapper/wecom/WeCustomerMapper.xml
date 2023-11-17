@@ -24,6 +24,12 @@
             <if test="weCustomerList.trackState !=null">
                 AND wcr.track_state=#{weCustomerList.trackState}
             </if>
+           <if test="weCustomerList.noContainTrackStates !=null and weCustomerList.noContainTrackStates !=''">
+               AND wcr.track_state not in
+               <foreach collection="weCustomerList.noContainTrackStates.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                   #{item}
+               </foreach>
+           </if>
 
             <if test="weCustomerList.addMethod !=null">
                 AND wcr.add_method=#{weCustomerList.addMethod}
@@ -43,6 +49,13 @@
             <if test="weCustomerList.externalUserid !=null">
                 AND wcr.external_userid=#{weCustomerList.externalUserid}
             </if>
+
+           <if test="weCustomerList.externalUserids !=null and weCustomerList.externalUserids !=''">
+               AND wcr.external_userid in
+               <foreach collection="weCustomerList.externalUserids.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                   #{item}
+               </foreach>
+           </if>
 
             <if test="weCustomerList.firstUserId !=null">
                 AND wcr.add_user_id=#{weCustomerList.firstUserId}

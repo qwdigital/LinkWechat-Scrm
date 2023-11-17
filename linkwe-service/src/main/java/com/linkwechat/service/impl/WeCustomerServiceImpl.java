@@ -1453,6 +1453,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         WeCustomersQuery weCustomersQuery = new WeCustomersQuery();
         weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
         weCustomersQuery.setIsJoinBlacklist(1);
+        weCustomersQuery .setNoContainTrackStates(TrackState.STATE_YLS.getType().toString());
         return  this.findWeCustomerList(weCustomersQuery,pageDomain);
     }
 
