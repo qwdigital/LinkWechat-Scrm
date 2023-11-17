@@ -65,12 +65,6 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     @Resource
     private IWeTagService weTagService;
     @Resource
-    private IWeMomentsCustomerService weMomentsCustomerService;
-    @Resource
-    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-    @Resource
-    private IWeCustomerService weCustomerService;
-    @Resource
     private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
     @Resource
     private WeMomentsTaskMapper weMomentsTaskMapper;
@@ -79,7 +73,7 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     public void addMomentsUser(Long momentsTaskId, List<SysUser> users) {
         List<WeMomentsUser> weMomentsUsers = new ArrayList<>();
         users.forEach(user -> weMomentsUsers.add(build(momentsTaskId, null, user, 0)));
-        this.saveBatch(weMomentsUsers);
+        this.baseMapper.insertBatchSomeColumn(weMomentsUsers);
     }
 
     @Override
