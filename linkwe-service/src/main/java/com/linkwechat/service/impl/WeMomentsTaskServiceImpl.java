@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
@@ -215,12 +216,13 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     }
 
 
+                    List<WeMomentsCustomer> customers = new ArrayList<>();
                     senderList.stream().forEach(k->{
                         List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                                 .externalUserids(StringUtils.join(k.getCustomerList(), ","))
                                 .build(), null);
 
-                        List<WeMomentsCustomer> customers = new ArrayList<>();
+
                         //预估可查看客户
                         if(CollectionUtil.isNotEmpty(weCustomerList)){
                             for (WeCustomersVo weCustomer : weCustomerList) {
@@ -232,20 +234,26 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                 weMomentsCustomer.setExternalUserid(weCustomer.getExternalUserid());
                                 weMomentsCustomer.setCustomerName(weCustomer.getCustomerName());
                                 weMomentsCustomer.setDeliveryStatus(1);
+                                weMomentsCustomer.setDelFlag(Constants.COMMON_STATE);
                                 customers.add(weMomentsCustomer);
                             }
 
                         }
 
-                        if(CollectionUtil.isNotEmpty(customers)){
-                            ((WeMomentsCustomerMapper)weMomentsCustomerService.getBaseMapper()).insertBatchSomeColumn(customers);
-                        }
+
 
 
 
 
                     });
 
+                    if(CollectionUtil.isNotEmpty(customers)){
+                        List<List<WeMomentsCustomer>> partitions = Lists.partition(customers, 1000);
+                        for(List<WeMomentsCustomer> partition:partitions){
+                            ((WeMomentsCustomerMapper)weMomentsCustomerService.getBaseMapper()).insertBatchSomeColumn(partition);
+                        }
+
+                    }
 
                 }
 
