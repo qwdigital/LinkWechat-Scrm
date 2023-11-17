@@ -239,7 +239,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     });
 
                     if(CollectionUtil.isNotEmpty(customers)){
-                        weMomentsCustomerService.saveOrUpdateBatch(customers);
+                        weMomentsCustomerService.saveBatch(customers);
                     }
 
                 }

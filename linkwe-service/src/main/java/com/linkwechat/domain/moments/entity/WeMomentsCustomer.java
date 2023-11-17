@@ -1,5 +1,6 @@
 package com.linkwechat.domain.moments.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -40,11 +41,13 @@ public class WeMomentsCustomer extends BaseEntity {
     /**
      * 朋友圈id
      */
+    @TableField(insertStrategy = FieldStrategy.IGNORED)
     private String momentsId;
 
     /**
      * 员工id
      */
+    @TableField(insertStrategy = FieldStrategy.IGNORED)
     private Long userId;
 
     /**
@@ -75,6 +78,7 @@ public class WeMomentsCustomer extends BaseEntity {
     /**
      * 删除标识 0:正常 1:删除
      */
+    @TableField(insertStrategy = FieldStrategy.IGNORED)
     private Integer delFlag;
 
 }

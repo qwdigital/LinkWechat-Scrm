@@ -261,6 +261,11 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
         }
     }
 
+    @Override
+    public void saveBatch(List<WeMomentsCustomer> weMomentsCustomers) {
+        this.baseMapper.insertBatchSomeColumn(weMomentsCustomers);
+    }
+
     /**
      * 迭代获取发送成功的客户数据
      *

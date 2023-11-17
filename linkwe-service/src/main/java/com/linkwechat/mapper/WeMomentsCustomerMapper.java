@@ -1,6 +1,8 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
+import com.linkwechat.common.config.mybatis.WeBaseMapper;
 import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
 
 /**
@@ -10,6 +12,7 @@ import com.linkwechat.domain.moments.entity.WeMomentsCustomer;
  * @version 2.0.0
  * @date 2023/06/07 9:58
  */
-public interface WeMomentsCustomerMapper extends BaseMapper<WeMomentsCustomer> {
+public interface WeMomentsCustomerMapper extends WeBaseMapper<WeMomentsCustomer> {
+
 
 }
