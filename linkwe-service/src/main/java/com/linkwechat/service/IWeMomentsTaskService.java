@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.moments.dto.MomentsListDetailParamDto;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.entity.WeMomentsTask;
+import com.linkwechat.domain.moments.entity.WeMomentsTaskRelation;
 import com.linkwechat.domain.moments.query.*;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,6 +43,12 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
 
 
     /**
+     * 异步执行-立即执行发送朋友圈
+     * @param task
+     */
+    void immediatelySendMoments(WeMomentsTask task);
+
+    /**
      * 获取朋友圈详情
      *
      * @param weMomentsTaskId 朋友圈任务Id
@@ -57,7 +65,7 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
      * @author WangYX
      * @date 2023/06/12 10:17
      */
-    void sendWeMoments(Long weMomentsTaskId);
+    void sendWeMoments(Long weMomentsTaskId) throws IOException;
 
     /**
      * 取消发送朋友圈
@@ -110,11 +118,11 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
     /**
      * jobId换取MomentsId
      *
-     * @param request jobId换取MomentsId参数
+     * @param relations jobId换取MomentsId参数
      * @author WangYX
      * @date 2023/06/13 10:33
      */
-    void jobIdToMomentsId(WeMomentsJobIdToMomentsIdRequest request);
+    void jobIdToMomentsId(List<WeMomentsTaskRelation> relations);
 
     /**
      * 获取企微朋友圈信息
