@@ -11,7 +11,7 @@
         SELECT
             wgc.*,
             GROUP_CONCAT(distinct wt.`name`) as tags,
-            GROUP_CONCAT(distinct wt.id) as tagIds,
+            GROUP_CONCAT(distinct wt.tag_id) as tagIds,
             (SELECT GROUP_CONCAT(wg.group_name) FROM we_group wg WHERE FIND_IN_SET(wg.chat_id,wgc.chat_id_list)) as groupNames
         FROM
             we_group_code  wgc
