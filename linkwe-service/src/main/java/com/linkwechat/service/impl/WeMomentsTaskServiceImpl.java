@@ -48,6 +48,7 @@ import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.fegin.QwMomentsClient;
 import com.linkwechat.fegin.QwSysUserClient;
+import com.linkwechat.mapper.WeMomentsCustomerMapper;
 import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -212,13 +213,14 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     if(null !=ajaxResult && CollectionUtil.isNotEmpty(ajaxResult.getData())){
                         weMomentsUserService.addMomentsUser(task.getId(),ajaxResult.getData());
                     }
-                    List<WeMomentsCustomer> customers = new ArrayList<>();
+
 
                     senderList.stream().forEach(k->{
                         List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                                 .externalUserids(StringUtils.join(k.getCustomerList(), ","))
                                 .build(), null);
 
+                        List<WeMomentsCustomer> customers = new ArrayList<>();
                         //预估可查看客户
                         if(CollectionUtil.isNotEmpty(weCustomerList)){
                             for (WeCustomersVo weCustomer : weCustomerList) {
@@ -234,13 +236,15 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
                         }
 
+                        if(CollectionUtil.isNotEmpty(customers)){
+                            ((WeMomentsCustomerMapper)weMomentsCustomerService.getBaseMapper()).insertBatchSomeColumn(customers);
+                        }
+
+
 
 
                     });
 
-                    if(CollectionUtil.isNotEmpty(customers)){
-                        weMomentsCustomerService.saveOrUpdateBatch(customers);
-                    }
 
                 }
 
