@@ -23,6 +23,9 @@ public class WeCustomersQuery implements Serializable {
     //跟踪状态 1:待跟进;2:跟进中;3:已成交;4:无意向;5:已流失
     private Integer trackState;
 
+    //不包含的跟踪状态，多个使用逗号隔开
+    private String noContainTrackStates;
+
     //添加方式
     private Integer addMethod;
 
@@ -34,6 +37,9 @@ public class WeCustomersQuery implements Serializable {
 
     //客户id
     private String externalUserid;
+
+    //多个企业微信客户id查询
+    private String externalUserids;
 
     //跟进人id
     private String firstUserId;
