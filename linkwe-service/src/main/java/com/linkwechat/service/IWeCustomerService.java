@@ -345,7 +345,6 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     List<WeAddGroupMessageQuery.SenderInfo> findLimitSenderInfoWeCustomerList();
 
 
-    void makeTagWeCustomer(String exId, List<WeTag> weTags);
 
 
 }
