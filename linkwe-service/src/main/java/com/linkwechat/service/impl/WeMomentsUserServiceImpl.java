@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -73,7 +74,14 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     public void addMomentsUser(Long momentsTaskId, List<SysUser> users) {
         List<WeMomentsUser> weMomentsUsers = new ArrayList<>();
         users.forEach(user -> weMomentsUsers.add(build(momentsTaskId, null, user, 0)));
-        this.baseMapper.insertBatchSomeColumn(weMomentsUsers);
+        if(CollectionUtil.isNotEmpty(weMomentsUsers)){
+            List<List<WeMomentsUser>> partitions = Lists.partition(weMomentsUsers, 1000);
+            for(List<WeMomentsUser> partition:partitions){
+                this.baseMapper.insertBatchSomeColumn(partition);
+            }
+
+        }
+
     }
 
     @Override

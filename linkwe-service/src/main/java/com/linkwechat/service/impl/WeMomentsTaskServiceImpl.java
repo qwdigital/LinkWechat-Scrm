@@ -6,7 +6,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -17,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.config.mybatis.LwBaseMapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.SynchRecordConstants;
@@ -34,7 +34,6 @@ import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCorpAccount;
-import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
@@ -60,12 +59,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -188,6 +183,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
                         List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                                 .externalUserids(StringUtils.join(k.getCustomerList(), ","))
+                                        .firstUserId(k.getUserId())
                                 .build(), null);
                         //预估可查看客户
                         if(CollectionUtil.isNotEmpty(weCustomerList)){
@@ -203,7 +199,11 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                         }
                     });
                     if(CollectionUtil.isNotEmpty(customers)){
-                        weMomentsEstimateCustomerService.saveBatch(customers);
+                        List<List<WeMomentsEstimateCustomer>> partitions = Lists.partition(customers, 1000);
+                        for(List<WeMomentsEstimateCustomer> partition:partitions){
+                            ((LwBaseMapper)weMomentsEstimateCustomerService.getBaseMapper()).insertBatchSomeColumn(partition);
+                        }
+
                     }
 
                 }else if(task.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())){
@@ -220,6 +220,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     senderList.stream().forEach(k->{
                         List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                                 .externalUserids(StringUtils.join(k.getCustomerList(), ","))
+                                .firstUserId(k.getUserId())
                                 .build(), null);
 
 
@@ -239,11 +240,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                             }
 
                         }
-
-
-
-
-
 
                     });
 

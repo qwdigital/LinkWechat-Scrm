@@ -4,6 +4,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.domain.moments.entity.WeMomentsEstimateUser;
@@ -47,7 +48,16 @@ public class IWeMomentsEstimateUserServiceImpl extends ServiceImpl<WeMomentsEsti
                         .executeCount(0)
                         .executeStatus(0)
                         .build()));
-        this.saveBatch(list);
+        if(CollectionUtil.isNotEmpty(list)){
+            List<List<WeMomentsEstimateUser>> partitions = Lists.partition(list, 1000);
+            for(List<WeMomentsEstimateUser> partition:partitions){
+
+                this.baseMapper.insertBatchSomeColumn(partition);
+            }
+        }
+
+
+
     }
 
     @Override
