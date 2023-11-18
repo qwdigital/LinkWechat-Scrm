@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.config.mybatis.LwBaseMapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.constant.SynchRecordConstants;
@@ -188,6 +189,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
                         List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                                 .externalUserids(StringUtils.join(k.getCustomerList(), ","))
+                                        .firstUserId(k.getUserId())
                                 .build(), null);
                         //预估可查看客户
                         if(CollectionUtil.isNotEmpty(weCustomerList)){
@@ -203,7 +205,11 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                         }
                     });
                     if(CollectionUtil.isNotEmpty(customers)){
-                        weMomentsEstimateCustomerService.saveBatch(customers);
+                        List<List<WeMomentsEstimateCustomer>> partitions = Lists.partition(customers, 1000);
+                        for(List<WeMomentsEstimateCustomer> partition:partitions){
+                            ((LwBaseMapper)weMomentsEstimateCustomerService.getBaseMapper()).insertBatchSomeColumn(partition);
+                        }
+
                     }
 
                 }else if(task.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())){
@@ -220,6 +226,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     senderList.stream().forEach(k->{
                         List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
                                 .externalUserids(StringUtils.join(k.getCustomerList(), ","))
+                                .firstUserId(k.getUserId())
                                 .build(), null);
 
 
@@ -239,11 +246,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                             }
 
                         }
-
-
-
-
-
 
                     });
 
