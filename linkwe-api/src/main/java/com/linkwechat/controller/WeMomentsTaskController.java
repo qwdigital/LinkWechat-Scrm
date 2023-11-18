@@ -154,34 +154,37 @@ public class WeMomentsTaskController extends BaseController {
     /**
      * 同步朋友圈
      *
-     * @param filterType 朋友圈类型 0：企业发表  1：个人发表  2：所有，包括个人创建以及企业创建，默认情况下为所有类型
+     * @param taskIds 多个任务id
      * @return {@link AjaxResult}
      * @author WangYX
      * @date 2023/06/12 10:53
      */
     @RepeatSubmit
     @ApiOperation("同步朋友圈")
-    @GetMapping("/sync/{filterType}")
-    public AjaxResult sync(@PathVariable(value = "filterType") Integer filterType) {
-        weMomentsTaskService.syncMoments(filterType);
+    @GetMapping("/sync/{taskIds}")
+    public AjaxResult sync(@PathVariable(value = "taskIds") List<String> taskIds) {
+        weMomentsTaskService.syncMoments(taskIds);
         return AjaxResult.success(WeConstans.SYNCH_TIP);
     }
 
-    /**
-     * 同步成员群发类型朋友圈
-     * 成员群发类型朋友圈，员工完成任务后，调用该接口，同步企微数据
-     *
-     * @param request 同步成员群发类型朋友圈参数
-     * @return {@link AjaxResult}
-     * @author WangYX
-     * @date 2023/06/21 15:56
-     */
-    @ApiOperation("同步成员群发类型朋友圈")
-    @PostMapping("/group/send/finish")
-    public AjaxResult groupSendFinish(@Validated @RequestBody WeMomentsSyncGroupSendRequest request) {
-        weMomentsTaskService.groupSendFinish(request);
-        return AjaxResult.success();
-    }
+
+
+
+//    /**
+//     * 同步成员群发类型朋友圈
+//     * 成员群发类型朋友圈，员工完成任务后，调用该接口，同步企微数据
+//     *
+//     * @param request 同步成员群发类型朋友圈参数
+//     * @return {@link AjaxResult}
+//     * @author WangYX
+//     * @date 2023/06/21 15:56
+//     */
+//    @ApiOperation("同步成员群发类型朋友圈")
+//    @PostMapping("/group/send/finish")
+//    public AjaxResult groupSendFinish(@Validated @RequestBody WeMomentsSyncGroupSendRequest request) {
+//        weMomentsTaskService.groupSendFinish(request);
+//        return AjaxResult.success();
+//    }
 
     /**
      * 移动端列表
