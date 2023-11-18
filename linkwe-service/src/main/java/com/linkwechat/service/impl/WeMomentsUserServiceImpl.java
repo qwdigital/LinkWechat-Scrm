@@ -28,6 +28,7 @@ import com.linkwechat.domain.moments.entity.WeMomentsAttachments;
 import com.linkwechat.domain.moments.entity.WeMomentsEstimateCustomer;
 import com.linkwechat.domain.moments.entity.WeMomentsTask;
 import com.linkwechat.domain.moments.entity.WeMomentsUser;
+import com.linkwechat.domain.moments.query.WeMomentsTaskEstimateCustomerNumRequest;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
@@ -38,6 +39,7 @@ import com.linkwechat.mapper.WeMomentsEstimateCustomerMapper;
 import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.mapper.WeMomentsUserMapper;
 import com.linkwechat.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -69,6 +71,9 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
     @Resource
     private WeMomentsTaskMapper weMomentsTaskMapper;
+
+    @Resource
+    private IWeMomentsCustomerService weMomentsCustomerService;
 
     @Override
     public void addMomentsUser(Long momentsTaskId, List<SysUser> users) {
@@ -305,12 +310,12 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             }
         }
 
-        //客户数
-        LambdaQueryWrapper<WeMomentsEstimateCustomer> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WeMomentsEstimateCustomer::getMomentsTaskId, weMomentsTaskId);
-        queryWrapper.eq(WeMomentsEstimateCustomer::getWeUserId, loginUser.getSysUser().getWeUserId());
-        int count = weMomentsEstimateCustomerMapper.selectCount(queryWrapper);
-        vo.setCustomerNum(count);
+        vo.setCustomerNum(
+                weMomentsCustomerService.estimateCustomerNum(
+                        WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTask.getScopeType())
+                                .weCustomersQuery(weMomentsTask.getWeCustomersQuery()).build()
+                )
+        );
 
         return vo;
     }

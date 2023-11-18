@@ -80,12 +80,12 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
      * 同步朋友圈
      * 发送消息到mq队列
      *
-     * @param filterType 朋友圈类型。0：企业发表 1：个人发表 2：所有，包括个人创建以及企业创建，默认情况下为所有类型
+     * @param taskIds 任务id集合
      * @return
      * @author WangYX
      * @date 2023/06/12 11:04
      */
-    void syncMoments(Integer filterType);
+    void syncMoments(List<String> taskIds);
 
     /**
      * mq队列,朋友圈同步处理

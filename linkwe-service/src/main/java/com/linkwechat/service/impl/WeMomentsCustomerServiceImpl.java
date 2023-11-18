@@ -12,6 +12,7 @@ import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
+import com.linkwechat.common.enums.TrackState;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
@@ -58,51 +59,65 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
     private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
     @Resource
     private IWeMomentsUserService weMomentsUserService;
-    @Resource
-    private QwSysUserClient qwSysUserClient;
+//    @Resource
+//    private QwSysUserClient qwSysUserClient;
     @Resource
     private QwMomentsClient qwMomentsClient;
 
 
     @Override
     public long estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request) {
-        WeCustomersQuery weCustomersQuery=new WeCustomersQuery();
 
-        //查询员工不为空
-        if(CollectionUtil.isNotEmpty(request.getUserIds())){
-            weCustomersQuery.setUserIds(
-                    String.join(",", request.getUserIds())
-            );
-        }else{
-            request.setUserIds(new ArrayList<>());
-        }
-
-        //查询标签不为空
-        if(CollectionUtil.isNotEmpty(request.getCustomerTag())){
-            weCustomersQuery.setTagIds(
-                    String.join(",", request.getCustomerTag())
-            );
-        }
+           long estimateCustomerNum=0;
+          if(new Integer(0).equals(request.getScopeType())){
+              WeCustomersQuery weCustomersQuery = new WeCustomersQuery();
+              weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
+              weCustomersQuery.setIsJoinBlacklist(1);
+              weCustomersQuery .setNoContainTrackStates(TrackState.STATE_YLS.getType().toString());
+              estimateCustomerNum=weCustomerService.countWeCustomerList(weCustomersQuery);
+          }else if(new Integer(1).equals(request.getScopeType())){
+              estimateCustomerNum=weCustomerService.countWeCustomerList(request.getWeCustomersQuery());
+          }
 
 
-        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(null, StrUtil.join(",",request.getPosts()), StrUtil.join(",", request.getDeptIds()));
+          return estimateCustomerNum>10000?10000:estimateCustomerNum;
+//        WeCustomersQuery weCustomersQuery=new WeCustomersQuery();
+//
+//        //查询员工不为空
+//        if(CollectionUtil.isNotEmpty(request.getUserIds())){
+//            weCustomersQuery.setUserIds(
+//                    String.join(",", request.getUserIds())
+//            );
+//        }else{
+//            request.setUserIds(new ArrayList<>());
+//        }
+//
+//        //查询标签不为空
+//        if(CollectionUtil.isNotEmpty(request.getCustomerTag())){
+//            weCustomersQuery.setTagIds(
+//                    String.join(",", request.getCustomerTag())
+//            );
+//        }
+//
+//
+//        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(null, StrUtil.join(",",request.getPosts()), StrUtil.join(",", request.getDeptIds()));
+//
+//        if(null != request){
+//            List<SysUser> sysUsers = result.getData();
+//            if(CollectionUtil.isNotEmpty(sysUsers)){
+//
+//                request.getUserIds().addAll(
+//                        sysUsers.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
+//                );
+//            }
+//        }
+//
 
-        if(null != request){
-            List<SysUser> sysUsers = result.getData();
-            if(CollectionUtil.isNotEmpty(sysUsers)){
-
-                request.getUserIds().addAll(
-                        sysUsers.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
-                );
-            }
-        }
 
 
 
 
-
-
-       return weCustomerService.countWeCustomerList(weCustomersQuery);
+//       return weCustomerService.countWeCustomerList(weCustomersQuery);
 //        if (request.getScopeType().equals(0)) {
 //            //全部客户
 //            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);

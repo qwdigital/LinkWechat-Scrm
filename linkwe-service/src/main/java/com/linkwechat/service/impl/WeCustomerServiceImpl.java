@@ -267,11 +267,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public void synchWeCustomerByAddIds(List<String> followUserIds) {
         if (CollectionUtil.isNotEmpty(followUserIds)) {
 
-//            List<List<String>> partition = Lists.partition(followUserIds, 100);
-//            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+
             Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
 
-//            List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
             this.getByUser(followUserIds, null,currentTenantSysUser);
 
 
@@ -418,10 +416,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
-                weCustomers.forEach(fWeCustomer -> {
-                  this.updateWeCustomerTagIds(fWeCustomer.getAddUserId(),fWeCustomer.getExternalUserid());
-                  iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer);
-                });
+                weCustomers.forEach(fWeCustomer ->{
+                    if(StringUtils.isEmpty(fWeCustomer.getTagIds())){
+                        this.updateWeCustomerTagIds(fWeCustomer.getAddUserId(),fWeCustomer.getExternalUserid());
+                    }
+
+                    iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer);
+                } );
             }
 
             //更新已流失的客户数据
@@ -886,7 +887,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             weCustomer.setTrackContent(trajectory.getTrackContent());
             weCustomer.setTrackTime(new Date());
             if (this.update(weCustomer, new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getAddUserId,
-                    weCustomer.getAddUserId())
+                            weCustomer.getAddUserId())
                     .eq(WeCustomer::getExternalUserid, weCustomer.getExternalUserid()))) {
                 iWeCustomerTrajectoryService.createTrackTrajectory(trajectory.getExternalUserid(), trajectory.getWeUserId(),
                         trajectory.getTrackState(), trajectory.getTrackContent());
@@ -1035,7 +1036,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             }
             this.baseMapper.batchAddOrUpdate(ListUtil.toList(weCustomer));
 
-             //添加方式为手机号搜索,更新客户公海中对应的状态
+            //添加方式为手机号搜索,更新客户公海中对应的状态
             if (CustomerAddWay.ADD_WAY_SSSJH.getKey().equals(weCustomer.getAddMethod())) {
 
                 if (StringUtils.isNotEmpty(weCustomer.getPhone())) {
@@ -1457,7 +1458,6 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         WeCustomersQuery weCustomersQuery = new WeCustomersQuery();
         weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
         weCustomersQuery.setIsJoinBlacklist(1);
-        weCustomersQuery .setNoContainTrackStates(TrackState.STATE_YLS.getType().toString());
         return  this.findWeCustomerList(weCustomersQuery,pageDomain);
     }
 
