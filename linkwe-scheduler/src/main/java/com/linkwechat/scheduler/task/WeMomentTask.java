@@ -133,33 +133,25 @@ public class WeMomentTask {
                         weMomentsTaskService.immediatelySendMoments(k);
                     });
                 }
+
+             // 通过jobId换取momentsId
+                List<WeMomentsTaskRelation> weMomentsTaskRelations = iWeMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
+                        .isNotNull(WeMomentsTaskRelation::getJobId)
+                        .isNull(WeMomentsTaskRelation::getMomentId));
+                if(CollectionUtil.isNotEmpty(weMomentsTaskRelations)){
+                    weMomentsTaskService.jobIdToMomentsId(
+                            weMomentsTaskRelations
+                    );
+                }
+
+
+
             }finally {
                lock.unlock();
             }
         }
     }
 
-
-    /**
-     * 通过jobId换取momentsId
-     */
-    @XxlJob("wePullMomentIdHandle")
-    public void wePullMomentIdHandle(){
-        RLock lock = redissonClient.getLock(LockEnums.WE_MOMENTS_ID_LOCK.getCode());
-        if(lock.tryLock()){
-            try {
-                List<WeMomentsTaskRelation> weMomentsTaskRelations = iWeMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
-                        .isNotNull(WeMomentsTaskRelation::getJobId)
-                        .isNull(WeMomentsTaskRelation::getMomentId));
-                weMomentsTaskService.jobIdToMomentsId(
-                        weMomentsTaskRelations
-                );
-            }finally {
-                lock.unlock();
-            }
-        }
-
-    }
 
 
 //    @Data
