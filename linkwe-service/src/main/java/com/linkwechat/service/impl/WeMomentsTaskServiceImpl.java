@@ -112,6 +112,9 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     @Resource
     private IWeMomentsEstimateCustomerService weMomentsEstimateCustomerService;
 
+    @Resource
+    private IWeMomentsUserService iWeMomentsUserService;
+
 
     @Autowired
      private IWeCustomerService iWeCustomerService;
@@ -511,21 +514,19 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     private void sendWeMoments(WeMomentsTask weMomentsTask, List<Long> materialIds) throws IOException {
 
 
-        //朋友圈执行成员
-        List<WeMomentsEstimateUser> estimateUsers = weMomentsEstimateUserService.list(new LambdaQueryWrapper<WeMomentsEstimateUser>()
-                .eq(WeMomentsEstimateUser::getMomentsTaskId, weMomentsTask.getId()));
+        //企微发送
+        if (weMomentsTask.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())){
 
-        if(CollectionUtil.isNotEmpty(estimateUsers)){
-
-            //企微发送
-            if (weMomentsTask.getSendType().equals(WeMomentsTaskSendTypEnum.ENTERPRISE_GROUP_SEND.getCode())){
+            List<WeMomentsUser> weMomentsUsers = iWeMomentsUserService.list(new LambdaQueryWrapper<WeMomentsUser>()
+                    .eq(WeMomentsUser::getMomentsTaskId, weMomentsTask.getId()));
+            if(CollectionUtil.isNotEmpty(weMomentsUsers)){
                 List<String> customerTagIds = new ArrayList<>();
                 if(StringUtils.isNotEmpty(weMomentsTask.getCustomerTag())){
                     customerTagIds = JSONObject.parseArray(weMomentsTask.getCustomerTag(), String.class);
                 }
 
                 MomentsParamDto dto = this.buildMomentsParam(weMomentsTask.getContent(), materialIds, weMomentsTask.getScopeType(), customerTagIds,
-                        estimateUsers.stream().map(WeMomentsEstimateUser::getWeUserId).collect(Collectors.toList()));
+                        weMomentsUsers.stream().map(WeMomentsUser::getWeUserId).collect(Collectors.toList()));
                 AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(dto);
                 if (result.getCode() == HttpStatus.SUCCESS) {
                     MomentsResultDto data = result.getData();
@@ -536,19 +537,21 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     WeMomentsTaskRelation build = WeMomentsTaskRelation.builder().id(SnowFlakeUtil.nextId()).momentTaskId(weMomentsTask.getId()).jobId(jobId).jobIdExpire(DateUtil.toLocalDateTime(jobIdExpireTime)).build();
                     weMomentsTaskRelationService.save(build);
 
-                    //3.2 jobId换取momentsId，延迟2分钟执行
-//                    Long intervalTime = 2 * 60 * 1000L;
-//                    WeMomentsJobIdToMomentsIdRequest request = WeMomentsJobIdToMomentsIdRequest.builder().jobId(jobId).num(1).build();
-//                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-//                        //注意这里时间可使用long类型,毫秒单位，设置header
-//                        message.getMessageProperties().setHeader("x-delay", intervalTime);
-//                        return message;
-//                    });
                 }
+
+            }
+
+
 
 
             //成员发送
-            }else if(weMomentsTask.getSendType().equals(WeMomentsTaskSendTypEnum.USER_GROUP_SEND.getCode())){
+        }else if(weMomentsTask.getSendType().equals(WeMomentsTaskSendTypEnum.USER_GROUP_SEND.getCode())){
+            //朋友圈执行成员
+            List<WeMomentsEstimateUser> estimateUsers = weMomentsEstimateUserService.list(new LambdaQueryWrapper<WeMomentsEstimateUser>()
+                    .eq(WeMomentsEstimateUser::getMomentsTaskId, weMomentsTask.getId()));
+
+            if(CollectionUtil.isNotEmpty(estimateUsers)){
+
                 //4.成员群发,需要员工在移动端，调用sdk来发送朋友圈
                 //通过应用消息下发提醒
                 WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
@@ -576,9 +579,14 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     body.setMessageTemplates(template);
                     qwAppSendMsgService.appMsgSend(body);
                 }
+
+
             }
 
         }
+
+
+
 
 
 
@@ -703,13 +711,13 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
      * @param content      文本内容
      * @param materialIds  附件内容
      * @param scopeType    发送类型
-     * @param customerTags 客户标签
+     * @param exIds 客户id
      * @param weUserIds    发送员工
      * @return {@link MomentsParamDto}
      * @author WangYX
      * @date 2023/06/08 16:05
      */
-    private MomentsParamDto buildMomentsParam(String content, List<Long> materialIds, Integer scopeType, List<String> customerTags, List<String> weUserIds) throws IOException {
+    private MomentsParamDto buildMomentsParam(String content, List<Long> materialIds, Integer scopeType, List<String> exIds, List<String> weUserIds) throws IOException {
         MomentsParamDto.MomentsParamDtoBuilder builder = MomentsParamDto.builder();
         //文本内容
         if (StrUtil.isNotBlank(content)) {
@@ -804,6 +812,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             if (CollectionUtil.isNotEmpty(weUserIds)) {
                 visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUserIds.toArray(new String[0])).build());
             }
+
 
 //        }
         builder.visible_range(visibleRange);

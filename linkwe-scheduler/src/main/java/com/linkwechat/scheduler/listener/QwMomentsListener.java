@@ -43,7 +43,7 @@ public class QwMomentsListener {
     @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_Delay_Execute}")
     public void momentsExecute(String msg, Channel channel, Message message) {
         try {
-            log.info("朋友圈发送任务定时执行处理：msg:{}", msg);
+            log.info("朋友圈发送任务执行处理：msg:{}", msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             momentsExecute(Long.valueOf(msg));
 
