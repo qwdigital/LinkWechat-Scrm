@@ -267,11 +267,9 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     public void synchWeCustomerByAddIds(List<String> followUserIds) {
         if (CollectionUtil.isNotEmpty(followUserIds)) {
 
-//            List<List<String>> partition = Lists.partition(followUserIds, 100);
-//            Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
+
             Map<String, SysUser> currentTenantSysUser = findCurrentTenantSysUser();
 
-//            List<WeCustomerDetailVo> weCustomerDetailVos = new ArrayList<>();
             this.getByUser(followUserIds, null,currentTenantSysUser);
 
 
@@ -418,7 +416,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
-                weCustomers.forEach(fWeCustomer -> iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer));
+                weCustomers.forEach(fWeCustomer ->{
+                    if(StringUtils.isEmpty(fWeCustomer.getTagIds())){
+                        this.updateWeCustomerTagIds(fWeCustomer.getAddUserId(),fWeCustomer.getExternalUserid());
+                    }
+
+                    iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer);
+                } );
             }
 
             //更新已流失的客户数据
@@ -1173,6 +1177,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                             .eq(WeFlowerCustomerTagRel::getExternalUserid, externalUserId)
                             .eq(WeFlowerCustomerTagRel::getUserId, userId));
+                    this.updateWeCustomerTagIds(userId,externalUserId);
                 }
 
             }
