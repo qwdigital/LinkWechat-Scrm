@@ -6,6 +6,7 @@ import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeCustomerTrackRecord;
+import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
@@ -334,6 +335,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @return
      */
     List<WeAddGroupMessageQuery.SenderInfo> findLimitSenderInfoWeCustomerList();
+
+
+    void makeTagWeCustomer(String exId, List<WeTag> weTags);
 
 
 }
