@@ -418,7 +418,10 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
-                weCustomers.forEach(fWeCustomer -> iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer));
+                weCustomers.forEach(fWeCustomer -> {
+                  this.updateWeCustomerTagIds(fWeCustomer.getAddUserId(),fWeCustomer.getExternalUserid());
+                  iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer);
+                });
             }
 
             //更新已流失的客户数据
