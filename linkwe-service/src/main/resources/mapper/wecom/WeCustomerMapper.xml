@@ -457,7 +457,7 @@
 
     <select id="noRepeatCountCustomer" resultType="long">
         SELECT
-        COUNT(DISTINCT  wc.external_userid)
+        COUNT(DISTINCT  wcr.external_userid)
         FROM
         we_customer wcr
         <where>
