@@ -126,6 +126,7 @@ public class WeMomentTask {
                 //需要指定的朋友圈
                 List<WeMomentsTask> weMomentsTasks = weMomentsTaskService.list(new LambdaQueryWrapper<WeMomentsTask>()
                         .isNull(WeMomentsTask::getExecuteTime)
+                        .or()
                         .apply("date_format (execute_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d')",new Date())
                         .eq(WeMomentsTask::getStatus,1));
                 if(CollectionUtil.isNotEmpty(weMomentsTasks)){
