@@ -206,4 +206,12 @@ public class WeCustomersVo {
     private Integer isJoinBlacklist;
 
 
+    /**
+     * 流失时间
+     */
+    @ExcelIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date lossTime;
+
+
 }
