@@ -205,4 +205,10 @@ public class WeCustomer extends BaseEntity {
      */
     private Integer isJoinBlacklist;
 
+
+    /**
+     * 流失时间
+     */
+    private Date lossTime;
+
 }
