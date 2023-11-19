@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @author danmo
@@ -54,6 +55,7 @@ public class WeCallBackDelFollowUserImpl extends WeEventStrategy {
             return;
         }
         weCustomer.setTrackState(TrackState.STATE_YLS.getType());
+        weCustomer.setLossTime(new Date());
         if (weCustomerService.updateById(weCustomer)) {
             //异常结束当前客户涉及到的sop任务
             iWeSopExecuteTargetService.sopExceptionEnd(customerInfo.getExternalUserID());
