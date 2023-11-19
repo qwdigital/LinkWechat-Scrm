@@ -264,40 +264,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         return task.getId();
     }
 
-//    /**
-//     * 取消发送朋友圈
-//     *
-//     * @param task 朋友圈任务
-//     * @author WangYX
-//     * @date 2023/06/09 13:53
-//     */
-//    private void delayCancelMoments(WeMomentsTask task) {
-//        log.info("取消发送朋友圈:Id为{}", task.getId());
-//        //执行结束时间，添加结束操作
-//        long intervalTime = DateUtil.betweenMs(DateUtil.date(), DateUtil.date(task.getExecuteEndTime()));
-//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayCancelRk(), task.getId().toString(), message -> {
-//            //注意这里时间可使用long类型,毫秒单位，设置header
-//            message.getMessageProperties().setHeader("x-delay", intervalTime);
-//            return message;
-//        });
-//    }
-//
-//    /**
-//     * 延迟发送朋友圈
-//     *
-//     * @param task 朋友圈任务
-//     * @author WangYX
-//     * @date 2023/06/09 13:51
-//     */
-//    private void delaySendMoments(WeMomentsTask task) {
-//        log.info("延迟发送朋友圈:Id为{}", task.getId());
-//        long intervalTime = DateUtil.betweenMs(DateUtil.date(), DateUtil.date(task.getExecuteTime()));
-//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayExecuteRk(), task.getId().toString(), message -> {
-//            //注意这里时间可使用long类型,毫秒单位，设置header
-//            message.getMessageProperties().setHeader("x-delay", intervalTime);
-//            return message;
-//        });
-//    }
 
     /**
      * 异步执行-立即执行发送朋友圈
@@ -584,112 +550,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             }
 
         }
-
-
-
-
-
-
-
-        //2.员工
-//        List<String> weUserIds = new ArrayList<>();
-//        if (weMomentsTask.getScopeType().equals(1)) {
-//            if ((BeanUtil.isEmpty(weMomentsTask.getDeptIds()) && BeanUtil.isEmpty(weMomentsTask.getPostIds()) && BeanUtil.isEmpty(weMomentsTask.getUserIds()))
-//                    && CollectionUtil.isEmpty(customerTagIds)) {
-//                throw new ServiceException("成员来源和客户标签必须二选一！");
-//            }
-//        }
-//        List<Long> deptIdList = JSONObject.parseArray(weMomentsTask.getDeptIds(), Long.class);
-//        List<String> postList = JSONObject.parseArray(weMomentsTask.getPostIds(), String.class);
-//        List<String> weUserIdList = JSONObject.parseArray(weMomentsTask.getUserIds(), String.class);
-//        List<SysUser> momentsTaskExecuteUser = weMomentsUserService.getMomentsTaskExecuteUser(weMomentsTask.getScopeType(), deptIdList, postList, weUserIdList);
-//        if (BeanUtil.isNotEmpty(momentsTaskExecuteUser)) {
-//            weUserIds = momentsTaskExecuteUser.stream().map(SysUser::getWeUserId).collect(Collectors.toList());
-//            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-//        }
-//        //标签不为空，通过标签在筛选一次
-//        if (CollectionUtil.isNotEmpty(customerTagIds)) {
-//            weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(weUserIds, customerTagIds);
-//            weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-//        }
-
-        //3.新增预估朋友圈执行员工（成员群发时，才添加）
-//        if (weMomentsTask.getSendType().equals(2)) {
-//            if (CollectionUtil.isNotEmpty(weUserIds)) {
-//                weMomentsEstimateUserService.batchInsert(weMomentsTask.getId(), weUserIds);
-//            }
-//            WeMomentsTaskEstimateCustomerNumRequest request = new WeMomentsTaskEstimateCustomerNumRequest();
-//            request.setCustomerTag(customerTagIds);
-//            request.setScopeType(weMomentsTask.getScopeType());
-//            request.setUserIds(weUserIds);
-//            List<WeCustomer> weCustomers = weMomentsCustomerService.estimateCustomers(request);
-//            if (CollectionUtil.isNotEmpty(weCustomers)) {
-//                List<WeMomentsEstimateCustomer> customers = new ArrayList<>();
-//                for (WeCustomer weCustomer : weCustomers) {
-//                    WeMomentsEstimateCustomer weMomentsEstimateCustomer = new WeMomentsEstimateCustomer();
-//                    weMomentsEstimateCustomer.setId(IdUtil.getSnowflake().nextId());
-//                    weMomentsEstimateCustomer.setMomentsTaskId(weMomentsTask.getId());
-//                    weMomentsEstimateCustomer.setWeUserId(weCustomer.getAddUserId());
-//                    weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
-//                    weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
-//                    customers.add(weMomentsEstimateCustomer);
-//                }
-//                weMomentsEstimateCustomerService.saveBatch(customers);
-//            }
-//        }
-
-//        //4.企微群发
-//        if (weMomentsTask.getSendType().equals(0)) {
-//
-//            MomentsParamDto dto = this.buildMomentsParam(weMomentsTask.getContent(), materialIds, weMomentsTask.getScopeType(), customerTagIds, weUserIds);
-//            AjaxResult<MomentsResultDto> result = qwMomentsClient.addMomentTask(dto);
-//            if (result.getCode() == HttpStatus.SUCCESS) {
-//                MomentsResultDto data = result.getData();
-//                String jobId = data.getJobid();
-//
-//                //3.1 保存job和momentId的关联表
-//                DateTime jobIdExpireTime = DateUtil.offsetDay(DateUtil.date(), 1);
-//                WeMomentsTaskRelation build = WeMomentsTaskRelation.builder().id(SnowFlakeUtil.nextId()).momentTaskId(weMomentsTask.getId()).jobId(jobId).jobIdExpire(DateUtil.toLocalDateTime(jobIdExpireTime)).build();
-//                weMomentsTaskRelationService.save(build);
-//
-//                //3.2 jobId换取momentsId，延迟2分钟执行
-//                Long intervalTime = 2 * 60 * 1000L;
-//                WeMomentsJobIdToMomentsIdRequest request = WeMomentsJobIdToMomentsIdRequest.builder().jobId(jobId).num(1).build();
-//                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-//                    //注意这里时间可使用long类型,毫秒单位，设置header
-//                    message.getMessageProperties().setHeader("x-delay", intervalTime);
-//                    return message;
-//                });
-//            }
-//        } else {
-//            //4.成员群发,需要员工在移动端，调用sdk来发送朋友圈
-//            //通过应用消息下发提醒
-//            WeCorpAccount weCorpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
-//            if (BeanUtil.isEmpty(weCorpAccount)) {
-//                throw new ServiceException("企微基础数据未配置！");
-//            }
-//            List<List<String>> split = CollectionUtil.split(weUserIds, 1000);
-//            for (List<String> list : split) {
-//                QwAppMsgBody body = new QwAppMsgBody();
-//                body.setCorpId(weCorpAccount.getCorpId());
-//                body.setCorpUserIds(list);
-//
-//                //设置消息模板
-//                WeMessageTemplate template = new WeMessageTemplate();
-//                //设置消息内型
-//                template.setMsgType("text");
-//                //设置应用id
-//                template.setAppId(weCorpAccount.getAgentId());
-//
-//                String url = StringUtils.format(linkWeChatConfig.getMomentsUrl(), weMomentsTask.getId());
-//                String content = "【朋友圈营销】<br/> 管理员下发一条【" + weMomentsTask.getName() + "】的朋友圈营销任务，请及时执行 <br/><br/>" +
-//                        "<a href='" + url + "'>去处理</a>";
-//
-//                template.setContent(content);
-//                body.setMessageTemplates(template);
-//                qwAppSendMsgService.appMsgSend(body);
-//            }
-//        }
     }
 
 
@@ -783,16 +643,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     weMaterial.setCoverUrl(
                             fileEntity.getUrl()
                     );
-//                    if ("ppt".equals(substring)) {
-//                        //ppt
-//                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/563331c3-5ad5-4b99-9e06-04a58480698d.png");
-//                    } else if ("word".equals(substring)) {
-//                        //word
-//                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/a66d85bb-28c7-4549-841d-f980848fea06.png");
-//                    } else {
-//                        //pdf
-//                        weMaterial.setCoverUrl("https://dev.linkwechat.net/fileUpload/5bdeeb73-b09e-45b7-906f-5ff6af265f49.png");
-//                    }
                     convertWeChatMaterial(attachments, weMaterial);
                 }
             }
@@ -802,19 +652,12 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         MomentsParamDto.VisibleRange visibleRange = MomentsParamDto.VisibleRange.builder().build();
 
         //设置可见范围
-        //部分客户
-//        if (scopeType.equals(1)) {
-            //部分客户
-//            if (CollectionUtil.isNotEmpty(customerTags)) {
-//                visibleRange.setExternal_contact_list(MomentsParamDto.ExternalContactList.builder().tag_list(customerTags.toArray(new String[0])).build());
-//            }
             //指定发送人
             if (CollectionUtil.isNotEmpty(weUserIds)) {
                 visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUserIds.toArray(new String[0])).build());
             }
 
 
-//        }
         builder.visible_range(visibleRange);
         return builder.build();
     }
@@ -959,27 +802,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         }
 
 
-
-
-
-//        LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
-//        SecurityContextHolder.setCorpId(loginUser.getCorpId());
-//
-//        Integer filterType = loginUser.getFilterType();
-//
-//
-//
-//
-//
-//
-//        //同步的时间从当天的开始时间到当前时间
-//        Long startTime = DateUtil.beginOfDay(new Date()).getTime() / 1000;
-//        Long endTime = DateUtil.date().getTime() / 1000;
-//        MomentsListDetailParamDto query = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).filter_type(filterType).build();
-//        query.setCursor(null);
-//        getMomentPage(query);
-
-
     }
 
     //朋友圈同步分页入库
@@ -1104,8 +926,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     @Override
     public void jobIdToMomentsId(List<WeMomentsTaskRelation> relations) {
 
-//        List<WeMomentsTaskRelation> taskRelations = weMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
-//                .eq(WeMomentsTaskRelation::getJobId, request.getJobId()));
 
         if(CollectionUtil.isNotEmpty(relations)){
             relations.stream().forEach(k->{
@@ -1125,71 +945,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             weMomentsTaskRelationService.updateBatchById(relations);
         }
 
-
-
-
-
-//        LambdaQueryWrapper<WeMomentsTaskRelation> queryWrapper = Wrappers.lambdaQuery(WeMomentsTaskRelation.class);
-//        queryWrapper.eq(WeMomentsTaskRelation::getJobId, request.getJobId());
-//        WeMomentsTaskRelation one = weMomentsTaskRelationService.getOne(queryWrapper);
-//        if (BeanUtil.isEmpty(one)) {
-//            //数据不存在，不执行
-//            return;
-//        }
-//        if (StrUtil.isNotEmpty(one.getMomentId())) {
-//            //朋友圈id已经存在，说明已经同步过了，不继续执行。
-//            return;
-//        }
-//
-//        AjaxResult<MomentsCreateResultDto> momentTaskResult = qwMomentsClient.getMomentTaskResult(request.getJobId());
-//        if (momentTaskResult.getCode() == HttpStatus.SUCCESS) {
-//            MomentsCreateResultDto data = momentTaskResult.getData();
-//            if (!data.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())) {
-//                //企微接口返回数据存在异常，不继续执行
-//                return;
-//            }
-//            //任务状态，整型，1表示开始创建任务，2表示正在创建任务中，3表示创建任务已完成
-//            if (data.getStatus().equals(3)) {
-//                MomentsCreateResultDto.Result result = data.getResult();
-//                if (result.getErrCode().equals(0)) {
-//                    String momentId = result.getMomentId();
-//                    //1.修改朋友圈任务和朋友圈绑定表
-//                    one.setMomentId(momentId);
-//                    weMomentsTaskRelationService.updateById(one);
-//                    //2.同步朋友圈发送情况
-//                    weMomentsUserService.syncAddMomentsUser(one.getMomentTaskId(), momentId);
-//                    //3.同步朋友圈的客户情况
-//                    weMomentsCustomerService.syncAddMomentsCustomer(one.getMomentTaskId(), momentId);
-//                    //4.同步员工发送成功的数据
-//                    weMomentsCustomerService.syncMomentsCustomerSendSuccess(one.getMomentTaskId(), momentId);
-//                    //5.同步互动数据
-//                    weMomentsInteracteService.syncUpdateWeMomentsInteract(one.getMomentTaskId(), momentId);
-//                }
-//            } else {
-//                if (request.getNum() <= 3) {
-//                    request.setNum(request.getNum() + 1);
-//                    Long intervalTime = request.getNum() * 5 * 60 * 1000L;
-//                    request.setNum(2);
-//                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-//                        //注意这里时间可使用long类型,毫秒单位，设置header
-//                        message.getMessageProperties().setHeader("x-delay", intervalTime);
-//                        return message;
-//                    });
-//                } else if (request.getNum() <= 12) {
-//                    //间隔1小时执行一次
-//                    Long intervalTime = 60 * 60 * 1000L;
-//                    request.setNum(request.getNum() + 1);
-//                    rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayJobIdToMomentsIdRK(), JSONObject.toJSONString(request), message -> {
-//                        //注意这里时间可使用long类型,毫秒单位，设置header
-//                        message.getMessageProperties().setHeader("x-delay", intervalTime);
-//                        return message;
-//                    });
-//                } else {
-//                    //TODO 暂不处理
-//                    //jobId失效了，如何处理
-//                }
-//            }
-//        }
 
 
 
