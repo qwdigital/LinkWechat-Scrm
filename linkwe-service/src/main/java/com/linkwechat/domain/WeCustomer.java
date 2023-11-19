@@ -2,13 +2,10 @@ package com.linkwechat.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.linkwechat.common.core.domain.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
 import java.util.Date;
 
 
@@ -210,5 +207,7 @@ public class WeCustomer extends BaseEntity {
      * 流失时间
      */
     private Date lossTime;
+
+
 
 }
