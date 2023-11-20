@@ -1162,7 +1162,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         .eq(WeFlowerCustomerTagRel::getUserId,userId));
 
                 if (CollectionUtil.isNotEmpty(tags)) {
-
+                    weCustomer.setTagIds(StringUtils.join(tags.stream().map(WeCustomerDetailVo.ExternalUserTag::getTagId)
+                            .collect(Collectors.toList()),","));
                     List<WeFlowerCustomerTagRel> tagRels = tags.stream().map(tagInfo -> WeFlowerCustomerTagRel.builder()
                             .id(SnowFlakeUtil.nextId())
                             .externalUserid(externalContact.getExternalUserId())
