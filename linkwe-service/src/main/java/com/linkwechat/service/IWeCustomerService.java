@@ -115,6 +115,14 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
     /**
+     * 更新客户表的标签id,冗余字段
+     * @param userId
+     * @param externalUserid
+     */
+    void updateWeCustomerTagIds(String userId, String externalUserid);
+
+
+    /**
      * 在职员工客户分配
      *
      * @param weOnTheJobCustomerQuery

@@ -578,7 +578,8 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     //更新客户表的标签id,冗余字段
-    private void updateWeCustomerTagIds(String userId, String externalUserid) {
+    @Override
+    public void updateWeCustomerTagIds(String userId, String externalUserid) {
         WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getAddUserId, userId)
                 .eq(WeCustomer::getExternalUserid, externalUserid));

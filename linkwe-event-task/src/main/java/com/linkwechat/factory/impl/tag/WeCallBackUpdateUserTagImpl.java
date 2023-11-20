@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @date 2021/1/20 23:10
  **/
 @Slf4j
-@Component("update_tag")
+@Component("shuffleCustomerTag")
 public class WeCallBackUpdateUserTagImpl extends WeEventStrategy {
 
     @Autowired
@@ -67,8 +67,25 @@ public class WeCallBackUpdateUserTagImpl extends WeEventStrategy {
                     .orElse("").split(",")).collect(Collectors.toList());
 
             if(CollectionUtil.isNotEmpty(delUserItemsList)){
-                weFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                        .in(WeFlowerCustomerTagRel::getTagId,delUserItemsList));
+                List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .in(WeFlowerCustomerTagRel::getTagId, delUserItemsList));
+
+
+                if(CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)){
+
+
+                    if(weFlowerCustomerTagRelService.removeByIds(weFlowerCustomerTagRels.stream().map(
+                            WeFlowerCustomerTagRel::getId
+                    ).collect(Collectors.toList()))){
+                        weFlowerCustomerTagRels.stream().forEach(k->{
+                            iWeCustomerService.updateWeCustomerTagIds(k.getUserId(),k.getExternalUserid());
+
+                        });
+
+                    }
+                }
+//                weFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+//                        .in(WeFlowerCustomerTagRel::getTagId,delUserItemsList));
             }
 
 

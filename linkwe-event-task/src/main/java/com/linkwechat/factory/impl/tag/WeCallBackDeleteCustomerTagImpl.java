@@ -29,6 +29,7 @@ public class WeCallBackDeleteCustomerTagImpl extends WeEventStrategy {
     @Autowired
     private IWeTagService weTagService;
 
+
     @Override
     public void eventHandle(WeBackBaseVo message) {
         WeBackCustomerTagVo customerTagInfo = (WeBackCustomerTagVo) message;
@@ -37,6 +38,10 @@ public class WeCallBackDeleteCustomerTagImpl extends WeEventStrategy {
             if(TagSynchEnum.TAG_TYPE.getType().equals(customerTagInfo.getTagType())){//删除标签
                 weTagService.remove(new LambdaQueryWrapper<WeTag>()
                         .in(WeTag::getTagId, Arrays.asList(customerTagInfo.getId().split(","))));
+
+
+
+
             }else if(TagSynchEnum.GROUP_TAG_TYPE.getType().equals(customerTagInfo.getTagType())){//删除标签组
                 weTagGroupService.remove(
                         new LambdaQueryWrapper<WeTagGroup>()
