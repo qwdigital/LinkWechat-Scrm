@@ -1,6 +1,7 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,6 +26,25 @@ public interface WeFlowerCustomerTagRelMapper extends BaseMapper<WeFlowerCustome
      * @return
      */
     List<WeFlowerCustomerTagRel> findNowAddWeFlowerCustomerTagRel(@Param("externalUserId") String externalUserId, @Param("userId") String userId);
+
+
+    /**
+     * 批量获取员工对应的标签
+     * @param weCustomers
+     * @return
+     */
+    List<WeFlowerCustomerTagRel> findConcatNowAddWeFlowerCustomerTagRel(@Param("weCustomers") List<WeCustomer> weCustomers);
+
+
+
+    /**
+     * 批量删除客户对应的标签关系
+     * @param weCustomers
+     * @return
+     */
+    void removeConcatNowAddWeFlowerCustomerTagRel(@Param("weCustomers") List<WeCustomer> weCustomers);
+
+
 
     /**
      * 获取移除的标签

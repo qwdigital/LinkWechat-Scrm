@@ -399,9 +399,14 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                         }
                         weFlowerCustomerTagRels.add(weFlowerCustomerTagRel);
                     });
+                }else{
+                    weCustomer.setTagIds(null);
                 }
                 weCustomerList.add(weCustomer);
             }
+
+
+
         });
 
         //添加客户标签
@@ -416,11 +421,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
             List<List<WeCustomer>> partition = Lists.partition(weCustomerList, 500);
             for (List<WeCustomer> weCustomers : partition) {
                 this.baseMapper.batchAddOrUpdate(weCustomers);
-                weCustomers.forEach(fWeCustomer ->{
-                    if(StringUtils.isEmpty(fWeCustomer.getTagIds())){
-                        this.updateWeCustomerTagIds(fWeCustomer.getAddUserId(),fWeCustomer.getExternalUserid());
-                    }
+                List<WeCustomer> noTagWeCustomer
+                        = weCustomers.stream().filter(item -> StringUtils.isEmpty(item.getTagIds())).collect(Collectors.toList());
+                if(CollectionUtil.isNotEmpty(noTagWeCustomer)){
+                    iWeFlowerCustomerTagRelService.removeConcatNowAddWeFlowerCustomerTagRel(noTagWeCustomer);
+                }
 
+                weCustomers.forEach(fWeCustomer ->{
                     iWeFissionService.handleTaskFissionRecord(fWeCustomer.getState(), fWeCustomer);
                 } );
             }
@@ -601,6 +608,34 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         }
     }
 
+
+    @Override
+    public void batchUpdateWeCustomerTagIds(List<WeCustomer> weCustomers){
+
+        if(CollectionUtil.isNotEmpty(weCustomers)){
+            List<WeFlowerCustomerTagRel> concatNowAddWeFlowerCustomerTagRel
+                    = iWeFlowerCustomerTagRelService.findConcatNowAddWeFlowerCustomerTagRel(weCustomers);
+            if(CollectionUtil.isNotEmpty(concatNowAddWeFlowerCustomerTagRel)){
+                 weCustomers.stream().forEach(k->{
+                     List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels
+                             = concatNowAddWeFlowerCustomerTagRel.stream().filter(item -> item.getExternalUserid().equals(k.getExternalUserid())
+                             && item.getUserId().equals(k.getAddUserId())).collect(Collectors.toList());
+
+                     if(CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)){
+                          k.setTagIds(
+                                  weFlowerCustomerTagRels.stream().map(WeFlowerCustomerTagRel::getTagId).collect(Collectors.toList())
+                                          .stream().map(String::valueOf).collect(Collectors.joining(","))
+                          );
+                     }else{
+                         k.setTagIds(null);
+                     }
+                 });
+            }
+            this.updateBatchById(weCustomers);
+        }
+
+
+    }
 
     @Override
     @Transactional
