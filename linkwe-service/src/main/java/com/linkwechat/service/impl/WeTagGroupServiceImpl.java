@@ -191,6 +191,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     }
 
     @Override
+    @Transactional
     public void deleteWeTagGroupByIds(String[] ids) {
 
         List<WeTagGroup> weTagGroups = this.list(new LambdaQueryWrapper<WeTagGroup>()
