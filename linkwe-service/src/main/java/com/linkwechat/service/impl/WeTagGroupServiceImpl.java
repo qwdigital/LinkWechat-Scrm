@@ -144,7 +144,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                                 .build());
                         if(null != weResultVoAjaxResult){
                             WeResultVo data = weResultVoAjaxResult.getData();
-                            if(null != data && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                            if(null != data && !data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
                                 throw new WeComException(data.getErrMsg());
                             }
                         }
