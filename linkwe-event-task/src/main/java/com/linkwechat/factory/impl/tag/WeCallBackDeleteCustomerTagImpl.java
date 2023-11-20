@@ -50,15 +50,6 @@ public class WeCallBackDeleteCustomerTagImpl extends WeEventStrategy {
         try {
 
             handlerTag(customerTagInfo);
-//            if(TagSynchEnum.TAG_TYPE.getType().equals(customerTagInfo.getTagType())){//删除标签
-//                weTagService.remove(new LambdaQueryWrapper<WeTag>()
-//                        .in(WeTag::getTagId, Arrays.asList(customerTagInfo.getId().split(","))));
-//            }else if(TagSynchEnum.GROUP_TAG_TYPE.getType().equals(customerTagInfo.getTagType())){//删除标签组
-//                weTagGroupService.remove(
-//                        new LambdaQueryWrapper<WeTagGroup>()
-//                                .in(WeTagGroup::getGroupId,Arrays.asList(customerTagInfo.getId().split(",")))
-//                );
-//            }
         } catch (Exception e) {
             log.error("deleteCustomerTag>>>>>>>>>param:{},ex:{}",customerTagInfo.getId(),e);
         }
