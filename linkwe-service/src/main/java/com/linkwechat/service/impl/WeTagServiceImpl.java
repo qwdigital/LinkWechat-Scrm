@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.WeConstans;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
@@ -13,6 +15,7 @@ import com.linkwechat.domain.wecom.entity.customer.tag.WeCorpTagEntity;
 import com.linkwechat.domain.wecom.entity.customer.tag.WeCorpTagGroupEntity;
 import com.linkwechat.domain.wecom.query.customer.tag.WeAddCorpTagQuery;
 import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeTagMapper;
@@ -123,28 +126,32 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper, WeTag> implements
     @Override
     public void removeWxTag(String groupId, List<WeTag> removeWeTags, boolean removeGroup, Boolean qwNotify) {
         //同步删除微信端的标签
-        try {
-            if(qwNotify){
-                WeCorpTagListQuery tagListQuery = WeCorpTagListQuery.builder().build();
-                if (removeGroup) {
-                    tagListQuery.setGroup_id(ListUtil.toList(groupId));
-                } else {
-                    tagListQuery.setTag_id(
-                            removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()
-                            ));
+        if(qwNotify){
+            WeCorpTagListQuery tagListQuery = WeCorpTagListQuery.builder().build();
+            if (removeGroup) {
+                tagListQuery.setGroup_id(ListUtil.toList(groupId));
+            } else {
+                tagListQuery.setTag_id(
+                        removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList()
+                        ));
+            }
+
+            AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.delCorpTag(tagListQuery);
+            if(null != weResultVoAjaxResult){
+                WeResultVo data = weResultVoAjaxResult.getData();
+                if(data != null && !data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                    throw new WeComException(data.getErrMsg());
+                }else{
+
+                    //移除本地
+                    if(CollectionUtil.isNotEmpty(removeWeTags)){
+                        this.remove(new LambdaQueryWrapper<WeTag>()
+                                .in(WeTag::getTagId,removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                    }
+
                 }
 
-                qwCustomerClient.delCorpTag(tagListQuery);
             }
-        }catch (Exception e){
-            log.error(e.getMessage());
-        } finally {
-            //移除本地
-            if(CollectionUtil.isNotEmpty(removeWeTags)){
-                this.remove(new LambdaQueryWrapper<WeTag>()
-                        .in(WeTag::getTagId,removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
-            }
-
         }
     }
 
