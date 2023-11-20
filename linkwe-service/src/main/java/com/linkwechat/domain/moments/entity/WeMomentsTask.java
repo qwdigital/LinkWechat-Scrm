@@ -31,7 +31,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @SuppressWarnings("serial")
-@TableName("we_moments_task")
+@TableName(value="we_moments_task",autoResultMap = true)
 public class WeMomentsTask extends BaseEntity {
 
     /**
