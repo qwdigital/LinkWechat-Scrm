@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.constant.SynchRecordConstants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.TagSynchEnum;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
@@ -135,10 +137,16 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             if (oldWeTagGroup != null) {
 
                 if (!oldWeTagGroup.getGroupName().equals(weTagGroup.getGroupName())) {//标签名不同则更新企业微信端
-                    qwCustomerClient.editCorpTag(WeUpdateCorpTagQuery.builder()
+                    AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.editCorpTag(WeUpdateCorpTagQuery.builder()
                             .id(weTagGroup.getGroupId())
                             .name(weTagGroup.getGroupName())
                             .build());
+                    if(null != weResultVoAjaxResult){
+                        WeResultVo data = weResultVoAjaxResult.getData();
+                        if(null != data && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                            throw new WeComException(data.getErrMsg());
+                        }
+                    }
                 }
 
                 List<WeTag> weTags = weTagGroup.getWeTags();
