@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.WeTagGroup;
 import com.linkwechat.domain.wecom.entity.customer.tag.WeCorpTagEntity;
@@ -15,9 +16,12 @@ import com.linkwechat.domain.wecom.query.customer.tag.WeCorpTagListQuery;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeTagMapper;
+import com.linkwechat.service.IWeCustomerService;
+import com.linkwechat.service.IWeFlowerCustomerTagRelService;
 import com.linkwechat.service.IWeTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +34,14 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper, WeTag> implements
 
     @Autowired
     private QwCustomerClient qwCustomerClient;
+
+
+    @Autowired
+    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+
+
+    @Autowired
+    private IWeCustomerService iWeCustomerService;
 
 
 
@@ -74,7 +86,35 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper, WeTag> implements
     }
 
     @Override
+    @Transactional
     public void removeWxTag(String groupId, List<WeTag> removeWeTags,boolean removeGroup) {
+
+        if(CollectionUtil.isNotEmpty(removeWeTags)){
+            List<WeFlowerCustomerTagRel> tagRels = weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                    .in(WeFlowerCustomerTagRel::getTagId, removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+
+            if(CollectionUtil.isNotEmpty(tagRels)){
+
+                if(weFlowerCustomerTagRelService.removeByIds(tagRels.stream().map(WeFlowerCustomerTagRel::getId)
+                        .collect(Collectors.toList()))){
+                    tagRels.stream().forEach(k->{
+
+                        iWeCustomerService.updateWeCustomerTagIds(k.getUserId(),k.getExternalUserid());
+
+                    });
+
+                }
+
+            }
+
+
+
+
+
+        }
+
+
+
        this.removeWxTag(groupId,removeWeTags,removeGroup,true);
     }
 
