@@ -15,6 +15,7 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.WeTagGroup;
 import com.linkwechat.domain.wecom.entity.customer.tag.WeCorpTagEntity;
@@ -25,6 +26,8 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.tag.WeCorpTagListVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeTagGroupMapper;
+import com.linkwechat.service.IWeCustomerService;
+import com.linkwechat.service.IWeFlowerCustomerTagRelService;
 import com.linkwechat.service.IWeTagGroupService;
 import com.linkwechat.service.IWeTagService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -56,6 +59,13 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private IWeFlowerCustomerTagRelService iWeFlowerCustomerTagRelService;
+
+
+    @Autowired
+    private IWeCustomerService iWeCustomerService;
 
     @Override
     public List<WeTagGroup> selectWeTagGroupList(WeTagGroup weTagGroup) {
@@ -326,10 +336,25 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             List<WeTag> weTags = handleWeTags.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
 
             //移除不包含的标签
-            iWeTagService.remove(new LambdaQueryWrapper<WeTag>()
-                    .notIn(WeTag::getTagId,weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+            List<WeTag> notWetags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                    .notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+
+            if(CollectionUtil.isNotEmpty(notWetags)){
+                List<WeFlowerCustomerTagRel> tagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .in(WeFlowerCustomerTagRel::getTagId, notWetags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                if(CollectionUtil.isNotEmpty(tagRels)){
+                    tagRels.stream().forEach(k->{
+                        iWeCustomerService.updateWeCustomerTagIds(k.getUserId(),k.getExternalUserid());
+                    });
+                    iWeFlowerCustomerTagRelService.removeByIds(tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList()));
+                }
+            }
             iWeTagService.batchAddOrUpdate(weTags);
         }
+
+
+
+
 
     }
 
