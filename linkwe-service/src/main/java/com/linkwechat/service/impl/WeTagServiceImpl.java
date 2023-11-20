@@ -20,6 +20,7 @@ import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeFlowerCustomerTagRelService;
 import com.linkwechat.service.IWeTagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper, WeTag> implements
 
 
     @Autowired
+    @Lazy
     private IWeCustomerService iWeCustomerService;
 
 
