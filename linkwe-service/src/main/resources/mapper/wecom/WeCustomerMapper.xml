@@ -731,7 +731,7 @@
         update_by_id=IFNULL(VALUES(update_by_id),we_customer.update_by_id),
         update_time=IFNULL(VALUES(update_time),we_customer.update_time),
         other_descr=IFNULL(VALUES(other_descr),we_customer.other_descr),
-        tag_ids=IFNULL(VALUES(tag_ids),we_customer.tag_ids),
+        tag_ids=IF(tag_ids IS NULL,we_customer.tag_ids,VALUES(tag_ids)),
         remark_name=IFNULL(VALUES(remark_name),we_customer.remark_name);
     </insert>
 
