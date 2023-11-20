@@ -130,12 +130,7 @@ public interface IWeCustomerService extends IService<WeCustomer> {
     void allocateOnTheJobCustomer(WeOnTheJobCustomerQuery weOnTheJobCustomerQuery);
 
 
-    /**
-     * 更新客户表的标签id,冗余字段
-     * @param userId
-     * @param externalUserid
-     */
-    void updateWeCustomerTagIds(String userId, String externalUserid);
+
 
 
     /**
