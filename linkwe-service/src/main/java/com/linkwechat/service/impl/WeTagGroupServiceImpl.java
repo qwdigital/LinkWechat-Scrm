@@ -313,6 +313,9 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
         //根据企业微信返回的，存在状态恢复，不存在的新增
         if (CollectionUtil.isNotEmpty(weTagGroups)) {
+            //移除不包含的标签
+            this.remove(new LambdaQueryWrapper<WeTagGroup>()
+                    .notIn(WeTagGroup::getGroupId,weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
             this.baseMapper.batchAddOrUpdate(weTagGroups);
         }
 
@@ -320,7 +323,12 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                 = weTagGroups.stream().map(WeTagGroup::getWeTags).collect(Collectors.toList());
 
         if (CollectionUtil.isNotEmpty(handleWeTags)) {
-            iWeTagService.batchAddOrUpdate(handleWeTags.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll));
+            List<WeTag> weTags = handleWeTags.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
+
+            //移除不包含的标签
+            iWeTagService.remove(new LambdaQueryWrapper<WeTag>()
+                    .notIn(WeTag::getTagId,weTags.stream().map(WeTag::getTagId)));
+            iWeTagService.batchAddOrUpdate(weTags);
         }
 
     }
