@@ -131,64 +131,65 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     @Transactional
     public void updateWeTagGroup(WeTagGroup weTagGroup) {
 
-        //更新标签组名称
-        if (this.updateById(weTagGroup)) {
+
             WeTagGroup oldWeTagGroup = this.getById(weTagGroup.getId());
             if (oldWeTagGroup != null) {
+                //更新标签组名称
+                if (this.updateById(weTagGroup)) {
 
-                if (!oldWeTagGroup.getGroupName().equals(weTagGroup.getGroupName())) {//标签名不同则更新企业微信端
-                    AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.editCorpTag(WeUpdateCorpTagQuery.builder()
-                            .id(weTagGroup.getGroupId())
-                            .name(weTagGroup.getGroupName())
-                            .build());
-                    if(null != weResultVoAjaxResult){
-                        WeResultVo data = weResultVoAjaxResult.getData();
-                        if(null != data && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                            throw new WeComException(data.getErrMsg());
+                    if (!oldWeTagGroup.getGroupName().equals(weTagGroup.getGroupName())) {//标签名不同则更新企业微信端
+                        AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.editCorpTag(WeUpdateCorpTagQuery.builder()
+                                .id(weTagGroup.getGroupId())
+                                .name(weTagGroup.getGroupName())
+                                .build());
+                        if(null != weResultVoAjaxResult){
+                            WeResultVo data = weResultVoAjaxResult.getData();
+                            if(null != data && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                                throw new WeComException(data.getErrMsg());
+                            }
                         }
                     }
-                }
 
-                List<WeTag> weTags = weTagGroup.getWeTags();
+                    List<WeTag> weTags = weTagGroup.getWeTags();
 
-                List<WeTag> removeWeTags = new ArrayList<>();
+                    List<WeTag> removeWeTags = new ArrayList<>();
 
-                if (CollectionUtil.isNotEmpty(weTags)) {
-                    //新增的标签
-                    List<WeTag> addWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
-                    if (CollectionUtil.isNotEmpty(addWeTags)) {
-                        if (weTagGroup.getGroupTagType().equals(new Integer(1))) {
-                            iWeTagService.addWxTag(weTagGroup, addWeTags);
-                        } else {
-                            weTags.stream().forEach(k -> {
-                                if (StringUtils.isEmpty(k.getTagId())) {
-                                    Long weTagId = SnowFlakeUtil.nextId();
-                                    k.setId(weTagId);
-                                    k.setTagId(String.valueOf(weTagId));
-                                }
+                    if (CollectionUtil.isNotEmpty(weTags)) {
+                        //新增的标签
+                        List<WeTag> addWeTags = weTags.stream().filter(v -> StringUtils.isEmpty(v.getTagId())).collect(Collectors.toList());
+                        if (CollectionUtil.isNotEmpty(addWeTags)) {
+                            if (weTagGroup.getGroupTagType().equals(new Integer(1))) {
+                                iWeTagService.addWxTag(weTagGroup, addWeTags);
+                            } else {
+                                weTags.stream().forEach(k -> {
+                                    if (StringUtils.isEmpty(k.getTagId())) {
+                                        Long weTagId = SnowFlakeUtil.nextId();
+                                        k.setId(weTagId);
+                                        k.setTagId(String.valueOf(weTagId));
+                                    }
 
-                            });
+                                });
+                            }
+                            addWeTags.stream().forEach(k -> k.setGroupId(weTagGroup.getGroupId()));
+                            iWeTagService.saveBatch(addWeTags);
                         }
-                        addWeTags.stream().forEach(k -> k.setGroupId(weTagGroup.getGroupId()));
-                        iWeTagService.saveBatch(addWeTags);
+
+                        removeWeTags.addAll(
+                                iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
+                                        weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                                        .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
+                        );
+
+                    } else {//删除所有标签
+                        removeWeTags.addAll(
+                                iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                        .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
+                        );
                     }
 
-                    removeWeTags.addAll(
-                            iWeTagService.list(new LambdaQueryWrapper<WeTag>().notIn(WeTag::getTagId,
-                                    weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
-                                    .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
-                    );
-
-                } else {//删除所有标签
-                    removeWeTags.addAll(
-                            iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                                    .eq(WeTag::getGroupId, weTagGroup.getGroupId()))
-                    );
-                }
-
-                if (CollectionUtil.isNotEmpty(removeWeTags)) {
-                    iWeTagService.removeWxTag(weTagGroup.getGroupId(), removeWeTags, false);
-                }
+                    if (CollectionUtil.isNotEmpty(removeWeTags)) {
+                        iWeTagService.removeWxTag(weTagGroup.getGroupId(), removeWeTags, false);
+                    }
 
 
             }
