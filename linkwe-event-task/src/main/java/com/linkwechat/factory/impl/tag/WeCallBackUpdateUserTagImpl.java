@@ -25,72 +25,55 @@ import java.util.stream.Collectors;
 @Component("shuffleCustomerTag")
 public class WeCallBackUpdateUserTagImpl extends WeEventStrategy {
 
-    @Autowired
-    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-
-    @Autowired
-    private IWeCustomerService iWeCustomerService;
+//    @Autowired
+//    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
+//
+//    @Autowired
+//    private IWeCustomerService iWeCustomerService;
 
     @Override
     public void eventHandle(WeBackBaseVo message) {
-        WeBackUserTagVo userTagInfo = (WeBackUserTagVo) message;
-        try {
-            String tagId = userTagInfo.getTagId();
-            //标签中新增的成员userid列表，用逗号分隔
-            List<String> addUserItemsList = Arrays.stream(Optional.ofNullable(userTagInfo.getAddUserItems())
-                    .orElse("").split(",")).collect(Collectors.toList());
-            if(CollectionUtil.isNotEmpty(addUserItemsList)){
-
-                //获取员工对应的所有客户
-                List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                        .in(WeCustomer::getAddUserId, addUserItemsList));
-
-                if(CollectionUtil.isNotEmpty(weCustomers)){
-                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
-                    weCustomers.stream().forEach(k->{
-                        WeFlowerCustomerTagRel customerTagRel=WeFlowerCustomerTagRel.builder()
-                                .userId(k.getAddUserId())
-                                .externalUserid(k.getExternalUserid())
-                                .tagId(tagId)
-                                .build();
-                        weFlowerCustomerTagRels.add(
-                                customerTagRel
-                        );
-                    });
-                    weFlowerCustomerTagRelService.batchAddOrUpdate(weFlowerCustomerTagRels);
-                }
-            }
-
-
-            //标签中删除的成员userid列表，用逗号分隔
-            List<String> delUserItemsList = Arrays.stream(Optional.ofNullable(userTagInfo.getDelUserItems())
-                    .orElse("").split(",")).collect(Collectors.toList());
-
-            if(CollectionUtil.isNotEmpty(delUserItemsList)){
-                List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                        .in(WeFlowerCustomerTagRel::getTagId, delUserItemsList));
-
-
-                if(CollectionUtil.isNotEmpty(weFlowerCustomerTagRels)){
-
-
-                    if(weFlowerCustomerTagRelService.removeByIds(weFlowerCustomerTagRels.stream().map(
-                            WeFlowerCustomerTagRel::getId
-                    ).collect(Collectors.toList()))){
-                        weFlowerCustomerTagRels.stream().forEach(k->{
-                            iWeCustomerService.updateWeCustomerTagIds(k.getUserId(),k.getExternalUserid());
-
-                        });
-
-                    }
-                }
+//        WeBackUserTagVo userTagInfo = (WeBackUserTagVo) message;
+//        try {
+//            String tagId = userTagInfo.getTagId();
+//            //标签中新增的成员userid列表，用逗号分隔
+//            List<String> addUserItemsList = Arrays.stream(Optional.ofNullable(userTagInfo.getAddUserItems())
+//                    .orElse("").split(",")).collect(Collectors.toList());
+//            if(CollectionUtil.isNotEmpty(addUserItemsList)){
+//
+//                //获取员工对应的所有客户
+//                List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+//                        .in(WeCustomer::getAddUserId, addUserItemsList));
+//
+//                if(CollectionUtil.isNotEmpty(weCustomers)){
+//                    List<WeFlowerCustomerTagRel> weFlowerCustomerTagRels = new ArrayList<>();
+//                    weCustomers.stream().forEach(k->{
+//                        WeFlowerCustomerTagRel customerTagRel=WeFlowerCustomerTagRel.builder()
+//                                .userId(k.getAddUserId())
+//                                .externalUserid(k.getExternalUserid())
+//                                .tagId(tagId)
+//                                .build();
+//                        weFlowerCustomerTagRels.add(
+//                                customerTagRel
+//                        );
+//                    });
+//                    weFlowerCustomerTagRelService.batchAddOrUpdate(weFlowerCustomerTagRels);
+//                }
+//            }
+//
+//
+//            //标签中删除的成员userid列表，用逗号分隔
+//            List<String> delUserItemsList = Arrays.stream(Optional.ofNullable(userTagInfo.getDelUserItems())
+//                    .orElse("").split(",")).collect(Collectors.toList());
+//
+//            if(CollectionUtil.isNotEmpty(delUserItemsList)){
 //                weFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
 //                        .in(WeFlowerCustomerTagRel::getTagId,delUserItemsList));
-            }
-
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+//            }
+//
+//
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//        }
     }
 }
