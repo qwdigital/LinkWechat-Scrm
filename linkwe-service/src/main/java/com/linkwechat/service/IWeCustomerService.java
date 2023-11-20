@@ -132,6 +132,12 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
 
+    /**
+     * 批量更新客户标签id，冗余字段
+     * @param weCustomers
+     */
+    void batchUpdateWeCustomerTagIds(List<WeCustomer> weCustomers);
+
 
     /**
      * 客户详情基础数据

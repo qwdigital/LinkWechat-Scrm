@@ -1,6 +1,7 @@
 package com.linkwechat.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.mapper.WeFlowerCustomerTagRelMapper;
 import com.linkwechat.service.IWeFlowerCustomerTagRelService;
@@ -41,5 +42,15 @@ public class WeFlowerCustomerTagRelServiceImpl extends ServiceImpl<WeFlowerCusto
     @Override
     public List<WeFlowerCustomerTagRel> getListByTagIdAndUserId(List<String> tagIds, List<String> userIds) {
         return this.baseMapper.getListByTagIdAndUserId(tagIds, userIds);
+    }
+
+    @Override
+    public List<WeFlowerCustomerTagRel> findConcatNowAddWeFlowerCustomerTagRel(List<WeCustomer> weCustomers) {
+        return this.baseMapper.findConcatNowAddWeFlowerCustomerTagRel(weCustomers);
+    }
+
+    @Override
+    public void removeConcatNowAddWeFlowerCustomerTagRel(List<WeCustomer> weCustomers) {
+        this.baseMapper.removeConcatNowAddWeFlowerCustomerTagRel(weCustomers);
     }
 }
