@@ -28,7 +28,7 @@ public class WeCallBackCreateCustomerTagImpl extends WeEventStrategy {
         WeBackCustomerTagVo customerTagInfo = (WeBackCustomerTagVo) message;
 
         try {
-            weTagGroupService.synchWeGroupAndTag(customerTagInfo.getId(),customerTagInfo.getTagType());
+            weTagGroupService.synchWeGroupAndTag(customerTagInfo.getId(),customerTagInfo.getTagType(),true);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("createCustomerTag>>>>>>>>>param:{},ex:{}",customerTagInfo.getId(),e);

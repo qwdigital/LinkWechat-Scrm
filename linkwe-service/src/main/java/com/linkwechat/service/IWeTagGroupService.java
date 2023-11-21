@@ -66,8 +66,9 @@ public interface IWeTagGroupService extends IService<WeTagGroup> {
      * 指定标签同步
      * @param businessId
      * @param tagType
+     * @param isCallBack true来自回调 false 不来自回调
      */
-    void synchWeGroupAndTag(String businessId,String tagType);
+    void synchWeGroupAndTag(String businessId,String tagType,boolean isCallBack);
 
     /**
      * 查询标签组列表（分页）

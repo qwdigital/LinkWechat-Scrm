@@ -223,11 +223,10 @@ public interface WeCustomerClient {
 
     /**
      * 获取企业标签库
-     *
      * @param query
      * @return WeCorpTagListVo
      */
-    @Request(url = "/externalcontact/get_corp_tag_list", type = "POST")
+    @Request(url = "/externalcontact/get_corp_tag_list", type = "POST" )
     WeCorpTagListVo getCorpTagList(@JSONBody WeCorpTagListQuery query);
 
     /**
