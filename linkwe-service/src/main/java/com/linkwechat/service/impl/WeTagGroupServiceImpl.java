@@ -242,7 +242,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
         SecurityContextHolder.setUserId(String.valueOf(loginUser.getSysUser().getUserId()));
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
-        this.synchWeGroupAndTag(null, null);
+        this.synchWeGroupAndTag(null, null,false);
 
     }
 
@@ -250,7 +250,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
     @Override
     @Transactional
     @Async
-    public void synchWeGroupAndTag(String businessId, String tagType) {
+    public void synchWeGroupAndTag(String businessId, String tagType,boolean isCallBack) {
 
 
         WeCorpTagListQuery weCorpTagListQuery = new WeCorpTagListQuery();
@@ -333,9 +333,12 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
         //根据企业微信返回的，存在状态恢复，不存在的新增
         if (CollectionUtil.isNotEmpty(weTagGroups)) {
-            //移除不包含的标签
-            this.remove(new LambdaQueryWrapper<WeTagGroup>()
-                    .notIn(WeTagGroup::getGroupId,weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
+            if(!isCallBack){
+                //移除不包含的标签
+                this.remove(new LambdaQueryWrapper<WeTagGroup>()
+                        .notIn(WeTagGroup::getGroupId,weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
+            }
+
             this.baseMapper.batchAddOrUpdate(weTagGroups);
         }
 
@@ -345,22 +348,27 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
         if (CollectionUtil.isNotEmpty(handleWeTags)) {
             List<WeTag> weTags = handleWeTags.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
 
-            //移除不包含的标签
-            List<WeTag> notWetags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                    .notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
-                    .eq(WeTag::getTagType,1)
-            );
+            if(!isCallBack){
+                //移除不包含的标签
+                List<WeTag> notWetags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                        .eq(WeTag::getTagType,1)
+                );
 
-            if(CollectionUtil.isNotEmpty(notWetags)){
-                List<WeFlowerCustomerTagRel> tagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                        .in(WeFlowerCustomerTagRel::getTagId, notWetags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
-                if(CollectionUtil.isNotEmpty(tagRels)){
-                    tagRels.stream().forEach(k->{
-                        iWeCustomerService.updateWeCustomerTagIds(k.getUserId(),k.getExternalUserid());
-                    });
-                    iWeFlowerCustomerTagRelService.removeByIds(tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList()));
+                if(CollectionUtil.isNotEmpty(notWetags)){
+                    List<WeFlowerCustomerTagRel> tagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                            .in(WeFlowerCustomerTagRel::getTagId, notWetags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                    if(CollectionUtil.isNotEmpty(tagRels)){
+                        tagRels.stream().forEach(k->{
+                            iWeCustomerService.updateWeCustomerTagIds(k.getUserId(),k.getExternalUserid());
+                        });
+                        iWeFlowerCustomerTagRelService.removeByIds(tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList()));
+                    }
                 }
             }
+
+
+
             iWeTagService.batchAddOrUpdate(weTags);
         }
 
