@@ -209,43 +209,46 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                 .in(WeTagGroup::getGroupId, ListUtil.toList(ids)));
         if (CollectionUtil.isNotEmpty(weTagGroups)) {
             weTagGroups.forEach(k -> {
-                WeCorpTagListQuery tagListQuery = WeCorpTagListQuery.builder()
-                        .group_id(ListUtil.toList(k.getGroupId())).build();
+                if(this.removeById(k.getId())){
+                    WeCorpTagListQuery tagListQuery = WeCorpTagListQuery.builder()
+                            .group_id(ListUtil.toList(k.getGroupId())).build();
 
-                AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.delCorpTag(tagListQuery);
-                if(null != weResultVoAjaxResult){
-                    WeResultVo data = weResultVoAjaxResult.getData();
-                    if(data != null && !data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                        throw new WeComException(data.getErrMsg());
-                    }else{
-                        List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                                .eq(WeTag::getGroupId, k.getGroupId()));
-                        if(CollectionUtil.isNotEmpty(weTags)&&iWeTagService.removeByIds(
-                                weTags.stream().map(WeTag::getId).collect(Collectors.toList())
-                        )){
-                            List<WeFlowerCustomerTagRel> tagRels = weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
-                                    .in(WeFlowerCustomerTagRel::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
-
-                            if(CollectionUtil.isNotEmpty(tagRels)&&weFlowerCustomerTagRelService.removeByIds(
-                                    tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList())
+                    AjaxResult<WeResultVo> weResultVoAjaxResult = qwCustomerClient.delCorpTag(tagListQuery);
+                    if(null != weResultVoAjaxResult){
+                        WeResultVo data = weResultVoAjaxResult.getData();
+                        if(data != null && !data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                            throw new WeComException(data.getErrMsg());
+                        }else{
+                            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                                    .eq(WeTag::getGroupId, k.getGroupId()));
+                            if(CollectionUtil.isNotEmpty(weTags)&&iWeTagService.removeByIds(
+                                    weTags.stream().map(WeTag::getId).collect(Collectors.toList())
                             )){
-                                tagRels.stream().forEach(kk->{
+                                List<WeFlowerCustomerTagRel> tagRels = weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                                        .in(WeFlowerCustomerTagRel::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
 
-                                    iWeCustomerService.updateWeCustomerTagIds(kk.getUserId(),kk.getExternalUserid());
+                                if(CollectionUtil.isNotEmpty(tagRels)&&weFlowerCustomerTagRelService.removeByIds(
+                                        tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList())
+                                )){
+                                    tagRels.stream().forEach(kk->{
+
+                                        iWeCustomerService.updateWeCustomerTagIds(kk.getUserId(),kk.getExternalUserid());
 
 
-                                });
+                                    });
+
+
+                                }
 
 
                             }
-
-
-                        }
 //                        //移除本地
 //                        if(CollectionUtil.isNotEmpty(removeWeTags)){
 //                            this.remove(new LambdaQueryWrapper<WeTag>()
 //                                    .in(WeTag::getTagId,removeWeTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
 //                        }
+
+                        }
 
                     }
 
