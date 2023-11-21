@@ -475,8 +475,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 //                .eq(WeFlowerCustomerTagRel::getUserId, weMakeCustomerTag.getUserId()));
 
         if (CollectionUtil.isNotEmpty(addTag)) {
+
             List<WeFlowerCustomerTagRel> tagRels = new ArrayList<>();
             addTag.stream().forEach(k -> {
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .eq(WeTag::getTagId, k.getTagId()));
+                if(CollectionUtil.isEmpty(weTags)){
+                    throw new WeComException("当前标签中存在已删除的标签");
+                }
+
+
                 WeFlowerCustomerTagRel weFlowerCustomerTagRel = WeFlowerCustomerTagRel.builder()
                         .id(SnowFlakeUtil.nextId())
                         .externalUserid(weMakeCustomerTag.getExternalUserid())
