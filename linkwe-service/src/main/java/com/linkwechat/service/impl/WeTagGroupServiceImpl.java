@@ -347,7 +347,9 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
             //移除不包含的标签
             List<WeTag> notWetags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
-                    .notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
+                    .notIn(WeTag::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList()))
+                    .eq(WeTag::getTagType,1)
+            );
 
             if(CollectionUtil.isNotEmpty(notWetags)){
                 List<WeFlowerCustomerTagRel> tagRels = iWeFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
