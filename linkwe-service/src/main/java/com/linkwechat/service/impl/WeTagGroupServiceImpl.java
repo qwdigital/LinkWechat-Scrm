@@ -17,6 +17,7 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.WeTagGroup;
@@ -230,12 +231,26 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                                 if(CollectionUtil.isNotEmpty(tagRels)&&weFlowerCustomerTagRelService.removeByIds(
                                         tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList())
                                 )){
+                                    List<WeCustomer> weCustomers=new ArrayList<>();
                                     tagRels.stream().forEach(kk->{
 
-                                        iWeCustomerService.updateWeCustomerTagIds(kk.getUserId(),kk.getExternalUserid());
-
+                                        weCustomers.add(WeCustomer.builder()
+                                                        .externalUserid(kk.getExternalUserid())
+                                                        .addUserId(kk.getUserId())
+                                                .build());
 
                                     });
+
+                                    if(CollectionUtil.isNotEmpty(weCustomers)){
+                                        iWeCustomerService.batchUpdateWeCustomerTagIds(weCustomers);
+                                    }
+
+//                                    tagRels.stream().forEach(kk->{
+//
+//                                        iWeCustomerService.updateWeCustomerTagIds(kk.getUserId(),kk.getExternalUserid());
+//
+//
+//                                    });
 
 
                                 }
@@ -312,6 +327,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
     @Override
     @Transactional
+    @Async
     public void synchWeGroupAndTag(String businessId, String tagType,boolean isCallBack) {
 
 
@@ -398,7 +414,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             if(!isCallBack){
                 //移除不包含的标签
                 this.remove(new LambdaQueryWrapper<WeTagGroup>()
-                                .eq(WeTagGroup::getGroupTagType,1)
+                        .eq(WeTagGroup::getGroupTagType,1)
                         .notIn(WeTagGroup::getGroupId,weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
             }
 
