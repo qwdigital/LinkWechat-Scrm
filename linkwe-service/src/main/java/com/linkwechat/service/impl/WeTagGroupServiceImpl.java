@@ -221,7 +221,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                         List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                 .eq(WeTag::getGroupId, k.getGroupId()));
                         if(CollectionUtil.isNotEmpty(weTags)&&iWeTagService.removeByIds(
-                                weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())
+                                weTags.stream().map(WeTag::getId).collect(Collectors.toList())
                         )){
                             List<WeFlowerCustomerTagRel> tagRels = weFlowerCustomerTagRelService.list(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
                                     .in(WeFlowerCustomerTagRel::getTagId, weTags.stream().map(WeTag::getTagId).collect(Collectors.toList())));
