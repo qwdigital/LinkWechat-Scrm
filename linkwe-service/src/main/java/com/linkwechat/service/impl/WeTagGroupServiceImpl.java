@@ -312,7 +312,6 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
 
     @Override
     @Transactional
-    @Async
     public void synchWeGroupAndTag(String businessId, String tagType,boolean isCallBack) {
 
 
@@ -399,6 +398,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
             if(!isCallBack){
                 //移除不包含的标签
                 this.remove(new LambdaQueryWrapper<WeTagGroup>()
+                                .eq(WeTagGroup::getGroupTagType,1)
                         .notIn(WeTagGroup::getGroupId,weTagGroups.stream().map(WeTagGroup::getGroupId).collect(Collectors.toList())));
             }
 
