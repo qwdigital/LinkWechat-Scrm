@@ -212,8 +212,7 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                     iWeTagService.removeWxTag(k.getGroupId(),
                             iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                     .eq(WeTag::getGroupId, k.getId())),
-                            true,
-                            k.getGroupTagType() == 1
+                            true
                     );
                 }
             });
