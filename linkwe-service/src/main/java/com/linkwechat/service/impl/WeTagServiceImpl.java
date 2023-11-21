@@ -142,7 +142,6 @@ public class WeTagServiceImpl extends ServiceImpl<WeTagMapper, WeTag> implements
                 if(data != null && !data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
                     throw new WeComException(data.getErrMsg());
                 }else{
-
                     //移除本地
                     if(CollectionUtil.isNotEmpty(removeWeTags)){
                         this.remove(new LambdaQueryWrapper<WeTag>()
