@@ -231,26 +231,26 @@ public class WeTagGroupServiceImpl extends ServiceImpl<WeTagGroupMapper, WeTagGr
                                 if(CollectionUtil.isNotEmpty(tagRels)&&weFlowerCustomerTagRelService.removeByIds(
                                         tagRels.stream().map(WeFlowerCustomerTagRel::getId).collect(Collectors.toList())
                                 )){
-                                    List<WeCustomer> weCustomers=new ArrayList<>();
-                                    tagRels.stream().forEach(kk->{
-
-                                        weCustomers.add(WeCustomer.builder()
-                                                        .externalUserid(kk.getExternalUserid())
-                                                        .addUserId(kk.getUserId())
-                                                .build());
-
-                                    });
-
-                                    if(CollectionUtil.isNotEmpty(weCustomers)){
-                                        iWeCustomerService.batchUpdateWeCustomerTagIds(weCustomers);
-                                    }
-
+//                                    List<WeCustomer> weCustomers=new ArrayList<>();
 //                                    tagRels.stream().forEach(kk->{
 //
-//                                        iWeCustomerService.updateWeCustomerTagIds(kk.getUserId(),kk.getExternalUserid());
-//
+//                                        weCustomers.add(WeCustomer.builder()
+//                                                        .externalUserid(kk.getExternalUserid())
+//                                                        .addUserId(kk.getUserId())
+//                                                .build());
 //
 //                                    });
+//
+//                                    if(CollectionUtil.isNotEmpty(weCustomers)){
+//                                        iWeCustomerService.batchUpdateWeCustomerTagIds(weCustomers);
+//                                    }
+
+                                    tagRels.stream().forEach(kk->{
+
+                                        iWeCustomerService.updateWeCustomerTagIds(kk.getUserId(),kk.getExternalUserid());
+
+
+                                    });
 
 
                                 }
