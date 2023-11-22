@@ -335,28 +335,32 @@ public class WeTasksServiceImpl extends ServiceImpl<WeTasksMapper, WeTasks> impl
 
     @Override
     public void handlerWeTasks(WeTasksRequest request) {
-        switch (request.getType()) {
-            case 1:
-                this.handlerAppointItemWaitFollowUp(request);
-                break;
-            case 2:
-                this.handlerUserFollowUp2You(request);
-                break;
-            case 5:
-                this.handlerUserAppointItemWaitFollowUp(request);
-                break;
-            case 6:
-                this.handlerCustomerSop(request);
-                break;
-            case 7:
-                this.handlerGroupSop(request);
-                break;
-            case 8:
-                this.handlerGroupAddByLabel(request);
-                break;
-            default:
-                break;
+        if(request != null && request.getType() != null){
+            switch (request.getType()) {
+                case 1:
+                    this.handlerAppointItemWaitFollowUp(request);
+                    break;
+                case 2:
+                    this.handlerUserFollowUp2You(request);
+                    break;
+                case 5:
+                    this.handlerUserAppointItemWaitFollowUp(request);
+                    break;
+                case 6:
+                    this.handlerCustomerSop(request);
+                    break;
+                case 7:
+                    this.handlerGroupSop(request);
+                    break;
+                case 8:
+                    this.handlerGroupAddByLabel(request);
+                    break;
+                default:
+                    break;
+            }
+
         }
+
     }
 
     @Override
