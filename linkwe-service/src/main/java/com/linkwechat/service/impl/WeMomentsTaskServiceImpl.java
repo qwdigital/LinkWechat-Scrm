@@ -771,6 +771,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                                         iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                                                 .in(WeTag::getTagId,JSONObject.parseArray(kk.getLikeTagIds(),String.class)))
                                                 )
+                                                .isCompanyTag(true)
                                                 .userId(interactes.getWeUserId())
                                                 .externalUserid(interactes.getInteracteUserId()).build()
 
@@ -787,16 +788,18 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                                 .isCompanyTag(true)
                                                 .userId(interactes.getWeUserId())
                                                 .externalUserid(interactes.getInteracteUserId()).build()
-
                                 );
                             }
                         });
 
                     }
 
-                    iWeCustomerService.batchMakeLabel(WeBacthMakeCustomerTag.builder().addOrRemove(true)
-                            .weMakeCustomerTagList(weMakeCustomerTags)
-                            .build());
+                    if(CollectionUtil.isNotEmpty(weMomentsInteractes)){
+                        iWeCustomerService.batchMakeLabel(WeBacthMakeCustomerTag.builder().addOrRemove(true)
+                                .weMakeCustomerTagList(weMakeCustomerTags)
+                                .build());
+                    }
+
 
                 }
 
