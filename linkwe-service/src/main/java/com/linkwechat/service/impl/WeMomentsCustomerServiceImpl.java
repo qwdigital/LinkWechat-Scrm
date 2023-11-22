@@ -266,7 +266,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
                         .deliveryStatus(0)
                         .build(), new LambdaQueryWrapper<WeMomentsCustomer>()
                         .eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId)
-                        .in(WeMomentsCustomer::getUserId,weMomentsUsers.stream().map(WeMomentsUser::getWeUserId).collect(Collectors.toSet())));
+                        .in(WeMomentsCustomer::getWeUserId,weMomentsUsers.stream().map(WeMomentsUser::getWeUserId).collect(Collectors.toSet())));
             }
 
     }
