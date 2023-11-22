@@ -784,6 +784,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                                         iWeTagService.list(new LambdaQueryWrapper<WeTag>()
                                                                 .in(WeTag::getTagId,JSONObject.parseArray(kk.getCommentTagIds(),String.class)))
                                                 )
+                                                .isCompanyTag(true)
                                                 .userId(interactes.getWeUserId())
                                                 .externalUserid(interactes.getInteracteUserId()).build()
 
