@@ -722,6 +722,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         LoginUser loginUser = SecurityUtils.getLoginUser();
         loginUser.setBusinessIds( Joiner.on(",").join(taskIds));
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeMomentsRk(), JSONObject.toJSONString(loginUser));
+
     }
 
     @Override

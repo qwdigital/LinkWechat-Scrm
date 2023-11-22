@@ -259,7 +259,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
         //查询跟进员工
         LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
         queryWrapper.eq(WeMomentsUser::getMomentsTaskId, weMomentsTaskId);
-        queryWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
+//        queryWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
         queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
         List<WeMomentsUser> list = weMomentsUserService.list(queryWrapper);
         for (WeMomentsUser weMomentsUser : list) {
