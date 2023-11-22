@@ -175,7 +175,6 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             if (CollectionUtil.isNotEmpty(collect)) {
                 LambdaUpdateWrapper<WeMomentsUser> updateWrapper = Wrappers.lambdaUpdate(WeMomentsUser.class);
                 updateWrapper.eq(WeMomentsUser::getMomentsTaskId, momentsTaskId);
-//                updateWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
                 updateWrapper.in(WeMomentsUser::getWeUserId, collect);
                 updateWrapper.set(WeMomentsUser::getExecuteStatus, 1);
                 this.update(updateWrapper);

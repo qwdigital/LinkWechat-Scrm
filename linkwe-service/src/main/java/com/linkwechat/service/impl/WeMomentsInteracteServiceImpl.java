@@ -104,7 +104,7 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
                         //保存
                         this.saveBatch(result);
                         //打标签
-                        this.interactTag(momentsTaskId, result);
+//                        this.interactTag(momentsTaskId, result);
                         //添加客户轨迹
                         this.addCustomerTrajectory(oldData, result);
                     }
