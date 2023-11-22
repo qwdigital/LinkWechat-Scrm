@@ -772,6 +772,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                                                 .in(WeTag::getTagId,JSONObject.parseArray(kk.getLikeTagIds(),String.class)))
                                                 )
                                                 .isCompanyTag(true)
+                                                .extIdAndWeUserId(interactes.getInteracteUserId()+":"+interactes.getWeUserId())
                                                 .userId(interactes.getWeUserId())
                                                 .externalUserid(interactes.getInteracteUserId()).build()
 
@@ -786,6 +787,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                                                 .in(WeTag::getTagId,JSONObject.parseArray(kk.getCommentTagIds(),String.class)))
                                                 )
                                                 .isCompanyTag(true)
+                                                .extIdAndWeUserId(interactes.getInteracteUserId()+":"+interactes.getWeUserId())
                                                 .userId(interactes.getWeUserId())
                                                 .externalUserid(interactes.getInteracteUserId()).build()
                                 );
@@ -795,8 +797,27 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     }
 
                     if(CollectionUtil.isNotEmpty(weMomentsInteractes)){
+                        //针对同一个客户既点赞又评论的场景，打标签
+                        List<WeMakeCustomerTag>  newWeMakeCustomerTags=new ArrayList<>();
+                        weMakeCustomerTags.stream().collect(Collectors
+                                .groupingBy(WeMakeCustomerTag::getExtIdAndWeUserId)).forEach((k,v)->{
+
+                            WeMakeCustomerTag customerTag=new WeMakeCustomerTag();
+                            List<WeTag> weTags=new ArrayList<>();
+                            v.stream().forEach(ks->{
+                                weTags.addAll(ks.getAddTag());
+                                customerTag.setIsCompanyTag(true);
+                                customerTag.setUserId(ks.getUserId());
+                                customerTag.setExternalUserid(ks.getExternalUserid());
+
+                            });
+                            customerTag.setAddTag(weTags);
+
+                            newWeMakeCustomerTags.add(customerTag);
+                        });
+
                         iWeCustomerService.batchMakeLabel(WeBacthMakeCustomerTag.builder().addOrRemove(true)
-                                .weMakeCustomerTagList(weMakeCustomerTags)
+                                .weMakeCustomerTagList(newWeMakeCustomerTags)
                                 .build());
                     }
 
