@@ -1,10 +1,12 @@
 package com.linkwechat.domain.moments.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -18,7 +20,10 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("we_moments_estimate_customer")
-public class WeMomentsEstimateCustomer implements Serializable {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class WeMomentsEstimateCustomer extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,5 +75,17 @@ public class WeMomentsEstimateCustomer implements Serializable {
     @ApiModelProperty(value = "客户名称")
     @TableField("customer_name")
     private String customerName;
+
+    /**
+     * 送达状态 0已送达 1未送达
+     */
+    private Integer deliveryStatus;
+
+    /**
+     * 删除标识 0:正常 1:删除
+     */
+    @TableLogic
+    private Integer delFlag;
+
 
 }

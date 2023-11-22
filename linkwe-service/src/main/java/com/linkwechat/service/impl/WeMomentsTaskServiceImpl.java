@@ -882,19 +882,27 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         one.setExecuteStatus(1);
         weMomentsEstimateUserService.updateById(one);
 
+        //更新执行状态
+        weMomentsEstimateCustomerService.update(WeMomentsEstimateCustomer.builder()
+                        .momentsTaskId(weMomentsTask.getId())
+                        .deliveryStatus(0)
+                .build(), new LambdaQueryWrapper<WeMomentsEstimateCustomer>()
+                        .eq(WeMomentsEstimateCustomer::getMomentsTaskId,weMomentsTask.getId())
+                .in(WeMomentsEstimateCustomer::getWeUserId,sysUser.getWeUserId()));
+
         //获取成员群发执行结果
-        WeMomentsSyncGroupSendMqRequest mqRequest = new WeMomentsSyncGroupSendMqRequest();
-        mqRequest.setWeMomentsTaskId(request.getWeMomentsTaskId());
-        mqRequest.setSendTime(request.getSendTime());
-        mqRequest.setUser(sysUser);
-        mqRequest.setNum(1);
+//        WeMomentsSyncGroupSendMqRequest mqRequest = new WeMomentsSyncGroupSendMqRequest();
+//        mqRequest.setWeMomentsTaskId(request.getWeMomentsTaskId());
+//        mqRequest.setSendTime(request.getSendTime());
+//        mqRequest.setUser(sysUser);
+//        mqRequest.setNum(1);
         //延迟1分钟执行
-        long intervalTime = 60 * 1000;
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayGetGroupSendResultRK(), JSONObject.toJSONString(mqRequest), message -> {
-            //注意这里时间可使用long类型,毫秒单位，设置header
-            message.getMessageProperties().setHeader("x-delay", intervalTime);
-            return message;
-        });
+//        long intervalTime = 60 * 1000;
+//        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeDelayEx(), rabbitMQSettingConfig.getWeMomentsDelayGetGroupSendResultRK(), JSONObject.toJSONString(mqRequest), message -> {
+//            //注意这里时间可使用long类型,毫秒单位，设置header
+//            message.getMessageProperties().setHeader("x-delay", intervalTime);
+//            return message;
+//        });
     }
 
     @Override

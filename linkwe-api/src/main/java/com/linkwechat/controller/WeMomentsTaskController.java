@@ -170,21 +170,21 @@ public class WeMomentsTaskController extends BaseController {
 
 
 
-//    /**
-//     * 同步成员群发类型朋友圈
-//     * 成员群发类型朋友圈，员工完成任务后，调用该接口，同步企微数据
-//     *
-//     * @param request 同步成员群发类型朋友圈参数
-//     * @return {@link AjaxResult}
-//     * @author WangYX
-//     * @date 2023/06/21 15:56
-//     */
-//    @ApiOperation("同步成员群发类型朋友圈")
-//    @PostMapping("/group/send/finish")
-//    public AjaxResult groupSendFinish(@Validated @RequestBody WeMomentsSyncGroupSendRequest request) {
-//        weMomentsTaskService.groupSendFinish(request);
-//        return AjaxResult.success();
-//    }
+    /**
+     * 同步成员群发类型朋友圈
+     * 成员群发类型朋友圈，员工完成任务后，调用该接口，同步企微数据
+     *
+     * @param request 同步成员群发类型朋友圈参数
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/06/21 15:56
+     */
+    @ApiOperation("同步成员群发类型朋友圈")
+    @PostMapping("/group/send/finish")
+    public AjaxResult groupSendFinish(@Validated @RequestBody WeMomentsSyncGroupSendRequest request) {
+        weMomentsTaskService.groupSendFinish(request);
+        return AjaxResult.success();
+    }
 
     /**
      * 移动端列表
