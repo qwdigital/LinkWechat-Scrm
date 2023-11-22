@@ -257,23 +257,18 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
     @Override
     public void syncMomentsCustomerSendSuccess(Long weMomentsTaskId, String momentsId) {
         //查询跟进员工
-        LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
-        queryWrapper.eq(WeMomentsUser::getMomentsTaskId, weMomentsTaskId);
-//        queryWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
-        queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
-        List<WeMomentsUser> list = weMomentsUserService.list(queryWrapper);
-        for (WeMomentsUser weMomentsUser : list) {
-            List<ExternalUserid> externalUserIds = iterateGetCustomerSendResult(momentsId, weMomentsUser.getWeUserId(), null);
-            List<String> collect = externalUserIds.stream().map(ExternalUserid::getExternal_userid).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(collect)) {
-                LambdaUpdateWrapper<WeMomentsCustomer> wrapper = Wrappers.lambdaUpdate(WeMomentsCustomer.class);
-                wrapper.eq(WeMomentsCustomer::getMomentsId, momentsId);
-                wrapper.eq(WeMomentsCustomer::getWeUserId, weMomentsUser.getWeUserId());
-                wrapper.in(WeMomentsCustomer::getExternalUserid, collect);
-                wrapper.set(WeMomentsCustomer::getDeliveryStatus, 0);
-                this.update(wrapper);
+         List<WeMomentsUser> weMomentsUsers = weMomentsUserService.list(new LambdaQueryWrapper<WeMomentsUser>()
+                .eq(WeMomentsUser::getMomentsTaskId, weMomentsTaskId)
+                .eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE)
+                .eq(WeMomentsUser::getExecuteStatus,1));
+            if(CollectionUtil.isNotEmpty(weMomentsUsers)){
+                this.update(WeMomentsCustomer.builder()
+                        .deliveryStatus(0)
+                        .build(), new LambdaQueryWrapper<WeMomentsCustomer>()
+                        .eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId)
+                        .in(WeMomentsCustomer::getUserId,weMomentsUsers.stream().map(WeMomentsUser::getWeUserId).collect(Collectors.toSet())));
             }
-        }
+
     }
 
     @Override
