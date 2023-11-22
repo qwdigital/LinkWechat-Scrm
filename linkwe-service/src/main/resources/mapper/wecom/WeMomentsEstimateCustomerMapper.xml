@@ -26,7 +26,7 @@
         t1.we_user_id,
         t1.user_name AS user_name,
         t1.customer_name,
-        IFNULL(t2.delivery_status, 1) AS delivery_status
+        IFNULL(t1.delivery_status, 1) AS delivery_status
         FROM we_moments_estimate_customer t1
         WHERE t1.moments_task_id = #{weMomentsTaskId}
         <if test="weUserIds!=null and weUserIds!=''">
