@@ -72,7 +72,7 @@ public class WeMomentTask {
                     });
                 }
 
-             // 通过jobId换取momentsId
+                //通过jobId换取momentsId
                 List<WeMomentsTaskRelation> weMomentsTaskRelations = iWeMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
                         .isNotNull(WeMomentsTaskRelation::getJobId)
                         .isNull(WeMomentsTaskRelation::getMomentId));
@@ -82,6 +82,9 @@ public class WeMomentTask {
                     );
                 }
 
+                //到期结束任务
+                weMomentsTaskService.update(WeMomentsTask.builder().status(2).build(),new LambdaQueryWrapper<WeMomentsTask>()
+                        .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
 
 
             }finally {
