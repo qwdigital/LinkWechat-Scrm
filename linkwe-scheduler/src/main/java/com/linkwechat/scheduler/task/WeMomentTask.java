@@ -83,7 +83,7 @@ public class WeMomentTask {
                 }
 
                 //到期结束任务
-                weMomentsTaskService.update(WeMomentsTask.builder().status(2).build(),new LambdaQueryWrapper<WeMomentsTask>()
+                weMomentsTaskService.update(WeMomentsTask.builder().status(3).build(),new LambdaQueryWrapper<WeMomentsTask>()
                         .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
 
 
