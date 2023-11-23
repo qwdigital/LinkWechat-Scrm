@@ -5,7 +5,6 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.task.vo.WeTasksVO;
-import com.linkwechat.service.IWeSopExecuteTargetAttachmentsService;
 import com.linkwechat.service.IWeTasksService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
