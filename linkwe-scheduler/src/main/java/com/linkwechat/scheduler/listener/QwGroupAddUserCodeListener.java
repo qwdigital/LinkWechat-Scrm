@@ -92,9 +92,9 @@ public class QwGroupAddUserCodeListener {
                         .eq(WeGroupCodeTagRel::getGroupCodeId, weGroupCode.getId()));
 
                 if(CollectionUtil.isNotEmpty(tagRels)){
-
-                    List<WeTag> weTags = iWeTagService.listByIds(tagRels.stream().map(WeGroupCodeTagRel::getTagId)
-                            .collect(Collectors.toSet()));
+                    List<WeTag> weTags =iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                            .in(WeTag::getTagId,tagRels.stream().map(WeGroupCodeTagRel::getTagId)
+                                    .collect(Collectors.toSet())));
                     if(CollectionUtil.isNotEmpty(weTags)){
                         iWeCustomerService.makeTagWeCustomer(userId,weTags);
 

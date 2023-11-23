@@ -130,7 +130,7 @@ public class WeLeadsSeaController extends BaseController {
         LambdaQueryWrapper<WeLeads> queryWrapper = Wrappers.lambdaQuery(WeLeads.class);
         queryWrapper.eq(WeLeads::getSeaId, weLeadsSea.getId());
         queryWrapper.eq(WeLeads::getDelFlag, Constants.COMMON_STATE);
-        List<WeLeads> list = weLeadsService.list();
+        List<WeLeads> list = weLeadsService.list(queryWrapper);
         List<Long> ids = list.stream().map(WeLeads::getId).collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(ids)) {
             LambdaUpdateWrapper<WeLeads> lambdaUpdate = Wrappers.lambdaUpdate(WeLeads.class);
