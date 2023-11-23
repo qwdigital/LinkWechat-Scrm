@@ -81,70 +81,7 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
 
 
           return estimateCustomerNum>10000?10000:estimateCustomerNum;
-//        WeCustomersQuery weCustomersQuery=new WeCustomersQuery();
-//
-//        //查询员工不为空
-//        if(CollectionUtil.isNotEmpty(request.getUserIds())){
-//            weCustomersQuery.setUserIds(
-//                    String.join(",", request.getUserIds())
-//            );
-//        }else{
-//            request.setUserIds(new ArrayList<>());
-//        }
-//
-//        //查询标签不为空
-//        if(CollectionUtil.isNotEmpty(request.getCustomerTag())){
-//            weCustomersQuery.setTagIds(
-//                    String.join(",", request.getCustomerTag())
-//            );
-//        }
-//
-//
-//        AjaxResult<List<SysUser>> result = qwSysUserClient.findAllSysUser(null, StrUtil.join(",",request.getPosts()), StrUtil.join(",", request.getDeptIds()));
-//
-//        if(null != request){
-//            List<SysUser> sysUsers = result.getData();
-//            if(CollectionUtil.isNotEmpty(sysUsers)){
-//
-//                request.getUserIds().addAll(
-//                        sysUsers.stream().map(SysUser::getWeUserId).collect(Collectors.toList())
-//                );
-//            }
-//        }
-//
 
-
-
-
-
-//       return weCustomerService.countWeCustomerList(weCustomersQuery);
-//        if (request.getScopeType().equals(0)) {
-//            //全部客户
-//            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
-//            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-//            queryWrapper.ne(WeCustomer::getTrackState, 5);
-//            return weCustomerService.count(queryWrapper);
-//        } else {
-//            //通过条件筛选
-//            List<SysUser> sysUsers = weMomentsUserService.getMomentsTaskExecuteUser(request.getScopeType(), request.getDeptIds(), request.getPosts(), request.getUserIds());
-//            List<String> collect = sysUsers.stream().map(SysUser::getWeUserId).distinct().collect(Collectors.toList());
-//            if (CollectionUtil.isNotEmpty(request.getCustomerTag())) {
-//                //标签数量不为0时，获取标签对应的客户数量
-//                List<String> weUserIds = weFlowerCustomerTagRelService.getCountByTagIdAndUserId(request.getCustomerTag(), collect);
-//                weUserIds = weUserIds.stream().distinct().collect(Collectors.toList());
-//                return CollectionUtil.isNotEmpty(weUserIds) ? weUserIds.size() : 0;
-//            }
-//            //通过条件筛选出的员工数据为0，且没有客户标签时
-//            if (CollectionUtil.isEmpty(sysUsers)) {
-//                return 0;
-//            }
-//            //员工数据不为0时，获取全部的客户数量
-//            LambdaQueryWrapper<WeCustomer> queryWrapper = Wrappers.lambdaQuery(WeCustomer.class);
-//            queryWrapper.eq(WeCustomer::getDelFlag, Constants.COMMON_STATE);
-//            queryWrapper.ne(WeCustomer::getTrackState, 5);
-//            queryWrapper.in(WeCustomer::getAddUserId, collect);
-//            return weCustomerService.count(queryWrapper);
-//        }
     }
 
     @Override
@@ -262,11 +199,20 @@ public class WeMomentsCustomerServiceImpl extends ServiceImpl<WeMomentsCustomerM
                 .eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE)
                 .eq(WeMomentsUser::getExecuteStatus,1));
             if(CollectionUtil.isNotEmpty(weMomentsUsers)){
-                this.update(WeMomentsCustomer.builder()
-                        .deliveryStatus(0)
-                        .build(), new LambdaQueryWrapper<WeMomentsCustomer>()
-                        .eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId)
-                        .in(WeMomentsCustomer::getWeUserId,weMomentsUsers.stream().map(WeMomentsUser::getWeUserId).collect(Collectors.toSet())));
+                for (WeMomentsUser weMomentsUser : weMomentsUsers) {
+                    List<ExternalUserid> externalUserIds = iterateGetCustomerSendResult(momentsId, weMomentsUser.getWeUserId(), null);
+
+                    if(CollectionUtil.isNotEmpty(externalUserIds)){
+                        this.update(WeMomentsCustomer.builder()
+                                .deliveryStatus(0)
+                                .build(), new LambdaQueryWrapper<WeMomentsCustomer>()
+                                .eq(WeMomentsCustomer::getMomentsTaskId, weMomentsTaskId)
+                                .in(WeMomentsCustomer::getExternalUserid,externalUserIds.stream().map(ExternalUserid::getExternal_userid).collect(Collectors.toList()))
+                                .eq(WeMomentsCustomer::getWeUserId,weMomentsUser.getWeUserId()));
+                    }
+
+                }
+
             }
 
     }

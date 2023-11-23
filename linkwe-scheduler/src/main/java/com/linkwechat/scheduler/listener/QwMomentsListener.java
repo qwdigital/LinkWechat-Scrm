@@ -52,24 +52,24 @@ public class QwMomentsListener {
         }
     }
 
-    /**
-     * 朋友圈任务定时取消
-     *
-     * @author WangYX
-     * @date 2023/06/09 18:22
-     * @version 2.0.0
-     */
-    @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_Delay_Cancel}")
-    public void momentsCancel(String msg, Channel channel, Message message) {
-        try {
-            log.info("朋友圈任务定时取消处理：msg:{}", msg);
-            momentsCancel(Long.valueOf(msg));
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        } catch (Exception e) {
-            log.error("朋友圈任务定时取消处理失败 msg:{},error:{}", msg, e);
-        }
-    }
+//    /**
+//     * 朋友圈任务定时取消
+//     *
+//     * @author WangYX
+//     * @date 2023/06/09 18:22
+//     * @version 2.0.0
+//     */
+//    @RabbitHandler
+//    @RabbitListener(queues = "${wecom.mq.route.delay.we-moments:Qu_Moments_Delay_Cancel}")
+//    public void momentsCancel(String msg, Channel channel, Message message) {
+//        try {
+//            log.info("朋友圈任务定时取消处理：msg:{}", msg);
+//            momentsCancel(Long.valueOf(msg));
+//            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+//        } catch (Exception e) {
+//            log.error("朋友圈任务定时取消处理失败 msg:{},error:{}", msg, e);
+//        }
+//    }
 
 
     /**

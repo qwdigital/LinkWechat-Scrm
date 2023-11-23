@@ -46,73 +46,11 @@ public class WeMomentTask {
 
     @Autowired
     private IWeMomentsTaskRelationService iWeMomentsTaskRelationService;
-//    @Resource
-//    private RedisService redisService;
+
 
      @Autowired
      private RedissonClient redissonClient;
 
-
-
-//    /**
-//     * 同步30天数据
-//     */
-//    public final Integer TIME_TYPE_THIRTY = 1;
-//
-//    /**
-//     * 同步前一天数据
-//     */
-//    public final Integer PARAMS_TYPE_YESTERDAY = 2;
-//
-//    /**
-//     * 同步自定义时间
-//     */
-//    public final Integer PARAMS_TYPE_CUSTOMIZE = 3;
-
-//    /**
-//     * 朋友圈定时拉取任务
-//     */
-//    @XxlJob("weMomentPullTask")
-//    public void weMomentPullHandle() {
-//        //获取页面传递的参数
-//        String params = XxlJobHelper.getJobParam();
-//
-//        XxlJobHelper.log("朋友圈定时拉取任务>>>>>>>>>>>>>>>>>>> params:{}", params);
-//
-//        Long startTime = DateUtil.beginOfDay(new Date()).getTime() / 1000;
-//        Long endTime = DateUtil.date().getTime() / 1000;
-//
-//        WeMomentPullQuery query = new WeMomentPullQuery();
-//        if (StringUtils.isNotEmpty(params)) {
-//            query = JSONObject.parseObject(params, WeMomentPullQuery.class);
-//        }
-//        //设置同步起始时间
-//        if (ObjectUtil.equal(TIME_TYPE_THIRTY, query.getType())) {
-//            startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(), -30)).getTime() / 1000;
-//            endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-//        } else if (ObjectUtil.equal(PARAMS_TYPE_YESTERDAY, query.getType())) {
-//            startTime = DateUtil.beginOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-//            endTime = DateUtil.endOfDay(DateUtil.offsetDay(new Date(), -1)).getTime() / 1000;
-//        } else if (ObjectUtil.equal(PARAMS_TYPE_CUSTOMIZE, query.getType())) {
-//            startTime = query.getStartTime();
-//            endTime = query.getEndTime();
-//        }
-//
-//        //加锁，防止并发处理
-//        String key = "momentsSyncKey";
-//        String value = "lock";
-//        Boolean b = redisService.tryLock(key, value, 60 * 60L);
-//        if (b) {
-//            try {
-//                List<MomentsListDetailResultDto.Moment> moments = new ArrayList<>();
-//                MomentsListDetailParamDto detailParamDto = MomentsListDetailParamDto.builder().start_time(startTime).end_time(endTime).build();
-//                weMomentsTaskService.getMoment(null, moments, detailParamDto);
-//                weMomentsTaskService.syncMomentsDataHandle(moments);
-//            } finally {
-//                redisService.unLock(key, value);
-//            }
-//        }
-//    }
 
 
     /**
@@ -154,12 +92,5 @@ public class WeMomentTask {
     }
 
 
-
-//    @Data
-//    private static class WeMomentPullQuery {
-//        private Integer type = 2;
-//        private Long startTime;
-//        private Long endTime;
-//    }
 
 }

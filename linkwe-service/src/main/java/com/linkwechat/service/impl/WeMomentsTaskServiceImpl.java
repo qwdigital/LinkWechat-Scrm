@@ -657,7 +657,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                 visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUserIds.toArray(new String[0])).build());
             }
 
-
         builder.visible_range(visibleRange);
         return builder.build();
     }
@@ -733,7 +732,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
         List<WeMomentsTaskRelation> weMomentsTaskRelations = weMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
                         .in(StringUtils.isNotEmpty(loginUser.getBusinessIds()),WeMomentsTaskRelation::getMomentTaskId,ListUtil.toList(loginUser.getBusinessIds().split(",")))
-//                        .eq(WeMomentsTaskRelation::getMomentTaskId,"1727240387690561538")
                 .isNotNull(WeMomentsTaskRelation::getMomentTaskId));
 
         if(CollectionUtil.isNotEmpty(weMomentsTaskRelations)){
@@ -749,7 +747,6 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
 
 
         List<WeMomentsTask> weMomentsTasks = this.listByIds(ListUtil.toList(loginUser.getBusinessIds().split(",")));
-//        List<WeMomentsTask> weMomentsTasks = this.listByIds(ListUtil.toList("1727240387690561538"));
         if(CollectionUtil.isNotEmpty(weMomentsTasks)){
             weMomentsTasks.stream().forEach(kk->{
 
