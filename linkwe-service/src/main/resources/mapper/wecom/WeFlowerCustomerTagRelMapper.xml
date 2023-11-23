@@ -42,6 +42,24 @@
           AND del_flag = 0
     </select>
 
+    <select id="findConcatNowAddWeFlowerCustomerTagRel" resultType="com.linkwechat.domain.WeFlowerCustomerTagRel">
+        SELECT *
+        FROM we_flower_customer_tag_rel
+        WHERE  is_company_tag = 1  AND del_flag = 0 AND CONCAT(external_userid,":",user_id) in
+        <foreach item="item" index="index" collection="weCustomers" open="(" separator="," close=")">
+            CONCAT(#{item.externalUserid},":",#{item.addUserId})
+        </foreach>
+    </select>
+
+    <select id="removeConcatNowAddWeFlowerCustomerTagRel">
+      delete from we_flower_customer_tag_rel where CONCAT(external_userid,":",user_id) in
+        <foreach item="item" index="index" collection="weCustomers" open="(" separator="," close=")">
+            CONCAT(#{item.externalUserid},":",#{item.addUserId})
+        </foreach>
+
+    </select>
+
+
     <select id="findRemoveWeFlowerCustomerTagRel" resultType="com.linkwechat.domain.WeFlowerCustomerTagRel">
         SELECT *
         FROM we_flower_customer_tag_rel

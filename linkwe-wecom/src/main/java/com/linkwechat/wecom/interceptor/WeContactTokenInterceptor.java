@@ -20,6 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
+/**
+ * 外部联系人token
+ */
 @Slf4j
 @Component
 public class WeContactTokenInterceptor extends WeForestInterceptor implements Interceptor<WeResultVo> {

@@ -3,6 +3,7 @@ package com.linkwechat.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -217,31 +218,36 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
 
     private void getTaskCodeInfo(WePresTagGroupTask groupTask){
 
-        //触发客户数
-        groupTask.setTouchWeCustomerNumber(
-                iWePresTagGroupTaskStatService.count(new LambdaQueryWrapper<WePresTagGroupTaskStat>()
-                        .eq(WePresTagGroupTaskStat::getTaskId,groupTask)
-                        .eq(WePresTagGroupTaskStat::getSent,1))
-        );
+
+        if(null  != groupTask){
+            //触发客户数
+            groupTask.setTouchWeCustomerNumber(
+                    iWePresTagGroupTaskStatService.count(new LambdaQueryWrapper<WePresTagGroupTaskStat>()
+                            .eq(WePresTagGroupTaskStat::getTaskId,groupTask.getId())
+                            .eq(WePresTagGroupTaskStat::getSent,1))
+            );
 
 
-        //进群客户数
-        groupTask.setJoinGroupCustomerNumber(
-                iWeGroupMemberService.count(new LambdaQueryWrapper<WeGroupMember>()
-                        .eq(WeGroupMember::getState,groupTask.getGroupCodeState()))
-        );
+            //进群客户数
+            groupTask.setJoinGroupCustomerNumber(
+                    iWeGroupMemberService.count(new LambdaQueryWrapper<WeGroupMember>()
+                            .eq(WeGroupMember::getState,groupTask.getGroupCodeState()))
+            );
 
-        //实际群聊
-        String chatIdList = groupTask.getChatIdList();
-        if(StringUtils.isNotEmpty(chatIdList)){
-            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
-                    .in(WeGroup::getChatId, chatIdList.split(",")));
-            if(CollectionUtil.isNotEmpty(weGroups)){
-                groupTask.setGroupNames(
-                        weGroups.stream().map(WeGroup::getGroupName).collect(Collectors.joining(","))
-                );
+            //实际群聊
+            String chatIdList = groupTask.getChatIdList();
+            if(StringUtils.isNotEmpty(chatIdList)){
+                List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                        .in(WeGroup::getChatId, chatIdList.split(",")));
+                if(CollectionUtil.isNotEmpty(weGroups)){
+                    groupTask.setGroupNames(
+                            weGroups.stream().map(WeGroup::getGroupName).collect(Collectors.joining(","))
+                    );
+                }
             }
+
         }
+
 
 
 

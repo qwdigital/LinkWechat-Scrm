@@ -116,4 +116,11 @@ public interface IWeFissionService extends IService<WeFission> {
      * 裂变处理(状态维护，过期状态维护)
      */
     void handleFission();
+
+
+    /**
+     * 更新状态为未发送
+     * @param weFissions
+     */
+    void updateBatchFissionIsTipNoSend(List<WeFission> weFissions);
 }

@@ -52,6 +52,7 @@ public class SynchRecordAop {
             if (CollectionUtil.isNotEmpty(weSynchRecords)) {
                 throw new CustomException("由于企业微信开放平台的限制，" + linkWeChatConfig.getDataSynchInterval() + "分钟内不得重复同步操作",-1);
             }
+
         }
     }
 

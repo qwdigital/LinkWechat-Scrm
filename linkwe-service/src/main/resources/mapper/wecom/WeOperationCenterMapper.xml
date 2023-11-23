@@ -277,57 +277,72 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 
     <select id="getGroupAnalysisByApp" resultType="com.linkwechat.domain.operation.vo.WeGroupAnalysisVo">
-        select
-        (select count(1) from we_group where del_flag = 0
+        <choose>
 
-        <if test="chatIds != null and chatIds.size() > 0" >
-            and chat_id in
-            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
-                #{chatId}
-            </foreach>
-        </if>
-        ) total_cnt,
-        (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')
-        <if test="chatIds != null and chatIds.size() > 0" >
-            and chat_id in
-            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
-                #{chatId}
-            </foreach>
-        </if>
-        ) as td_group_add_cnt,
-        (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')  and del_flag = 1
-        <if test="chatIds != null and chatIds.size() > 0" >
-            and chat_id in
-            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
-                #{chatId}
-            </foreach>
-        </if>
-        ) as td_group_dissolve_cnt,
-        (select count(1) from we_group_member where del_flag = 0
-        <if test="chatIds != null and chatIds.size() > 0" >
-            and chat_id in
-            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
-                #{chatId}
-            </foreach>
-        </if>
-        ) as member_total_cnt,
-        (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')
-        <if test="chatIds != null and chatIds.size() > 0" >
-            and chat_id in
-            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
-                #{chatId}
-            </foreach>
-        </if>
-        ) as td_member_add_cnt,
-        (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1
-        <if test="chatIds != null and chatIds.size() > 0" >
-            and chat_id in
-            <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
-                #{chatId}
-            </foreach>
-        </if>
-        ) as td_member_quit_cnt
-    </select>
+
+         <when test="chatIds!= null and chatIds.size()>0" >
+              select
+            (select count(1) from we_group where del_flag = 0
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            ) total_cnt,
+            (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            ) as td_group_add_cnt,
+            (select count(1) from we_group where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')  and del_flag = 1
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            ) as td_group_dissolve_cnt,
+            (select count(1) from we_group_member where del_flag = 0
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            ) as member_total_cnt,
+            (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d')
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            ) as td_member_add_cnt,
+            (select count(1) from we_group_member where date_format(create_time,'%Y-%m-%d') = date_format(curdate(),'%Y-%m-%d') and del_flag = 1
+            <if test="chatIds != null and chatIds.size() > 0" >
+                and chat_id in
+                <foreach item="chatId" collection="chatIds" index="index" open="(" separator="," close=")">
+                    #{chatId}
+                </foreach>
+            </if>
+            ) as td_member_quit_cnt
+        </when>
+            <otherwise>
+                select
+                    0 as  total_cnt,
+                    0 as td_group_add_cnt,
+                    0 as td_group_dissolve_cnt,
+                    0 as member_total_cnt,
+                    0 as td_member_add_cnt,
+                    0 td_member_quit_cnt
+            </otherwise>
+
+        </choose>
+   </select>
 
 
 

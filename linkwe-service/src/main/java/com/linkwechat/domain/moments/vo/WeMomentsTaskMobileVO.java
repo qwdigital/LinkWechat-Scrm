@@ -86,7 +86,7 @@ public class WeMomentsTaskMobileVO {
      * 客户数
      */
     @ApiModelProperty(value = "客户数")
-    private Integer customerNum;
+    private long customerNum;
 
     /**
      * 执行状态:0未执行，1已执行

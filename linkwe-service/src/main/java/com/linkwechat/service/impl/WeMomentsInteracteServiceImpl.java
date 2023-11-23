@@ -69,7 +69,7 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
         //1.获取执行员工
         LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
         queryWrapper.eq(WeMomentsUser::getMomentsTaskId, momentsTaskId);
-        queryWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
+//        queryWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
         queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
         List<WeMomentsUser> list = weMomentsUserMapper.selectList(queryWrapper);
         if (CollectionUtil.isNotEmpty(list)) {
@@ -77,7 +77,7 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
             //数据库旧的已存在的朋友圈互动数据
             LambdaQueryWrapper<WeMomentsInteracte> wrapper = Wrappers.lambdaQuery(WeMomentsInteracte.class);
             wrapper.eq(WeMomentsInteracte::getMomentsTaskId, momentsTaskId);
-            wrapper.eq(WeMomentsInteracte::getMomentId, momentsId);
+//            wrapper.eq(WeMomentsInteracte::getMomentId, momentsId);
             wrapper.eq(WeMomentsInteracte::getDelFlag, Constants.COMMON_STATE);
             List<WeMomentsInteracte> oldData = this.list(wrapper);
 
@@ -104,7 +104,7 @@ public class WeMomentsInteracteServiceImpl extends ServiceImpl<WeMomentsInteract
                         //保存
                         this.saveBatch(result);
                         //打标签
-                        this.interactTag(momentsTaskId, result);
+//                        this.interactTag(momentsTaskId, result);
                         //添加客户轨迹
                         this.addCustomerTrajectory(oldData, result);
                     }

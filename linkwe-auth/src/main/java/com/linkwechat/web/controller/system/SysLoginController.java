@@ -120,6 +120,17 @@ public class SysLoginController {
         return AjaxResult.success(sysLoginService.login(loginBody.getUsername(), loginBody.getPassword()));
     }
 
+    /**
+     * 移动端应用登陆
+     *
+     * @param auth_code
+     * @return
+     */
+    @GetMapping("/linkLogin")
+    public AjaxResult<Map<String, Object>> linkLogin(String auth_code) {
+        Map<String, Object> map = sysLoginService.linkLogin(auth_code);
+        return AjaxResult.success(map);
+    }
 
     /**
      * 企业微信h5回掉地址

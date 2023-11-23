@@ -24,6 +24,12 @@
             <if test="weCustomerList.trackState !=null">
                 AND wcr.track_state=#{weCustomerList.trackState}
             </if>
+           <if test="weCustomerList.noContainTrackStates !=null and weCustomerList.noContainTrackStates !=''">
+               AND wcr.track_state not in
+               <foreach collection="weCustomerList.noContainTrackStates.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                   #{item}
+               </foreach>
+           </if>
 
             <if test="weCustomerList.addMethod !=null">
                 AND wcr.add_method=#{weCustomerList.addMethod}
@@ -43,6 +49,13 @@
             <if test="weCustomerList.externalUserid !=null">
                 AND wcr.external_userid=#{weCustomerList.externalUserid}
             </if>
+
+           <if test="weCustomerList.externalUserids !=null and weCustomerList.externalUserids !=''">
+               AND wcr.external_userid in
+               <foreach collection="weCustomerList.externalUserids.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                   #{item}
+               </foreach>
+           </if>
 
             <if test="weCustomerList.firstUserId !=null">
                 AND wcr.add_user_id=#{weCustomerList.firstUserId}
@@ -235,7 +248,7 @@
         wc.position,
         wc.corp_name as corpName,
         wc.other_descr as otherDescr,
-        timestampdiff(day,wc.add_time,NOW()) as retentionDays,
+        timestampdiff(day,wc.add_time, wc.loss_time) as retentionDays,
         (SELECT GROUP_CONCAT(DISTINCT wu.user_name) FROM sys_user wu WHERE  wu.we_user_id=wc.add_user_id) as userName,
         (SELECT GROUP_CONCAT(wt.tag_id) FROM we_flower_customer_tag_rel wfctr
         LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
@@ -250,7 +263,8 @@
         LEFT JOIN we_tag wt ON wt.tag_id= wfctr.tag_id
         WHERE wfctr.external_userid=wc.external_userid AND wc.add_user_id=wfctr.user_id AND wt.tag_type=1 and wfctr.del_flag=0)  as tagIds,
         wc.update_time as updateTime,
-        wc.area
+        wc.area,
+        wc.loss_time
         FROM
         we_customer wc
         WHERE
@@ -282,8 +296,20 @@
             <if test="weCustomerList.gender !=null">
                 AND wcr.gender=#{weCustomerList.gender}
             </if>
+            <if test="weCustomerList.genders !=null and weCustomerList.genders !=''">
+                AND wcr.gender in
+                <foreach collection="weCustomerList.genders.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="weCustomerList.trackState !=null">
                 AND wcr.track_state=#{weCustomerList.trackState}
+            </if>
+            <if test="weCustomerList.noContainTrackStates !=null and weCustomerList.noContainTrackStates !=''">
+                AND wcr.track_state not in
+                <foreach collection="weCustomerList.noContainTrackStates.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
 
             <if test="weCustomerList.addMethod !=null">
@@ -294,8 +320,22 @@
                 AND wcr.customer_type=#{weCustomerList.customerType}
             </if>
 
+            <if test="weCustomerList.customerTypes !=null and weCustomerList.customerTypes !=''">
+                AND wcr.customer_type in
+                <foreach collection="weCustomerList.customerTypes.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
             <if test="weCustomerList.externalUserid !=null">
                 AND wcr.external_userid=#{weCustomerList.externalUserid}
+            </if>
+
+            <if test="weCustomerList.externalUserids !=null and weCustomerList.externalUserids !=''">
+                AND wcr.external_userid in
+                <foreach collection="weCustomerList.externalUserids.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
 
             <if test="weCustomerList.firstUserId !=null">
@@ -318,11 +358,27 @@
                     #{item}
                 </foreach>
             </if>
+
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
-                    AND FIND_IN_SET(#{tagId},wcr.tag_ids)
-                </foreach>
+                <choose>
+                    <when test="weCustomerList.isContain == 2">
+                        OR FIND_IN_SET(#{tagId},wcr.tag_ids)
+                    </when>
+                    <when test="weCustomerList.isContain == 3">
+                        <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                            AND !FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        </foreach>
+                    </when>
+
+                    <otherwise>
+                        <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                            AND FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        </foreach>
+                    </otherwise>
+                </choose>
             </if>
+
+
             <if test="weCustomerList.noTagCheck">
                 AND ISNULL(wcr.tag_ids) or LENGTH(TRIM(wcr.tag_ids)) =0
             </if>
@@ -336,7 +392,8 @@
             </if>
         </where>
 
-<!--        SELECT-->
+
+        <!--        SELECT-->
 <!--        <choose>-->
 <!--            <when test="weCustomerList.noRepeat">-->
 <!--                count(DISTINCT wcr.external_userid)-->
@@ -399,54 +456,112 @@
 
     <select id="noRepeatCountCustomer" resultType="long">
         SELECT
-        COUNT(DISTINCT  wc.external_userid)
+        COUNT(DISTINCT  wcr.external_userid)
         FROM
-        we_customer wc
+        we_customer wcr
         <where>
+            <if test="weCustomerList.isJoinBlacklist != null">
+                AND wcr.is_join_blacklist=#{weCustomerList.isJoinBlacklist}
+            </if>
             <if test="weCustomerList.gender !=null">
-                AND wc.gender=#{weCustomerList.gender}
+                AND wcr.gender=#{weCustomerList.gender}
+            </if>
+            <if test="weCustomerList.genders !=null and weCustomerList.genders !=''">
+                AND wcr.gender in
+                <foreach collection="weCustomerList.genders.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="weCustomerList.trackState !=null">
-                AND wc.track_state=#{weCustomerList.trackState}
+                AND wcr.track_state=#{weCustomerList.trackState}
             </if>
+            <if test="weCustomerList.noContainTrackStates !=null and weCustomerList.noContainTrackStates !=''">
+                AND wcr.track_state not in
+                <foreach collection="weCustomerList.noContainTrackStates.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+
             <if test="weCustomerList.addMethod !=null">
-                AND wc.add_method=#{weCustomerList.addMethod}
+                AND wcr.add_method=#{weCustomerList.addMethod}
             </if>
 
             <if test="weCustomerList.customerType !=null">
-                AND wc.customer_type=#{weCustomerList.customerType}
+                AND wcr.customer_type=#{weCustomerList.customerType}
+            </if>
+
+            <if test="weCustomerList.customerTypes !=null and weCustomerList.customerTypes !=''">
+                AND wcr.customer_type in
+                <foreach collection="weCustomerList.customerTypes.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
 
             <if test="weCustomerList.externalUserid !=null">
-                AND wc.external_userid=#{weCustomerList.externalUserid}
+                AND wcr.external_userid=#{weCustomerList.externalUserid}
+            </if>
+
+            <if test="weCustomerList.externalUserids !=null and weCustomerList.externalUserids !=''">
+                AND wcr.external_userid in
+                <foreach collection="weCustomerList.externalUserids.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
 
             <if test="weCustomerList.firstUserId !=null">
-                AND wc.add_user_id=#{weCustomerList.firstUserId}
+                AND wcr.add_user_id=#{weCustomerList.firstUserId}
             </if>
-
 
             <if test="weCustomerList.delFlag != null">
-                AND wc.del_flag = #{weCustomerList.delFlag}
+                AND wcr.del_flag = #{weCustomerList.delFlag}
+            </if>
+            <if test="weCustomerList.phone != null and weCustomerList.phone !=''">
+                AND wcr.phone = #{weCustomerList.phone,jdbcType=VARCHAR}
             </if>
             <if test="weCustomerList.name != null and weCustomerList.name !=''">
-                AND  wc.customer_name like concat('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
+                AND  CONCAT( IFNULL(wcr.customer_name,''))
+                LIKE CONCAT('%',#{weCustomerList.name,jdbcType=VARCHAR},'%')
             </if>
             <if test="weCustomerList.userIds !=null and weCustomerList.userIds !=''">
-                AND wc.add_user_id in
+                AND wcr.add_user_id in
                 <foreach collection="weCustomerList.userIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
+
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
-                <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
-                    AND FIND_IN_SET(#{tagId},tag_ids)
+                <choose>
+                    <when test="weCustomerList.isContain == 2">
+                        OR FIND_IN_SET(#{tagId},wcr.tag_ids)
+                    </when>
+                    <when test="weCustomerList.isContain == 3">
+                        <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                            AND !FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        </foreach>
+                    </when>
+
+                    <otherwise>
+                        <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
+                            AND FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        </foreach>
+                    </otherwise>
+                </choose>
+            </if>
+
+
+            <if test="weCustomerList.noTagCheck">
+                AND ISNULL(wcr.tag_ids) or LENGTH(TRIM(wcr.tag_ids)) =0
+            </if>
+            <if test="weCustomerList.excludeTagIds !=null and weCustomerList.excludeTagIds !=''">
+                <foreach item="excludeTagId" index="index" collection="weCustomerList.excludeTagIds.split(',')">
+                    AND !FIND_IN_SET(#{excludeTagId},wcr.tag_ids)
                 </foreach>
             </if>
             <if test="weCustomerList.beginTime !=null and weCustomerList.beginTime != '' and weCustomerList.endTime !='' and weCustomerList.endTime != null">
-                AND  date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
+                AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
             </if>
         </where>
+
     </select>
 
 
@@ -616,7 +731,7 @@
         update_by_id=IFNULL(VALUES(update_by_id),we_customer.update_by_id),
         update_time=IFNULL(VALUES(update_time),we_customer.update_time),
         other_descr=IFNULL(VALUES(other_descr),we_customer.other_descr),
-        tag_ids=IFNULL(VALUES(tag_ids),we_customer.tag_ids),
+        tag_ids=IF(tag_ids IS NULL,we_customer.tag_ids,VALUES(tag_ids)),
         remark_name=IFNULL(VALUES(remark_name),we_customer.remark_name);
     </insert>
 

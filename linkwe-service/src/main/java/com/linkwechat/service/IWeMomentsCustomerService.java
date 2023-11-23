@@ -72,5 +72,9 @@ public interface IWeMomentsCustomerService extends IService<WeMomentsCustomer> {
      */
     void syncMomentsCustomerSendSuccess(Long weMomentsTaskId, String momentsId);
 
-
+    /**
+     * 批量插入
+     * @param weMomentsCustomers
+     */
+    void saveBatch(List<WeMomentsCustomer> weMomentsCustomers);
 }

@@ -109,4 +109,10 @@ public class WePoster {
      * 海报组件数组
      */
     private List<WePosterSubassembly> posterSubassemblyList;
+
+
+    /**
+     * 标签id，多个使用逗号隔开
+     */
+    private String tagIds;
 }

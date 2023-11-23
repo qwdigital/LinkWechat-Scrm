@@ -42,6 +42,7 @@ public class QwDataSyncListener {
     private IWeProductOrderService weProductOrderService;
 
 
+
     @Autowired
     private IWeLiveService iWeLiveService;
 
@@ -89,7 +90,6 @@ public class QwDataSyncListener {
             log.error("企微标签同步-消息处理失败 msg:{},error:{}", msg, e);
         }
     }
-
 
 
 

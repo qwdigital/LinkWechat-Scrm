@@ -18,6 +18,7 @@ import com.linkwechat.common.enums.CustomerAddWay;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
@@ -25,6 +26,7 @@ import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.WeCustomerDetailInfoVo;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeSynchRecordService;
 import io.swagger.annotations.ApiOperation;
@@ -95,21 +97,12 @@ public class WeCustomerController extends BaseController {
     @GetMapping("/export")
     public void export(WeCustomersQuery query) {
         query.setDelFlag(Constants.COMMON_STATE);
-        List<WeCustomersVo> list = weCustomerService.findWeCustomerList(query, null);
-        try {
-            String fileName = URLEncoder.encode("客户信息表_" + System.currentTimeMillis(), "UTF-8").replaceAll("\\+", "%20");
-            HttpServletResponse response = ServletUtils.getResponse();
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        List<WeCustomersVo> weCustomersVos = weCustomerService.findWeCustomerList(query, null);
 
-            long currentTimeMillis = System.currentTimeMillis();
-            EasyExcel.write(response.getOutputStream(), WeCustomersVo.class).sheet().doWrite(list);
-            System.out.println("耗时:" + (System.currentTimeMillis() - currentTimeMillis));
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCustomersVo.class,weCustomersVos,"客户信息表_" + System.currentTimeMillis()
+        );
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 

@@ -223,11 +223,10 @@ public interface WeCustomerClient {
 
     /**
      * 获取企业标签库
-     *
      * @param query
      * @return WeCorpTagListVo
      */
-    @Request(url = "/externalcontact/get_corp_tag_list", type = "POST")
+    @Request(url = "/externalcontact/get_corp_tag_list", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeCorpTagListVo getCorpTagList(@JSONBody WeCorpTagListQuery query);
 
     /**
@@ -236,7 +235,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeCorpTagVo
      */
-    @Request(url = "/externalcontact/add_corp_tag", type = "POST")
+    @Request(url = "/externalcontact/add_corp_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeCorpTagVo addCorpTag(@JSONBody WeAddCorpTagQuery query);
 
 
@@ -246,7 +245,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeResultVo
      */
-    @Request(url = "/externalcontact/edit_corp_tag", type = "POST")
+    @Request(url = "/externalcontact/edit_corp_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeResultVo editCorpTag(@JSONBody WeUpdateCorpTagQuery query);
 
 
@@ -256,7 +255,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeResultVo
      */
-    @Request(url = "/externalcontact/del_corp_tag", type = "POST")
+    @Request(url = "/externalcontact/del_corp_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeResultVo delCorpTag(@JSONBody WeCorpTagListQuery query);
 
     /**
@@ -265,7 +264,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeResultVo
      */
-    @Request(url = "/externalcontact/mark_tag", type = "POST")
+    @Request(url = "/externalcontact/mark_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeResultVo markCustomerTag(@JSONBody WeMarkTagQuery query);
 
     /**

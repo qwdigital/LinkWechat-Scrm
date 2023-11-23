@@ -4,10 +4,15 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
+import com.linkwechat.domain.groupcode.entity.WeGroupCodeTagRel;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.scheduler.task.WeGroupCodeTask;
+import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeGroupCodeService;
+import com.linkwechat.service.IWeGroupCodeTagRelService;
+import com.linkwechat.service.IWeTagService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -35,11 +40,18 @@ public class QwGroupAddUserCodeListener {
     @Autowired
     private IWeGroupCodeService weGroupCodeService;
 
-    @Resource
-    private QwCustomerClient qwCustomerClient;
 
     @Autowired
     private WeGroupCodeTask weGroupCodeTask;
+
+    @Autowired
+    private IWeGroupCodeTagRelService iWeGroupCodeTagRelService;
+
+    @Autowired
+    private IWeTagService iWeTagService;
+
+    @Autowired
+    private IWeCustomerService iWeCustomerService;
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.group-add-user-code:Qu_GroupAddUserCode}")
@@ -60,6 +72,7 @@ public class QwGroupAddUserCodeListener {
     private void msgGroupCodeHandler(JSONObject notcieObj) {
         String status = notcieObj.getString("status");
         String chatId = notcieObj.getString("chatId");
+        String userId = notcieObj.getString("userId");
         if(StringUtils.isEmpty(status)){
             return;
         }
@@ -68,9 +81,26 @@ public class QwGroupAddUserCodeListener {
                 .eq(WeGroupCode::getDelFlag, 0));
         if(CollectionUtil.isNotEmpty(weGroupCodeList)){
             for (WeGroupCode weGroupCode : weGroupCodeList) {
+
                 if(!weGroupCode.getChatIdList().contains(chatId)){
                     weGroupCodeTask.checkChatGroupNum(weGroupCode);
                 }
+
+
+                //入群的如果是企业客户，打上响应的标签。
+                List<WeGroupCodeTagRel> tagRels = iWeGroupCodeTagRelService.list(new LambdaQueryWrapper<WeGroupCodeTagRel>()
+                        .eq(WeGroupCodeTagRel::getGroupCodeId, weGroupCode.getId()));
+
+                if(CollectionUtil.isNotEmpty(tagRels)){
+                    List<WeTag> weTags =iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                            .in(WeTag::getTagId,tagRels.stream().map(WeGroupCodeTagRel::getTagId)
+                                    .collect(Collectors.toSet())));
+                    if(CollectionUtil.isNotEmpty(weTags)){
+                        iWeCustomerService.makeTagWeCustomer(userId,weTags);
+
+                    }
+                }
+
             }
         }
 
