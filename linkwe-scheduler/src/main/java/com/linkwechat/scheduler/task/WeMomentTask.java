@@ -63,17 +63,16 @@ public class WeMomentTask {
             try {
                 //需要指定的朋友圈
                 List<WeMomentsTask> weMomentsTasks = weMomentsTaskService.list(new LambdaQueryWrapper<WeMomentsTask>()
-                        .eq(WeMomentsTask::getStatus,1)
-                        .isNull(WeMomentsTask::getExecuteTime)
-                        .or()
-                        .apply("date_format (execute_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
+                        .and(i->i.isNull(WeMomentsTask::getExecuteTime).or()
+                                .apply("date_format (execute_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()))
+                        .and(i->i.eq(WeMomentsTask::getStatus,1)));
                 if(CollectionUtil.isNotEmpty(weMomentsTasks)){
                     weMomentsTasks.stream().forEach(k->{
                         weMomentsTaskService.immediatelySendMoments(k);
                     });
                 }
 
-             // 通过jobId换取momentsId
+                //通过jobId换取momentsId
                 List<WeMomentsTaskRelation> weMomentsTaskRelations = iWeMomentsTaskRelationService.list(new LambdaQueryWrapper<WeMomentsTaskRelation>()
                         .isNotNull(WeMomentsTaskRelation::getJobId)
                         .isNull(WeMomentsTaskRelation::getMomentId));
@@ -83,6 +82,9 @@ public class WeMomentTask {
                     );
                 }
 
+                //到期结束任务
+                weMomentsTaskService.update(WeMomentsTask.builder().status(3).build(),new LambdaQueryWrapper<WeMomentsTask>()
+                        .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
 
 
             }finally {
