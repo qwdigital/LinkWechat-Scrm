@@ -816,6 +816,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                             newWeMakeCustomerTags.add(customerTag);
                         });
 
+
                         iWeCustomerService.batchMakeLabel(WeBacthMakeCustomerTag.builder().addOrRemove(true)
                                 .weMakeCustomerTagList(newWeMakeCustomerTags)
                                 .build());
