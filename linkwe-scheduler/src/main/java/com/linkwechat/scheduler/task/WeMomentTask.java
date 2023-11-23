@@ -66,7 +66,7 @@ public class WeMomentTask {
                         .eq(WeMomentsTask::getStatus,1)
                         .isNull(WeMomentsTask::getExecuteTime)
                         .or()
-                        .apply("date_format (execute_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d')",new Date()));
+                        .apply("date_format (execute_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
                 if(CollectionUtil.isNotEmpty(weMomentsTasks)){
                     weMomentsTasks.stream().forEach(k->{
                         weMomentsTaskService.immediatelySendMoments(k);
