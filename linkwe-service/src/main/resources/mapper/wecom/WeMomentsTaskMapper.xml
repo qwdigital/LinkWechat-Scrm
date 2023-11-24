@@ -85,16 +85,19 @@
         t1.update_by_id,
         t1.update_time,
         t1.del_flag,
-        ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id AND t2.execute_status = 1 ) AS
-        executed,
         CASE
-        t1.send_type
+            t1.send_type
         WHEN 0 THEN
-        (SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id)
-        WHEN 1 THEN
-        (SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id)
+           ( SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id AND t2.execute_status = 1 )
         WHEN 2 THEN
-        (SELECT count( 1 ) FROM we_moments_estimate_user t2 WHERE t2.moments_task_id = t1.id )
+           (SELECT count( 1 ) FROM we_moments_estimate_user t2 WHERE t2.moments_task_id = t1.id AND  t2.execute_status = 1)
+        END AS executed,
+        CASE
+            t1.send_type
+        WHEN 0 THEN
+            (SELECT count( 1 ) FROM we_moments_user t2 WHERE t2.moments_task_id = t1.id)
+        WHEN 2 THEN
+            (SELECT count( 1 ) FROM we_moments_estimate_user t2 WHERE t2.moments_task_id = t1.id )
         END AS total
         FROM
         we_moments_task t1

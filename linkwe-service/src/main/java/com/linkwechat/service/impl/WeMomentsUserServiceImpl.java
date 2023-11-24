@@ -19,6 +19,7 @@ import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
@@ -69,8 +70,11 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     private IWeTagService weTagService;
     @Resource
     private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
-    @Resource
-    private WeMomentsTaskMapper weMomentsTaskMapper;
+//    @Resource
+//    private WeMomentsTaskMapper weMomentsTaskMapper;
+
+    @Autowired
+    private IWeMomentsTaskService iWeMomentsTaskService;
 
     @Resource
     private IWeMomentsCustomerService weMomentsCustomerService;
@@ -263,7 +267,7 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
         //数据不存在，直接返回
-        WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
+        WeMomentsTask weMomentsTask = iWeMomentsTaskService.getById(weMomentsTaskId);
         if (BeanUtil.isEmpty(weMomentsTask)) {
             return null;
         }
@@ -309,12 +313,17 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             }
         }
 
-        vo.setCustomerNum(
-                weMomentsCustomerService.estimateCustomerNum(
-                        WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTask.getScopeType())
-                                .weCustomersQuery(weMomentsTask.getWeCustomersQuery()).build()
-                )
-        );
+        WeCustomersQuery weCustomersQuery = weMomentsTask.getWeCustomersQuery();
+
+        if(null != weCustomersQuery){
+            weCustomersQuery.setNoRepeat(true);
+            vo.setCustomerNum(
+                    weMomentsCustomerService.estimateCustomerNum(
+                            WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTask.getScopeType())
+                                    .weCustomersQuery(weMomentsTask.getWeCustomersQuery()).build()
+                    )
+            );
+        }
 
         return vo;
     }
