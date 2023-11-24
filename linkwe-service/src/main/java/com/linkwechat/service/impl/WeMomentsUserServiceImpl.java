@@ -41,6 +41,7 @@ import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.mapper.WeMomentsUserMapper;
 import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -74,6 +75,7 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
 //    private WeMomentsTaskMapper weMomentsTaskMapper;
 
     @Autowired
+    @Lazy
     private IWeMomentsTaskService iWeMomentsTaskService;
 
     @Resource
