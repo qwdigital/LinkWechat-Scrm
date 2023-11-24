@@ -997,6 +997,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
             List<WeCustomerFollowUserEntity> followUserList = weCustomerDetail.getFollowUser();
+            //先清理标签关系表中当前客户对应的原有标签数据
+            if(StringUtils.isNotEmpty(weCustomer.getExternalUserid())
+                    &&StringUtils.isNotEmpty(weCustomer.getAddUserId())){
+                iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .eq(WeFlowerCustomerTagRel::getExternalUserid,weCustomer.getExternalUserid())
+                        .eq(WeFlowerCustomerTagRel::getUserId,weCustomer.getAddUserId()));
+            }
             if (CollectionUtil.isNotEmpty(followUserList)) {
                 WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
 
