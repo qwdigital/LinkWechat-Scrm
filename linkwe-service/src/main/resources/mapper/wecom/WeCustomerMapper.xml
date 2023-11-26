@@ -46,7 +46,7 @@
                    </foreach>
                </if>
 
-            <if test="weCustomerList.externalUserid !=null">
+            <if test="weCustomerList.externalUserid !=null and weCustomerList.externalUserid !=''">
                 AND wcr.external_userid=#{weCustomerList.externalUserid}
             </if>
 
@@ -57,7 +57,7 @@
                </foreach>
            </if>
 
-            <if test="weCustomerList.firstUserId !=null">
+            <if test="weCustomerList.firstUserId !=null and weCustomerList.firstUserId !=''">
                 AND wcr.add_user_id=#{weCustomerList.firstUserId}
             </if>
 
@@ -327,7 +327,7 @@
                 </foreach>
             </if>
 
-            <if test="weCustomerList.externalUserid !=null">
+            <if test="weCustomerList.externalUserid !=null and weCustomerList.externalUserid !=''">
                 AND wcr.external_userid=#{weCustomerList.externalUserid}
             </if>
 
@@ -338,7 +338,7 @@
                 </foreach>
             </if>
 
-            <if test="weCustomerList.firstUserId !=null">
+            <if test="weCustomerList.firstUserId !=null and weCustomerList.firstUserId !=''">
                 AND wcr.add_user_id=#{weCustomerList.firstUserId}
             </if>
 
