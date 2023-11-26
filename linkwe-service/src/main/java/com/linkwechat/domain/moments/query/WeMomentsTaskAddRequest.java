@@ -50,7 +50,7 @@ public class WeMomentsTaskAddRequest {
     /**
      * 朋友圈可见客户数
      */
-    @NotNull(message = "朋友圈可见客户数必填")
+//    @NotNull(message = "朋友圈可见客户数必填")
     private Integer customerNum;
 
     /**
