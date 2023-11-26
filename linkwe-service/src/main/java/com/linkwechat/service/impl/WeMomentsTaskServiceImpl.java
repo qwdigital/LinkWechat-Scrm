@@ -198,6 +198,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                 weMomentsEstimateCustomer.setWeUserId(weCustomer.getFirstUserId());
                                 weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
                                 weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
+                                weMomentsEstimateCustomer.setDelFlag(Constants.COMMON_STATE);
                                 customers.add(weMomentsEstimateCustomer);
                             }
                         }
