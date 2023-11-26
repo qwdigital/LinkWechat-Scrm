@@ -539,14 +539,15 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     );
                 } else {
 
-                    iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
-                            weMakeCustomerTag.getUserId(),
-                            weMakeCustomerTag.getIsCompanyTag() ?
-                                    TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getType() :
-                                    TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getType(),
-                            String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
-                    );
-
+                    if(CollectionUtil.isNotEmpty(removeTag)){
+                        iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
+                                weMakeCustomerTag.getUserId(),
+                                weMakeCustomerTag.getIsCompanyTag() ?
+                                        TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getType() :
+                                        TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getType(),
+                                String.join(",", removeTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                        );
+                    }
                 }
 
 
