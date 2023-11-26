@@ -3,6 +3,8 @@ package com.linkwechat.domain.sop;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.sop.vo.WeSopExecuteConditVo;
 import com.linkwechat.domain.sop.vo.WeSopExecuteEndVo;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
@@ -114,4 +116,18 @@ public class WeSopBase extends BaseEntity {
      */
     @TableLogic
     private Integer delFlag;
+
+
+
+    /**
+     * 客户查询条件
+     */
+    private WeCustomersQuery weCustomersQuery;
+
+    /**
+     * 发送人()
+     */
+    @TableField(exist = false)
+    private List<WeAddGroupMessageQuery.SenderInfo> senderList;
+
 }
