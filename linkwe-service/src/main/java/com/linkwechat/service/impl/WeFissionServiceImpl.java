@@ -479,7 +479,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
-//                .eq(WeFission::getIsTip,2)
                 .isNotNull(WeFission::getAddWeUserOrGroupCode)
                 .notIn(WeFission::getFassionState, ListUtil.toList(3,4)));
 
@@ -558,20 +557,20 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                             if(TaskFissionType.USER_FISSION.getCode()
                                     .equals(weFission.getFassionType())){
                                 messageQuery.setChatType(1);
-                                List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
-                                        weFission.getExecuteUserOrGroup()
-                                );
 
-                                if(CollectionUtil.isNotEmpty(weCustomersVos)){
-                                    weCustomersVos.stream()
-                                            .collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId))
+                                List<WeFissionNotice> weFissionNotices = iWeFissionNoticeService.list(new LambdaQueryWrapper<WeFissionNotice>()
+                                        .eq(WeFissionNotice::getFissionId, weFission.getId()));
+
+                                if(CollectionUtil.isNotEmpty(weFissionNotices)){
+                                    weFissionNotices.stream()
+                                            .collect(Collectors.groupingBy(WeFissionNotice::getSendWeUserid))
                                             .forEach((k,v)->{
                                                 senderInfos.add(
                                                         WeAddGroupMessageQuery
                                                                 .SenderInfo
                                                                 .builder()
                                                                 .userId(k)
-                                                                .customerList(v.stream().map(WeCustomersVo::getExternalUserid).collect(Collectors.toList()))
+                                                                .customerList(v.stream().map(WeFissionNotice::getTargetId).collect(Collectors.toList()))
                                                                 .build()
                                                 );
 
@@ -639,9 +638,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                 });
 
-
-
-//                this.updateBatchById(weFissions);
 
 
 
