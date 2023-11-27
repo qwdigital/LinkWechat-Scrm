@@ -269,8 +269,12 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         List<String> xAxis = new ArrayList<>();
         List<Integer> yAxis = new ArrayList<>();
         Long qrId = qrCodeListQuery.getQrId();
-//        Date beginTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getBeginTime());
-//        Date endTime = DateUtils.dateTime(DateUtils.YYYY_MM_DD, qrCodeListQuery.getEndTime());
+        if(StringUtils.isEmpty(qrCodeListQuery.getBeginTime())){
+            qrCodeListQuery.setBeginTime(DateUtil.offsetWeek(DateUtil.date(),-1).toDateStr());
+        }
+        if(StringUtils.isEmpty(qrCodeListQuery.getEndTime())){
+            qrCodeListQuery.setEndTime(DateUtil.today());
+        }
         WeQrCode weQrCode = getById(qrId);
         Map<String, List<WeCustomer>> customerMap = new HashMap<>();
 
@@ -644,7 +648,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
         String shortUrl = Base62NumUtil.encode(qrCodeListQuery.getQrId());
         //今日PV
-        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl);
+        int todayPvNum = (int) Optional.ofNullable(redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl)).orElse(0);
         weQrCodeScanCountVo.setTodayLinkVisitsTotal(todayPvNum);
         //今日UV
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "qr:" + shortUrl);
@@ -669,8 +673,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         if(Objects.isNull(weQrCode)){
             throw new WeComException("无效活码ID");
         }
-        DateTime startTime = StringUtils.isNotBlank(qrCodeListQuery.getBeginTime())?DateUtil.parseDateTime(qrCodeListQuery.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
-        DateTime endTime = StringUtils.isNotBlank(qrCodeListQuery.getEndTime())?DateUtil.parseDateTime(qrCodeListQuery.getEndTime()):DateUtil.date();
+        DateTime startTime = StringUtils.isNotBlank(qrCodeListQuery.getBeginTime())?DateUtil.parseDate(qrCodeListQuery.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
+        DateTime endTime = StringUtils.isNotBlank(qrCodeListQuery.getEndTime())?DateUtil.parseDate(qrCodeListQuery.getEndTime()):DateUtil.date();
         List<WeCustomerChannelCountVo> customerNumByState = weCustomerService.getCustomerNumByState(weQrCode.getState(),startTime,endTime);
         List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
 
@@ -685,7 +689,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
         String shortUrl = Base62NumUtil.encode(qrCodeListQuery.getQrId());
         //今日PV
-        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl);
+        int todayPvNum = (int) Optional.ofNullable(redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl)).orElse(0);
         //今日UV
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "qr:" + shortUrl);
 
@@ -729,8 +733,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         if(Objects.isNull(weQrCode)){
             throw new WeComException("无效活码ID");
         }
-        DateTime startTime = StringUtils.isNotBlank(qrCodeListQuery.getBeginTime())?DateUtil.parseDateTime(qrCodeListQuery.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
-        DateTime endTime = StringUtils.isNotBlank(qrCodeListQuery.getEndTime())?DateUtil.parseDateTime(qrCodeListQuery.getEndTime()):DateUtil.date();
+        DateTime startTime = StringUtils.isNotBlank(qrCodeListQuery.getBeginTime())?DateUtil.parseDate(qrCodeListQuery.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
+        DateTime endTime = StringUtils.isNotBlank(qrCodeListQuery.getEndTime())?DateUtil.parseDate(qrCodeListQuery.getEndTime()):DateUtil.date();
         List<WeCustomerChannelCountVo> customerNumByState = weCustomerService.getCustomerNumByState(weQrCode.getState(),null,endTime);
         List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
 
@@ -745,7 +749,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
         String shortUrl = Base62NumUtil.encode(qrCodeListQuery.getQrId());
         //今日PV
-        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl);
+        int todayPvNum = (int) Optional.ofNullable(redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl)).orElse(0);
         //今日UV
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "qr:" + shortUrl);
 

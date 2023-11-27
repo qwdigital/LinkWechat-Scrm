@@ -607,23 +607,29 @@
     </select>
 
     <select id="countCustomerChannel" resultType="com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo">
-        SELECT
+        select
         sdd.date,
-        (SELECT count(wc.id) from we_customer wc where date_format(wc.add_time,'%Y-%m-%d')=date_format(sdd.date,'%Y-%m-%d')
+        count(wc.id) as customer_number
+        from
+        (
+        SELECT
+            `date`
+        FROM
+        sys_dim_date
+        <where>
+            <if test="startTime != null "><!-- 开始时间检索 -->
+                and `date` &gt;= date_format(#{startTime},'%y-%m-%d')
+            </if>
+            <if test="endTime != null "><!-- 结束时间检索 -->
+                and `date` &lt;= date_format(#{endTime},'%y-%m-%d')
+            </if>
+        </where>) as sdd
+        left join we_customer wc on
+        date_format(wc.add_time, '%Y-%m-%d')= date_format(sdd.date, '%Y-%m-%d')
         <if test="state != null and state !=''">
             AND wc.state=#{state}
         </if>
-        <if test="delFlag != null">
-            and wc.del_flag=#{delFlag}
-        </if>
-        ) as customerNumber
-        FROM
-        sys_dim_date sdd
-        <where>
-            <if test="startTime != null and startTime !='' and endTime != null and endTime !=''">
-                date_format(sdd.date,'%Y-%m-%d') BETWEEN #{startTime} AND #{endTime}
-            </if>
-        </where>
+        group by sdd.date asc
     </select>
 
 

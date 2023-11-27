@@ -101,6 +101,6 @@ public class WeCommonLinkStat extends BaseEntity implements Serializable {
      * 删除标识 0正常 1 删除
      */
     @ApiModelProperty(value = "删除标识 0正常 1 删除")
-    @TableField("del_flg")
-    private Integer delFlg;
+    @TableField("del_flag")
+    private Integer delFlag;
 }
