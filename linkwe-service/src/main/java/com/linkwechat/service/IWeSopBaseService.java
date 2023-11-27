@@ -3,6 +3,7 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.domain.sop.vo.*;
@@ -177,7 +178,7 @@ public interface IWeSopBaseService extends IService<WeSopBase> {
      * @param isCreateOrUpdate
      * @param buildXkSopPlan 是否构建新客执行计划 true构建，false不构建
      */
-    void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomer>> executeWeCustomers, boolean isCreateOrUpdate,boolean buildXkSopPlan);
+    void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate, boolean buildXkSopPlan);
 
 
     /**

@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -25,23 +24,21 @@ import com.linkwechat.common.utils.WeekDateUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.sop.*;
 import com.linkwechat.domain.sop.dto.WeSopBaseDto;
-import com.linkwechat.domain.sop.dto.WeSopPushTaskDto;
 import com.linkwechat.domain.sop.dto.WeSopPushTimeDto;
 import com.linkwechat.domain.sop.vo.*;
 import com.linkwechat.domain.sop.vo.content.*;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
 import com.linkwechat.fegin.QwCustomerClient;
-import com.linkwechat.fegin.QwDeptClient;
 import com.linkwechat.fegin.QwSysDeptClient;
 import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
-import com.linkwechat.mapper.WeSopExecuteTargetAttachmentsMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
 import com.linkwechat.service.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -109,8 +106,6 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     private QwSysDeptClient qwSysDeptClient;
 
 
-    @Autowired
-    private WeSopExecuteTargetAttachmentsMapper weSopExecuteTargetAttachmentsMapper;
 
 
 
@@ -840,7 +835,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomer>> executeWeCustomers, boolean isCreateOrUpdate,boolean buildXkSopPlan) {
+    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate, boolean buildXkSopPlan) {
         if(CollectionUtil.isNotEmpty(executeWeCustomers)){
             List<WeSopExecuteTarget> weSopExecuteTargets=new ArrayList<>();
             executeWeCustomers.forEach((k,v)->{
@@ -849,7 +844,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                             WeSopExecuteTarget.builder()
                                     .targetId(weCustomer.getExternalUserid())
                                     .targetType(1)
-                                    .addCustomerOrCreateGoupTime(weCustomer.getAddTime())
+                                    .addCustomerOrCreateGoupTime(weCustomer.getFirstAddTime())
                                     .sopBaseId(weSopBase.getId())
                                     .executeWeUserId(k)
                                     .build()

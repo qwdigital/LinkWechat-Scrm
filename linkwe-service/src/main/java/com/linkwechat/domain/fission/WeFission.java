@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
 import com.linkwechat.domain.fission.vo.WeGroupMessageExecuteUserOrGroupTipVo;
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
@@ -14,7 +16,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 裂变（任务宝,群裂变）
@@ -162,6 +166,26 @@ public class WeFission extends BaseEntity {
      * 活动封面url
      */
     private String activeCoverUrl;
+
+
+    /**
+     * 客户查询条件
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
+    private WeCustomersQuery weCustomersQuery;
+
+    /**
+     * 发送人()
+     */
+    @TableField(exist = false)
+    private List<WeAddGroupMessageQuery.SenderInfo> senderList;
+
+
+
+    /**
+     * 发送范围: 0全部客户 1按条件筛选
+     */
+    private Integer scopeType;
 
 
 

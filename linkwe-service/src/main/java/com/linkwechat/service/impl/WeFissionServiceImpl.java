@@ -17,6 +17,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.fission.*;
 import com.linkwechat.domain.fission.vo.*;
@@ -123,18 +124,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
 
-        //如果当前时间在裂变结束时间之前,则裂变结束
-//        if(new Date().after(weFission.getFassionEndTime())){
-//            weFission.setFassionState(3);
-//        }
-
-        //如果当前时间是裂变开始时间与结束时间之间,则裂变开始
-//        if(new Date().after(weFission.getFassionStartTime())&&
-//                new Date().before(weFission.getFassionEndTime())
-//        ) {
-//            weFission.setFassionState(2);
-//
-//        }
 
         WeFission.ExchangeContent exchangeContent = weFission.getExchangeContent();
 
@@ -169,9 +158,28 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
             //任务宝
             if(TaskFissionType.USER_FISSION.getCode()
                     .equals(weFission.getFassionType())){
-                List<WeCustomersVo> weCustomersVos = iWeCustomerService.findWeCustomersForCommonAssembly(
-                        weFission.getExecuteUserOrGroup()
-                );
+
+                List<WeCustomersVo> weCustomersVos=new ArrayList<>();
+                if(new Integer(0).equals(weFission.getScopeType())){ //全部
+                    List<WeCustomersVo> limitWeCustomerList = iWeCustomerService.findLimitWeCustomerList();
+                    if(CollectionUtil.isNotEmpty(limitWeCustomerList)){
+                        weCustomersVos.addAll(limitWeCustomerList);
+                    }
+                }else if(new Integer(1).equals(weFission.getScopeType())){//部分
+                    List<WeAddGroupMessageQuery.SenderInfo> senderList
+                            = weFission.getSenderList();
+                    if(CollectionUtil.isNotEmpty(senderList)){
+                        senderList.stream().forEach(k->{
+                            List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
+                                    .firstUserId(k.getUserId())
+                                    .externalUserids(StringUtils.join(k.getCustomerList(), ","))
+                                    .build(), null);
+                            if(CollectionUtil.isNotEmpty(weCustomerList)){
+                                weCustomersVos.addAll(weCustomerList);
+                            }
+                        });
+                    }
+                }
 
                 if(CollectionUtil.isNotEmpty(weCustomersVos)){
                    weCustomersVos.stream()
@@ -189,6 +197,8 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                             });
                 }
+
+
             //群裂变
             }else if(TaskFissionType.GROUP_FISSION.getCode()
                     .equals(weFission.getFassionType())){

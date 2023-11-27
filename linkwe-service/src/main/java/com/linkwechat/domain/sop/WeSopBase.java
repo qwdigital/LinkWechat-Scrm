@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -120,8 +121,15 @@ public class WeSopBase extends BaseEntity {
 
 
     /**
+     * 发送范围: 0全部客户 1按条件筛选
+     */
+    private Integer scopeType;
+
+
+    /**
      * 客户查询条件
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
     private WeCustomersQuery weCustomersQuery;
 
     /**
