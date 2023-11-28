@@ -609,7 +609,8 @@
     <select id="countCustomerChannel" resultType="com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo">
         select
         sdd.date,
-        count(wc.id) as customer_number
+        count(wc.id) as customer_number,
+        count(case when wc.del_flag = 0 then 1 end) as  efficient_number
         from
         (
         SELECT

@@ -8,7 +8,9 @@ import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -186,9 +188,15 @@ public class WeQrCodeController extends BaseController {
 
     @ApiOperation(value = "获取活码表格统计", httpMethod = "GET")
     @GetMapping("/scan/sheet")
-    public AjaxResult<List<WeQrCodeScanLineCountVo>> getWeQrCodeScanSheetCount(WeQrCodeListQuery qrCodeListQuery) {
+    public TableDataInfo<List<WeQrCodeScanLineCountVo>> getWeQrCodeScanSheetCount(WeQrCodeListQuery qrCodeListQuery) {
         List<WeQrCodeScanLineCountVo> weQrCodeScanCount = weQrCodeService.getWeQrCodeScanSheetCount(qrCodeListQuery);
-        return AjaxResult.success(weQrCodeScanCount);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Integer pageNum = pageDomain.getPageNum();
+        Integer pageSize = pageDomain.getPageSize();
+        PageInfo<WeQrCodeScanLineCountVo> pageInfo = new PageInfo<>();
+        pageInfo.setTotal(weQrCodeScanCount.size());
+        pageInfo.setList(startPage(weQrCodeScanCount,pageNum,pageSize));
+        return getDataTable(pageInfo);
     }
 
     @ApiOperation(value = "获取活码表格统计导出", httpMethod = "GET")

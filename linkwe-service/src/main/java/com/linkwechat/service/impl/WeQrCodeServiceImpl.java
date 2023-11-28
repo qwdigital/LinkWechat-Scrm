@@ -740,6 +740,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         List<WeCustomerChannelCountVo> customerNumByState = weCustomerService.getCustomerNumByState(weQrCode.getState(),null,endTime);
         List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
 
+
+
         Map<String, List<WeCustomerChannelCountVo>> customerListMap = new HashMap<>();
 
         if(CollectionUtil.isNotEmpty(customerNumByState)){
@@ -793,6 +795,10 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
             }
             weQrCodeScanCountList.add(weQrCodeScanLineCountVo);
         }
+
+
+
+
         return weQrCodeScanCountList;
     }
 
