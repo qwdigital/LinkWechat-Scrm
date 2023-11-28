@@ -250,7 +250,9 @@ public class SopTaskServiceImpl implements SopTaskService {
         if(null != weSopBase){
             //全部客户
             if(new Integer(0).equals(weSopBase.getScopeType())){
-                weCustomersVoList=iWeCustomerService.findLimitWeCustomerList();
+                if (!weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XK.getSopKey())){
+                    weCustomersVoList=iWeCustomerService.findLimitWeCustomerList();
+                }
             //按照条件筛选部分客户
             }else if(new Integer(1).equals(weSopBase.getScopeType())){
                 //不等于新客sop，新客sop中的客户来源为新加入的客户
