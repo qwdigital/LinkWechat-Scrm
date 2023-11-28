@@ -224,6 +224,8 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
                 if(weQrScopeMap.get(qrCodeDetail.getId()) != null){
                     qrCodeDetail.setQrUserInfos(weQrScopeMap.get(qrCodeDetail.getId()));
                 }
+                String encode = Base62NumUtil.encode(qrCodeDetail.getId());
+                qrCodeDetail.setQrShortLink(linkWeChatConfig.getQrShortLinkDomainName() + encode);
             }
             weQrCodeList.addAll(qrDetailByQrIds);
         }
