@@ -30,7 +30,7 @@ public class WeQrCodeScanLineCountVo {
     @ApiModelProperty("短链访问总数")
     private Integer linkVisitsTotal = 0;
 
-    @ExcelProperty(value = "短链访问总人数",order = 4)
+    //@ExcelProperty(value = "短链访问总人数",order = 4)
     @ApiModelProperty("短链访问总人数")
     private Integer linkVisitsPeopleTotal = 0;
 
@@ -38,7 +38,7 @@ public class WeQrCodeScanLineCountVo {
     @ApiModelProperty("短链今日访问总数")
     private Integer todayLinkVisitsTotal = 0;
 
-    @ExcelProperty(value = "短链今日访问总人数",order = 6)
+    //@ExcelProperty(value = "短链今日访问总人数",order = 6)
     @ApiModelProperty("短链今日访问总人数")
     private Integer todayLinkVisitsPeopleTotal = 0;
 

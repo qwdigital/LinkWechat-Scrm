@@ -19,6 +19,7 @@ import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
 import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
 import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.service.IWeGroupCodeService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/groupCode")
+@Api(tags = "群活码管理")
 public class WeGroupCodeController extends BaseController {
 
     @Autowired
