@@ -563,6 +563,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
+    @Transactional
     public void updateWeCustomerTagIds(String userId, String externalUserid) {
         WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getAddUserId, userId)
@@ -1379,6 +1380,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         weCustomersQuery.setIsJoinBlacklist(1);
         return  this.findWeCustomerList(weCustomersQuery,pageDomain);
     }
+
 
     @Override
     public List<WeCustomersVo> findLimitWeCustomerList(WeCustomersQuery weCustomersQuery) {
