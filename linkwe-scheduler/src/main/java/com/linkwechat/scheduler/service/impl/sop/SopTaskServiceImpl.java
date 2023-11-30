@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.SettingUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
@@ -246,6 +247,8 @@ public class SopTaskServiceImpl implements SopTaskService {
     private Map<String, List<WeCustomersVo>> builderExecuteWeCustomer(WeSopBase weSopBase) {
 
         List<WeCustomersVo> weCustomersVoList=new ArrayList<>();
+
+        log.error("新客SOP"+ JSONUtil.toJsonStr(weSopBase));
 
         if(null != weSopBase){
             if(weSopBase.getBusinessType().intValue()==SopType.SOP_TYPE_XK.getSopKey()){

@@ -277,65 +277,82 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                         .sopState(k.getSopState())
                         .sendType(k.getSendType())
                         .build();
-                //设置执行成员
-                WeSopExecuteUserConditVo executeWeUser = k.getExecuteWeUser();
-                if(Objects.isNull(executeWeUser)){//执行成员为空则查询当前系统所有员工
 
-                    AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
 
-                    if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
+                if(k.getBaseType().equals(new Integer(1))){//客户sop
 
-                        weSopListsVo.setExecuteUser(
-                                listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
-                                        .stream().collect(Collectors.joining(","))
-                        );
-                    }
-                }else{//查询成员，或者部门岗位
-                    StringBuilder sb=new StringBuilder();
-                    //设置具体执行员工
-                    WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit
-                            = executeWeUser.getExecuteUserCondit();
-                    if(null != executeUserCondit && executeUserCondit.isChange()
-                            && CollectionUtil.isNotEmpty(executeUserCondit.getWeUserIds())){
+                  if( new Integer(0).equals(k.getScopeType())){ //全部
+                      weSopListsVo.setExecuteUser("全部");
+                  }else if(new Integer(1).equals(k.getScopeType())){//部分
+                      if(k.getWeCustomersQuery() != null){
+                          weSopListsVo.setExecuteUser(k.getWeCustomersQuery().getUserNames());
+                      }
+                  }
 
-                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(
-                                Joiner.on(",").join(executeUserCondit.getWeUserIds()),null,null);
+                }else if(k.getBaseType().equals(new Integer(2))){//客群sop
+
+                    //设置执行成员
+                    WeSopExecuteUserConditVo executeWeUser = k.getExecuteWeUser();
+                    if(Objects.isNull(executeWeUser)){//执行成员为空则查询当前系统所有员工
+
+                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
 
                         if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
 
-                            sb.append(
+                            weSopListsVo.setExecuteUser(
                                     listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
                                             .stream().collect(Collectors.joining(","))
                             );
                         }
+                    }else{//查询成员，或者部门岗位
+                        StringBuilder sb=new StringBuilder();
+                        //设置具体执行员工
+                        WeSopExecuteUserConditVo.ExecuteUserCondit executeUserCondit
+                                = executeWeUser.getExecuteUserCondit();
+                        if(null != executeUserCondit && executeUserCondit.isChange()
+                                && CollectionUtil.isNotEmpty(executeUserCondit.getWeUserIds())){
 
+                            AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(
+                                    Joiner.on(",").join(executeUserCondit.getWeUserIds()),null,null);
 
-                    }
+                            if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
 
-                    //设置执行的部门或岗位
-                    WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit
-                            = executeWeUser.getExecuteDeptCondit();
-                    if(null != executeDeptCondit && executeDeptCondit.isChange()){
-                        if(CollectionUtil.isNotEmpty(executeDeptCondit.getDeptIds())){//设置部门
-                            AjaxResult<List<SysDept>> result
-                                    = qwSysDeptClient.findSysDeptByIds(StringUtils.join(executeDeptCondit.getDeptIds(), ","));
-
-                            if(null != result && CollectionUtil.isNotEmpty(result.getData())){
-                                sb.append(",").append(result.getData().stream().map(SysDept::getDeptName).collect(Collectors.joining(",")));
+                                sb.append(
+                                        listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
+                                                .stream().collect(Collectors.joining(","))
+                                );
                             }
 
 
                         }
 
-                        if(CollectionUtil.isNotEmpty(executeDeptCondit.getPosts())){//设置岗位
-                            sb.append(",").append( Joiner.on(",").join(executeDeptCondit.getPosts()));
+                        //设置执行的部门或岗位
+                        WeSopExecuteUserConditVo.ExecuteDeptCondit executeDeptCondit
+                                = executeWeUser.getExecuteDeptCondit();
+                        if(null != executeDeptCondit && executeDeptCondit.isChange()){
+                            if(CollectionUtil.isNotEmpty(executeDeptCondit.getDeptIds())){//设置部门
+                                AjaxResult<List<SysDept>> result
+                                        = qwSysDeptClient.findSysDeptByIds(StringUtils.join(executeDeptCondit.getDeptIds(), ","));
+
+                                if(null != result && CollectionUtil.isNotEmpty(result.getData())){
+                                    sb.append(",").append(result.getData().stream().map(SysDept::getDeptName).collect(Collectors.joining(",")));
+                                }
+
+
+                            }
+
+                            if(CollectionUtil.isNotEmpty(executeDeptCondit.getPosts())){//设置岗位
+                                sb.append(",").append( Joiner.on(",").join(executeDeptCondit.getPosts()));
+
+                            }
 
                         }
 
+                        weSopListsVo.setExecuteUser(sb.toString());
                     }
 
-                    weSopListsVo.setExecuteUser(sb.toString());
                 }
+
 
 
                 //设置sop数据
@@ -978,12 +995,13 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             }
-        }else{
-
-            //处理不满足当前条件的生效客群(针对客客户sop编辑)
-            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                    new ArrayList<>());
         }
+//        else{
+//
+//            //处理不满足当前条件的生效客群(针对客客户sop编辑)
+//            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                    new ArrayList<>());
+//        }
     }
 
     @Override
