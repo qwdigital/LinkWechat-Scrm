@@ -248,88 +248,26 @@ public class SopTaskServiceImpl implements SopTaskService {
         List<WeCustomersVo> weCustomersVoList=new ArrayList<>();
 
         if(null != weSopBase){
+            if(weSopBase.getBusinessType().intValue()==SopType.SOP_TYPE_XK.getSopKey()){
+                return new HashMap<>();
+            }
             //全部客户
             if(new Integer(0).equals(weSopBase.getScopeType())){
-                if (!weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XK.getSopKey())){
-                    weCustomersVoList=iWeCustomerService.findLimitWeCustomerList();
-                }
+                weCustomersVoList=iWeCustomerService.findLimitWeCustomerList();
             //按照条件筛选部分客户
             }else if(new Integer(1).equals(weSopBase.getScopeType())){
                 //不等于新客sop，新客sop中的客户来源为新加入的客户
-                if (!weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XK.getSopKey())){
-                    WeCustomersQuery weCustomersQuery = weSopBase.getWeCustomersQuery();
-                    if(null != weCustomersQuery){
-                        weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
-                        weCustomersVoList=iWeCustomerService.findWeCustomerList(weCustomersQuery, null);
-                    }
-
+                WeCustomersQuery weCustomersQuery = weSopBase.getWeCustomersQuery();
+                if(null != weCustomersQuery){
+                    weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
+                    weCustomersVoList=iWeCustomerService.findWeCustomerList(weCustomersQuery, null);
                 }
+
             }
         }
 
         return weCustomersVoList.stream().collect(Collectors.groupingBy(WeCustomersVo::getFirstUserId));
 
-
-
-
-
-//
-//        if (Objects.isNull(weSopBase.getExecuteCustomerOrGroup()) && CollectionUtil.isEmpty(weSopBase.getExecuteCustomerSwipe())) {//获取全部客户
-//
-//            weCustomerList = iWeCustomerService.list(
-//                    new LambdaQueryWrapper<WeCustomer>()
-//                            .in(WeCustomer::getAddUserId, executeWeUserIds)
-//                            .ne(WeCustomer::getTrackState, TrackState.STATE_YLS.getType())
-//                            .eq(WeCustomer::getDelFlag, Constants.COMMON_STATE)
-//            );
-//
-//
-//        } else if (CollectionUtil.isNotEmpty(weSopBase.getExecuteCustomerSwipe())) { //true客户属性跟进动态选择
-//
-//            weCustomerList = filterCustomers(weSopBase.getExecuteCustomerSwipe(), executeWeUserIds);
-//
-//
-//
-//        } else if (Objects.nonNull(weSopBase.getExecuteCustomerOrGroup()
-//                .getCrowdAttribute()) && weSopBase.getExecuteCustomerOrGroup().getCrowdAttribute().isChange()) {//跟据人群获取客户
-//            List<String> crowdIds = weSopBase.getExecuteCustomerOrGroup().getCrowdAttribute().getCrowdIds();
-//            if (CollectionUtil.isNotEmpty(crowdIds)) {
-//               List<WeCustomer> crowdCustomerList = iWeStrategicCrowdService.getCustomerListByCrowdIds(crowdIds);
-//
-//                if(CollectionUtil.isNotEmpty(crowdCustomerList)&&CollectionUtil.isNotEmpty(executeWeUserIds)){
-//                    weCustomerList=crowdCustomerList.stream().filter(weCustomer -> executeWeUserIds.contains(weCustomer.getAddUserId())).collect(Collectors.toList());
-//                }
-//
-//            }
-//        }
-//
-//             if(CollectionUtil.isNotEmpty(weCustomerList)) {
-//
-//                 //如果是新客sop的话获取当天的客户构建执行计划(筛选出前一天)
-//                 //如果是新客sop获取新客sop创建以后的时间
-//                 if (weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XK.getSopKey())) {
-//                     if (isSelectYdCustomer) {
-////                         weCustomerList = weCustomerList.stream().filter(weCustomer ->
-////                                 DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, DateUtils.daysAgoOrAfter(new Date(), -1)).equals(
-////                                         DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weCustomer.getAddTime())
-////                                 )).collect(Collectors.toList());
-//
-//
-//
-//                         weCustomerList =  weCustomerList.stream().filter(weCustomer ->
-//
-//                                 DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopBase.getCreateTime())).getTime()
-//                                         <= DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weCustomer.getAddTime())).getTime()
-//
-//                         ).collect(Collectors.toList());
-//
-//                     }
-//
-//                 }
-//                 return weCustomerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
-//             }
-
-//        return new HashMap();
 
     }
 
