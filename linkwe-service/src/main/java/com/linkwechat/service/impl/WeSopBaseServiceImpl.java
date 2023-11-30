@@ -1,6 +1,7 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -995,13 +996,12 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             }
+        } else{
+
+            //处理不满足当前条件的生效客群(针对客客户sop编辑)
+            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+                    new ArrayList<>());
         }
-//        else{
-//
-//            //处理不满足当前条件的生效客群(针对客客户sop编辑)
-//            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-//                    new ArrayList<>());
-//        }
     }
 
     @Override

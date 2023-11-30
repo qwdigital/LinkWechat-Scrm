@@ -54,7 +54,7 @@ public class QwSopListener {
             log.info("新加入的客户加入新客sop：msg:{}", msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             WeCustomer weCustomer = JSONObject.parseObject(msg, WeCustomer.class);
-            abstractSopTaskService.builderNewWeCustomer(weCustomer);
+          abstractSopTaskService.builderNewWeCustomer(weCustomer);
 
         }catch (Exception e){
 
