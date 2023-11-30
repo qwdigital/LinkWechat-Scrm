@@ -73,7 +73,7 @@ public class SopTaskServiceImpl implements SopTaskService {
 
                     if (weSopBase.getBaseType() == 1) { //客户sop
                         //构建客户sop执行计划
-                        iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase), isCreateOrUpdate, false);
+                        iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase,false), isCreateOrUpdate, false);
                     }else if (weSopBase.getBaseType() == 2) { //客群sop
 
                             Set<String> executeWeUserIds
@@ -124,7 +124,7 @@ public class SopTaskServiceImpl implements SopTaskService {
                         weCustomersQuery.setExternalUserid(weCustomer.getExternalUserid());
                         weSopBase.setWeCustomersQuery(weCustomersQuery);
                         Map<String, List<WeCustomersVo>> stringListMap
-                                = builderExecuteWeCustomer(weSopBase);
+                                = builderExecuteWeCustomer(weSopBase,true);
 
                         if(CollectionUtil.isNotEmpty(stringListMap)){
                             //加入新客sop
@@ -231,17 +231,20 @@ public class SopTaskServiceImpl implements SopTaskService {
 
 
 
-    //构建生效客户 isSelectYdCustomer(是否查询昨日新增客户,只针对新客sop，新加入的客户) true查询 false不查询
-    private Map<String, List<WeCustomersVo>> builderExecuteWeCustomer(WeSopBase weSopBase) {
+    //isSourceNewWeCustomer 是否来自新客回调新客 true是 false不是
+    private Map<String, List<WeCustomersVo>> builderExecuteWeCustomer(WeSopBase weSopBase,boolean isSourceNewWeCustomer) {
 
         List<WeCustomersVo> weCustomersVoList=new ArrayList<>();
 
         log.error("新客SOP"+ JSONUtil.toJsonStr(weSopBase));
 
         if(null != weSopBase){
-            if(weSopBase.getBusinessType().intValue()==SopType.SOP_TYPE_XK.getSopKey()){
-                return new HashMap<>();
+            if(isSourceNewWeCustomer){
+                if(weSopBase.getBusinessType().intValue()==SopType.SOP_TYPE_XK.getSopKey()){
+                    return new HashMap<>();
+                }
             }
+
             //全部客户
             if(new Integer(0).equals(weSopBase.getScopeType())){
                 if(weSopBase.getWeCustomersQuery() == null){
