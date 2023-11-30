@@ -603,7 +603,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                                             = weGroups.stream().collect(Collectors.groupingBy(WeGroup::getOwner));
 
                                     weGroupMap.forEach((k,v)->{
-                                        senderInfos.clear();
+
                                         senderInfos.add(
                                                 WeAddGroupMessageQuery
                                                         .SenderInfo
@@ -615,12 +615,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                                         messageQuery.setSenderList(senderInfos);
 
-                                        weFission.setIsTip(1);
-                                        //通知员工群发
-                                        iWeMessagePushService.officialPushMessage(messageQuery);
 
 
                                     });
+
+                                    weFission.setIsTip(1);
+                                    //通知员工群发
+                                    iWeMessagePushService.officialPushMessage(messageQuery);
 
                                 }
 
