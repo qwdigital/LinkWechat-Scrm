@@ -480,6 +480,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         //查询处未期的裂变任务
         List<WeFission> weFissions = this.list(new LambdaQueryWrapper<WeFission>()
                 .isNotNull(WeFission::getAddWeUserOrGroupCode)
+                        .eq(WeFission::getIsTip,2)
                 .notIn(WeFission::getFassionState, ListUtil.toList(3,4)));
 
 

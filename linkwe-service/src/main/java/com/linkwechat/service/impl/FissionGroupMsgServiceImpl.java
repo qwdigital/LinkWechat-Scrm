@@ -49,7 +49,6 @@ public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService
                 WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
 
                  if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
-
                      //设置发送状态为已通知员工
                      iWeFissionNoticeService.update(WeFissionNotice.builder().msgId(weAddCustomerMsgVo.getMsgId()).build(),
                              new LambdaQueryWrapper<WeFissionNotice>()
@@ -57,13 +56,14 @@ public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService
                                      .in(WeFissionNotice::getSendWeUserid, ListUtil.toList(senderInfo.getUserId().split(","))));
 
 
-                 }else{ //发送失败，修改为未发送
-                     iWeFissionService.updateBatchFissionIsTipNoSend(
-                             ListUtil.toList(WeFission.builder()
-                                     .id(Long.parseLong(query.getBusinessIds()))
-                                     .build())
-                     );
                  }
+//                 else{ //发送失败，修改为未发送
+//                     iWeFissionService.updateBatchFissionIsTipNoSend(
+//                             ListUtil.toList(WeFission.builder()
+//                                     .id(Long.parseLong(query.getBusinessIds()))
+//                                     .build())
+//                     );
+//                 }
 
             });
 
