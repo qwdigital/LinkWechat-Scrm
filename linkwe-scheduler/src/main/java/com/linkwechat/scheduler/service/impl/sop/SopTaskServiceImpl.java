@@ -239,7 +239,7 @@ public class SopTaskServiceImpl implements SopTaskService {
         log.error("新客SOP"+ JSONUtil.toJsonStr(weSopBase));
 
         if(null != weSopBase){
-            if(isSourceNewWeCustomer){
+            if(!isSourceNewWeCustomer){
                 if(weSopBase.getBusinessType().intValue()==SopType.SOP_TYPE_XK.getSopKey()){
                     return new HashMap<>();
                 }
