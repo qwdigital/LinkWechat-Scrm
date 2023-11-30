@@ -351,7 +351,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
 
         String shortUrl = Base62NumUtil.encode(weGroupCode.getId());
         //今日PV
-        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "gqr:" + shortUrl);
+        int todayPvNum = (int) Optional.ofNullable(redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "gqr:" + shortUrl)).orElse(0);
         weQrCodeScanCountVo.setTodayLinkVisitsTotal(todayPvNum);
         //今日UV
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "gqr:" + shortUrl);
@@ -376,8 +376,8 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
         if(Objects.isNull(weQrCode)){
             throw new WeComException("无效群活码ID");
         }
-        DateTime startTime = StringUtils.isNotBlank(weGroupCode.getBeginTime())?DateUtil.parseDateTime(weGroupCode.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
-        DateTime endTime = StringUtils.isNotBlank(weGroupCode.getEndTime())?DateUtil.parseDateTime(weGroupCode.getEndTime()):DateUtil.date();
+        DateTime startTime = StringUtils.isNotBlank(weGroupCode.getBeginTime())?DateUtil.parseDate(weGroupCode.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
+        DateTime endTime = StringUtils.isNotBlank(weGroupCode.getEndTime())?DateUtil.parseDate(weGroupCode.getEndTime()):DateUtil.date();
         List<WeGroupChannelCountVo> memberNumByState = weGroupMemberService.getMemberNumByState(weQrCode.getState(),startTime,endTime);
         List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
 
@@ -392,7 +392,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
 
         String shortUrl = Base62NumUtil.encode(weGroupCode.getId());
         //今日PV
-        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl);
+        int todayPvNum = (int) Optional.ofNullable(redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "qr:" + shortUrl)).orElse(0);
         //今日UV
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "gqr:" + shortUrl);
 
@@ -436,8 +436,8 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
         if(Objects.isNull(weQrCode)){
             throw new WeComException("无效群活码ID");
         }
-        DateTime startTime = StringUtils.isNotBlank(weGroupCode.getBeginTime())?DateUtil.parseDateTime(weGroupCode.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
-        DateTime endTime = StringUtils.isNotBlank(weGroupCode.getEndTime())?DateUtil.parseDateTime(weGroupCode.getEndTime()):DateUtil.date();
+        DateTime startTime = StringUtils.isNotBlank(weGroupCode.getBeginTime())?DateUtil.parseDate(weGroupCode.getBeginTime()):DateUtil.offsetDay(new Date(),-7);
+        DateTime endTime = StringUtils.isNotBlank(weGroupCode.getEndTime())?DateUtil.parseDate(weGroupCode.getEndTime()):DateUtil.date();
         List<WeGroupChannelCountVo> memberNumByState = weGroupMemberService.getMemberNumByState(weQrCode.getState(),null,endTime);
         List<DateTime> dateTimes = DateUtil.rangeToList(startTime, endTime, DateField.DAY_OF_YEAR);
 
@@ -452,7 +452,7 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
 
         String shortUrl = Base62NumUtil.encode(weGroupCode.getId());
         //今日PV
-        int todayPvNum = redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "gqr:" + shortUrl);
+        int todayPvNum = (int) Optional.ofNullable(redisService.getCacheObject(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.PV + "gqr:" + shortUrl)).orElse(0);
         //今日UV
         Long todayUvNum =redisService.hyperLogLogCount(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.UV + "gqr:" + shortUrl);
 
