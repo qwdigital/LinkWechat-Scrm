@@ -2,6 +2,7 @@ package com.linkwechat.domain.groupmsg.query;
 
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.domain.WeGroupMessageTemplate;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +17,6 @@ import java.util.List;
  * @description 添加群发消息入参
  * @date 2021/10/24 12:14
  **/
-@ApiModel
 @Data
 public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
 
@@ -38,6 +38,12 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
 
     //消息来源 1:通常 2:sop 3:直播 ,4:裂变，5:短链推广 6:标签建群
     private Integer msgSource=1;
+
+
+    /**
+     * 客户查询条件
+     */
+    private WeCustomersQuery weCustomersQuery;
 
     public void setCurrentUserInfo(LoginUser loginUser) {
         this.loginUser = loginUser;

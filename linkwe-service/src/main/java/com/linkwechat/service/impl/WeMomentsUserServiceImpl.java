@@ -32,6 +32,7 @@ import com.linkwechat.domain.moments.entity.WeMomentsUser;
 import com.linkwechat.domain.moments.query.WeMomentsTaskEstimateCustomerNumRequest;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
+import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwMomentsClient;
@@ -269,8 +270,10 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
         //数据不存在，直接返回
-        WeMomentsTask weMomentsTask = iWeMomentsTaskService.getById(weMomentsTaskId);
-        if (BeanUtil.isEmpty(weMomentsTask)) {
+//        WeMomentsTask weMomentsTask = iWeMomentsTaskService.getById(weMomentsTaskId);
+        WeMomentsTaskVO weMomentsTaskVO = iWeMomentsTaskService.get(weMomentsTaskId);
+
+        if (BeanUtil.isEmpty(weMomentsTaskVO)) {
             return null;
         }
 
@@ -315,18 +318,17 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             }
         }
 
-        WeCustomersQuery weCustomersQuery = weMomentsTask.getWeCustomersQuery();
-
-        if(null != weCustomersQuery){
+        WeCustomersQuery weCustomersQuery = weMomentsTaskVO.getWeCustomersQuery();
+        if(weCustomersQuery !=null){
             weCustomersQuery.setNoRepeat(true);
             vo.setCustomerNum(
                     weMomentsCustomerService.estimateCustomerNum(
-                            WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTask.getScopeType())
-                                    .weCustomersQuery(weMomentsTask.getWeCustomersQuery()).build()
+                            WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTaskVO.getScopeType())
+                                    .weCustomersQuery(weCustomersQuery).build()
                     )
             );
-        }
 
+        }
         return vo;
     }
 

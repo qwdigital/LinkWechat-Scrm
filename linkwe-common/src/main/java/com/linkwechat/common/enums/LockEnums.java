@@ -8,6 +8,8 @@ public enum LockEnums {
 
     WE_MOMENTS_SEND_LOCK("momentsSendKey::lock","朋友圈发送锁"),
 
+    WE_FASSION_LOCK("fissionKey::lock","任务裂变发送锁"),
+
     WE_MOMENTS_ID_LOCK("jobIdToMomentId","通过jobId换取momentsId");
 
 

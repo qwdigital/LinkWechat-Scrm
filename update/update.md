@@ -179,3 +179,16 @@
             `del_flag` tinyint(4) DEFAULT '0' COMMENT '删除标识 0:正常 1:删除',
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='朋友圈执行员工';
+
+## V5.0.1 (2023-11-30)
+      ● 升级日志
+         1.客户sop,企为群发，任务裂变客户筛选功能重构与优化;
+         2.群裂变条件为全部时任务通知循环发送相关BUG。
+
+       ● sql更新日志
+         ALTER TABLE we_fission ADD COLUMN we_customers_query text  COMMENT '客户查询条件';
+         ALTER TABLE we_fission ADD COLUMN scope_type tinyint  COMMENT '发送范围: 0全部客户 1按条件筛选';
+         ALTER TABLE we_sop_base ADD COLUMN we_customers_query text  COMMENT '客户查询条件';
+         ALTER TABLE we_sop_base ADD COLUMN scope_type tinyint  COMMENT '发送范围: 0全部客户 1按条件筛选';
+         ALTER TABLE we_group_message_task ADD COLUMN we_customers_query text  COMMENT '客户查询条件';
+         ALTER TABLE we_group_message_task ADD COLUMN scope_type tinyint  COMMENT '发送范围: 0全部客户 1按条件筛选';

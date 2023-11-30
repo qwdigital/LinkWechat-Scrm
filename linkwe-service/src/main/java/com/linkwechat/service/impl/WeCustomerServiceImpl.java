@@ -539,14 +539,15 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                     );
                 } else {
 
-                    iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
-                            weMakeCustomerTag.getUserId(),
-                            weMakeCustomerTag.getIsCompanyTag() ?
-                                    TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getType() :
-                                    TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getType(),
-                            String.join(",", addTag.stream().map(WeTag::getName).collect(Collectors.toList()))
-                    );
-
+                    if(CollectionUtil.isNotEmpty(removeTag)){
+                        iWeCustomerTrajectoryService.createEditTrajectory(weMakeCustomerTag.getExternalUserid(),
+                                weMakeCustomerTag.getUserId(),
+                                weMakeCustomerTag.getIsCompanyTag() ?
+                                        TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getType() :
+                                        TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getType(),
+                                String.join(",", removeTag.stream().map(WeTag::getName).collect(Collectors.toList()))
+                        );
+                    }
                 }
 
 
@@ -562,6 +563,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
     @Override
+    @Transactional
     public void updateWeCustomerTagIds(String userId, String externalUserid) {
         WeCustomer weCustomer = this.getOne(new LambdaQueryWrapper<WeCustomer>()
                 .eq(WeCustomer::getAddUserId, userId)
@@ -997,6 +999,13 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
 
             List<WeCustomerFollowUserEntity> followUserList = weCustomerDetail.getFollowUser();
+            //先清理标签关系表中当前客户对应的原有标签数据
+            if(StringUtils.isNotEmpty(weCustomer.getExternalUserid())
+                    &&StringUtils.isNotEmpty(weCustomer.getAddUserId())){
+                iWeFlowerCustomerTagRelService.remove(new LambdaQueryWrapper<WeFlowerCustomerTagRel>()
+                        .eq(WeFlowerCustomerTagRel::getExternalUserid,weCustomer.getExternalUserid())
+                        .eq(WeFlowerCustomerTagRel::getUserId,weCustomer.getAddUserId()));
+            }
             if (CollectionUtil.isNotEmpty(followUserList)) {
                 WeCustomerFollowUserEntity followUserEntity = followUserList.stream().filter(followUserInfo -> followUserInfo.getUserId().equals(userId)).findFirst().get();
 
@@ -1367,6 +1376,17 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
         pageDomain.setPageNum(1);
         pageDomain.setPageSize(10000);
         WeCustomersQuery weCustomersQuery = new WeCustomersQuery();
+        weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
+        weCustomersQuery.setIsJoinBlacklist(1);
+        return  this.findWeCustomerList(weCustomersQuery,pageDomain);
+    }
+
+
+    @Override
+    public List<WeCustomersVo> findLimitWeCustomerList(WeCustomersQuery weCustomersQuery) {
+        PageDomain pageDomain = new PageDomain();
+        pageDomain.setPageNum(1);
+        pageDomain.setPageSize(10000);
         weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
         weCustomersQuery.setIsJoinBlacklist(1);
         return  this.findWeCustomerList(weCustomersQuery,pageDomain);
