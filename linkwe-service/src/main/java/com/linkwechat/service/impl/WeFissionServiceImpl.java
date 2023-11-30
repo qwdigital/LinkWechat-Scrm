@@ -504,7 +504,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                         //发送通知逻辑
                         if(weFission.getIsTip().equals(new Integer(2))){
-
+                            weFission.setIsTip(1);
                             WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
                             messageQuery.setIsAll(false);
                             messageQuery.setMsgSource(4);
@@ -579,7 +579,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                                 messageQuery.setSenderList(senderInfos);
 
-                                weFission.setIsTip(1);
+
                                 //通知员工群发
                                 iWeMessagePushService.officialPushMessage(messageQuery);
 
@@ -619,7 +619,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
                                     });
 
-                                    weFission.setIsTip(1);
                                     //通知员工群发
                                     iWeMessagePushService.officialPushMessage(messageQuery);
 
