@@ -94,17 +94,17 @@ public class SopTaskServiceImpl implements SopTaskService {
 
     @Override
     public void builderNewWeCustomer(WeCustomer weCustomer) {
-        List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
-                .externalUserid(weCustomer.getExternalUserid())
-                .firstUserId(weCustomer.getAddUserId())
-                .delFlag(Constants.COMMON_STATE)
-                .build(), null);
+//        List<WeCustomersVo> weCustomerList = iWeCustomerService.findWeCustomerList(WeCustomersQuery.builder()
+//                .externalUserid(weCustomer.getExternalUserid())
+//                .firstUserId(weCustomer.getAddUserId())
+//                .delFlag(Constants.COMMON_STATE)
+//                .build(), null);
 
 
-        if(CollectionUtil.isNotEmpty(weCustomerList)){
-            WeCustomersVo weCustomersVo = weCustomerList.stream().findFirst().get();
+//        if(CollectionUtil.isNotEmpty(weCustomerList)){
+//            WeCustomersVo weCustomersVo = weCustomerList.stream().findFirst().get();
 
-            if(null != weCustomersVo){
+//            if(null != weCustomersVo){
                 //获取执行中的新客sop
                 List<WeSopBase> weSopBases = iWeSopBaseService.list(new LambdaQueryWrapper<WeSopBase>()
                         .eq(WeSopBase::getBusinessType, SopType.SOP_TYPE_XK.getSopKey())
@@ -114,39 +114,30 @@ public class SopTaskServiceImpl implements SopTaskService {
                     weSopBases.stream().forEach(weSopBase -> {
 
 
+                        WeCustomersQuery weCustomersQuery = weSopBase.getWeCustomersQuery();
 
+                        if(null == weCustomersQuery){
+                            weCustomersQuery=new WeCustomersQuery();
+                        }
+
+                        weCustomersQuery.setFirstUserId(weCustomer.getAddUserId());
+                        weCustomersQuery.setExternalUserid(weCustomer.getExternalUserid());
+                        weSopBase.setWeCustomersQuery(weCustomersQuery);
                         Map<String, List<WeCustomersVo>> stringListMap
                                 = builderExecuteWeCustomer(weSopBase);
 
                         if(CollectionUtil.isNotEmpty(stringListMap)){
-                            List<WeCustomersVo> weCustomers = stringListMap.get(weCustomer.getAddUserId());
-
-                            if(CollectionUtil.isNotEmpty(weCustomers)){
-
-                                weCustomers.stream().forEach(k->{
-
-                                    if(k.getExternalUserid().equals(weCustomer.getExternalUserid())){
-                                        //加入新客sop
-                                        iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase,
-                                                MapUtil.builder(weCustomersVo.getFirstUserId(),ListUtil.list(false, weCustomersVo)).build()
-                                                , false, true);
-                                    }
-
-                                });
-
-                            }
+                            //加入新客sop
+                            iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase,
+                                    stringListMap
+                                    , false, true);
 
                         }
-
-
-
 
                     });
 
                 }
-            }
 
-        }
 
 
 
@@ -253,7 +244,11 @@ public class SopTaskServiceImpl implements SopTaskService {
             }
             //全部客户
             if(new Integer(0).equals(weSopBase.getScopeType())){
-                weCustomersVoList=iWeCustomerService.findLimitWeCustomerList();
+                if(weSopBase.getWeCustomersQuery() == null){
+                    weCustomersVoList=iWeCustomerService.findLimitWeCustomerList();
+                }else{
+                    weCustomersVoList=iWeCustomerService.findLimitWeCustomerList(weSopBase.getWeCustomersQuery());
+                }
             //按照条件筛选部分客户
             }else if(new Integer(1).equals(weSopBase.getScopeType())){
                 //不等于新客sop，新客sop中的客户来源为新加入的客户
@@ -273,51 +268,6 @@ public class SopTaskServiceImpl implements SopTaskService {
 
 
 
-    //动态筛选客户(与牵扯到人群相关的计算)
-    private List<WeCustomer>  filterCustomers(List<WeStrategicCrowdSwipe>  executeCustomerSwipes, Set<String> executeWeUserIds){
-        List<WeCustomer> weCustomerList = new ArrayList<>();
-
-        if(CollectionUtil.isEmpty(executeWeUserIds)){
-            return weCustomerList;
-        }
-
-        try { //WeStrategicCrowdSwipe
-            for (WeStrategicCrowdSwipe crowdSwipe : executeCustomerSwipes) {
-                CrowdSwipeTypeEnum crowdSwipeTypeEnum = CrowdSwipeTypeEnum.parseEnum(crowdSwipe.getSwipType());
-                if (crowdSwipeTypeEnum == null) {
-                    continue;
-                } else{
-                    if("0".equals(crowdSwipe.getCode())){//渠道
-                        crowdSwipe.setCode(CorpAddStateEnum.CORP_STATE.getCode().toString());
-                    }
-
-                }
-                List<WeCustomer> calculate = SpringUtils.getBean(crowdSwipeTypeEnum.getMethod(), AbstractCrowdService.class).calculate(crowdSwipe);
-                if (CollectionUtil.isEmpty(calculate)) {
-                    continue;
-                }
-                List<Long> calculateCustomerIdList = calculate.parallelStream().map(WeCustomer::getId).collect(Collectors.toList());
-                if (CollectionUtil.isNotEmpty(weCustomerList)) {
-                    if (crowdSwipe.getAndOr() == 1) {
-                        weCustomerList=weCustomerList.stream().filter(weCustomer -> calculateCustomerIdList.contains(weCustomer.getId())).collect(Collectors.toList());
-                    } else if (crowdSwipe.getAndOr() == 2) {
-                        weCustomerList.addAll(calculate);
-                    }
-                } else {
-                    weCustomerList.addAll(calculate);
-                }
-            }
-
-        } catch (Exception e) {
-            log.error("动态筛选客户失败:", e);
-        }
-
-        if(CollectionUtil.isNotEmpty(weCustomerList)){//取出符合执行员工的所属客户
-            weCustomerList=weCustomerList.stream().filter(weCustomer -> executeWeUserIds.contains(weCustomer.getAddUserId())).collect(Collectors.toList());
-        }
-
-        return weCustomerList;
-    }
 
 
 }

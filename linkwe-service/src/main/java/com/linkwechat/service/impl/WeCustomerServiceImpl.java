@@ -1381,6 +1381,16 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
     }
 
     @Override
+    public List<WeCustomersVo> findLimitWeCustomerList(WeCustomersQuery weCustomersQuery) {
+        PageDomain pageDomain = new PageDomain();
+        pageDomain.setPageNum(1);
+        pageDomain.setPageSize(10000);
+        weCustomersQuery.setDelFlag(Constants.COMMON_STATE);
+        weCustomersQuery.setIsJoinBlacklist(1);
+        return  this.findWeCustomerList(weCustomersQuery,pageDomain);
+    }
+
+    @Override
     public List<WeAddGroupMessageQuery.SenderInfo> findLimitSenderInfoWeCustomerList() {
         List<WeAddGroupMessageQuery.SenderInfo> senderInfos=new ArrayList<>();
         List<WeCustomersVo> limitWeCustomerList = this.findLimitWeCustomerList();

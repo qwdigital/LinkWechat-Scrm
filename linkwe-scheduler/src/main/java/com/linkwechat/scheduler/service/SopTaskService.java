@@ -15,10 +15,7 @@ public interface SopTaskService {
      */
     void createOrUpdateSop(WeSopBaseDto weSopBaseDto);
 
-//    /**
-//     * 构建新客SOP
-//     */
-//    void builderXkPlan();
+
 
 
     /**

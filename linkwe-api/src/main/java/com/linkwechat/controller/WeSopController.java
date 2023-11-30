@@ -20,6 +20,7 @@ public class WeSopController extends BaseController {
     private IWeSopBaseService iWeSopBaseService;
 
 
+
     /**
      * 获取sop列表
      * @param weSopBase  baseType sop基础类型(1:客户sop;2:客群sop)

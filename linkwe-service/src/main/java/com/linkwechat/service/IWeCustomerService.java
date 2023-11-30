@@ -345,6 +345,10 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @return
      */
     List<WeCustomersVo> findLimitWeCustomerList();
+
+
+
+    List<WeCustomersVo> findLimitWeCustomerList(WeCustomersQuery weCustomersQuery);
     /**
      * 通过客户id为当前客户打标签(如果是多个员工添加该客户都需打标签)
      * @param exId
