@@ -3,6 +3,8 @@ package com.linkwechat.scheduler.task;
 import com.linkwechat.service.IWeTasksService;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -20,6 +22,9 @@ public class WeTasksTask {
 
     @Resource
     private IWeTasksService weTasksService;
+
+
+
 
     /**
      * 线索长时间未跟进
