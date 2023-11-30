@@ -198,6 +198,7 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                                 weMomentsEstimateCustomer.setWeUserId(weCustomer.getFirstUserId());
                                 weMomentsEstimateCustomer.setExternalUserid(weCustomer.getExternalUserid());
                                 weMomentsEstimateCustomer.setCustomerName(weCustomer.getCustomerName());
+                                weMomentsEstimateCustomer.setDelFlag(Constants.COMMON_STATE);
                                 customers.add(weMomentsEstimateCustomer);
                             }
                         }
@@ -849,24 +850,27 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
     @Transactional(rollbackFor = Exception.class)
     public void groupSendFinish(WeMomentsSyncGroupSendRequest request) {
 
+
+
+
         log.info("成员朋友发送结束:{}", JSONObject.toJSONString(request));
 
         if (BeanUtil.isEmpty(SecurityUtils.getLoginUser())) {
             throw new ServiceException("用户未登录", HttpStatus.UNAUTHORIZED);
         }
 
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        log.info("成员朋友发送结束！，任务Id：{}，发送成员：{}", request.getWeMomentsTaskId(), sysUser.getWeUserId());
+//        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+//        log.info("成员朋友发送结束！，任务Id：{}，发送成员：{}", request.getWeMomentsTaskId(), sysUser.getWeUserId());
 
-        WeMomentsTask weMomentsTask = this.getById(request.getWeMomentsTaskId());
-        if (BeanUtil.isEmpty(weMomentsTask)) {
-            return;
-        }
+//        WeMomentsTask weMomentsTask = this.getById(request.getWeMomentsTaskId());
+//        if (BeanUtil.isEmpty(weMomentsTask)) {
+//            return;
+//        }
 
         //判断是否已经执行过
         LambdaQueryWrapper<WeMomentsEstimateUser> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(WeMomentsEstimateUser::getMomentsTaskId, request.getWeMomentsTaskId());
-        wrapper.eq(WeMomentsEstimateUser::getWeUserId, sysUser.getWeUserId());
+        wrapper.eq(WeMomentsEstimateUser::getWeUserId, SecurityUtils.getLoginUser().getSysUser().getWeUserId());
         WeMomentsEstimateUser one = weMomentsEstimateUserService.getOne(wrapper);
         if (BeanUtil.isEmpty(one)) {
             return;
@@ -881,12 +885,12 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
         weMomentsEstimateUserService.updateById(one);
 
         //更新执行状态
-        weMomentsEstimateCustomerService.update(WeMomentsEstimateCustomer.builder()
-                        .momentsTaskId(weMomentsTask.getId())
-                        .deliveryStatus(0)
-                .build(), new LambdaQueryWrapper<WeMomentsEstimateCustomer>()
-                        .eq(WeMomentsEstimateCustomer::getMomentsTaskId,weMomentsTask.getId())
-                .in(WeMomentsEstimateCustomer::getWeUserId,sysUser.getWeUserId()));
+//        weMomentsEstimateCustomerService.update(WeMomentsEstimateCustomer.builder()
+//                        .momentsTaskId(weMomentsTask.getId())
+//                        .deliveryStatus(0)
+//                .build(), new LambdaQueryWrapper<WeMomentsEstimateCustomer>()
+//                        .eq(WeMomentsEstimateCustomer::getMomentsTaskId,weMomentsTask.getId())
+//                .in(WeMomentsEstimateCustomer::getWeUserId,sysUser.getWeUserId()));
 
         //获取成员群发执行结果
 //        WeMomentsSyncGroupSendMqRequest mqRequest = new WeMomentsSyncGroupSendMqRequest();

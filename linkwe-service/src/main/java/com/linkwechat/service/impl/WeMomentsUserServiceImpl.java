@@ -19,6 +19,7 @@ import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
@@ -31,6 +32,7 @@ import com.linkwechat.domain.moments.entity.WeMomentsUser;
 import com.linkwechat.domain.moments.query.WeMomentsTaskEstimateCustomerNumRequest;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
+import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwMomentsClient;
@@ -40,6 +42,7 @@ import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.mapper.WeMomentsUserMapper;
 import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -69,8 +72,12 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     private IWeTagService weTagService;
     @Resource
     private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
-    @Resource
-    private WeMomentsTaskMapper weMomentsTaskMapper;
+//    @Resource
+//    private WeMomentsTaskMapper weMomentsTaskMapper;
+
+    @Autowired
+    @Lazy
+    private IWeMomentsTaskService iWeMomentsTaskService;
 
     @Resource
     private IWeMomentsCustomerService weMomentsCustomerService;
@@ -263,8 +270,10 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
         //数据不存在，直接返回
-        WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
-        if (BeanUtil.isEmpty(weMomentsTask)) {
+//        WeMomentsTask weMomentsTask = iWeMomentsTaskService.getById(weMomentsTaskId);
+        WeMomentsTaskVO weMomentsTaskVO = iWeMomentsTaskService.get(weMomentsTaskId);
+
+        if (BeanUtil.isEmpty(weMomentsTaskVO)) {
             return null;
         }
 
@@ -309,13 +318,17 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             }
         }
 
-        vo.setCustomerNum(
-                weMomentsCustomerService.estimateCustomerNum(
-                        WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTask.getScopeType())
-                                .weCustomersQuery(weMomentsTask.getWeCustomersQuery()).build()
-                )
-        );
+        WeCustomersQuery weCustomersQuery = weMomentsTaskVO.getWeCustomersQuery();
+        if(weCustomersQuery !=null){
+            weCustomersQuery.setNoRepeat(true);
+            vo.setCustomerNum(
+                    weMomentsCustomerService.estimateCustomerNum(
+                            WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTaskVO.getScopeType())
+                                    .weCustomersQuery(weCustomersQuery).build()
+                    )
+            );
 
+        }
         return vo;
     }
 

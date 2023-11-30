@@ -818,7 +818,7 @@ public class RabbitMQConfig {
     @Bean
     public Exchange sopEx() {
         // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
-        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
+        return ExchangeBuilder.directExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
 
