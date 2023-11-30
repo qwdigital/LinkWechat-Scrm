@@ -7,13 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
-import com.linkwechat.domain.fission.WeFission;
 import com.linkwechat.domain.fission.WeFissionNotice;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.service.AbstractGroupMsgSendTaskService;
 import com.linkwechat.service.IWeFissionNoticeService;
-import com.linkwechat.service.IWeFissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +30,6 @@ public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService
     @Autowired
     private IWeFissionNoticeService iWeFissionNoticeService;
 
-    @Autowired
-    private IWeFissionService iWeFissionService;
 
 
     @Override
