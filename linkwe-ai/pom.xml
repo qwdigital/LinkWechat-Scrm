@@ -74,10 +74,42 @@
     </dependencies>
 
     <build>
+        <finalName>lw-ai</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.3.3.RELEASE</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>4.8.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.liquibase</groupId>
+                        <artifactId>liquibase-core</artifactId>
+                        <version>4.8.0</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <propertyFile>src/main/resources/liquibase-db.properties</propertyFile>
+                    <changeLogFile>src/main/resources/db/changelog-master.xml</changeLogFile>
+                    <diffChangeLogFile>src/main/resources/db/changelog/changelog_${maven.build.timestamp}.xml</diffChangeLogFile>
+                    <outputChangeLogFile>src/main/resources/db/changelog/changelog_original.xml</outputChangeLogFile>
+                    <dropFirst>false</dropFirst>
+                    <defaultSchemaName/>
+                    <verbose>true</verbose>
+                    <logging>debug</logging>
+                    <promptOnNonLocalDatabase>true</promptOnNonLocalDatabase>
+                </configuration>
             </plugin>
         </plugins>
     </build>
