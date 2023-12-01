@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -34,7 +35,7 @@ public class WeAiAssistantController {
 
     @ApiOperation(value = "发送消息",httpMethod = "POST")
     @PostMapping("/send/msg")
-    public AjaxResult sendMsg(@RequestBody WeAiMsgQuery query){
+    public AjaxResult sendMsg(@RequestBody @Validated WeAiMsgQuery query){
         iWeAiSessionService.sendMsg(query);
         return AjaxResult.success();
     }
