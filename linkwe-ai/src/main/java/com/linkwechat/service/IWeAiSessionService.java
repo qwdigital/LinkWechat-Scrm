@@ -1,9 +1,10 @@
 package com.linkwechat.service;
 
 import com.linkwechat.domain.WeAiMsgQuery;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface IWeAiSessionService {
-    void createSseConnect();
+    SseEmitter createSseConnect();
 
 
     void closeSseConnect(String sessionId);

@@ -15,5 +15,5 @@ public class WeAiMsgQuery {
     private String sessionId;
 
     @ApiModelProperty("消息列表")
-    private List<Message> msgList;
+    private List<AiMessage> msgList;
 }

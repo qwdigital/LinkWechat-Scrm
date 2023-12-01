@@ -6,7 +6,9 @@ import com.linkwechat.service.IWeAiSessionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping(value = "/assistant")
@@ -18,10 +20,9 @@ public class WeAiAssistantController {
 
 
     @ApiOperation(value = "创建连接",httpMethod = "GET")
-    @GetMapping("/create/connect")
-    public AjaxResult createSseConnect() {
-        iWeAiSessionService.createSseConnect();
-        return AjaxResult.success();
+    @GetMapping(value = "/create/connect",produces = {MediaType.TEXT_EVENT_STREAM_VALUE})
+    public SseEmitter createSseConnect() {
+        return iWeAiSessionService.createSseConnect();
     }
 
     @ApiOperation(value = "关闭连接",httpMethod = "GET")

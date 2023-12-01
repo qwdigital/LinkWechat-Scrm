@@ -19,9 +19,8 @@ public class HunYuanService {
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
 
-    public void sendMsg(List<Message> msgList, Consumer<String> consumer) {
+    public void sendMsg(Message [] msgList, Consumer<String> consumer) {
         HunYuanClient client = new HunYuanClient(new Credential(linkWeChatConfig.getTxAiSecretId(), linkWeChatConfig.getTxAiSecretKey()), linkWeChatConfig.getTxAiRegion());
-        Message[] array = msgList.toArray(new Message[0]);
-        client.sendMsg(array, consumer);
+        client.sendMsg(msgList, consumer);
     }
 }

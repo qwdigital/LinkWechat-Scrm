@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.exception.wecom.WeComException;
@@ -11,6 +12,7 @@ import com.linkwechat.utils.WeAiSessionUtil;
 import com.tencentcloudapi.hunyuan.v20230901.models.ChatStdResponse;
 import com.tencentcloudapi.hunyuan.v20230901.models.Choice;
 import com.tencentcloudapi.hunyuan.v20230901.models.Delta;
+import com.tencentcloudapi.hunyuan.v20230901.models.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +37,10 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     private RabbitMQSettingConfig rabbitMQSettingConfig;
 
     @Override
-    public void createSseConnect() {
+    public SseEmitter createSseConnect() {
         String sessionId = IdUtil.simpleUUID();
         // 设置超时时间，0表示不过期。默认30秒，超过时间未完成会抛出异常：AsyncRequestTimeoutException
-        SseEmitter sseEmitter = new SseEmitter(60 * 1000L);
+        SseEmitter sseEmitter = new SseEmitter(0L);
         // 注册回调
         sseEmitter.onCompletion(completionCallBack(sessionId));
 
@@ -51,6 +53,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             log.error("SseEmitterServiceImpl[createSseConnect]: 创建长链接异常，客户端ID:{}", sessionId, e);
             throw new WeComException("创建连接异常！");
         }
+        return sseEmitter;
     }
 
     @Override
@@ -79,7 +82,16 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
 
     public void sendAiMsg(WeAiMsgQuery query) {
-        hunYuanService.sendMsg(query.getMsgList(), (data) -> {
+        if(CollectionUtil.isEmpty(query.getMsgList())){
+            return;
+        }
+        Message[] msgArray = query.getMsgList().stream().map(item -> {
+            Message message = new Message();
+            message.setRole(item.getRole());
+            message.setContent(item.getContent());
+            return message;
+        }).toArray(Message[]::new);
+        hunYuanService.sendMsg(msgArray, (data) -> {
             SseEmitter sseEmitter = WeAiSessionUtil.get(query.getSessionId());
             if (Objects.nonNull(sseEmitter)) {
                 ChatStdResponse response = JSONObject.parseObject(data, ChatStdResponse.class);
