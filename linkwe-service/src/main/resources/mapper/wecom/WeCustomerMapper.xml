@@ -362,7 +362,7 @@
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
                 <choose>
                     <when test="weCustomerList.isContain == 2">
-                        OR FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        OR FIND_IN_SET(#{weCustomerList.tagIds},wcr.tag_ids)
                     </when>
                     <when test="weCustomerList.isContain == 3">
                         <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
@@ -472,7 +472,7 @@
             <if test="weCustomerList.tagIds !=null and weCustomerList.tagIds !=''">
                 <choose>
                     <when test="weCustomerList.isContain == 2">
-                        OR FIND_IN_SET(#{tagId},wcr.tag_ids)
+                        OR FIND_IN_SET(#{weCustomerList.tagIds},wcr.tag_ids)
                     </when>
                     <when test="weCustomerList.isContain == 3">
                         <foreach item="tagId" index="index" collection="weCustomerList.tagIds.split(',')">
