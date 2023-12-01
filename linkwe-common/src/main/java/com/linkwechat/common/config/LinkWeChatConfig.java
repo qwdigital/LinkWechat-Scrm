@@ -262,6 +262,19 @@ public class LinkWeChatConfig {
 
     private FincaceProxyConfig fincaceProxyConfig;
 
+    /**
+     * 混元大模型秘钥ID
+     */
+    private String txAiSecretId;
+    /**
+     * 混元大模型秘钥
+     */
+    private String txAiSecretKey;
+
+    /**
+     * 混元大模型地区
+     */
+    private String txAiRegion;
 
     public String getName() {
         return name;

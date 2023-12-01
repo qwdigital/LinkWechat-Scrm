@@ -1,0 +1,14 @@
+package com.linkwechat.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeAiMsg;
+
+/**
+ * ai助手消息表(WeAiMsg)
+ *
+ * @author makejava
+ * @since 2023-12-01 15:12:13
+ */
+public interface IWeAiMsgService extends IService<WeAiMsg> {
+
+} 

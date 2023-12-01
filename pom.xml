@@ -70,6 +70,7 @@
         <combiner.version>2.6.3</combiner.version>
         <orika.version>1.5.2</orika.version>
         <redisson.version>3.20.0</redisson.version>
+        <tencentcloud-sdk.version>3.1.915</tencentcloud-sdk.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -517,6 +518,11 @@
                 <version>${redisson.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java</artifactId>
+                <version>${tencentcloud-sdk.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -543,6 +549,7 @@
         <module>linkwe-framework</module>
         <module>linkwe-service</module>
         <module>linkwe-event-task</module>
+        <module>linkwe-ai</module>
     </modules>
 
     <build>
