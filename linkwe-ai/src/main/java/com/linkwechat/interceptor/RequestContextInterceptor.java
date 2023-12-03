@@ -34,12 +34,10 @@ public class RequestContextInterceptor implements HandlerInterceptor {
         SecurityContextHolder.setUserName(ServletUtils.getHeader(request, SecurityConstants.USER_NAME));
         SecurityContextHolder.setUserType(ServletUtils.getHeader(request, SecurityConstants.USER_TYPE));
         SecurityContextHolder.setUserKey(ServletUtils.getHeader(request, SecurityConstants.USER_KEY));
-        String loginType = ServletUtils.getHeader(request, SecurityConstants.LOGIN_TYPE);
         String loginUserStr = ServletUtils.getHeader(request, SecurityConstants.LOGIN_USER);
         if(StringUtils.isNotEmpty(loginUserStr)){
             SecurityContextHolder.set(SecurityConstants.Details.LOGIN_USER.getCode(), JSONObject.parseObject(loginUserStr, LoginUser.class));
         }
-
         return true;
     }
 

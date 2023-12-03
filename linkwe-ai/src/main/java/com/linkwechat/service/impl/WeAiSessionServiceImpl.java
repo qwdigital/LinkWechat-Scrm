@@ -5,8 +5,10 @@ import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.WeAiMsg;
 import com.linkwechat.domain.WeAiMsgQuery;
 import com.linkwechat.service.HunYuanService;
+import com.linkwechat.service.IWeAiMsgService;
 import com.linkwechat.service.IWeAiSessionService;
 import com.linkwechat.utils.WeAiSessionUtil;
 import com.tencentcloudapi.hunyuan.v20230901.models.ChatStdResponse;
@@ -26,6 +28,9 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class WeAiSessionServiceImpl implements IWeAiSessionService {
+
+    @Autowired
+    private IWeAiMsgService iWeAiMsgService;
 
     @Autowired
     private HunYuanService hunYuanService;
@@ -91,13 +96,14 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             message.setContent(item.getContent());
             return message;
         }).toArray(Message[]::new);
+
+
         hunYuanService.sendMsg(msgArray, (data) -> {
             SseEmitter sseEmitter = WeAiSessionUtil.get(query.getSessionId());
             if (Objects.nonNull(sseEmitter)) {
                 ChatStdResponse response = JSONObject.parseObject(data, ChatStdResponse.class);
-                Delta delta = Arrays.stream(response.getChoices()).map(Choice::getDelta).findFirst().orElseGet(null);
                 try {
-                    sseEmitter.send(SseEmitter.event().name("msg").data(delta));
+                    sseEmitter.send(SseEmitter.event().name("msg").data(response));
                 } catch (IOException e) {
                     log.error("发送客户端异常 query：{}", JSONObject.toJSONString(query), e);
                 }

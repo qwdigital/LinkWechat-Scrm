@@ -1,6 +1,5 @@
 package com.linkwechat.domain;
 
-import com.tencentcloudapi.hunyuan.v20230901.models.Message;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
