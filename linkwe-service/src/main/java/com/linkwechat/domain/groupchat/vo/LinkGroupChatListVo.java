@@ -68,5 +68,10 @@ public class LinkGroupChatListVo extends WeGroup {
      */
     private Date addTime;
 
+    /**
+     * 成员id
+     */
+    private String memberId;
+
 
 }

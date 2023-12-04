@@ -296,16 +296,16 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     //设置执行成员
                     WeSopExecuteUserConditVo executeWeUser = k.getExecuteWeUser();
                     if(Objects.isNull(executeWeUser)){//执行成员为空则查询当前系统所有员工
-
-                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
-
-                        if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
-
-                            weSopListsVo.setExecuteUser(
-                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
-                                            .stream().collect(Collectors.joining(","))
-                            );
-                        }
+                         weSopListsVo.setExecuteUser("全部");
+//                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
+//
+//                        if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
+//
+//                            weSopListsVo.setExecuteUser(
+//                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
+//                                            .stream().collect(Collectors.joining(","))
+//                            );
+//                        }
                     }else{//查询成员，或者部门岗位
                         StringBuilder sb=new StringBuilder();
                         //设置具体执行员工
@@ -736,56 +736,59 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public Map<String, List<LinkGroupChatListVo>> builderExecuteGroup(WeSopBase weSopBase,WeSopExecuteConditVo executeCustomerOrGroup, Set<String> executeWeUserIds) {
+    public Map<String, List<LinkGroupChatListVo>> builderExecuteGroup(WeSopBase weSopBase,String chatId) {
+
         Map<String,List<LinkGroupChatListVo>> weGroupMap=new HashMap<>();
 
+        //查询出对应的成员所在的群
+        Set<String> executeWeUserIds = this.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
 
-        WeGroupChatQuery weGroupChatQuery = WeGroupChatQuery.builder()
-                .userIds(StringUtils.join(executeWeUserIds, ","))
-                .build();
-        //查询全部群
-        if(Objects.nonNull(executeCustomerOrGroup)){
 
-            //时间
-            WeSopExecuteConditVo.WeSopExecuteGroupTimeCondit weSopExecuteGroupTimeCondit
-                    = executeCustomerOrGroup.getWeSopExecuteGroupTimeCondit();
-            if(Objects.nonNull(weSopExecuteGroupTimeCondit)&&weSopExecuteGroupTimeCondit.isChange()){
-                weGroupChatQuery.setBeginTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getBeginTime()));
-                weGroupChatQuery.setEndTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getEndTime()));
+        if(CollectionUtil.isNotEmpty(executeWeUserIds)){
+            WeGroupChatQuery weGroupChatQuery = WeGroupChatQuery.builder()
+                    .memberIds(StringUtils.join(executeWeUserIds, ","))
+                    .build();
+            if(StringUtils.isNotEmpty(chatId)){
+                weGroupChatQuery.setChatId(chatId);
             }
 
-            //标签
-            WeSopExecuteConditVo.WeSopExecuteGroupTagIdsCondit weSopExecuteGroupTagIdsCondit
-                    = executeCustomerOrGroup.getWeSopExecuteGroupTagIdsCondit();
-            if(Objects.nonNull(weSopExecuteGroupTagIdsCondit)&&weSopExecuteGroupTagIdsCondit.isChange()){
-                weGroupChatQuery.setTagIds(StringUtils.join(weSopExecuteGroupTagIdsCondit.getTagIds(),","));
+            WeSopExecuteConditVo executeCustomerOrGroup = weSopBase.getExecuteCustomerOrGroup();
+
+            if(Objects.nonNull(executeCustomerOrGroup)){
+                //时间
+                WeSopExecuteConditVo.WeSopExecuteGroupTimeCondit weSopExecuteGroupTimeCondit
+                        = executeCustomerOrGroup.getWeSopExecuteGroupTimeCondit();
+                if(Objects.nonNull(weSopExecuteGroupTimeCondit)&&weSopExecuteGroupTimeCondit.isChange()){
+                    weGroupChatQuery.setBeginTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getBeginTime()));
+                    weGroupChatQuery.setEndTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getEndTime()));
+                }
+
+                //标签
+                WeSopExecuteConditVo.WeSopExecuteGroupTagIdsCondit weSopExecuteGroupTagIdsCondit
+                        = executeCustomerOrGroup.getWeSopExecuteGroupTagIdsCondit();
+                if(Objects.nonNull(weSopExecuteGroupTagIdsCondit)&&weSopExecuteGroupTagIdsCondit.isChange()){
+                    weGroupChatQuery.setTagIds(StringUtils.join(weSopExecuteGroupTagIdsCondit.getTagIds(),","));
+                }
+
+                //客群人数上限范围
+                WeSopExecuteConditVo.WeSopExecuteGroupMemberLimitCondit weSopExecuteGroupMemberLimitCondit
+                        = executeCustomerOrGroup.getWeSopExecuteGroupMemberLimitCondit();
+                if(Objects.nonNull(weSopExecuteGroupMemberLimitCondit)&&weSopExecuteGroupMemberLimitCondit.isChange()){
+                    weGroupChatQuery.setGroupMemberUp(weSopExecuteGroupMemberLimitCondit.getGroupMemberUp());
+                    weGroupChatQuery.setGroupMemberDown(weSopExecuteGroupMemberLimitCondit.getGroupMemberDown());
+                }
+
             }
 
-            //上线
-            WeSopExecuteConditVo.WeSopExecuteGroupMemberLimitCondit weSopExecuteGroupMemberLimitCondit
-                    = executeCustomerOrGroup.getWeSopExecuteGroupMemberLimitCondit();
-            if(Objects.nonNull(weSopExecuteGroupMemberLimitCondit)&&weSopExecuteGroupMemberLimitCondit.isChange()){
-                weGroupChatQuery.setGroupMemberUp(weSopExecuteGroupMemberLimitCondit.getGroupMemberUp());
-                weGroupChatQuery.setGroupMemberDown(weSopExecuteGroupMemberLimitCondit.getGroupMemberDown());
-            }
-
-        }
-        List<LinkGroupChatListVo> weGroups =  iWeGroupService.getPageList(weGroupChatQuery);
-        if(CollectionUtil.isNotEmpty(weGroups)){
-
-            if (weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XQPY.getSopKey())) {
-
-                weGroups =  weGroups.stream().filter(LinkGroupChatListVo ->
-                        DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopBase.getCreateTime())).getTime()
-                                <= DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, LinkGroupChatListVo.getAddTime())).getTime()
-                ).collect(Collectors.toList());
-
-            }
+            List<LinkGroupChatListVo> weGroups =  iWeGroupService.selectChatByMember(weGroupChatQuery);
 
             weGroupMap.putAll(
-                    weGroups.stream().distinct().collect(Collectors.groupingBy(LinkGroupChatListVo::getOwner))
+                    weGroups.stream().distinct().collect(Collectors.groupingBy(LinkGroupChatListVo::getMemberId))
             );
         }
+
+
+
 
 
 

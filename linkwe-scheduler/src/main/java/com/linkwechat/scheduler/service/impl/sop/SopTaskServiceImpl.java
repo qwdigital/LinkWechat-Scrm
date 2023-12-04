@@ -28,6 +28,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.sop.WeSopBase;
 import com.linkwechat.domain.sop.dto.WeSopBaseDto;
 import com.linkwechat.domain.sop.vo.WeSopExecuteConditVo;
+import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.strategic.crowd.WeStrategicCrowdSwipe;
 import com.linkwechat.scheduler.service.AbstractCrowdService;
 import com.linkwechat.scheduler.service.SopTaskService;
@@ -76,14 +77,14 @@ public class SopTaskServiceImpl implements SopTaskService {
                         iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase,false), isCreateOrUpdate, false);
                     }else if (weSopBase.getBaseType() == 2) { //客群sop
 
-                            Set<String> executeWeUserIds
-                                    = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
-                        if (CollectionUtil.isNotEmpty(executeWeUserIds)) {
+//                            Set<String> executeWeUserIds
+//                                    = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
+//                        if (CollectionUtil.isNotEmpty(executeWeUserIds)) {
                             //构建客群sop执行计划
                             iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
-                                    , iWeSopBaseService.builderExecuteGroup(weSopBase,(WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(), executeWeUserIds), isCreateOrUpdate,false);
+                                    , iWeSopBaseService.builderExecuteGroup(weSopBase,null), isCreateOrUpdate,false);
 
-                        }
+//                        }
 
                 }
 
@@ -155,41 +156,17 @@ public class SopTaskServiceImpl implements SopTaskService {
 
         if(CollectionUtil.isNotEmpty(weSopBases)){
             weSopBases.stream().forEach(weSopBase -> {
+                Map<String, List<LinkGroupChatListVo>> executeGroup
+                        = iWeSopBaseService.builderExecuteGroup(weSopBase, linkGroupChatListVo.getChatId());
 
-
-                //判断该群符不符合当前sop的条件
-                Map<String, List<LinkGroupChatListVo>> groupListMap
-                        = iWeSopBaseService.builderExecuteGroup(weSopBase, (WeSopExecuteConditVo) weSopBase.getExecuteCustomerOrGroup(),
-                        CollUtil.newHashSet(linkGroupChatListVo.getOwner()));
-
-
-                if(CollectionUtil.isNotEmpty(groupListMap)){
-                    List<LinkGroupChatListVo> linkGroupChatListVos
-                            = groupListMap.get(linkGroupChatListVo.getOwner());
-
-                    if(CollectionUtil.isNotEmpty(linkGroupChatListVos)){
-
-                        linkGroupChatListVos.stream().forEach(k->{
-
-                            if(k.getChatId().equals(linkGroupChatListVo.getChatId())){
-                                //构建新群sop
-                                iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
-                                        ,
-                                        MapUtil.builder(linkGroupChatListVo.getOwner(),ListUtil.list(false, linkGroupChatListVo)).build()
-                                        , true,true);
-                            }
-
-                        });
-
-                    }
-
-
-
+                //构建新群sop
+                if(CollectionUtil.isNotEmpty(executeGroup)){
+                    iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
+                            ,
+                            executeGroup
+                            , true,true);
 
                 }
-
-
-
 
             });
 

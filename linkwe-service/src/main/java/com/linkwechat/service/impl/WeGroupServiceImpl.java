@@ -643,5 +643,10 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         return this.baseMapper.findGroupByUserId(chatUserId,state);
     }
 
+    @Override
+    public List<LinkGroupChatListVo> selectChatByMember(WeGroupChatQuery query) {
+        return this.baseMapper.selectChatByMember(query);
+    }
+
 
 }

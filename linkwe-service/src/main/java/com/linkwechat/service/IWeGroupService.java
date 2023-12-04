@@ -151,6 +151,14 @@ public interface IWeGroupService extends IService<WeGroup> {
     List<WeGroup> findGroupByUserId(String chatUserId,String state);
 
 
+    /**
+     * 群成员id查询相关群
+     * @param query
+     * @return
+     */
+    List<LinkGroupChatListVo> selectChatByMember(WeGroupChatQuery query);
+
+
 
 
 }
