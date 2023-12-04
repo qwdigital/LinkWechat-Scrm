@@ -682,11 +682,11 @@
 
 
     <select id="findCurrentSysUserInfo" resultType="com.linkwechat.common.core.domain.entity.SysUser">
-        SELECT * FROM sys_user where user_id=#{userId} and del_falg=0
+        SELECT * FROM sys_user where user_id=#{userId} and del_flag=0
     </select>
 
     <select id="findSysUserInfoByWeUserId" resultType="com.linkwechat.common.core.domain.entity.SysUser">
-        SELECT * FROM sys_user where we_user_id= #{weUserId}
+        SELECT * FROM sys_user where we_user_id= #{weUserId} and del_flag=0
     </select>
 
     <select id="getCustomerListByCondition" resultType="com.linkwechat.domain.WeCustomer">
