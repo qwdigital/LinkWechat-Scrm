@@ -26,6 +26,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.media.WeMessageTemplate;
+import com.linkwechat.domain.moments.entity.WeMomentsTask;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
@@ -483,7 +484,6 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         .eq(WeFission::getIsTip,2)
                 .notIn(WeFission::getFassionState, ListUtil.toList(3,4)));
 
-
         try {
 
 
@@ -664,6 +664,12 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
 
+    }
+
+    @Override
+    public void handleExpireFission() {
+        this.update(WeFission.builder().fassionState(3).build(),new LambdaQueryWrapper<WeFission>()
+                .apply("date_format (fassion_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
     }
 
     @Override
