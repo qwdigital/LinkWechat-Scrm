@@ -740,6 +740,12 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
         Map<String,List<LinkGroupChatListVo>> weGroupMap=new HashMap<>();
 
+
+        //新客群SOP创建的时候直接过滤相关（针对创建的情况）
+        if(StringUtils.isEmpty(chatId)&&new Integer(4).equals(weSopBase.getBusinessType())){
+             return weGroupMap;
+        }
+
         //查询出对应的成员所在的群
         Set<String> executeWeUserIds = this.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
 
@@ -1060,16 +1066,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
                                 if(weSopPushTimeDto.getPushTimeType()==2) {//设置推送时间,周期推送，先计算出当前时间至周日下的推送,后续客每周日运行定时任务生成下一周的执行计划
                                     //获取当天是周几
-//                                    int currentWeek = DateUtil.dayOfWeek(new Date());
-//
-//                                    if(currentWeek-1<=new Integer(weSopPushTimeDto.getPushTimePre())){//生成符合条件当前日期下到周日的具体时间
 
                                     Integer weekDay = Integer.parseInt(weSopPushTimeDto.getPushTimePre());
                                     weekDay = weekDay % 7 + 1;
 
-                                        //执行日期
-//                                    String executeData
-//                                            = WeekDateUtils.GetCurrentWeekAllDate().get(Integer.parseInt(weSopPushTimeDto.getPushTimePre()));
+                                    //执行日期
                                     String executeData
                                             = WeekDateUtils.GetCurrentWeekAllDate().get(weekDay);
 
@@ -1077,9 +1078,9 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                             Date pushEndTime
                                                     = DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS, executeData + " " + weSopPushTimeDto.getPushEndTime());
 
-                                                    if(new Date().before(
-                                                            pushEndTime
-                                                    )){
+//                                                    if(new Date().before(
+//                                                            pushEndTime
+//                                                    )){
 
                                                         attachments.setPushStartTime(
                                                                 DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,executeData+" "+weSopPushTimeDto.getPushStartTime())
@@ -1090,11 +1091,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                                         );
 
 
-                                                    }
+//                                                    }
 
                                         }
 
-//                                    }
 
 
 
@@ -1128,11 +1128,16 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
                                 if(weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XQPY.getSopKey())){
-                                    if(buildXkSopPlan){
-                                        targetAttachments.add(attachments);
+                                    if(buildXkSopPlan) {
+                                        if (attachments.getPushStartTime() != null && attachments.getPushEndTime() != null){
+                                            targetAttachments.add(attachments);
+                                         }
                                     }
                                 }else{
-                                    targetAttachments.add(attachments);
+                                    if(attachments.getPushStartTime() != null && attachments.getPushEndTime() != null){
+                                        targetAttachments.add(attachments);
+                                    }
+
                                 }
 
 
@@ -1279,6 +1284,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     public void updateSopState(String sopId, Integer sopState) {
         this.baseMapper.updateSopState(sopId,sopState);
     }
+
 
 
 }
