@@ -682,7 +682,7 @@
 
 
     <select id="findCurrentSysUserInfo" resultType="com.linkwechat.common.core.domain.entity.SysUser">
-        SELECT * FROM sys_user where user_id=#{userId}
+        SELECT * FROM sys_user where user_id=#{userId} and del_falg=0
     </select>
 
     <select id="findSysUserInfoByWeUserId" resultType="com.linkwechat.common.core.domain.entity.SysUser">
