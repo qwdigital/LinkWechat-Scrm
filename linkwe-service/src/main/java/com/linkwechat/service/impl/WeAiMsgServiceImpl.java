@@ -1,11 +1,12 @@
 package com.linkwechat.service.impl;
 
-import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkwechat.mapper.WeAiMsgMapper;
 import com.linkwechat.domain.WeAiMsg;
+import com.linkwechat.mapper.WeAiMsgMapper;
 import com.linkwechat.service.IWeAiMsgService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * ai助手消息表(WeAiMsg)
@@ -16,8 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Service
 public class WeAiMsgServiceImpl extends ServiceImpl<WeAiMsgMapper, WeAiMsg> implements IWeAiMsgService {
 
-public WeAiMsgServiceImpl() {}
 
-@Autowired
-private WeAiMsgMapper weAiMsgMapper; 
+    @Override
+    public List<WeAiMsg> getSessionList(Long userId) {
+        return this.baseMapper.getSessionList(userId);
+    }
 }

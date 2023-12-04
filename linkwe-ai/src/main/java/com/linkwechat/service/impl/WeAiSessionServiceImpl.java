@@ -1,12 +1,19 @@
 package com.linkwechat.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
+import com.linkwechat.domain.AiMessage;
 import com.linkwechat.domain.WeAiMsg;
 import com.linkwechat.domain.WeAiMsgQuery;
+import com.linkwechat.domain.WeAiMsgVo;
 import com.linkwechat.service.HunYuanService;
 import com.linkwechat.service.IWeAiMsgService;
 import com.linkwechat.service.IWeAiSessionService;
@@ -22,8 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,8 +49,10 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     private RabbitMQSettingConfig rabbitMQSettingConfig;
 
     @Override
-    public SseEmitter createSseConnect() {
-        String sessionId = IdUtil.simpleUUID();
+    public SseEmitter createSseConnect(String sessionId) {
+        if (StringUtils.isEmpty(sessionId)) {
+            sessionId = IdUtil.simpleUUID();
+        }
         // 设置超时时间，0表示不过期。默认30秒，超过时间未完成会抛出异常：AsyncRequestTimeoutException
         SseEmitter sseEmitter = new SseEmitter(0L);
         // 注册回调
@@ -87,10 +96,29 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
 
     public void sendAiMsg(WeAiMsgQuery query) {
-        if(CollectionUtil.isEmpty(query.getMsgList())){
+        if (Objects.isNull(query.getMsg())) {
             return;
         }
-        Message[] msgArray = query.getMsgList().stream().map(item -> {
+
+        List<AiMessage> aiMessageList = new ArrayList<>();
+
+        List<WeAiMsg> aiLastMsgList = iWeAiMsgService.list(new LambdaQueryWrapper<WeAiMsg>()
+                .eq(WeAiMsg::getSessionId, query.getSessionId())
+                .orderByAsc(WeAiMsg::getId)
+                .last(" limit 40"));
+
+        if (CollectionUtil.isNotEmpty(aiLastMsgList)) {
+            for (WeAiMsg aiMsg : aiLastMsgList) {
+                AiMessage aiMessage = new AiMessage();
+                aiMessage.setRole(aiMsg.getRole());
+                aiMessage.setContent(aiMsg.getContent());
+                aiMessageList.add(aiMessage);
+            }
+        }
+        aiMessageList.add(query.getMsg());
+
+
+        Message[] msgArray = aiMessageList.stream().map(item -> {
             Message message = new Message();
             message.setRole(item.getRole());
             message.setContent(item.getContent());
@@ -98,16 +126,72 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         }).toArray(Message[]::new);
 
 
+        WeAiMsg replyMsg = new WeAiMsg();
+        replyMsg.setSessionId(query.getSessionId());
+        StringBuilder replyContent = new StringBuilder();
         hunYuanService.sendMsg(msgArray, (data) -> {
             SseEmitter sseEmitter = WeAiSessionUtil.get(query.getSessionId());
             if (Objects.nonNull(sseEmitter)) {
                 ChatStdResponse response = JSONObject.parseObject(data, ChatStdResponse.class);
+
+                replyMsg.setMsgId(response.getId());
+                replyMsg.setNote(response.getNote());
+                replyMsg.setRequestId(response.getRequestId());
+                replyMsg.setSendTime(new Date(response.getCreated() * 1000));
                 try {
                     sseEmitter.send(SseEmitter.event().name("msg").data(response));
                 } catch (IOException e) {
                     log.error("发送客户端异常 query：{}", JSONObject.toJSONString(query), e);
                 }
+                replyContent.append(Arrays.stream(response.getChoices()).map(Choice::getDelta).map(Delta::getContent).findFirst().orElse(""));
+                String role = Arrays.stream(response.getChoices()).map(Choice::getDelta).map(Delta::getRole).findFirst().orElse("assistant");
+                replyMsg.setRole(role);
             }
         });
+        replyMsg.setContent(replyContent.toString());
+        replyMsg.setUserId(SecurityUtils.getUserId());
+
+        WeAiMsg sendMsg = new WeAiMsg();
+        sendMsg.setSessionId(query.getSessionId());
+        sendMsg.setSendTime(new Date());
+        sendMsg.setRole(query.getMsg().getRole());
+        sendMsg.setContent(query.getMsg().getContent());
+        sendMsg.setUserId(SecurityUtils.getUserId());
+
+        List<WeAiMsg> addMsgList = new ArrayList<>();
+        addMsgList.add(sendMsg);
+        addMsgList.add(replyMsg);
+        iWeAiMsgService.saveBatch(addMsgList);
+    }
+
+    @Override
+    public PageInfo<WeAiMsgVo> list(WeAiMsgQuery query) {
+        PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
+        List<WeAiMsg> weAiMsgList =  iWeAiMsgService.getSessionList(SecurityUtils.getUserId());
+        if(CollectionUtil.isNotEmpty(weAiMsgList)){
+            List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
+                WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
+                BeanUtil.copyProperties(item, weAiMsgVo);
+                return weAiMsgVo;
+            }).collect(Collectors.toList());
+            pageInfo.setList(weAiMsgVos);
+        }
+        PageInfo<WeAiMsg> msgPageInfo = new PageInfo<>(weAiMsgList);
+        pageInfo.setTotal(msgPageInfo.getTotal());
+        return pageInfo;
+    }
+
+    @Override
+    public List<WeAiMsgVo> getDetail(String sessionId) {
+        List<WeAiMsg> list = iWeAiMsgService.list(new LambdaQueryWrapper<WeAiMsg>().eq(WeAiMsg::getSessionId, sessionId).eq(WeAiMsg::getUserId, SecurityUtils.getUserId())
+                .orderByAsc(WeAiMsg::getId));
+        if(CollectionUtil.isNotEmpty(list)){
+            return list.stream().map(item -> {
+                WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
+                BeanUtil.copyProperties(item, weAiMsgVo);
+                return weAiMsgVo;
+            }).collect(Collectors.toList());
+        }
+        return null;
     }
 }

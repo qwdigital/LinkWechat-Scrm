@@ -3,6 +3,8 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeAiMsg;
 
+import java.util.List;
+
 /**
  * ai助手消息表(WeAiMsg)
  *
@@ -11,4 +13,5 @@ import com.linkwechat.domain.WeAiMsg;
  */
 public interface IWeAiMsgService extends IService<WeAiMsg> {
 
-} 
+    List<WeAiMsg> getSessionList(Long userId);
+}

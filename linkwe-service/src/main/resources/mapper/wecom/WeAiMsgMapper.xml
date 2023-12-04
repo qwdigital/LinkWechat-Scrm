@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.linkwechat.mapper.WeAiMsgMapper">
 
     <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
 
     <resultMap type="com.linkwechat.domain.WeAiMsg" id="WeAiMsgResult">
         <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="sessionId" column="session_id" jdbcType="VARCHAR"/>
         <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
         <result property="role" column="role" jdbcType="VARCHAR"/>
@@ -23,7 +24,47 @@
     </resultMap>
 
     <sql id="selectWeAiMsgVo">
-        select idmsg_iduser_idrolecontentrequest_idsend_timenotecreate_timecreate_bycreate_by_idupdate_timeupdate_byupdate_by_iddel_flag from we_ai_msg
+        select id,
+               session_id,
+               msg_id,
+               user_id,
+               role,
+               content,
+               request_id,
+               send_time,
+               note,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_ai_msg
     </sql>
+
+    <select id="getSessionList" resultType="com.linkwechat.domain.WeAiMsg">
+        select id,
+               session_id,
+               msg_id,
+               user_id,
+               role,
+               content,
+               request_id,
+               send_time,
+               note,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_ai_msg
+        where id in (select max(id)
+                     from we_ai_msg
+                     where user_id = #{userId}
+                     group by session_id)
+    </select>
 
 </mapper>

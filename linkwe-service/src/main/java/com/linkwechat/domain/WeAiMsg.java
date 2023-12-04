@@ -21,7 +21,7 @@ import lombok.Data;
  * ai助手消息表(WeAiMsg)
  *
  * @author makejava
- * @since 2023-12-01 15:12:13
+ * @since 2023-12-04 10:01:27
  */
 @ApiModel
 @Data
@@ -38,6 +38,14 @@ public class WeAiMsg extends BaseEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     @TableField("id")
     private Long id;
+
+
+    /**
+     * 会话ID
+     */
+    @ApiModelProperty(value = "会话ID")
+    @TableField("session_id")
+    private String sessionId;
 
 
     /**

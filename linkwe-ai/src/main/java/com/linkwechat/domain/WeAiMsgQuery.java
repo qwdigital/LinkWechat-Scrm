@@ -5,18 +5,17 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 @ApiModel
 @Data
-public class WeAiMsgQuery {
+public class WeAiMsgQuery extends PostBaseQuery {
 
     @NotEmpty(message = "会话ID不能为空")
-    @ApiModelProperty(value = "会话ID",required = true)
+    @ApiModelProperty(value = "会话ID", required = true)
     private String sessionId;
 
-    @ApiModelProperty(value = "消息列表",required = true)
-    @Size(min = 1, max = 40, message = "消息列表最少为1个最长为40")
-    private List<AiMessage> msgList;
+    @NotNull(message = "消息不能为空")
+    @ApiModelProperty(value = "消息", required = true)
+    private AiMessage msg;
 }

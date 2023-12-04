@@ -16,8 +16,4 @@ public class AiMessage {
 
     @ApiModelProperty("内容")
     private String content;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @ApiModelProperty("发送时间")
-    private Date sendTime;
 }
