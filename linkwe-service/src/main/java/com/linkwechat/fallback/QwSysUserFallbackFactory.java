@@ -49,10 +49,10 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
         return null;
     }
 
-    @Override
-    public AjaxResult<List<SysUser>> list(SysUser sysUser) {
-        return null;
-    }
+//    @Override
+//    public AjaxResult<List<SysUser>> list(SysUser sysUser) {
+//        return null;
+//    }
 
     @Override
     public AjaxResult<SysUser> getInfo(String weUserId) {
@@ -96,6 +96,11 @@ public class QwSysUserFallbackFactory implements QwSysUserClient {
 
     @Override
     public AjaxResult builderLeaveSysUser(SysUserQuery sysUsers) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<List<SysUser>> listByQuery(SysUser sysUser) {
         return null;
     }
 }

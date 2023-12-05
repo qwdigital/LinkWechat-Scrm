@@ -21,6 +21,8 @@ import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.operation.query.WeOperationCustomerQuery;
 import com.linkwechat.domain.operation.query.WeOperationGroupQuery;
 import com.linkwechat.domain.operation.vo.*;
+import com.linkwechat.fegin.QwAuthClient;
+import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.mapper.WeOperationCenterMapper;
 import com.linkwechat.service.*;
@@ -60,7 +62,7 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
     private IWeMessagePushService iWeMessagePushService;
 
     @Autowired
-    private QwUserClient qwUserClient;
+    private QwSysUserClient qwSysUserClient;
 
     //客户提醒模版
     private static String customerRemindMsgTpl = "【动态日报】\r\n\r\n 昨日客户总数：${ydTotalCnt} \r\n 昨日新增客户：${ydCnt} \r\n " +
@@ -78,12 +80,23 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
 
     @Override
     public WeCustomerAnalysisVo getCustomerAnalysisForApp(boolean dataScope) {
+        List<String> weUserIds=new ArrayList<>();
+        log.error("getCustomerAnalysisForApp"+SecurityUtils.getLoginUser());
+        if(dataScope){
+            AjaxResult<List<SysUser>> ajaxResult = qwSysUserClient.listByQuery(new SysUser());
+            if(null != ajaxResult && CollectionUtil.isNotEmpty(ajaxResult.getData())){
+                weUserIds=ajaxResult.getData().stream().map(SysUser::getWeUserId).collect(Collectors.toList());
+            }
 
-        AjaxResult<SysUser> ajaxResult = qwUserClient.listByQuery(new SysUser());
-        log.error("ajaxResult="+JSONUtil.toJsonStr(ajaxResult));
+        }else{
+            weUserIds=ListUtil.toList(SecurityUtils.getLoginUser().getSysUser().getWeUserId());
+        }
 
+        if(CollectionUtil.isEmpty(weUserIds)){
+            return new WeCustomerAnalysisVo();
+        }
         return weOperationCenterMapper.getCustomerAnalysisForApp(
-                dataScope ? iWeCustomerService.findWeUserIds() : ListUtil.toList(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
+                weUserIds
         );
     }
 
