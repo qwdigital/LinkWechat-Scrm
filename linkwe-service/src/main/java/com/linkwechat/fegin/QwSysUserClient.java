@@ -62,8 +62,8 @@ public interface QwSysUserClient {
     @GetMapping("/system/user/info/{id}")
     AjaxResult getUserInfoById(@PathVariable("id") Long userId);
 
-    @PostMapping("/system/user/listByQuery")
-    AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
+//    @PostMapping("/system/user/listByQuery")
+//    AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
 
     @GetMapping("/system/user/getUserInfo/{weUserId}")
     AjaxResult<SysUser> getInfo(@PathVariable("weUserId") String weUserId);
@@ -137,6 +137,10 @@ public interface QwSysUserClient {
      */
     @PostMapping("/system/user/builderLeaveSysUser")
     AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers);
+
+
+    @PostMapping("/system/user/listByQuery")
+    AjaxResult<List<SysUser>> listByQuery(@RequestBody SysUser sysUser);
 
 
 

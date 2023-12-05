@@ -67,7 +67,7 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      *
      * @return
      */
-    @DataScope(type = "2", value = @DataColumn(alias = "wc", name = "create_by_id", userid = "user_id"))
+    @DataScope(type = "2", value = @DataColumn(alias = "wcr", name = "create_by_id", userid = "user_id"))
     long noRepeatCountCustomer(@Param("weCustomerList") WeCustomersQuery weCustomersQuery);
 
 
