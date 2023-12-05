@@ -139,7 +139,7 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      *
      * @return
      */
-    @DataScope(type = "2", value = @DataColumn(name = "create_by_id", userid = "user_id"))
+    @DataScope(value = @DataColumn(name = "create_by_id", userid = "user_id"))
     List<String> findWeUserIds();
 
 
