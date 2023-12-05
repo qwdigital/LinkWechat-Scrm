@@ -89,7 +89,6 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     private Runnable completionCallBack(String sessionId) {
         return () -> {
             log.info("结束连接：{}", sessionId);
-
             WeAiSessionUtil.removeAndClose(sessionId);
         };
     }
@@ -99,7 +98,6 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         if (Objects.isNull(query.getMsg())) {
             return;
         }
-
         List<AiMessage> aiMessageList = new ArrayList<>();
 
         List<WeAiMsg> aiLastMsgList = iWeAiMsgService.list(new LambdaQueryWrapper<WeAiMsg>()
@@ -193,5 +191,28 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             }).collect(Collectors.toList());
         }
         return null;
+    }
+
+    @Override
+    public SseEmitter createAndSendMsg(WeAiMsgQuery query) {
+        if (StringUtils.isEmpty(query.getSessionId())) {
+            query.setSessionId(IdUtil.simpleUUID());
+        }
+        // 设置超时时间，0表示不过期。默认30秒，超过时间未完成会抛出异常：AsyncRequestTimeoutException
+        SseEmitter sseEmitter = new SseEmitter(30 * 1000L);
+        // 注册回调
+        sseEmitter.onCompletion(completionCallBack(query.getSessionId()));
+
+        WeAiSessionUtil.add(query.getSessionId(), sseEmitter);
+        log.info("创建新的sse连接，当前session：{}", query.getSessionId());
+
+        try {
+            sseEmitter.send(SseEmitter.event().id("sessionId").data(query.getSessionId()));
+            sendAiMsg(query);
+        } catch (IOException e) {
+            log.error("链接异常，sessionId:{}", query.getSessionId(), e);
+            throw new WeComException("连接异常！");
+        }
+        return sseEmitter;
     }
 }

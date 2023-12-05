@@ -40,11 +40,17 @@ public class WeAiAssistantController extends BaseController {
         return AjaxResult.success();
     }
 
-    @ApiOperation(value = "发送消息",httpMethod = "POST")
+   /* @ApiOperation(value = "发送消息",httpMethod = "POST")
     @PostMapping("/send/msg")
     public AjaxResult sendMsg(@RequestBody @Validated WeAiMsgQuery query){
         iWeAiSessionService.sendMsg(query);
         return AjaxResult.success();
+    }
+*/
+    @ApiOperation(value = "发送消息",httpMethod = "POST")
+    @PostMapping(value = "/send/msg", produces = {MediaType.TEXT_EVENT_STREAM_VALUE})
+    public SseEmitter sendMsg(@RequestBody @Validated WeAiMsgQuery query){
+        return iWeAiSessionService.createAndSendMsg(query);
     }
 
     @ApiOperation(value = "消息列表",httpMethod = "POST")

@@ -22,4 +22,5 @@ public interface IWeAiSessionService {
     List<WeAiMsgVo> getDetail(String sessionId);
 
 
+    SseEmitter createAndSendMsg(WeAiMsgQuery query);
 }
