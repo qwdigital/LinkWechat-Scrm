@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.PageDomain;
@@ -14,11 +15,13 @@ import com.linkwechat.common.resolver.PlaceholderResolver;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.operation.query.WeOperationCustomerQuery;
 import com.linkwechat.domain.operation.query.WeOperationGroupQuery;
 import com.linkwechat.domain.operation.vo.*;
+import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.mapper.WeOperationCenterMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +59,9 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
     @Autowired
     private IWeMessagePushService iWeMessagePushService;
 
+    @Autowired
+    private QwUserClient qwUserClient;
+
     //客户提醒模版
     private static String customerRemindMsgTpl = "【动态日报】\r\n\r\n 昨日客户总数：${ydTotalCnt} \r\n 昨日新增客户：${ydCnt} \r\n " +
             "昨日跟进客户：${ydFollowUpCustomer} \r\n 昨日净增客户：${ydNetCnt} \r\n 昨日流失客户：${ydLostCnt} \r\n 昨日发送申请：${ydNewApplyCnt} \r\n";
@@ -73,6 +79,8 @@ public class IWeOperationCenterServiceImpl implements IWeOperationCenterService 
     @Override
     public WeCustomerAnalysisVo getCustomerAnalysisForApp(boolean dataScope) {
 
+        AjaxResult<SysUser> ajaxResult = qwUserClient.listByQuery(new SysUser());
+        log.error("ajaxResult="+JSONUtil.toJsonStr(ajaxResult));
 
         return weOperationCenterMapper.getCustomerAnalysisForApp(
                 dataScope ? iWeCustomerService.findWeUserIds() : ListUtil.toList(SecurityUtils.getLoginUser().getSysUser().getWeUserId())
