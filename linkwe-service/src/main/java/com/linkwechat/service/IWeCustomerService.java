@@ -370,4 +370,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
 
+
+
+
+
+
 }

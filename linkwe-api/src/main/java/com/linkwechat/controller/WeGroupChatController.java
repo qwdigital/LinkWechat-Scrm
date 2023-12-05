@@ -1,5 +1,7 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
@@ -9,11 +11,15 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeCustomerTrajectory;
 import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.query.WeMakeGroupTagQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
+import com.linkwechat.domain.groupchat.vo.WeCustomerDeduplicationVo;
 import com.linkwechat.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -153,4 +159,55 @@ public class WeGroupChatController extends BaseController {
                         .eq(WeCustomerTrajectory::getExternalUseridOrChatid,chatId))
         );
     }
+
+
+    /**
+     * 客群去重列表
+     * @param query
+     * @return
+     */
+    @GetMapping("/findDeduplications")
+    public TableDataInfo<WeCustomerDeduplicationVo> findDeduplications(WeGroupChatQuery query){
+        startPage();
+        return getDataTable(
+                weGroupMemberService.findWeCustomerDeduplication(query.getMemberName())
+        );
+    }
+
+
+    /**
+     * 客户加入或移除黑名单
+     * @return
+     */
+    @PostMapping("/joinOrRemoveBlackList")
+    public AjaxResult joinOrRemoveBlackList(@RequestBody WeCustomersQuery query){
+        String customerIds = query.getExternalUserids();
+        if(StringUtils.isNotEmpty(customerIds)){
+            List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+                    .in(WeCustomer::getExternalUserid, ListUtil.toList(customerIds.split(","))));
+            if(CollectionUtil.isNotEmpty(weCustomers)){
+                weCustomers.stream().forEach(k->{
+                    k.setIsJoinBlacklist(query.getIsJoinBlacklist());
+                });
+
+                iWeCustomerService.updateBatchById(weCustomers);
+            }
+
+        }
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 群去重提醒
+     * @param query
+     * @return
+     */
+   @GetMapping("/remindDuplicateMembers")
+   public AjaxResult remindDuplicateMembers(WeCustomersQuery query){
+
+        weGroupMemberService.remindDuplicateMembers(query.getExternalUserids());
+
+        return AjaxResult.success();
+   }
 }

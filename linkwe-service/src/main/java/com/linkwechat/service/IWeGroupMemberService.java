@@ -2,6 +2,7 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.groupchat.vo.WeCustomerDeduplicationVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -56,4 +57,18 @@ public interface IWeGroupMemberService extends IService<WeGroupMember> {
      * @param userId
      */
     void physicalDelete(String chatId,String userId);
+
+
+    /**
+     * 获取去重客户列表
+     * @param customerName
+     * @return
+     */
+    List<WeCustomerDeduplicationVo> findWeCustomerDeduplication(String customerName);
+
+    /**
+     * 群去重提醒
+     * @param externalUserids
+     */
+    void remindDuplicateMembers(String externalUserids);
 }
