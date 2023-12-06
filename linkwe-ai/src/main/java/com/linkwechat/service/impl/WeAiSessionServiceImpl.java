@@ -27,14 +27,12 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -146,7 +144,8 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
                 replyMsg.setRequestId(response.getRequestId());
                 replyMsg.setSendTime(new Date(response.getCreated() * 1000));
                 try {
-                    threadPoolExecutor.execute(() ->{});
+                    threadPoolExecutor.execute(() -> {
+                    });
                     sseEmitter.send(SseEmitter.event().name("msg").data(response));
                 } catch (IOException e) {
                     log.error("发送客户端异常 query：{}", JSONObject.toJSONString(query), e);
@@ -175,8 +174,8 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     @Override
     public PageInfo<WeAiMsgVo> list(WeAiMsgQuery query) {
         PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
-        List<WeAiMsg> weAiMsgList =  iWeAiMsgService.getSessionList(SecurityUtils.getUserId());
-        if(CollectionUtil.isNotEmpty(weAiMsgList)){
+        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId());
+        if (CollectionUtil.isNotEmpty(weAiMsgList)) {
             List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
                 WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
                 BeanUtil.copyProperties(item, weAiMsgVo);
@@ -193,7 +192,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     public List<WeAiMsgVo> getDetail(String sessionId) {
         List<WeAiMsg> list = iWeAiMsgService.list(new LambdaQueryWrapper<WeAiMsg>().eq(WeAiMsg::getSessionId, sessionId).eq(WeAiMsg::getUserId, SecurityUtils.getUserId())
                 .orderByAsc(WeAiMsg::getId));
-        if(CollectionUtil.isNotEmpty(list)){
+        if (CollectionUtil.isNotEmpty(list)) {
             return list.stream().map(item -> {
                 WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
                 BeanUtil.copyProperties(item, weAiMsgVo);
@@ -215,16 +214,16 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         sseEmitter.onCompletion(completionCallBack(query.getSessionId()));
         WeAiSessionUtil.add(query.getSessionId(), sseEmitter);
         log.info("创建新的sse连接，当前session：{}", query.getSessionId());
-        sseEmitter.onTimeout(() ->{
-            log.info("连接超时 sessionId:{}",query.getSessionId());
+        sseEmitter.onTimeout(() -> {
+            log.info("连接超时 sessionId:{}", query.getSessionId());
             WeAiSessionUtil.removeAndClose(query.getSessionId());
         });
         try {
             sseEmitter.send(SseEmitter.event().id("sessionId").data(query.getSessionId()));
-            if(StringUtils.isEmpty(query.getMsg().getContent())){
+            if (StringUtils.isEmpty(query.getMsg().getContent())) {
                 throw new WeComException("消息内容不能为空！");
             }
-            sseThread.execute(() ->{
+            sseThread.execute(() -> {
                 sendAiMsg(query);
             });
         } catch (IOException e) {
