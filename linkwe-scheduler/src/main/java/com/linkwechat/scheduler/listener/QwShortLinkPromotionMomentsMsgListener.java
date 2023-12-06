@@ -212,7 +212,7 @@ public class QwShortLinkPromotionMomentsMsgListener {
         } else {
             //全部
             SysUser sysUser = new SysUser();
-            List<SysUser> weUsers = qwSysUserClient.list(sysUser).getData();
+            List<SysUser> weUsers = qwSysUserClient.listByQuery(sysUser).getData();
             if (CollectionUtil.isNotEmpty(weUsers)) {
                 visibleRange.setSender_list(MomentsParamDto.SenderList.builder().user_list(weUsers.stream().map(SysUser::getWeUserId).toArray(String[]::new)).build());
             }
