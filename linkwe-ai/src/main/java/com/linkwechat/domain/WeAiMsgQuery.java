@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class WeAiMsgQuery extends PostBaseQuery {
 
-    @NotEmpty(message = "会话ID不能为空")
     @ApiModelProperty(value = "会话ID", required = true)
     private String sessionId;
 

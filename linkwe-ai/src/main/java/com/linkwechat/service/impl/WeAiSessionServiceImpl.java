@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -25,6 +26,7 @@ import com.tencentcloudapi.hunyuan.v20230901.models.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -195,6 +197,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
     @Override
     public SseEmitter createAndSendMsg(WeAiMsgQuery query) {
+
         if (StringUtils.isEmpty(query.getSessionId())) {
             query.setSessionId(IdUtil.simpleUUID());
         }
@@ -202,13 +205,17 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         SseEmitter sseEmitter = new SseEmitter(30 * 1000L);
         // 注册回调
         sseEmitter.onCompletion(completionCallBack(query.getSessionId()));
-
         WeAiSessionUtil.add(query.getSessionId(), sseEmitter);
         log.info("创建新的sse连接，当前session：{}", query.getSessionId());
-
+        sseEmitter.onTimeout(() ->{
+            log.info("连接超时 sessionId:{}",query.getSessionId());
+            WeAiSessionUtil.removeAndClose(query.getSessionId());
+        });
         try {
             sseEmitter.send(SseEmitter.event().id("sessionId").data(query.getSessionId()));
-            sendAiMsg(query);
+            ThreadUtil.execAsync(() ->{
+                sendAiMsg(query);
+            });
         } catch (IOException e) {
             log.error("链接异常，sessionId:{}", query.getSessionId(), e);
             throw new WeComException("连接异常！");
