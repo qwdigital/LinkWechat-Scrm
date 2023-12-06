@@ -23,6 +23,7 @@ import com.tencentcloudapi.hunyuan.v20230901.models.ChatStdResponse;
 import com.tencentcloudapi.hunyuan.v20230901.models.Choice;
 import com.tencentcloudapi.hunyuan.v20230901.models.Delta;
 import com.tencentcloudapi.hunyuan.v20230901.models.Message;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,6 +54,8 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
     @Autowired
     private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    private static ExecutorService sseThread = new ScheduledThreadPoolExecutor(1, new DefaultThreadFactory("we-sse-pool-%d"));
 
     @Override
     public SseEmitter createSseConnect(String sessionId) {
@@ -129,16 +136,17 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         WeAiMsg replyMsg = new WeAiMsg();
         replyMsg.setSessionId(query.getSessionId());
         StringBuilder replyContent = new StringBuilder();
+        ThreadPoolExecutor threadPoolExecutor = ThreadUtil.newExecutor(5, 10);
+        SseEmitter sseEmitter = WeAiSessionUtil.get(query.getSessionId());
         hunYuanService.sendMsg(msgArray, (data) -> {
-            SseEmitter sseEmitter = WeAiSessionUtil.get(query.getSessionId());
             if (Objects.nonNull(sseEmitter)) {
                 ChatStdResponse response = JSONObject.parseObject(data, ChatStdResponse.class);
-
                 replyMsg.setMsgId(response.getId());
                 replyMsg.setNote(response.getNote());
                 replyMsg.setRequestId(response.getRequestId());
                 replyMsg.setSendTime(new Date(response.getCreated() * 1000));
                 try {
+                    threadPoolExecutor.execute(() ->{});
                     sseEmitter.send(SseEmitter.event().name("msg").data(response));
                 } catch (IOException e) {
                     log.error("发送客户端异常 query：{}", JSONObject.toJSONString(query), e);
@@ -213,7 +221,10 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         });
         try {
             sseEmitter.send(SseEmitter.event().id("sessionId").data(query.getSessionId()));
-            ThreadUtil.execAsync(() ->{
+            if(StringUtils.isEmpty(query.getMsg().getContent())){
+                throw new WeComException("消息内容不能为空！");
+            }
+            sseThread.execute(() ->{
                 sendAiMsg(query);
             });
         } catch (IOException e) {

@@ -23,12 +23,14 @@ import com.tencentcloudapi.common.SSEResponseModel;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.hunyuan.v20230901.models.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Slf4j
 public class HunYuanClient extends AbstractClient {
     private static String endpoint = "hunyuan.tencentcloudapi.com";
     private static String service = "hunyuan";
@@ -90,6 +92,7 @@ public class HunYuanClient extends AbstractClient {
         try {
             ChatStdResponse stdResponse = ChatStd(chatStdRequest);
             for (SSEResponseModel.SSE next : stdResponse) {
+                log.info("stdResponse:{}",next.Data);
                 consumer.accept(next.Data);
             }
         } catch (TencentCloudSDKException e) {
