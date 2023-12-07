@@ -19,6 +19,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -33,7 +34,7 @@ public class QwAppMsgListener {
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.app-msg:Qu_AppMsg}")
-    public void subscribe(String msg, Channel channel, Message message) {
+    public void subscribe(String msg, Channel channel, Message message) throws IOException {
         try {
             log.info("应用通知消息监听：msg:{}", msg);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
@@ -53,8 +54,8 @@ public class QwAppMsgListener {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("应用通知消息监听-消息处理失败 msg:{},error:{}", msg, e);
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), true, true);
         }
     }
 

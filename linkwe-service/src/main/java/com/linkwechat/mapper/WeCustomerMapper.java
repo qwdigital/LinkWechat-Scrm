@@ -10,6 +10,7 @@ import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.vo.*;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
@@ -67,7 +68,7 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      *
      * @return
      */
-    @DataScope(type = "2", value = @DataColumn(alias = "wc", name = "create_by_id", userid = "user_id"))
+    @DataScope(type = "2", value = @DataColumn(alias = "wcr", name = "create_by_id", userid = "user_id"))
     long noRepeatCountCustomer(@Param("weCustomerList") WeCustomersQuery weCustomersQuery);
 
 
@@ -139,7 +140,7 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      *
      * @return
      */
-    @DataScope(type = "2", value = @DataColumn(name = "create_by_id", userid = "user_id"))
+    @DataScope(value = @DataColumn(name = "create_by_id", userid = "user_id"))
     List<String> findWeUserIds();
 
 
@@ -224,4 +225,5 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
     Integer totalScanCodeNumber(@Param("state") String state);
 
 
+    List<WeCustomerChannelCountVo> getCustomerNumByState(@Param("state") String state, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

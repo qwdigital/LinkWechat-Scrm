@@ -1,17 +1,12 @@
 package com.linkwechat.service.impl;
 
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ObjectUtil;
+
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
-import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.exception.wecom.WeComException;
-import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
@@ -25,12 +20,8 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
-import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
-import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
-import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeStoreCodeCountMapper;
 import com.linkwechat.mapper.WeStoreCodeMapper;
-import com.linkwechat.service.IWeGroupCodeService;
 import com.linkwechat.service.IWeStoreCodeConfigService;
 import com.linkwechat.service.IWeStoreCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +35,6 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
         implements IWeStoreCodeService {
 
 
-    @Autowired
-    private QwCustomerClient qwCustomerClient;
-
 
     @Autowired
     private WeStoreCodeCountMapper weStoreCodeCountMapper;
@@ -56,8 +44,6 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
     private IWeStoreCodeConfigService iWeStoreCodeConfigService;
 
 
-    @Autowired
-    private IWeGroupCodeService weGroupCodeService;
 
 
     @Override
@@ -111,7 +97,18 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public WeStoreShopGuideTabVo countWeStoreShopGuideTab() {
-        return weStoreCodeCountMapper.countWeStoreShopGuideTab();
+        List<WeStoreCodeConfig> weStoreCodeConfigs = iWeStoreCodeConfigService.list(new LambdaQueryWrapper<WeStoreCodeConfig>()
+                .eq(WeStoreCodeConfig::getStoreCodeType, 1));
+
+        if(CollectionUtil.isNotEmpty(weStoreCodeConfigs)){
+            String state = weStoreCodeConfigs.stream().findFirst().get().getState();
+            if(StringUtils.isNotEmpty(state)){
+                return weStoreCodeCountMapper.countWeStoreShopGuideTab(state);
+            }
+
+        }
+
+        return new WeStoreShopGuideTabVo();
     }
 
     @Override

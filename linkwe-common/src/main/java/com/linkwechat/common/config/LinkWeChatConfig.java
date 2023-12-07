@@ -262,6 +262,15 @@ public class LinkWeChatConfig {
 
     private FincaceProxyConfig fincaceProxyConfig;
 
+    /**
+     * 活码短链域名
+     */
+    private String qrShortLinkDomainName;
+
+    /**
+     * 群活码短链域名
+     */
+    private String qrGroupShortLinkDomainName;
 
     public String getName() {
         return name;

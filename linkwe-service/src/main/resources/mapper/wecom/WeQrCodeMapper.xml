@@ -14,6 +14,8 @@
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="configId" column="config_id" jdbcType="VARCHAR"/>
         <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="qrWelcomeOpen" column="qr_welcome_open" jdbcType="INTEGER"/>
+        <result property="qrPriorityUserWelcome" column="qr_priority_user_welcome" jdbcType="INTEGER"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
@@ -34,6 +36,8 @@
         <result property="state" column="state" jdbcType="VARCHAR"/>
         <result property="configId" column="config_id" jdbcType="VARCHAR"/>
         <result property="qrCode" column="qr_code" jdbcType="VARCHAR"/>
+        <result property="qrWelcomeOpen" column="qr_welcome_open" jdbcType="INTEGER"/>
+        <result property="qrPriorityUserWelcome" column="qr_priority_user_welcome" jdbcType="INTEGER"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <collection property="qrTags" ofType="com.linkwechat.domain.tag.vo.WeTagVo">
             <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
@@ -55,7 +59,7 @@
     </resultMap>
 
     <sql id="selectWeQrCodeVo">
-        select id, name, group_id, auto_add, type, rule_type, state, scan_num, config_id, qr_code, rule_mode,open_spare_user,is_exclusive, create_by, create_time, update_by, update_time, del_flag from we_qr_code
+        select id, name, group_id, auto_add, type, rule_type, state, scan_num, config_id, qr_code, rule_mode,open_spare_user,is_exclusive, qr_welcome_open, qr_priority_user_welcome, create_by, create_time, update_by, update_time, del_flag from we_qr_code
     </sql>
 
     <sql id="selectWeQrCodeDetailVo">
@@ -77,6 +81,8 @@
             wqc.rule_mode,
             wqc.open_spare_user,
             wqc.is_exclusive,
+            wqc.qr_welcome_open,
+            wqc.qr_priority_user_welcome,
             wqc.update_time,
             wqtr.tag_id,
             wt.name as tag_name,

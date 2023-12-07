@@ -3,11 +3,13 @@ package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeGroupMember;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,5 +37,6 @@ public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
     void physicalDelete(@Param("chatId") String chatId,@Param("userId") String userId);
 
 
+    List<WeGroupChannelCountVo> getMemberNumByState(@Param("state") String state, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }
 

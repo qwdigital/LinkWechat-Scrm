@@ -30,8 +30,13 @@ public class RequestContextInterceptor implements HandlerInterceptor {
             return true;
         }
         String loginType = ServletUtils.getHeader(request, SecurityConstants.LOGIN_TYPE);
-        if(StringUtils.isNotEmpty(loginType) && ObjectUtil.notEqual("LinkWeChatWXAPI",loginType)){
-            throw new WeComException("token不合法");
+        if(StringUtils.isNotEmpty(loginType)){
+            if(ObjectUtil.notEqual("LinkWeChatWXAPI",loginType)||
+                    SecurityConstants.IS_FEGIN.equals(
+                            ServletUtils.getHeader(request, SecurityConstants.IS_FEGIN)
+                    )){
+                throw new WeComException("token不合法");
+            }
         }
         String loginUserStr = ServletUtils.getHeader(request, SecurityConstants.LOGIN_USER);
         if(StringUtils.isNotEmpty(loginUserStr)){

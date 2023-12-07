@@ -117,6 +117,11 @@ public interface IWeFissionService extends IService<WeFission> {
      */
     void handleFission();
 
+    /**
+     * 过期列变
+     */
+    void handleExpireFission();
+
 
     /**
      * 更新状态为未发送

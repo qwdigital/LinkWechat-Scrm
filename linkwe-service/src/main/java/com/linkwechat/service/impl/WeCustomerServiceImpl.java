@@ -49,6 +49,7 @@ import com.linkwechat.domain.wecom.vo.customer.transfer.WeTransferCustomerVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeCustomerMapper;
 import com.linkwechat.service.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -1431,6 +1432,11 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
 
         }
 
+    }
+
+    @Override
+    public List<WeCustomerChannelCountVo> getCustomerNumByState(String state, Date startTime, Date endTime) {
+        return baseMapper.getCustomerNumByState(state,startTime,endTime);
     }
 
 

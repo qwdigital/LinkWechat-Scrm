@@ -217,6 +217,9 @@ public class WeConstans {
     //短链统计缓存key值前缀
     public static final String  WE_SHORT_LINK_KEY = "we_short_link:statistics:";
 
+    //通用短链统计缓存key前缀
+    public static final String WE_SHORT_LINK_COMMON_KEY = "we_short_link:common:statistics:";
+
     /**
      * 短链缓存命名空间
      */

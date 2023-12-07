@@ -57,5 +57,8 @@ public interface WeGroupMapper extends BaseMapper<WeGroup> {
     //根据群成员id获取渠道id
     List<WeGroup> findGroupByUserId(@Param("chatUserId") String chatUserId,@Param("state") String state);
 
+    //根据群成员相关id查询群
+     List<LinkGroupChatListVo> selectChatByMember(@Param("query") WeGroupChatQuery query);
+
 }
 

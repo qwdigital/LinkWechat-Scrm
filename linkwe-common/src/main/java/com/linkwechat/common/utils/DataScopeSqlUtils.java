@@ -143,7 +143,7 @@ public class DataScopeSqlUtils {
 
         StringBuilder sqlPart = new StringBuilder();
         if(dataScope.type().equals("1")){
-            sqlPart.append(StringUtils.format(" or {}.user_id = {} ", dataScope.userAlias(), sysUser.getUserId()));
+            sqlPart.append(StringUtils.format(" AND {}.user_id = {} ", dataScope.userAlias(), sysUser.getUserId()));
         }else {
             DataColumn dataColumn = dataScope.value()[0];
             if(StringUtils.isEmpty( dataColumn.alias())){
