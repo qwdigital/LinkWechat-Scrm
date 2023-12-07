@@ -22,6 +22,8 @@ import java.util.List;
  */
 public interface IWeShortLinkService extends IService<WeShortLink> {
 
+    Boolean checkEnv();
+
     WeShortLinkAddVo addShortLink(WeShortLinkAddQuery query);
 
     WeShortLinkAddVo updateShortLink(WeShortLinkAddQuery query);
@@ -37,4 +39,5 @@ public interface IWeShortLinkService extends IService<WeShortLink> {
     WeShortLinkStatisticsVo getDataStatistics(WeShortLinkStatisticQuery query);
 
     WeShortLinkStatisticsVo getLineStatistics(WeShortLinkStatisticQuery query);
+
 }

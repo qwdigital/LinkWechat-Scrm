@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsTemplateSettingsMapper">
+
+    <resultMap id="TemplateSettingsMap" type="com.linkwechat.domain.leads.template.vo.WeLeadsTemplateSettingsVO">
+        <result property="id" column="id" jdbcType="BIGINT"/>
+        <result property="tableEntryName" column="table_entry_name" jdbcType="VARCHAR"/>
+        <result property="tableEntryId" column="table_entry_id" jdbcType="VARCHAR"/>
+        <result property="tableEntryAttr" column="table_entry_attr" jdbcType="INTEGER"/>
+        <result property="dataAttr" column="data_attr" jdbcType="INTEGER"/>
+        <result property="datetimeType" column="datetime_type" jdbcType="INTEGER"/>
+        <result property="maxInputLen" column="max_input_len" jdbcType="INTEGER"/>
+        <result property="required" column="is_required" jdbcType="INTEGER"/>
+        <result property="rank" column="rank" jdbcType="INTEGER"/>
+        <result property="canEdit" column="can_edit" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <collection property="tableEntryContent" ofType="com.linkwechat.domain.leads.template.vo.WeLeadsTemplateTableEntryContentVO" javaType="ArrayList">
+            <result property="id" column="we_table_entry_content_id" jdbcType="BIGINT"/>
+            <result property="content" column="content" javaType="String" jdbcType="VARCHAR"/>
+            <result property="leadsTemplateSettingsId" column="leads_template_settings_id" javaType="Long" jdbcType="BIGINT"/>
+        </collection>
+    </resultMap>
+
+    <select id="queryWithTableEntryContent" resultMap="TemplateSettingsMap">
+        SELECT
+            wslts.id,
+            wslts.table_entry_name,
+            wslts.table_entry_id,
+            wslts.table_entry_attr,
+            wslts.data_attr,
+            wslts.datetime_type,
+            wslts.max_input_len,
+            wslts.is_required,
+            wslts.rank,
+            wslts.can_edit,
+            wslts.create_time,
+            wslts.create_by,
+            wslts.create_by_id,
+            wslts.update_time,
+            wslts.update_by,
+            wslts.update_by_id,
+            wslts.del_flag,
+            wtec.id as we_table_entry_content_id,
+            wtec.content,
+            wtec.leads_template_settings_id
+        FROM
+            we_leads_template_settings AS wslts
+            LEFT JOIN (
+                SELECT id, content, leads_template_settings_id FROM we_leads_template_table_entry_content WHERE we_leads_template_table_entry_content.del_flag = 0
+            ) AS wtec
+            ON wslts.id = wtec.leads_template_settings_id
+        WHERE
+            wslts.del_flag = 0
+            order by wslts.rank,wtec.id asc
+    </select>
+</mapper>

@@ -1,9 +1,13 @@
 package com.linkwechat.domain.moments.query;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -21,6 +25,9 @@ import java.util.List;
  */
 @ApiModel("预估客户数量")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeMomentsTaskEstimateCustomerNumRequest {
 
     /**
@@ -53,4 +60,10 @@ public class WeMomentsTaskEstimateCustomerNumRequest {
      */
     @ApiModelProperty(value = "客户标签")
     private List<String> customerTag;
+
+    /**
+     * 客户查询条件
+     */
+    private WeCustomersQuery weCustomersQuery;
+
 }

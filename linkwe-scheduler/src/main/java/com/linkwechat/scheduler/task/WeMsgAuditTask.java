@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.thread.WeMsgAuditThreadExecutor;
@@ -22,6 +23,7 @@ import com.linkwechat.service.*;
 import com.tencent.wework.FinanceService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +73,26 @@ public class WeMsgAuditTask {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
+
 
     /**
      * 会话拉取定时任务
      */
     @XxlJob("weChatMsgPullTask")
     public void eChatMsgPullHandle(String message) {
+        WeChatMsgAuditTaskParams auditTaskParam=new WeChatMsgAuditTaskParams(false);
+
+        String jobParam = XxlJobHelper.getJobParam();
+
+        if(StringUtils.isNotEmpty(jobParam)){
+            auditTaskParam=JSONObject.parseObject(jobParam,WeChatMsgAuditTaskParams.class);
+        }
+
         String corpId = XxlJobHelper.getJobParam();
+
         XxlJobHelper.log("会话拉取定时任务--------------{}",corpId);
         Long seqLong = 0L;
 
@@ -87,24 +102,38 @@ public class WeMsgAuditTask {
         }
 
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(corpId);
-        if (corpAccount == null) {
-            log.info("无有效企业----------------->");
-            return;
+        if (corpAccount != null) {
+
+
+
+
+            if(!auditTaskParam.synchAll){
+                if(redisService.keyIsExists("we:chat:seq:" + corpAccount.getCorpId())){
+                    seqLong = (Long) redisService.getCacheObject("we:chat:seq:" + corpAccount.getCorpId());
+                }else {
+                    LambdaQueryWrapper<WeChatContactMsg> wrapper = new LambdaQueryWrapper<WeChatContactMsg>().orderByDesc(WeChatContactMsg::getSeq).last("limit 1");
+                    WeChatContactMsg weChatContactMsg = weChatContactMsgService.getOne(wrapper);
+                    if (weChatContactMsg != null) {
+                        seqLong = weChatContactMsg.getSeq();
+                    }
+                }
+
+            }
+
+
+            if(StringUtils.isNotEmpty(corpAccount.getCorpId()) && StringUtils.isNotEmpty(corpAccount.getChatSecret()) && StringUtils.isNotEmpty(corpAccount.getFinancePrivateKey())){
+                FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey(),
+                        linkWeChatConfig.getFincaceProxyConfig().getProxy(),linkWeChatConfig.getFincaceProxyConfig().getPaswd());
+                financeService.setRedisService(redisService);
+                financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), "" ,data.toJSONString()));
+                log.info("会话存档定时任务执行完成----------------->");
+            }
+
+
+
         }
 
-        if(redisService.keyIsExists("we:chat:seq:" + corpAccount.getCorpId())){
-            seqLong = (Long) redisService.getCacheObject("we:chat:seq:" + corpAccount.getCorpId());
-        }else {
-            LambdaQueryWrapper<WeChatContactMsg> wrapper = new LambdaQueryWrapper<WeChatContactMsg>().orderByDesc(WeChatContactMsg::getSeq).last("limit 1");
-            WeChatContactMsg weChatContactMsg = weChatContactMsgService.getOne(wrapper);
-            if (weChatContactMsg != null) {
-                seqLong = weChatContactMsg.getSeq();
-            }
-        }
-        FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
-        financeService.setRedisService(redisService);
-        financeService.getChatData(seqLong, (data) -> rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeChatMsgAuditEx(), rabbitMQSettingConfig.getWeChatMsgAuditRk(), data.toJSONString()));
-        log.info("会话存档定时任务执行完成----------------->");
+
     }
 
 
@@ -243,5 +272,19 @@ public class WeMsgAuditTask {
         });
 
 
+    }
+
+
+    @Data
+    private static class WeChatMsgAuditTaskParams {
+        //是否同步所有数据,默认不同步
+        private Boolean synchAll=false;
+
+        WeChatMsgAuditTaskParams(){
+
+        }
+        WeChatMsgAuditTaskParams(Boolean synchAllP){
+            synchAll=synchAllP;
+        }
     }
 }

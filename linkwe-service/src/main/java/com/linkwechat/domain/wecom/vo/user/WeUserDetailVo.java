@@ -37,12 +37,12 @@ public class WeUserDetailVo extends WeResultVo {
     /**
      * 成员所属部门id列表，不超过100个
      */
-    private List<Integer> department;
+    private List<Long> department;
 
     /**
      * 部门内的排序值，默认为0
      */
-    private List<Integer> order;
+    private List<Long> order;
 
 
     /**
@@ -109,7 +109,7 @@ public class WeUserDetailVo extends WeResultVo {
     /**
      * 主部门
      */
-    private Integer mainDepartment;
+    private Long mainDepartment;
 
     /**
      * 是否邀请该成员使用企业微信（将通过微信服务通知或短信或邮件下发邀请，
@@ -147,6 +147,11 @@ public class WeUserDetailVo extends WeResultVo {
      * 全局唯一。对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的
      */
     private String openUserId;
+
+    /**
+     * 是否离职1:是；0:否
+     */
+    private Integer isUserLeave;
 
 
     public Integer getGender() {

@@ -1,6 +1,9 @@
 package com.linkwechat.controller;
 
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.constant.Constants;
@@ -13,6 +16,9 @@ import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.enums.CustomerAddWay;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.customer.WeBacthMakeCustomerTag;
 import com.linkwechat.domain.customer.WeMakeCustomerTag;
@@ -20,6 +26,7 @@ import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.customer.query.WeOnTheJobCustomerQuery;
 import com.linkwechat.domain.customer.vo.WeCustomerDetailInfoVo;
 import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import com.linkwechat.domain.live.WeLive;
 import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeSynchRecordService;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +83,26 @@ public class WeCustomerController extends BaseController {
         );//去重客户数
 
         return dataTable;
+    }
+
+
+    /**
+     * 客户数据导出
+     *
+     * @param query 请求参数
+     * @author WangYX
+     * @date 2023/08/23 14:00
+     */
+    @ApiOperation("客户数据导出")
+    @GetMapping("/export")
+    public void export(WeCustomersQuery query) {
+        query.setDelFlag(Constants.COMMON_STATE);
+        List<WeCustomersVo> weCustomersVos = weCustomerService.findWeCustomerList(query, null);
+
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCustomersVo.class,weCustomersVos,"客户信息表_" + System.currentTimeMillis()
+        );
+
     }
 
 
@@ -132,7 +163,7 @@ public class WeCustomerController extends BaseController {
     @Log(title = "客户打标签", businessType = BusinessType.UPDATE)
     @PostMapping("/makeLabel")
     public AjaxResult makeLabel(@RequestBody WeMakeCustomerTag weMakeCustomerTag) {
-
+        weMakeCustomerTag.setRecord(false);
         weCustomerService.makeLabel(weMakeCustomerTag);
 
         return AjaxResult.success();
@@ -232,43 +263,6 @@ public class WeCustomerController extends BaseController {
     }
 
 
-//    /**
-//     * 跟进记录
-//     * @param externalUserid
-//     * @param userId
-//     * @return
-//     */
-//    @GetMapping("/followUpRecord")
-//    public TableDataInfo followUpRecord(String externalUserid,String userId){
-//
-//        startPage();
-//
-//        return getDataTable( iWeCustomerTrackRecordService.list(new LambdaQueryWrapper<WeCustomerTrackRecord>()
-//                .eq(WeCustomerTrackRecord::getExternalUserid,externalUserid)
-//                .eq(WeCustomerTrackRecord::getWeUserId,userId)));
-//    }
-
-
-//    /**
-//     * 客户轨迹
-//     * @param externalUserid
-//     * @param weUserId
-//     * @param trajectoryType 轨迹类型:1:信息动态;2:社交动态;3:活动规则;4:待办动态
-//     * @return
-//     */
-//    @GetMapping("/findTrajectory")
-//    public AjaxResult<WeCustomerTrajectory> findTrajectory(String externalUserid,String weUserId,Integer trajectoryType){
-//
-//        List<WeCustomerTrajectory> weCustomerTrajectories = iWeCustomerTrajectoryService
-//                .list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-//                        .eq(StringUtils.isNotEmpty(externalUserid),WeCustomerTrajectory::getExternalUseridOrChatid, externalUserid)
-//                        .eq(StringUtils.isNotEmpty(weUserId),WeCustomerTrajectory::getWeUserId, weUserId)
-//                        .eq(trajectoryType !=null,WeCustomerTrajectory::getTrajectoryType,trajectoryType)
-//                );
-//
-//        return AjaxResult.success(weCustomerTrajectories);
-//    }
-
 
     @ApiOperation(value = "通过条件校验客户数据", httpMethod = "POST")
     @PostMapping("/checkByCondition")
@@ -298,6 +292,31 @@ public class WeCustomerController extends BaseController {
 
         weCustomerService.batchMakeLabel(makeCustomerTags);
 
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 客户加入或移除黑名单
+     * @return
+     */
+    @PostMapping("/joinOrRemoveBlackList")
+    public AjaxResult joinOrRemoveBlackList(@RequestBody WeCustomersQuery query){
+        String customerIds = query.getCustomerIds();
+        if(StringUtils.isNotEmpty(customerIds)){
+
+            List<WeCustomer> weCustomers = weCustomerService.listByIds(
+                    ListUtil.toList(customerIds.split(","))
+            );
+            if(CollectionUtil.isNotEmpty(weCustomers)){
+                weCustomers.stream().forEach(k->{
+                    k.setIsJoinBlacklist(query.getIsJoinBlacklist());
+                });
+
+                weCustomerService.updateBatchById(weCustomers);
+            }
+
+        }
         return AjaxResult.success();
     }
 

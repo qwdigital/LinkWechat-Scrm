@@ -74,6 +74,9 @@ public class FinanceService{
      */
     private final long LIMIT = 1000L;
 
+
+
+
     public FinanceService(String corpId, String secret, String privateKey){
         this(corpId,secret,privateKey,"","");
     }
@@ -130,6 +133,7 @@ public class FinanceService{
                 if (jsonObject != null) {
                     jsonObject.put("seq", data.getLong("seq"));
                     jsonObject.put("corpId",this.corpId);
+                    log.info("数据发送消息:------------"+jsonObject.toJSONString());
                     consumer.accept(jsonObject);
                 }
             });
@@ -160,6 +164,7 @@ public class FinanceService{
             realJsonData = JSONObject.parseObject(jsonDataStr);
         } catch (Exception e) {
             log.error("解析密文失败",e);
+            realJsonData=null;
         } finally {
             if (msg != null) {
                 //释放参数slice

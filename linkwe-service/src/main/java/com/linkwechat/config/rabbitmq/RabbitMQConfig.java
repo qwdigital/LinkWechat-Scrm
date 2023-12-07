@@ -145,6 +145,10 @@ public class RabbitMQConfig {
         return new Queue(rabbitMQSettingConfig.getWeGroupChatQu());
     }
 
+
+
+
+
     /**
      * 客户群同步队列绑定交换机
      *
@@ -154,6 +158,8 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncGroupChat() {
         return BindingBuilder.bind(quSyncGroupChat()).to(syncEx()).with(rabbitMQSettingConfig.getWeGroupChatRk()).noargs();
     }
+
+
 
 
     /**
@@ -166,6 +172,19 @@ public class RabbitMQConfig {
         return new Queue(rabbitMQSettingConfig.getWecustomerQu());
     }
 
+
+
+    /**
+     * 客户详情同步队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quDetailWeCustomer() {
+        return new Queue(rabbitMQSettingConfig.getWecustomerDetailQu());
+    }
+
+
     /**
      * 客户同步队列绑定交换机
      *
@@ -175,6 +194,18 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncWeCustomer() {
         return BindingBuilder.bind(quWeCustomer()).to(syncEx()).with(rabbitMQSettingConfig.getWeCustomerRk()).noargs();
     }
+
+
+    /**
+     * 客户详情同步队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncWeCustomerDetail() {
+        return BindingBuilder.bind(quDetailWeCustomer()).to(syncEx()).with(rabbitMQSettingConfig.getWeCustomerDetailRk()).noargs();
+    }
+
 
     /**
      * 员工部门队列
@@ -195,6 +226,27 @@ public class RabbitMQConfig {
     public Binding bindingExchangeSyncUserDepart() {
         return BindingBuilder.bind(quUserDepart()).to(syncEx()).with(rabbitMQSettingConfig.getUserDepartRk()).noargs();
     }
+
+    /**
+     * 员工队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue quSysUser() {
+        return new Queue(rabbitMQSettingConfig.getSysUserQu());
+    }
+
+    /**
+     * 员工部门同步队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingExchangeSyncSysUser() {
+        return BindingBuilder.bind(quSysUser()).to(syncEx()).with(rabbitMQSettingConfig.getSysUserRk()).noargs();
+    }
+
 
     /**
      * 客户标签同步队列
@@ -687,6 +739,37 @@ public class RabbitMQConfig {
 
 
     /**
+     * 新客sop队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingNewWeCustomerSopExchange() {
+        return BindingBuilder.bind(newWeCustomerSopQu()).to(sopEx()).with(rabbitMQSettingConfig.getNewWeCustomerSopRk()).noargs();
+    }
+
+    /**
+     * 群sop队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingGroupSopExchange() {
+        return BindingBuilder.bind(newGroupSopQu()).to(sopEx()).with(rabbitMQSettingConfig.getNewWeGroupSopRk()).noargs();
+    }
+
+
+    /**
+     * 转入下一个sop队列绑定交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingChangeWeCustomerSopExchange() {
+        return BindingBuilder.bind(changeWeCustomerSopQu()).to(sopEx()).with(rabbitMQSettingConfig.getChnageWeCustomerSopRk()).noargs();
+    }
+
+    /**
      * sop队列
      *
      * @return
@@ -694,6 +777,37 @@ public class RabbitMQConfig {
     @Bean
     public Queue sopQu() {
         return new Queue(rabbitMQSettingConfig.getSopQu());
+    }
+
+
+    /**
+     * 新客sop队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue newWeCustomerSopQu() {
+        return new Queue(rabbitMQSettingConfig.getNewWeCustomerSopQu());
+    }
+
+    /**
+     * 新群sop队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue newGroupSopQu() {
+        return new Queue(rabbitMQSettingConfig.getNewWeGroupSopQu());
+    }
+
+    /**
+     * 转入下一个sop队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue changeWeCustomerSopQu() {
+        return new Queue(rabbitMQSettingConfig.getChangeWeCustomerSopQu());
     }
 
     /**
@@ -704,7 +818,7 @@ public class RabbitMQConfig {
     @Bean
     public Exchange sopEx() {
         // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
-        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
+        return ExchangeBuilder.directExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
 
@@ -852,8 +966,6 @@ public class RabbitMQConfig {
     }
 
 
-
-
     /**
      * 客户群新增成员广播交换机
      */
@@ -884,6 +996,30 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quGroupAddUserCode()).to(weGroupAddUserFanoutEx()).with(rabbitMQSettingConfig.getGroupAddUserCodeRk()).noargs();
 
     }
+
+    /**
+     * 待办任务
+     *
+     * @return {@link Queue}
+     * @author WangYX
+     * @date 2023/07/24 11:19
+     */
+    @Bean
+    public Queue quWeTasksDelay() {
+        return new Queue(rabbitMQSettingConfig.getWeTasksDelayQu());
+    }
+    /**
+     * 待办任务绑定延迟交换机
+     *
+     * @return {@link Binding}
+     * @author WangYX
+     * @date 2023/07/24 11:22
+     */
+    @Bean
+    public Binding bindingWeTasksDelay() {
+        return BindingBuilder.bind(quWeTasksDelay()).to(delayEx()).with(rabbitMQSettingConfig.getWeTasksDelayRk()).noargs();
+    }
+
 
 }
 

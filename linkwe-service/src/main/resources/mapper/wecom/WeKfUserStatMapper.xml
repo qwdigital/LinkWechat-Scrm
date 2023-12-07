@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfUserStatMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeKfUserStat" id="WeKfUserStatResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="dateTime" column="date_time" jdbcType="VARCHAR"/>
+                <result property="openKfId" column="open_kf_id" jdbcType="VARCHAR"/>
+                <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+                <result property="sessionCnt" column="session_cnt" jdbcType="INTEGER"/>
+                <result property="evaluateCnt" column="evaluate_cnt" jdbcType="INTEGER"/>
+                <result property="goodCnt" column="good_cnt" jdbcType="INTEGER"/>
+                <result property="commonCnt" column="common_cnt" jdbcType="INTEGER"/>
+                <result property="badCnt" column="bad_cnt" jdbcType="INTEGER"/>
+                <result property="talkCnt" column="talk_cnt" jdbcType="INTEGER"/>
+                <result property="timeOutCnt" column="time_out_cnt" jdbcType="INTEGER"/>
+                <result property="timeOutDuration" column="time_out_duration" jdbcType="VARCHAR"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeKfUserStatVo">
+        select id, date_time, open_kf_id, user_id, session_cnt, evaluate_cnt, good_cnt, common_cnt, bad_cnt, talk_cnt, time_out_cnt, time_out_duration, create_time, create_by, create_by_id, update_time, update_by, update_by_id, del_flag from we_kf_user_stat
+    </sql>
+
+    <select id="getQualityChart" resultType="com.linkwechat.domain.WeKfUserStat">
+        select
+            date_list.date as date_time,
+            sum(ifnull(wkus.session_cnt,0)) as session_cnt,
+            sum(ifnull(wkus.evaluate_cnt,0)) as evaluate_cnt,
+            sum(ifnull(wkus.good_cnt,0)) as good_cnt,
+            sum(ifnull(wkus.common_cnt,0)) as common_cnt,
+            sum(ifnull(wkus.bad_cnt,0)) as bad_cnt,
+            sum(ifnull(wkus.talk_cnt,0)) as talk_cnt,
+            sum(ifnull(wkus.time_out_cnt,0)) as time_out_cnt,
+            sum(ifnull(wkus.time_out_duration,0)) as time_out_duration
+        from (select `date`
+        from sys_dim_date
+        where `date` &gt;= DATE_FORMAT(#{beginTime}, '%Y-%m-%d')
+        and `date` &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d')) AS date_list
+        left join we_kf_user_stat wkus on wkus.date_time = date_list.date
+        <if test="userIds != null and userIds.size > 0">
+            AND wkus.user_id in
+            <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="openKfIds != null and openKfIds.size > 0">
+            AND wkus.open_kf_id in
+            <foreach collection="openKfIds" item="openKfId" open="(" separator="," close=")">
+                #{openKfId}
+            </foreach>
+        </if>
+        group by date_list.date order by date_list.date desc
+    </select>
+
+</mapper>

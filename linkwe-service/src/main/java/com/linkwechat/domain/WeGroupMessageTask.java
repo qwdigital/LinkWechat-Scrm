@@ -1,11 +1,10 @@
 package com.linkwechat.domain;
 
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -108,4 +107,11 @@ public class WeGroupMessageTask extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "已发送客户",hidden = true)
     @TableField(exist = false)
     private String alreadyCustomerName;
+
+
+    /**
+     * 客户查询条件
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
+    private WeCustomersQuery weCustomersQuery;
 }

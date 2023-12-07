@@ -1,5 +1,6 @@
 package com.linkwechat.domain.customer.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,4 +20,17 @@ public class WeCustomerAddUserVo {
     private String headImageUrl;
     //创建时间
     private Date createTime;
+
+    //添加方式
+    private Integer addMethod;
+
+    //添加时间
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date firstAddTime;
+
+    //跟进状态
+    private Integer trackState;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date trackTime;
 }

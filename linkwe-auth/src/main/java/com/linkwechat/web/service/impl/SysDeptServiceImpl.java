@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataScope;
@@ -22,18 +23,18 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.system.dept.query.SysDeptQuery;
 import com.linkwechat.domain.system.dept.vo.SysDeptVo;
 import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.domain.wecom.entity.department.WeDeptEntity;
 import com.linkwechat.domain.wecom.query.department.WeDeptQuery;
+import com.linkwechat.domain.wecom.vo.department.WeDeptInfoVo;
 import com.linkwechat.domain.wecom.vo.department.WeDeptVo;
 import com.linkwechat.fegin.QwDeptClient;
 import com.linkwechat.web.mapper.SysDeptMapper;
 import com.linkwechat.web.service.ISysDeptService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  *
  * @author ruoyi
  */
+@Slf4j
 @Service
 public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> implements ISysDeptService {
     @Resource
@@ -277,47 +279,31 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         return deptMapper.deleteDeptById(deptId);
     }
 
+
     @Override
     public List<SysDept> syncWeDepartment(String corpId) {
         WeDeptQuery query = new WeDeptQuery();
         query.setCorpid(corpId);
-        AjaxResult<WeDeptVo> deptList = deptClient.getDeptList(query);
-        List<SysDept> sysDeptList = deptList.getData().getDepartment().stream().map(dept -> {
+        WeDeptVo weDeptVo = deptClient.getDeptList(query).getData();
+        if(Objects.isNull(weDeptVo)){
+            log.error("拉取企微部门接口失败 query：{}",query.getCorpid());
+            return new ArrayList<>();
+        }
+        List<SysDept> sysDeptList = weDeptVo.getDepartment().stream().map(dept -> {
             LoginUser user = SecurityUtils.getLoginUser();
             SysDept d = new SysDept();
-            d.setDeptId(Long.parseLong(String.valueOf(dept.getId())));
-            d.setParentId(Long.parseLong(String.valueOf(dept.getParentId())));
+            d.setDeptId(dept.getId());
+            d.setParentId(dept.getParentId());
             //设置ancestors
-            if (dept.getId() == 1) {
-                d.setAncestors("0");
-            } else {
-                SysDept parentDept = new LambdaQueryChainWrapper<>(baseMapper).eq(SysDept::getDeptId,
-                        Long.parseLong(String.valueOf(dept.getParentId()))).eq(SysDept::getDelFlag, "0").one();
-                if (parentDept != null) {
-                    d.setAncestors(String.format("%s,%d",
-                            StringUtils.isNotBlank(parentDept.getAncestors()) ? parentDept.getAncestors() : "0",
-                            dept.getParentId()));
-                }
-            }
+            TreeSet<Long> parentIds = new TreeSet<>();
+            getParentDeptIds(weDeptVo.getDepartment(),dept.getId(),parentIds);
+            d.setAncestors(parentIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
             d.setDeptName(dept.getName());
             d.setDeptEnName(dept.getNameEn());
             d.setLeader(String.join(",", dept.getDepartmentLeader()));
-            d.setOrderNum(String.valueOf(dept.getOrder()));
-            SysDept existsDept = getById(d.getDeptId());
-            if (existsDept != null) {
-                if (user != null) {
-                    d.setUpdateBy(user.getUserName());
-                }
-                d.setUpdateTime(new Date());
-            } else {
-                if (user != null) {
-                    d.setCreateBy(user.getUserName());
-                }
-                d.setCreateTime(new Date());
-            }
+            d.setOrderNum(dept.getOrder());
             return d;
         }).collect(Collectors.toList());
-
         //不存在的移除
         if(CollectionUtil.isNotEmpty(sysDeptList)){
             this.remove(
@@ -325,9 +311,28 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
                             .notIn(SysDept::getDeptId,sysDeptList.stream().map(SysDept::getDeptId).collect(Collectors.toList())
                             ));
         }
-
-        saveOrUpdateBatch(sysDeptList);
+        saveOrUpdateBatch(sysDeptList,200);
         return sysDeptList;
+    }
+
+    /**
+     * 递归获取父级ids
+     * @param weDeptEntityList 列表
+     * @param currentId 当前节点
+     * @param parentIds 父节点ID列表
+     */
+    private static void getParentDeptIds(List<WeDeptEntity> weDeptEntityList, Long currentId, TreeSet<Long> parentIds){
+        for (WeDeptEntity weDept : weDeptEntityList) {
+
+            if(Objects.equals(0L,currentId)){
+                return;
+            }
+            //判断是否有父节点
+            if (currentId.equals(weDept.getId())) {
+                parentIds.add(weDept.getParentId());
+                getParentDeptIds(weDeptEntityList, weDept.getParentId(), parentIds);
+            }
+        }
     }
 
     @Override
@@ -389,5 +394,60 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
             }).collect(Collectors.toList());
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public void callbackAdd(SysDeptQuery query) {
+        List<Long> deptIds = query.getDeptIds();
+        if(CollectionUtil.isNotEmpty(deptIds)){
+            WeDeptQuery weDeptQuery = new WeDeptQuery();
+            weDeptQuery.setId(query.getDeptIds().get(0));
+            WeDeptInfoVo deptInfo = deptClient.getDeptDetail(weDeptQuery).getData();
+
+            if(Objects.nonNull(deptInfo)){
+                WeDeptEntity department = deptInfo.getDepartment();
+                SysDept parentInfo = deptMapper.selectDeptById(department.getParentId());
+                SysDept dept = new SysDept();
+                dept.setDeptId(department.getId());
+                dept.setParentId(department.getParentId());
+                //设置ancestors
+                if(Objects.nonNull(parentInfo)){
+                    dept.setAncestors(parentInfo.getAncestors() + "," + dept.getParentId());
+                }else {
+                    dept.setAncestors(dept.getParentId() + "");
+                }
+                dept.setDeptName(department.getName());
+                dept.setDeptEnName(department.getNameEn());
+                dept.setLeader(String.join(",", department.getDepartmentLeader()));
+                dept.setOrderNum(department.getOrder());
+                saveOrUpdate(dept);
+            }
+        }
+
+    }
+
+    @Override
+    public void callbackDelete(SysDeptQuery query) {
+        List<Long> deptIds = query.getDeptIds();
+        if(CollectionUtil.isNotEmpty(deptIds)){
+            update(new LambdaUpdateWrapper<SysDept>().set(SysDept::getDelFlag,1).in(SysDept::getDeptId,deptIds));
+        }
+    }
+
+    @Override
+    public void callbackUpdate(SysDeptQuery query) {
+        callbackAdd(query);
+    }
+
+    @Override
+    public boolean isRoot(Long deptId) {
+        if(deptId != null){
+            SysDept sysDept = this.getById(deptId);
+            if(null != sysDept && new Long(0).equals(sysDept.getParentId())){
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }

@@ -54,12 +54,12 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
 
         String action="";
         String content="";
-        if(trajectorySceneType.equals(TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getName())){
+        if(trajectorySceneType.equals(TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getType())){
             action="点赞了员工朋友圈";
             content=String.format(TrajectorySceneType.TRAJECTORY_TITLE_DZPYQ.getMsgTpl(),weCustomer!=null?weCustomer.getCustomerName():"@客户"
                     ,StringUtils.isNotEmpty(userName)?userName:"@员工");
 
-        }else if(trajectorySceneType.equals(TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getName())){
+        }else if(trajectorySceneType.equals(TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getType())){
             action="评论了员工朋友圈";
             content=String.format(TrajectorySceneType.TRAJECTORY_TITLE_PLPYQ.getMsgTpl(),weCustomer!=null?weCustomer.getCustomerName():"@客户"
                     ,StringUtils.isNotEmpty(userName)?userName:"@员工");
@@ -95,9 +95,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
                         .operatoredObjectId(weUserId)
                         .action(action)
                         .title(TrajectoryType.TRAJECTORY_TYPE_SJDT.getName())
-                        .content(
-                                content
-                        )
+                        .content(content)
                         .build()
         );
 
@@ -124,6 +122,16 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
               action="更新客户详细资料";
               content=String.format(TrajectorySceneType.TRAJECTORY_TITLE_BJBQ.getMsgTpl()
                       ,StringUtils.isNotEmpty(userName)?userName:"@员工",weCustomer!=null?weCustomer.getCustomerName():"@客户");
+          }else if(trajectorySceneType.equals(TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getType())){ //取消企业标签
+              action="取消企业标签";
+              content=String.format(TrajectorySceneType.TRAJECTORY_TITLE_QXKHQYBQ.getMsgTpl()
+                      ,StringUtils.isNotEmpty(userName)?userName:"@员工",weCustomer!=null?weCustomer.getCustomerName():"@客户");
+
+          }else if(trajectorySceneType.equals(TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getType())){ //取消个人标签
+              action="取消个人标签";
+              content=String.format(TrajectorySceneType.TRAJECTORY_TITLE_QXKHGRBQ.getMsgTpl()
+                      ,StringUtils.isNotEmpty(userName)?userName:"@员工",weCustomer!=null?weCustomer.getCustomerName():"@客户");
+
           }
             this.save(
                     WeCustomerTrajectory.builder()
@@ -379,7 +387,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
             wrapper.eq(WeCustomerTrajectory::getTrajectoryType,trajectory.getTrajectoryType());
         }
         wrapper.eq(WeCustomerTrajectory::getCreateById, SecurityUtils.getUserId());
-
+        wrapper.groupBy(WeCustomerTrajectory::getContent);
         wrapper.orderByDesc(WeCustomerTrajectory::getCreateTime);
 
         return this.list(wrapper);
@@ -399,6 +407,7 @@ public class WeCustomerTrajectoryServiceImpl extends ServiceImpl<WeCustomerTraje
             wrapper.eq(WeCustomerTrajectory::getTrajectoryType,trajectory.getTrajectoryType());
         }
 
+        wrapper.groupBy(WeCustomerTrajectory::getContent);
         wrapper.orderByDesc(WeCustomerTrajectory::getCreateTime);
 
         if(StringUtils.isNotEmpty(trajectory.getParams().get("dataScope").toString())){

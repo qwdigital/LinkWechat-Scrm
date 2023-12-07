@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeCustomerLinkCountMapper">
+
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.WeCustomerLinkCount">
+            <result property="id" column="id" jdbcType="BIGINT"/>
+            <result property="externalUserid" column="external_userid" jdbcType="VARCHAR"/>
+            <result property="linkId" column="link_id" jdbcType="VARCHAR"/>
+            <result property="userid" column="userid" jdbcType="VARCHAR"/>
+            <result property="chatStatus" column="chat_status" jdbcType="TINYINT"/>
+            <result property="addTime" column="add_time" jdbcType="TIMESTAMP"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="createById" column="create_by_id" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+            <result property="updateById" column="update_by_id" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <select id="selectLinkCountTrend" resultType="com.linkwechat.domain.customer.vo.WeCustomerLinkCountTrendVo">
+        SELECT
+            sdd.date,
+            count(wckc.id) as addWeCustomerNumber,
+            count(if(wckc.chat_status=1,wckc.id,null)) as weCustomerActiveNumber
+        FROM
+            sys_dim_date sdd
+                LEFT JOIN we_customer_link_count wckc ON sdd.date= date_format(wckc.add_time,'%Y-%m-%d') and wckc.del_flag=0
+        WHERE  date_format(sdd.date,'%Y-%m-%d') BETWEEN  #{beginTime} AND #{endTime}
+          and wckc.link_id=#{linkId}
+        GROUP BY sdd.date
+    </select>
+
+    <select id="selectLinkCountTable" resultType="com.linkwechat.domain.customer.vo.WeCustomerLinkCountTableVo">
+        SELECT
+            date_format(wclc.add_time,'%Y-%m-%d') as date,
+            count(wclc.id) as addWeCustomerNumber,
+            count(if(wclc.chat_status=1,wclc.id,null)) as weCustomerActiveNumber,
+            (SELECT count(*) from we_customer_link_count wclct where DATEDIFF(wclct.add_time, wclc.add_time)&lt;0) as tdAddWeCustomerNumber,
+            (SELECT count(if(wclc.chat_status=1,wclc.id,null)) from we_customer_link_count wclct where DATEDIFF(wclct.add_time, wclc.add_time)&lt;0) as tdWeCustomerActiveNumber
+        FROM
+        we_customer_link_count wclc
+        where 	wclc.link_id=#{linkId}
+        and  date_format(wclc.add_time,'%Y-%m-%d') BETWEEN   #{beginTime} AND #{endTime}
+        GROUP BY date_format(wclc.add_time,'%Y-%m-%d')
+    </select>
+    <select id="selectLinkCountTab" resultType="com.linkwechat.domain.customer.vo.WeCustomerLinkCountTabVo">
+        SELECT
+            count(id) as addWeCustomerNumber,
+            count(if(chat_status=1,id,null)) as weCustomerActiveNumber,
+            count(if(to_days(add_time) = to_days(now()),id,null)) as tdAddWeCustomerNumber,
+            count(if(chat_status=1 AND to_days(add_time) = to_days(now()),id,null)) as tdWeCustomerActiveNumber
+        FROM
+            we_customer_link_count
+        where del_flag=0 and link_id=#{linkId}
+    </select>
+
+    <insert id="batchAddOrUpdate">
+        INSERT INTO we_customer_link_count(
+            id,
+            external_userid,
+            link_id,
+            we_user_id,
+            customer_name,
+            customer_type,
+            gender,
+            avatar,
+            user_name,
+            chat_status,
+            add_time,
+            state,
+            create_by,
+            create_by_id,
+            create_time,
+            update_by,
+            update_by_id,
+            update_time
+        ) values
+        <foreach collection="weCustomerLinkCounts" item="item" index="index" separator=",">
+            (#{item.id},#{item.externalUserid},#{item.linkId},#{item.weUserId},#{item.customerName},#{item.customerType},
+            #{item.gender},#{item.avatar},#{item.userName},#{item.chatStatus},#{item.addTime},#{item.state},
+            #{item.createBy},#{item.createById},now(),#{item.updateBy},#{item.updateById},now()
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        link_id=IFNULL(VALUES(link_id),we_customer_link_count.link_id),
+        customer_name=IFNULL(VALUES(customer_name),we_customer_link_count.customer_name),
+        customer_type=IFNULL(VALUES(customer_type),we_customer_link_count.customer_type),
+        gender=IFNULL(VALUES(gender),we_customer_link_count.gender),
+        avatar=IFNULL(VALUES(avatar),we_customer_link_count.avatar),
+        user_name=IFNULL(VALUES(user_name),we_customer_link_count.user_name),
+        chat_status=IFNULL(VALUES(chat_status),we_customer_link_count.chat_status),
+        add_time=IFNULL(VALUES(add_time),we_customer_link_count.add_time),
+        state=IFNULL(VALUES(state),we_customer_link_count.state),
+        update_by=IFNULL(VALUES(update_by),we_customer_link_count.update_by),
+        update_by_id=IFNULL(VALUES(update_by_id),we_customer_link_count.update_by_id),
+        update_time=IFNULL(VALUES(update_time),we_customer_link_count.update_time);
+
+    </insert>
+</mapper>

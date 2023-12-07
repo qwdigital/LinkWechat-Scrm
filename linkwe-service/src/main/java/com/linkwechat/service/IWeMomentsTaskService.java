@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.moments.dto.MomentsListDetailParamDto;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.entity.WeMomentsTask;
+import com.linkwechat.domain.moments.entity.WeMomentsTaskRelation;
 import com.linkwechat.domain.moments.query.*;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,6 +43,12 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
 
 
     /**
+     * 异步执行-立即执行发送朋友圈
+     * @param task
+     */
+    void immediatelySendMoments(WeMomentsTask task);
+
+    /**
      * 获取朋友圈详情
      *
      * @param weMomentsTaskId 朋友圈任务Id
@@ -57,7 +65,7 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
      * @author WangYX
      * @date 2023/06/12 10:17
      */
-    void sendWeMoments(Long weMomentsTaskId);
+    void sendWeMoments(Long weMomentsTaskId) throws IOException;
 
     /**
      * 取消发送朋友圈
@@ -72,12 +80,12 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
      * 同步朋友圈
      * 发送消息到mq队列
      *
-     * @param filterType 朋友圈类型。0：企业发表 1：个人发表 2：所有，包括个人创建以及企业创建，默认情况下为所有类型
+     * @param taskIds 任务id集合
      * @return
      * @author WangYX
      * @date 2023/06/12 11:04
      */
-    void syncMoments(Integer filterType);
+    void syncMoments(List<String> taskIds);
 
     /**
      * mq队列,朋友圈同步处理
@@ -110,11 +118,11 @@ public interface IWeMomentsTaskService extends IService<WeMomentsTask> {
     /**
      * jobId换取MomentsId
      *
-     * @param request jobId换取MomentsId参数
+     * @param relations jobId换取MomentsId参数
      * @author WangYX
      * @date 2023/06/13 10:33
      */
-    void jobIdToMomentsId(WeMomentsJobIdToMomentsIdRequest request);
+    void jobIdToMomentsId(List<WeMomentsTaskRelation> relations);
 
     /**
      * 获取企微朋友圈信息

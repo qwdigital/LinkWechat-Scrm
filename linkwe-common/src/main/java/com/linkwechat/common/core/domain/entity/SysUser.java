@@ -170,7 +170,7 @@ public class SysUser extends BaseEntity {
      */
     @ApiModelProperty(value = "企微用户激活状态(1=已激活，2=已禁用，4=未激活，5=退出企业)")
     @TableField("we_user_status")
-    private String weUserStatus;
+    private Integer weUserStatus;
 
     /**
      * 员工个人二维码
@@ -227,8 +227,6 @@ public class SysUser extends BaseEntity {
     private String jobNumber;
 
 
-
-
     /**
      * 用户类型（00管理员）(企微用户类型 1.创建者 2.内部系统管理员 3.外部系统管理员 4.分级管理员 5.成员)
      */
@@ -252,7 +250,7 @@ public class SysUser extends BaseEntity {
     /**
      * 离职时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dimissionTime;
 
 
@@ -280,7 +278,6 @@ public class SysUser extends BaseEntity {
      * 删除标志（0代表存在 1代表删除）
      */
     @TableField("del_flag")
-    @TableLogic
     private Integer delFlag;
 
     /**
@@ -335,8 +332,17 @@ public class SysUser extends BaseEntity {
     @TableField(exist = false)
     private String deptIds;
 
+    /**
+     * 是否开启动态日报 0开启，1关闭 默认开启0
+     */
+    @TableField("is_open_daily")
+    private Integer openDaily;
 
-
+    /**
+     * 是否按照跟节点查询所有数据来查询，默认不是
+     */
+    @TableField(exist = false)
+    private boolean checkIsRoot=false;
 
 
     public SysUser(Long userId) {
@@ -382,6 +388,14 @@ public class SysUser extends BaseEntity {
     @JsonProperty
     public String getPassword() {
         return password;
+    }
+
+    public boolean isCheckIsRoot() {
+        return checkIsRoot;
+    }
+
+    public void setCheckIsRoot(boolean checkIsRoot) {
+        this.checkIsRoot = checkIsRoot;
     }
 
     @Override

@@ -6,7 +6,7 @@
 
     <groupId>com.linkwechat</groupId>
     <artifactId>linkwechat-cloud</artifactId>
-    <version>3.1.0</version>
+    <version>2023-release</version>
     <name>linkwechat-cloud</name>
 
     <properties>
@@ -14,7 +14,7 @@
         <spring-cloud-gateway.version>3.0.7</spring-cloud-gateway.version>
         <spring-cloud-alibaba.version>2021.0.1.0</spring-cloud-alibaba.version>
         <springboot.version>2.6.6</springboot.version>
-        <linkwe.version>3.1.0</linkwe.version>
+        <linkwe.version>2023-release</linkwe.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -68,6 +68,8 @@
         <qiniu.version>7.2.7</qiniu.version>
         <wechatpay-httpclient.version>0.4.9</wechatpay-httpclient.version>
         <combiner.version>2.6.3</combiner.version>
+        <orika.version>1.5.2</orika.version>
+        <redisson.version>3.20.0</redisson.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -497,11 +499,22 @@
                 <version>${wechatpay-httpclient.version}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>com.freewayso</groupId>
                 <artifactId>image-combiner</artifactId>
                 <version>${combiner.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ma.glasnost.orika</groupId>
+                <artifactId>orika-core</artifactId>
+                <version>${orika.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>
@@ -529,6 +542,7 @@
         <module>linkwe-scheduler</module>
         <module>linkwe-framework</module>
         <module>linkwe-service</module>
+        <module>linkwe-event-task</module>
     </modules>
 
     <build>

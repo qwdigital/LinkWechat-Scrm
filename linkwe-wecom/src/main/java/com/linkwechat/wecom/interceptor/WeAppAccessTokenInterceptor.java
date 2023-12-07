@@ -9,6 +9,7 @@ import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
@@ -17,6 +18,7 @@ import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
+import com.linkwechat.wecom.utils.ForestProxyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,7 @@ public class WeAppAccessTokenInterceptor extends WeForestInterceptor implements 
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
+        setProxy(request);
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }
@@ -75,6 +78,13 @@ public class WeAppAccessTokenInterceptor extends WeForestInterceptor implements 
      */
     @Override
     public void onSuccess(WeResultVo resultDto, ForestRequest forestRequest, ForestResponse forestResponse) {
+        WeErrorCodeEnum weErrorCodeEnum = WeErrorCodeEnum.parseEnum(resultDto.getErrCode());
+        if(null != weErrorCodeEnum){
+            if(!resultDto.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                saveWeErrorMsg(weErrorCodeEnum,forestRequest);
+            }
+            resultDto.setErrMsg(weErrorCodeEnum.getErrorMsg());
+        }
         log.info("url:{},result:{}", forestRequest.getUrl(), forestResponse.getContent());
     }
 

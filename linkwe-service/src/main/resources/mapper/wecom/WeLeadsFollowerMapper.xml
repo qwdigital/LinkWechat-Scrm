@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsFollowerMapper">
+
+
+    <!-- 获取跟进人的跟进数据  -->
+    <select id="getLeadsFollower" resultType="com.linkwechat.domain.leads.leads.entity.WeLeadsFollower">
+        SELECT t1.id,
+               t1.leads_id,
+               t1.sea_id,
+               t1.follower_id,
+               t1.follower_we_user_id,
+               t1.follower_name,
+               t1.follower_start_time,
+               t1.follower_end_time
+        FROM we_leads_follower t1
+        WHERE t1.follower_id = #{userId}
+          AND t1.follower_status = 1
+    </select>
+
+    <select id="userStatistic" resultType="com.linkwechat.domain.leads.leads.vo.WeLeadsFollowerVO">
+        SELECT
+        t1.id,
+        t1.follower_id,
+        t1.follower_status,
+        t2.customer_id,
+        t2.bind_customer_time
+        FROM we_leads_follower t1
+        LEFT JOIN we_leads t2 ON t2.id = t1.leads_id AND t2.follower_id = t1.follower_id
+        <where>
+            <if test="userIds!=null and userIds.size()>0">
+                AND t1.follower_id in
+                <foreach collection="userIds" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getFollowerList" resultType="com.linkwechat.domain.leads.leads.entity.WeLeadsFollower">
+        SELECT t1.id,
+               t1.leads_id,
+               t1.follower_id,
+               t1.follower_we_user_id,
+               t1.follower_name,
+               t1.dept_id,
+               t2.dept_name,
+               t1.get_type,
+               t1.follower_status,
+               t1.return_type,
+               t1.return_reason,
+               t1.assigner_id,
+               t1.assigner_name,
+               t1.follower_start_time,
+               t1.follower_end_time,
+               t1.is_current_follower,
+               t1.sea_id,
+               t1.is_latest AS latest
+        FROM we_leads_follower t1
+                 left join sys_dept t2 on t1.dept_id = t2.dept_id
+        WHERE t1.leads_id = #{leadsId}
+        ORDER BY follower_start_time DESC
+    </select>
+</mapper>

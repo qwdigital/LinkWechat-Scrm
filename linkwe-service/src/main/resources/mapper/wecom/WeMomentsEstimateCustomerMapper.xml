@@ -24,12 +24,10 @@
         t1.moments_task_id,
         t1.user_id,
         t1.we_user_id,
-        (SELECT user_name FROM sys_user t3 WHERE t1.we_user_id = t3.we_user_id) AS user_name,
+        t1.user_name AS user_name,
         t1.customer_name,
-        IFNULL(t2.delivery_status, 1) AS delivery_status
+        IFNULL(t1.delivery_status, 1) AS delivery_status
         FROM we_moments_estimate_customer t1
-        LEFT JOIN we_moments_customer t2 ON t1.moments_task_id = t2.moments_task_id AND t1.we_user_id = t2.we_user_id
-        AND t1.external_userid = t2.external_userid
         WHERE t1.moments_task_id = #{weMomentsTaskId}
         <if test="weUserIds!=null and weUserIds!=''">
             AND t1.we_user_id in
@@ -40,13 +38,13 @@
         <if test="deliveryStatus!=null">
             <choose>
                 <when test="deliveryStatus == 0">
-                    AND t2.delivery_status = #{deliveryStatus}
+                    AND t1.delivery_status = #{deliveryStatus}
                 </when>
                 <when test="deliveryStatus == 1">
-                    AND (t2.delivery_status = #{deliveryStatus} or t2.delivery_status is null)
+                    AND (t1.delivery_status = #{deliveryStatus} or t1.delivery_status is null)
                 </when>
                 <when test="deliveryStatus == 2">
-                    AND (t2.delivery_status = #{deliveryStatus})
+                    AND (t1.delivery_status = #{deliveryStatus})
                 </when>
             </choose>
         </if>

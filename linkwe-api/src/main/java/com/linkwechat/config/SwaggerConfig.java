@@ -1,6 +1,8 @@
 package com.linkwechat.config;
 
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.SecurityUtils;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -136,4 +138,6 @@ public class SwaggerConfig {
                 .version("版本号:" + version)
                 .build();
     }
+
+
 }

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.model.LoginUser;
@@ -198,6 +199,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 WeGroupMessageTask messageTask = new WeGroupMessageTask();
                 messageTask.setMsgTemplateId(weGroupMessageTemplate.getId());
                 messageTask.setUserId(senderInfo.getUserId());
+                messageTask.setWeCustomersQuery(query.getWeCustomersQuery());
                 messageTaskList.add(messageTask);
 
                 if (CollectionUtil.isNotEmpty(senderInfo.getCustomerList())) {
@@ -248,23 +250,29 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     private void checkSenderList(WeAddGroupMessageQuery query, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
         if (query.getIsAll() && CollectionUtil.isEmpty(senderList)) {
             if (query.getChatType() == 1) {
-                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                        .select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId)
-                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid, WeCustomer::getAddUserId));
-                if (CollectionUtil.isNotEmpty(customerList)) {
-                    Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
-                    customerMap.forEach((userId, customers) -> {
-                        List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-                        WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
-                        senderInfo.setCustomerList(eids);
-                        senderInfo.setUserId(userId);
-                        senderList.add(senderInfo);
-                    });
+                List<WeAddGroupMessageQuery.SenderInfo> limitSenderInfoWeCustomerList = weCustomerService.findLimitSenderInfoWeCustomerList();
+
+                if(CollectionUtil.isNotEmpty(limitSenderInfoWeCustomerList)){
+
+                    senderList.addAll(limitSenderInfoWeCustomerList);
+//                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
+//                        .select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId)
+//                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid, WeCustomer::getAddUserId));
+//                if (CollectionUtil.isNotEmpty(customerList)) {
+//                    Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
+//                    customerMap.forEach((userId, customers) -> {
+//                        List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
+//                        WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
+//                        senderInfo.setCustomerList(eids);
+//                        senderInfo.setUserId(userId);
+//                        senderList.add(senderInfo);
+//                    });
+
                 } else {
                     throw new WeComException("暂无客户可发送");
                 }
             } else {
-                List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getDelFlag, 0));
+                List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().eq(WeGroup::getDelFlag, Constants.COMMON_STATE));
                 if (CollectionUtil.isNotEmpty(groupList)) {
                     Map<String, List<String>> ownerToChatIdMap = groupList.stream().collect(Collectors.groupingBy(WeGroup::getOwner, Collectors.mapping(WeGroup::getChatId, Collectors.toList())));
                     ownerToChatIdMap.forEach((userId, chatIds) -> {
@@ -384,6 +392,15 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         } else if (query.getMsgSource().equals(new Integer(5))) {
             //短链推广群发逻辑
             SpringUtils.getBean("shortLinkPromotionGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
+
+        } else if (query.getMsgSource().equals(new Integer(4))){
+            //裂变群发逻辑
+            SpringUtils.getBean("fissionGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
+
+
+        }else if(query.getMsgSource().equals(new Integer(6))){
+            //老客标签建群
+            SpringUtils.getBean("wePresTagGroupMsgService", AbstractGroupMsgSendTaskService.class).sendGroupMsg(query);
 
         } else {
             //公共消息群发逻辑

@@ -2,6 +2,11 @@ package com.linkwechat.mapper;
 
 import com.linkwechat.domain.WeCustomerLink;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.domain.WeCustomerLinkCount;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author robin
@@ -11,6 +16,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface WeCustomerLinkMapper extends BaseMapper<WeCustomerLink> {
 
+    /**
+     * 获取相关连接下添加的客户
+     * @param weCustomerLinkCount
+     * @return
+     */
+    List<WeCustomerLinkCount> findLinkWeCustomer(@Param("weCustomerLinkCount") WeCustomerLinkCount weCustomerLinkCount);
 }
 
 

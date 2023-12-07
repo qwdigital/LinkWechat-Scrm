@@ -9,13 +9,17 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.context.SecurityContextHolder;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.enums.GroupUpdateDetailEnum;
 import com.linkwechat.common.enums.MessageNoticeType;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
+import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
@@ -23,6 +27,7 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
 import com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
@@ -37,6 +42,7 @@ import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +84,29 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
     @Autowired
     private IWeFissionService iWeFissionService;
+    @Resource
+    private IWeMessageNotificationService weMessageNotificationService;
 
+    @Autowired
+    private IWeGroupMemberService iWeGroupMemberService;
+
+
+    @Override
+    public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query, PageDomain pageDomain) {
+        List<LinkGroupChatListVo> groupChatListVos = new ArrayList<>();
+        List<String> weGroupListIds = this.baseMapper.findWeGroupListIds(query, pageDomain);
+
+        if (CollectionUtil.isNotEmpty(weGroupListIds)) {
+            groupChatListVos = this.baseMapper.selectWeGroupListByIds(weGroupListIds);
+        }
+
+        return groupChatListVos;
+    }
+
+    @Override
+    public long countWeGroupListIds(WeGroupChatQuery query) {
+        return this.baseMapper.countWeGroupListIds(query);
+    }
 
     @Override
     public List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
@@ -120,10 +148,28 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
     @SynchRecord(synchType = SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
     public void synchWeGroup() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeGroupChatRk(), JSONObject.toJSONString(loginUser));
+
+        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
+        this.getGroupChatList(groupChatList,WeGroupChatListQuery.builder().build());
+        //当前群先入库
+        if (CollectionUtil.isNotEmpty(groupChatList)){
+
+            List<List<WeGroupChatListVo.GroupChat>> partition = Lists.partition(groupChatList, 5);
+
+
+            for (List<WeGroupChatListVo.GroupChat> groupChat : partition) {
+                loginUser.setChatIds(groupChat.stream().map(WeGroupChatListVo.GroupChat::getChatId)
+                        .collect(Collectors.toList()));
+                //发送通知更新群群详情
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeGroupChatRk(), JSONObject.toJSONString(loginUser));
+
+            }
+
+        }
+
     }
 
-    @Async
+
     @Override
     public void synchWeGroupHandler(String msg) {
         LoginUser loginUser = JSONObject.parseObject(msg, LoginUser.class);
@@ -131,30 +177,20 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
         SecurityContextHolder.setUserName(loginUser.getUserName());
         SecurityContextHolder.setUserType(loginUser.getUserType());
 
-        this.synchWeGroup(WeGroupChatListQuery.builder().build());
 
-
-    }
-
-    @Override
-    public List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery){
-
-        List<WeGroupChatListVo.GroupChat> groupChatList=new ArrayList<>();
-
-        this.getGroupChatList(groupChatList,chatListQuery);
-
-        if (CollectionUtil.isNotEmpty(groupChatList)) {
-            List<WeGroup> weGroups = new LinkedList<>();
-            List<WeGroupMember> weGroupMembers = new LinkedList<>();
-            for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
-
-                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
+        List<String> chatIds = loginUser.getChatIds();
+        if(CollectionUtil.isNotEmpty(chatIds)){
+            chatIds.stream().forEach(chatId->{
+                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(chatId, 1);
                 WeGroupChatDetailVo weGroupChatDetailVo = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery).getData();
-                if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode()) && weGroupChatDetailVo.getGroupChat() != null) {
+                List<WeGroup> weGroups = new LinkedList<>();
+                List<WeGroupMember> weGroupMembers = new LinkedList<>();
+                if (weGroupChatDetailVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
+                        && weGroupChatDetailVo.getGroupChat() != null) {
+
                     WeGroupChatDetailVo.GroupChatDetail detail = weGroupChatDetailVo.getGroupChat();
                     WeGroup weGroup = new WeGroup();
                     weGroup.transformQwParams(detail);
-                    weGroup.setStatus(groupChat.getStatus());
                     weGroup.setDelFlag(Constants.COMMON_STATE);
                     weGroup.setCreateBy(SecurityUtils.getUserName());
                     weGroup.setCreateById(SecurityUtils.getUserId());
@@ -168,7 +204,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     if (CollectionUtil.isNotEmpty(memberLists)) {
                         memberLists.forEach(groupMember -> {
                             WeGroupMember weGroupMember = new WeGroupMember();
-                            weGroupMember.setChatId(groupChat.getChatId());
+                            weGroupMember.setChatId(chatId);
                             weGroupMember.transformQwParams(groupMember);
                             weGroupMember.setCreateTime(new Date());
                             weGroupMember.setUpdateTime(new Date());
@@ -182,18 +218,34 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                             weGroupMembers.add(weGroupMember);
                         });
                     }
+
+
+                    if(CollectionUtil.isNotEmpty(weGroups)){
+                        //删除不包含当前的群以及成员
+                        this.baseMapper.insertBatch(weGroups);
+                    }
+
+
+                    if(CollectionUtil.isNotEmpty(weGroupMembers)){
+                        iWeGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
+                                .notIn(WeGroupMember::getUserId,weGroupMembers.stream().map(WeGroupMember::getUserId)
+                                        .collect(Collectors.toList()))
+                                .eq(WeGroupMember::getChatId,chatId));
+                        iWeGroupMemberService.insertBatch(weGroupMembers);
+                    }
+
+
                 }
-            }
-            //删除不包含当前的群以及成员
-            insertBatchGroupAndMember(weGroups, weGroupMembers,false);
+
+
+
+
+            });
+
         }
 
 
-
-        return groupChatList;
     }
-
-
 
 
 
@@ -209,41 +261,77 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
         if (CollectionUtil.isNotEmpty(groupChatList)) {
 
+            //获取相关详情
+            for (WeGroupChatListVo.GroupChat groupChat : groupChatList) {
+                WeGroupChatDetailQuery groupChatDetailQuery = new WeGroupChatDetailQuery(groupChat.getChatId(), 1);
+                AjaxResult<WeGroupChatDetailVo> result
+                        = qwCustomerClient.getGroupChatDetail(groupChatDetailQuery);
+                if(null != result){
+                    WeGroupChatDetailVo data = result.getData();
+                    if(null != data && data.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                        WeGroupChatDetailVo.GroupChatDetail groupChatDetail = data.getGroupChat();
+                        if(null != groupChatDetail){
 
-            List<WeGroup> weGroupList = this.list(new LambdaQueryWrapper<WeGroup>()
-                    .in(WeGroup::getChatId, groupChatList.stream().map(WeGroupChatListVo.GroupChat::getChatId).collect(Collectors.toList())));
+                            WeGroup weGroup = new WeGroup();
+                            weGroup.transformQwParams(groupChatDetail);
+                            weGroup.setStatus(groupChat.getStatus());
+                            weGroup.setDelFlag(Constants.COMMON_STATE);
+                            weGroup.setCreateBy(SecurityUtils.getUserName());
+                            weGroup.setCreateById(SecurityUtils.getUserId());
+                            weGroup.setUpdateBy(SecurityUtils.getUserName());
+                            weGroup.setUpdateById(SecurityUtils.getUserId());
+                            weGroup.setCreateTime(new Date());
+                            weGroup.setUpdateTime(new Date());
+                            weGroups.add(weGroup);
+
+                        }
 
 
-
-
-
-            groupChatList.stream().forEach(k->{
-
-                WeGroup weGroup = new WeGroup();
-                weGroup.setChatId(k.getChatId());
-                weGroup.setGroupName("@企微群");
-                weGroup.setDelFlag(Constants.COMMON_STATE);
-                weGroup.setCreateBy(SecurityUtils.getUserName());
-                weGroup.setCreateById(SecurityUtils.getUserId());
-                weGroup.setUpdateBy(SecurityUtils.getUserName());
-                weGroup.setUpdateById(SecurityUtils.getUserId());
-                weGroup.setCreateTime(new Date());
-                weGroup.setUpdateTime(new Date());
-
-
-                if(CollectionUtil.isNotEmpty(weGroupList)) {
-                    WeGroup oldWeGroup
-                            = weGroupList.stream().filter(item -> item.getChatId().equals(k.getChatId())).findFirst().get();
-                    if(null != oldWeGroup){
-                        weGroup.setGroupName(oldWeGroup.getGroupName());
                     }
+
+
 
                 }
 
 
-                weGroups.add(weGroup);
+            }
 
-            });
+
+//
+//            List<WeGroup> weGroupList = this.list(new LambdaQueryWrapper<WeGroup>()
+//                    .in(WeGroup::getChatId, groupChatList.stream().map(WeGroupChatListVo.GroupChat::getChatId).collect(Collectors.toList())));
+//
+//
+//
+//
+//
+//            groupChatList.stream().forEach(k->{
+//
+//                WeGroup weGroup = new WeGroup();
+//                weGroup.setChatId(k.getChatId());
+//                weGroup.setGroupName("@企微群");
+//                weGroup.setDelFlag(Constants.COMMON_STATE);
+//                weGroup.setCreateBy(SecurityUtils.getUserName());
+//                weGroup.setCreateById(SecurityUtils.getUserId());
+//                weGroup.setUpdateBy(SecurityUtils.getUserName());
+//                weGroup.setUpdateById(SecurityUtils.getUserId());
+//                weGroup.setCreateTime(new Date());
+//                weGroup.setUpdateTime(new Date());
+//
+//
+//                if(CollectionUtil.isNotEmpty(weGroupList)) {
+//                    WeGroup oldWeGroup
+//                            = weGroupList.stream().filter(item -> item.getChatId().equals(k.getChatId())).findFirst().get();
+//                    if(null != oldWeGroup){
+//                        weGroup.setGroupName(oldWeGroup.getGroupName());
+//                    }
+//
+//                }
+//
+//
+//                weGroups.add(weGroup);
+//
+//            });
 
 
 
@@ -282,10 +370,12 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
 
     @Override
     public void getGroupChatList( List<WeGroupChatListVo.GroupChat> groupChatList,WeGroupChatListQuery chatListQuery){
+        chatListQuery.setLimit(500);
         WeGroupChatListVo groupChatListVo = qwCustomerClient.getGroupChatList(chatListQuery).getData();
         if (groupChatListVo.getErrCode().equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())
                 && CollectionUtil.isNotEmpty(groupChatListVo.getGroupChatList())) {
             groupChatList.addAll(groupChatListVo.getGroupChatList());
+
             if(StringUtils.isNotEmpty(groupChatListVo.getNextCursor())){
                 chatListQuery.setCursor(groupChatListVo.getNextCursor());
                 getGroupChatList(groupChatList,chatListQuery);
@@ -339,6 +429,18 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             }
             insertBatchGroupAndMember(weGroups, weGroupMembers,isCallBack);
             weCustomerTrajectoryService.createBuildOrDissGroupTrajectory(weGroups,true);
+
+
+            if(isCallBack){
+                //通知新群sop满足条件则加入执行计划
+                LinkGroupChatListVo linkGroupChatListVo=new LinkGroupChatListVo();
+                linkGroupChatListVo.setGroupName(weGroup.getGroupName());
+                linkGroupChatListVo.setChatId(weGroup.getChatId());
+                linkGroupChatListVo.setOwner(weGroup.getOwner());
+                linkGroupChatListVo.setAddTime(weGroup.getAddTime());
+                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getNewWeGroupSopRk(), JSONObject.toJSONString(linkGroupChatListVo));
+            }
+
         }
     }
 
@@ -354,6 +456,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     .eq(WeGroup::getChatId,chatId));
             weGroupMemberService.remove(new LambdaQueryWrapper<WeGroupMember>()
                     .eq(WeGroupMember::getChatId,chatId));
+
 
             weCustomerTrajectoryService.createBuildOrDissGroupTrajectory(weGroups,false);
         }
@@ -480,8 +583,10 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                                         groupChat.getOwner()
                                 )
                                 , "【客群动态】<br/><br/> 客户@"+groupMember.getName()+" 刚刚进入群聊"+groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(),false);
-                    }
 
+                        //添加消息通知
+                       weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),groupChat.getOwner(), MessageConstants.GROUP_ADD,  groupMember.getName(), groupChat.getName());
+                    }
                 }
 
             }
@@ -506,13 +611,11 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
                     memeber.setQuitScene(quitScene);
                     weGroupMemberService.quitGroup(quitScene,memeber.getUserId(),memeber.getChatId());
                     //为被添加员工发送一条消息提醒
-                    iWeMessagePushService.pushMessageSelfH5( ListUtil.toList(
-                                    groupChat.getOwner()
-                            )
-                            , "【客群动态】<br/><br/> 客户@"+memeber.getName()+" 刚刚退出群聊"+groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(),false);
+                    iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(groupChat.getOwner()), "【客群动态】<br/><br/> 客户@" + memeber.getName() + " 刚刚退出群聊" + groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(), false);
+                    //添加消息通知
+                    weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),groupChat.getOwner(),MessageConstants.GROUP_DELETE,memeber.getName(),groupChat.getName());
                 });
-
-                weCustomerTrajectoryService.createJoinOrExitGroupTrajectory(needQuitMemberList,groupChat.getName(),false);
+                weCustomerTrajectoryService.createJoinOrExitGroupTrajectory(needQuitMemberList, groupChat.getName(), false);
             }
         }
     }
@@ -536,4 +639,16 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             }
         }
     }
+
+    @Override
+    public List<WeGroup> findGroupByUserId(String chatUserId, String state) {
+        return this.baseMapper.findGroupByUserId(chatUserId,state);
+    }
+
+    @Override
+    public List<LinkGroupChatListVo> selectChatByMember(WeGroupChatQuery query) {
+        return this.baseMapper.selectChatByMember(query);
+    }
+
+
 }

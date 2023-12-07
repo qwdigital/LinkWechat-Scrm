@@ -31,27 +31,35 @@ public class FissionGroupMsgServiceImpl  extends AbstractGroupMsgSendTaskService
     private IWeFissionNoticeService iWeFissionNoticeService;
 
 
+
     @Override
     public void sendGroupMsg(WeAddGroupMessageQuery query) {
         LoginUser loginUser = query.getLoginUser();
-        SecurityContextHolder.setUserName(loginUser.getUserName());
-        SecurityContextHolder.setCorpId(loginUser.getCorpId());
-
+        if(null != loginUser){
+            SecurityContextHolder.setUserName(loginUser.getUserName());
+            SecurityContextHolder.setCorpId(loginUser.getCorpId());
+        }
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
         if(CollectionUtil.isNotEmpty(senderList)){
             senderList.stream().forEach(senderInfo -> {
                 WeAddCustomerMsgVo weAddCustomerMsgVo = sendSpecGroupMsgTemplate(query, senderInfo);
 
                  if (weAddCustomerMsgVo != null && ObjectUtil.equal(WeConstans.WE_SUCCESS_CODE, weAddCustomerMsgVo.getErrCode())) {
+                     //设置发送状态为已通知员工
                      iWeFissionNoticeService.update(WeFissionNotice.builder().msgId(weAddCustomerMsgVo.getMsgId()).build(),
-
                              new LambdaQueryWrapper<WeFissionNotice>()
                                      .eq(WeFissionNotice::getFissionId,query.getBusinessIds())
                                      .in(WeFissionNotice::getSendWeUserid, ListUtil.toList(senderInfo.getUserId().split(","))));
 
+
                  }
-
-
+//                 else{ //发送失败，修改为未发送
+//                     iWeFissionService.updateBatchFissionIsTipNoSend(
+//                             ListUtil.toList(WeFission.builder()
+//                                     .id(Long.parseLong(query.getBusinessIds()))
+//                                     .build())
+//                     );
+//                 }
 
             });
 

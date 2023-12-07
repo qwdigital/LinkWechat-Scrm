@@ -282,20 +282,20 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
 //        List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().eq(WeCustomer::getState, weQrCode.getState()));
 //        if (CollectionUtil.isNotEmpty(customerList)) {
-        //累计扫码次数
-        scanCountVo.setTotal(
-                weCustomerService.totalScanCodeNumber(weQrCode.getState())
-        );
-        //今日扫码次数
-        List<WeCustomerChannelCountVo> weCustomerChannelCountVos
-                = weCustomerService.countCustomerChannel(weQrCode.getState(), DateUtils.getDate(), DateUtils.getDate(), null);
-        if(CollectionUtil.isNotEmpty(weCustomerChannelCountVos)){
-            scanCountVo.setToday(
-                    weCustomerChannelCountVos.stream().findFirst().get().getCustomerNumber()
+            //累计扫码次数
+            scanCountVo.setTotal(
+                    weCustomerService.totalScanCodeNumber(weQrCode.getState())
             );
-        }else{
-            scanCountVo.setToday(0);
-        }
+            //今日扫码次数
+            List<WeCustomerChannelCountVo> weCustomerChannelCountVos
+                    = weCustomerService.countCustomerChannel(weQrCode.getState(), DateUtils.getDate(), DateUtils.getDate(), null);
+            if(CollectionUtil.isNotEmpty(weCustomerChannelCountVos)){
+                scanCountVo.setToday(
+                        weCustomerChannelCountVos.stream().findFirst().get().getCustomerNumber()
+                );
+            }else{
+                scanCountVo.setToday(0);
+            }
 
 
         weCustomerService

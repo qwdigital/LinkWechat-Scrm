@@ -1,6 +1,7 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeCustomerTrajectory;
 import com.linkwechat.domain.WeGroup;
@@ -12,6 +13,7 @@ import com.linkwechat.domain.groupchat.vo.LinkGroupChatVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatListQuery;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatListVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -23,6 +25,20 @@ import java.util.List;
  * @since 2022-04-02 13:35:13
  */
 public interface IWeGroupService extends IService<WeGroup> {
+
+    /**
+     * 获取群列表
+     * @param query
+     */
+    List<LinkGroupChatListVo> getPageList(WeGroupChatQuery query, PageDomain pageDomain);
+
+    /**
+     * 获取总数
+     * @param query
+     * @param pageDomain
+     * @return
+     */
+    long countWeGroupListIds(WeGroupChatQuery query);
 
     /**
      * 获取群列表
@@ -57,12 +73,15 @@ public interface IWeGroupService extends IService<WeGroup> {
     void synchWeGroupHandler(String msg);
 
 
-    /**
-     * 跟进条件同步客群
-     * @param chatListQuery
-     * @return
-     */
-    List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery);
+
+
+
+//    /**
+//     * 跟进条件同步客群
+//     * @param chatListQuery
+//     * @return
+//     */
+//    List<WeGroupChatListVo.GroupChat> synchWeGroup(WeGroupChatListQuery chatListQuery);
 
 
 
@@ -124,4 +143,25 @@ public interface IWeGroupService extends IService<WeGroup> {
      * @param updateDetail 变更类型
      */
     void changeGroup(String chatId, String updateDetail);
+
+
+    /**
+     * 根据群员id获取群id
+     * @param chatUserId
+     * @param state
+     * @return
+     */
+    List<WeGroup> findGroupByUserId(String chatUserId,String state);
+
+
+    /**
+     * 群成员id查询相关群
+     * @param query
+     * @return
+     */
+    List<LinkGroupChatListVo> selectChatByMember(WeGroupChatQuery query);
+
+
+
+
 }

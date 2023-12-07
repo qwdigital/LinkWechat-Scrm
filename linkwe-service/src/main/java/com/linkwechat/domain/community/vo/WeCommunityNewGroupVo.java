@@ -3,6 +3,7 @@ package com.linkwechat.domain.community.vo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.community.WeEmpleCodeTag;
 import com.linkwechat.domain.community.WeEmpleCodeUseScop;
@@ -12,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class WeCommunityNewGroupVo {
+public class WeCommunityNewGroupVo extends BaseEntity {
 
     private Long id;
 
@@ -21,8 +22,8 @@ public class WeCommunityNewGroupVo {
      */
     private String codeName;
 
-    @JsonIgnore
-    private Long groupCodeId;
+//    @JsonIgnore
+//    private Long groupCodeId;
 
     @JsonIgnore
     private Long emplCodeId;
@@ -38,12 +39,16 @@ public class WeCommunityNewGroupVo {
     @TableField(exist = false)
     private String welcomeMsg;
 
-    /**
-     * 群活码信息
-     */
-    @TableField(exist = false)
-    private WeGroupCodeVo groupCodeInfo;
+//    /**
+//     * 群活码信息
+//     */
+//    @TableField(exist = false)
+//    private WeGroupCodeVo groupCodeInfo;
 
+    /**
+     * 群活码url
+     */
+    private String codeUrl;
     /**
      * 员工信息
      */
@@ -86,9 +91,30 @@ public class WeCommunityNewGroupVo {
     private String actualGroupName;
 
     /**
+     * 链接标题
+     */
+    private String linkTitle;
+
+    /**
+     * 链接描述
+     */
+    private String linkDesc;
+
+    /**
+     * 链接封面
+     */
+    private String linkCoverUrl;
+
+
+    /**
+     * 实际群id，多个实用逗号隔开
+     */
+    private String chatIdList;
+
+    /**
      * 创建时间
      */
-     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime = new Date();
 
 }

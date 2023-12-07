@@ -20,7 +20,7 @@ public class WeKfUser {
     private String userName;
 
     @ApiModelProperty("部门id")
-    private Integer departmentId;
+    private Long departmentId;
 
     @ApiModelProperty("部门名称")
     private String deptName;

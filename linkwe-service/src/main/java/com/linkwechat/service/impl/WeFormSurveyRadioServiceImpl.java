@@ -50,7 +50,7 @@ public class WeFormSurveyRadioServiceImpl extends ServiceImpl<WeFormSurveyRadioM
     @Override
     public List<WeFormSurveyRadio> selectDefaultValue(WeFormSurveyRadioQuery query) {
         QueryWrapper<WeFormSurveyRadio> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("DISTINCT default_value");
+        queryWrapper.select("DISTINCT form_code_id, default_value");
         if (StringUtils.isNotBlank(query.getDataSource())){
             queryWrapper.eq("data_source",query.getDataSource());
         }

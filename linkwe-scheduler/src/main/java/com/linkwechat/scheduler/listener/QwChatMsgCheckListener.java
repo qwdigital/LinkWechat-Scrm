@@ -92,7 +92,9 @@ public class QwChatMsgCheckListener {
             objectString.append(jsonObject.getString("info"));
         }
         //获取所有的敏感词规则
-        List<WeSensitive> allSensitiveRules = weSensitiveService.selectWeSensitiveList(new WeSensitive());
+        List<WeSensitive> allSensitiveRules = weSensitiveService.selectWeSensitiveList(WeSensitive.builder()
+                        .alertFlag(1)
+                .build());
         //根据规则过滤命中
         if (CollectionUtils.isNotEmpty(allSensitiveRules)) {
             String finalContent = objectString.toString();
@@ -100,19 +102,19 @@ public class QwChatMsgCheckListener {
                 List<String> patternWords = Arrays.asList(weSensitive.getPatternWords().split(","));
                 List<String> users = weSensitiveService.getScopeUsers(weSensitive.getAuditUserScope());
                 if (StringUtils.isNotBlank(finalContent)
-                        && CollectionUtils.isNotEmpty(users)
-                        && users.stream().anyMatch(user -> user.contains(fromId))) {
+                        && ((CollectionUtils.isNotEmpty(users) && users.stream().anyMatch(user -> user.contains(fromId)))
+                        || StringUtils.isEmpty(weSensitive.getAuditUserScope()))) {
                     WeChatContactSensitiveMsg wccsm = hitSensitive(patternWords, finalContent);
                     if (wccsm != null) {
                         wccsm.setMsgId(msgId);
                         wccsm.setFromId(fromId);
                         wccsm.setMsgTime(new Date(jsonObject.getLong("msgtime")));
                         if (weChatContactSensitiveMsgService.save(wccsm)) {
-                            QwAppMsgBody qwAppMsgBody=new QwAppMsgBody();
+                            QwAppMsgBody qwAppMsgBody = new QwAppMsgBody();
                             //发送人指定员工
                             qwAppMsgBody.setCorpUserIds(Collections.singletonList(weSensitive.getAuditUserId()));
                             //设置消息模板
-                            WeMessageTemplate template=new WeMessageTemplate();
+                            WeMessageTemplate template = new WeMessageTemplate();
                             template.setMsgType(MessageType.TEXT.getMessageType());
                             template.setContent("有消息触发敏感词，请登录系统及时处理!");
                             qwAppMsgBody.setMessageTemplates(template);

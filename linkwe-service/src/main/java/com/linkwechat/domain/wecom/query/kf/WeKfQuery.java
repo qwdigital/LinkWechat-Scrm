@@ -37,5 +37,5 @@ public class WeKfQuery extends WeBaseQuery {
     private List<String> userid_list;
 
     @ApiModelProperty("接待人员部门id列表")
-    private List<Integer> department_id_list;
+    private List<Long> department_id_list;
 }

@@ -1,6 +1,5 @@
 package com.linkwechat.scheduler.service.impl.welcome;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;

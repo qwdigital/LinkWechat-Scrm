@@ -65,6 +65,15 @@ public class LoginUser implements Serializable
     /**朋友圈同步需要的字段*/
     private Integer filterType;
 
+    /**业务id，多个使用逗号隔开**/
+    private String businessIds;
+
     /**企业微信员工id集合*/
     private List<String> weUserIds;
+
+    /**企微客群id集合*/
+    private List<String> chatIds;
+
+    /**客户id集合*/
+    private List<String> extIds;
 }

@@ -26,7 +26,12 @@ public class MybatisPlusConfig {
         return interceptor;
     }
 
-    //pagehelper 分页配置
+    @Bean
+    public BatchSqlInjector easySqlInjector () {
+        return new BatchSqlInjector();
+    }
+
+        //pagehelper 分页配置
     @Bean
     public ConfigurationCustomizer mybatisConfigurationCustomizer() {
         return new ConfigurationCustomizer() {

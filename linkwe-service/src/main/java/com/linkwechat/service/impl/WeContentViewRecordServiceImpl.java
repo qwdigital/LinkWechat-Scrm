@@ -6,20 +6,21 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.constant.MessageConstants;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.enums.TrajectorySceneType;
 import com.linkwechat.common.enums.TrajectoryType;
+import com.linkwechat.common.enums.message.MessageTypeEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
-import com.linkwechat.domain.WeCorpAccount;
-import com.linkwechat.domain.WeCustomer;
-import com.linkwechat.domain.WeCustomerTrajectory;
-import com.linkwechat.domain.WeUnionidExternalUseridRelation;
+import com.linkwechat.domain.*;
+import com.linkwechat.domain.customer.WeMakeCustomerTag;
 import com.linkwechat.domain.material.entity.WeContentTalk;
 import com.linkwechat.domain.material.entity.WeContentViewRecord;
 import com.linkwechat.domain.material.entity.WeMaterial;
@@ -35,6 +36,7 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.*;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +61,8 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
     private QwSysUserClient qwSysUserClient;
     @Resource
     private WeMaterialMapper weMaterialMapper;
+    @Resource
+    private IWeMessageNotificationService weMessageNotificationService;
 
 
     @Resource
@@ -68,6 +72,14 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
      */
     @Resource
     private WeCustomerTrajectoryMapper weCustomerTrajectoryMapper;
+
+
+    @Resource
+    private IWeCustomerService iWeCustomerService;
+
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
 
     @Override
@@ -143,11 +155,11 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         List<ContentDataDetailVo> contentDataDetailVos = this.baseMapper.findContentDataDetailVos(String.valueOf(contentDetailQuery.getContentId())
                 , contentDetailQuery.getBeginTime(), contentDetailQuery.getEndTime());
 
-        if(CollectionUtil.isNotEmpty(contentDataDetailVos)){
+        if (CollectionUtil.isNotEmpty(contentDataDetailVos)) {
             contentDataDetailVos.stream().forEach(contentDataDetailVo -> {
-                if(contentDataDetailVo.getViewDuration()!= null){
+                if (contentDataDetailVo.getViewDuration() != null) {
                     contentDataDetailVo.setViewDurationCpt(DateUtils.formatTime(
-                            contentDataDetailVo.getViewDuration().longValue()*1000
+                            contentDataDetailVo.getViewDuration().longValue() * 1000
                     ));
                 }
 
@@ -268,44 +280,20 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
 
 
 
-        //获取员工对应的企业信息
-//        WeCorpAccount weCorpAccount = iWeCorpAccountService.getCorpAccountByCorpId(null);
-//        SecurityContextHolder.setCorpId(weCorpAccount.getCorpId());
-
-//        //1.根据openId和unionId获取客户的ExternalUserId
-//        WeUnionidExternalUseridRelation weUnionidExternalUseridRelation = weUnionidExternalUseridRelationService.get(weContentViewRecordQuery.getOpenid(), weContentViewRecordQuery.getUnionid());
-//        //2.根据ExternalUserId获取客户信息
-//        WeCustomer weCustomer = null;
-//        if (ObjectUtil.isNotEmpty(weUnionidExternalUseridRelation)) {
-//            String externalUserid = weUnionidExternalUseridRelation.getExternalUserid();
-//            if (StringUtils.isNotBlank(externalUserid)) {
-//                LambdaQueryWrapper<WeCustomer> queryWrapper = new LambdaQueryWrapper<>();
-//                queryWrapper.select(WeCustomer::getExternalUserid, WeCustomer::getCustomerName, WeCustomer::getCustomerType, WeCustomer::getAvatar);
-//                queryWrapper.eq(WeCustomer::getExternalUserid, externalUserid);
-//                queryWrapper.last("limit 1");
-//                List<WeCustomer> weCustomers = weCustomerMapper.selectList(queryWrapper);
-//                if (weCustomers != null && weCustomers.size() > 0) {
-//                    weCustomer = weCustomers.get(0);
-//                }
-//            }
-//        }
-//
-
         //根据unionId获取客户
         WeCustomer weCustomer = null;
-        if(StringUtils
-                .isNotEmpty(weContentViewRecordQuery.getUnionid())){
+        if (StringUtils
+                .isNotEmpty(weContentViewRecordQuery.getUnionid())) {
 
 
             List<WeCustomer> weCustomers = weCustomerMapper.selectList(new LambdaQueryWrapper<WeCustomer>()
+                    .eq(WeCustomer::getAddUserId,data.getWeUserId())
                     .eq(WeCustomer::getUnionid, weContentViewRecordQuery.getUnionid()));
 
-            if(CollectionUtil.isNotEmpty(weCustomers)){
-                weCustomer=weCustomers.stream().findFirst().get();
+            if (CollectionUtil.isNotEmpty(weCustomers)) {
+                weCustomer = weCustomers.stream().findFirst().get();
             }
         }
-
-
 
 
         //3.添加查看数据
@@ -337,7 +325,7 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //非企业客户
             weContentViewRecord.setIsCustomer(0);
         }
-        int insert = weContentViewRecordMapper.insert(weContentViewRecord);
+         weContentViewRecordMapper.insert(weContentViewRecord);
 
 
         //素材信息
@@ -362,6 +350,24 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
         sb.append(minutes != 0L ? minutes + "分" : "");
         sb.append(second != 0L ? second + "秒" : "");
 
+
+        //给客户打标签
+        if(ObjectUtil.isNotEmpty(weCustomer)){
+            if(StringUtils.isNotEmpty(weMaterial.getTagIds())){
+                List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                        .in(WeTag::getTagId, weMaterial.getTagIds().split(",")));
+                if(CollectionUtil.isNotEmpty(weTags)){
+                    iWeCustomerService.makeLabel(WeMakeCustomerTag.builder()
+                            .addTag(weTags)
+                            .userId(weCustomer.getAddUserId())
+                            .source(false)
+                            .externalUserid(weCustomer.getExternalUserid())
+                            .build());
+                }
+            }
+
+        }
+
         //4.发送应用通知消息。由RabbitMQ进行解耦
         if (ObjectUtil.isNotEmpty(weCustomer)) {
 
@@ -378,6 +384,9 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             weMessageTemplate.setContent("【客户动态】\r\n\r\n 客户 " + weCustomer.getCustomerName() + " 查看了您发送的素材 「" + weMaterial.getMaterialName() + "」" + sb.toString());
             qwAppMsgBody.setMessageTemplates(weMessageTemplate);
             qwAppSendMsgService.appMsgSend(qwAppMsgBody);
+
+            //添加消息通知
+            weMessageNotificationService.save(MessageTypeEnum.MATERIAL.getType(), data.getWeUserId(), MessageConstants.MATERIAL_LOOK, weCustomer.getCustomerName(), weMaterial.getMaterialName(), sb.toString());
         }
 
         //5.添加客户轨迹
@@ -411,8 +420,10 @@ public class WeContentViewRecordServiceImpl extends ServiceImpl<WeContentViewRec
             //标题
             weCustomerTrajectory.setTitle(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
             //文案内容,整体内容
-            String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString());
-            weCustomerTrajectory.setContent(TrajectoryType.TRAJECTORY_TYPE_HDGZ.getName());
+
+            weCustomerTrajectory.setContent(
+                    String.format(TrajectorySceneType.TRAJECTORY_TITLE_LOOK_MATERIAL.getMsgTpl(), weCustomer.getCustomerName(), data.getUserName(), sb.toString())
+            );
             //
             weCustomerTrajectory.setMaterialId(weMaterial.getId());
             weCustomerTrajectoryMapper.insert(weCustomerTrajectory);

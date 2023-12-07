@@ -1,11 +1,14 @@
 package com.linkwechat.web.controller.system;
 
 import cn.hutool.core.collection.ListUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.dtflys.forest.annotation.Post;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -25,12 +28,8 @@ import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.domain.WeConfigParamInfo;
 import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WxUser;
-import com.linkwechat.domain.corp.query.WeCorpAccountQuery;
-import com.linkwechat.domain.corp.vo.WeCorpAccountVo;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
-import com.linkwechat.domain.user.vo.WeUserScreenConditVo;
-import com.linkwechat.domain.wecom.vo.user.WeLeaveUserVo;
 import com.linkwechat.domain.wecom.vo.user.WeUserDetailVo;
 import com.linkwechat.framework.service.TokenService;
 import com.linkwechat.service.*;
@@ -104,15 +103,20 @@ public class SysUserController extends BaseController {
     @Autowired
     private IWeStrackStageService iWeStrackStageService;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
 
 
     /**
      * 获取用户列表
      */
-    ////@PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
     @ApiOperation(value = "用户列表")
     public TableDataInfo list(SysUser user) {
+
+        if(user.isCheckIsRoot()&&iSysDeptService.isRoot(user.getDeptId())){ //判断是不是跟节点，如果是查询条件为查询所有部门下的包括本部门的数据
+            user.setDeptId(null);
+        }
         List<UserVo> userVos = userService.selectUserVoList(user, TableSupport.buildPageRequest());
         TableDataInfo dataTable
                 = getDataTable(userVos);
@@ -135,12 +139,10 @@ public class SysUserController extends BaseController {
     @GetMapping("/listAll")
     public AjaxResult<List<SysUser>> listAll(String userName) {
         return AjaxResult.success(userService.list(
-                new LambdaQueryWrapper<SysUser>().like(StringUtils.isNotEmpty(userName), SysUser::getUserName, userName)
+                new LambdaQueryWrapper<SysUser>().eq(SysUser::getDelFlag, Constants.COMMON_STATE).like(StringUtils.isNotEmpty(userName), SysUser::getUserName, userName)
         ));
     }
 
-    //    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-    ////@PreAuthorize("@ss.hasPermi('system:user:export')")
     @GetMapping("/export")
     public AjaxResult export(SysUser user) {
         List<SysUser> list = userService.selectUserList(user);
@@ -186,18 +188,30 @@ public class SysUserController extends BaseController {
     /**
      * 新增用户
      */
-    @PostMapping
-    public AjaxResult add(@Validated @RequestBody SysUserDTO user) {
-        userService.addUser(user);
+    @PostMapping("/callback/add")
+    public AjaxResult callBackAdd(@RequestBody SysUserQuery query) {
+        userService.addUser(query);
         return AjaxResult.success();
     }
 
     /**
      * 修改用户
      */
-    @PutMapping
-    public AjaxResult edit(@Validated @RequestBody SysUserDTO user) {
-        userService.updateUser(user);
+    @PutMapping("/callback/edit")
+    public AjaxResult callbackEdit(@RequestBody SysUserQuery query) {
+        userService.updateUser(query);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 回掉移除用户
+     *
+     * @param weUserIds
+     * @return
+     */
+    @DeleteMapping("/callback/{userIds}")
+    public AjaxResult callBackRemove(@PathVariable("userIds") List<String> weUserIds) {
+        userService.leaveUser(weUserIds);
         return AjaxResult.success();
     }
 
@@ -217,10 +231,11 @@ public class SysUserController extends BaseController {
 
     /**
      * 编辑数据权限
+     *
      * @return
      */
     @PostMapping("/editDataScop")
-    public AjaxResult editDataScop(@RequestBody SysUserDTO user){
+    public AjaxResult editDataScop(@RequestBody SysUserDTO user) {
         userService.editDataScop(user);
         return AjaxResult.success();
     }
@@ -232,10 +247,9 @@ public class SysUserController extends BaseController {
 //    @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
     public AjaxResult remove(@PathVariable String[] userIds) {
-        userService.leaveUser(userIds);
+        userService.leaveUser(ListUtil.toList(userIds));
         return AjaxResult.success();
     }
-
 
 
     /**
@@ -248,7 +262,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/callBackRemove/{corpId}/{userIds}")
     public AjaxResult callBackRemove(@PathVariable String corpId, @PathVariable String[] userIds) {
 
-        userService.leaveUser(userIds);
+        userService.leaveUser(ListUtil.toList(userIds));
 
         return AjaxResult.success();
 
@@ -257,8 +271,7 @@ public class SysUserController extends BaseController {
     /**
      * 重置密码
      */
-    ////@PreAuthorize("@ss.hasPermi('system:user:edit')")
-//    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @Deprecated
     @PutMapping("/resetPwd")
     public AjaxResult resetPwd(@RequestBody SysUser user) {
         userService.checkUserAllowed(user);
@@ -388,9 +401,9 @@ public class SysUserController extends BaseController {
      *
      * @param msg
      */
-    @GetMapping("/syncUserAndDeptHandler")
-    public AjaxResult syncUserAndDeptHandler(String msg) {
-        userService.syncUserAndDeptHandler(msg);
+    @PostMapping("/syncUserHandler")
+    public AjaxResult syncUserHandler(@RequestBody JSONObject msg) {
+        userService.syncUserHandler(msg);
         return AjaxResult.success();
     }
 
@@ -424,33 +437,32 @@ public class SysUserController extends BaseController {
     public AjaxResult<WxUser> getWxInfo() {
         WxLoginUser wxLoginUser = SecurityUtils.getWxLoginUser();
         WxUser customerInfo = wxUserService.getCustomerInfo(wxLoginUser.getOpenId(), wxLoginUser.getUnionId());
+        customerInfo.setEnableFilePreview(linkWeChatConfig.isEnableFilePreview());
         return AjaxResult.success(customerInfo);
     }
 
 
     /**
      * 根据weUserIds，positions，deptIds批量查询
+     *
      * @param weUserIds
      * @param positions
      * @param deptIds
      * @return
      */
     @GetMapping("/findAllSysUser")
-    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions,String deptIds){
-
-        return AjaxResult.success(
-                userService.findAllSysUser(weUserIds,positions,deptIds)
-        );
-
+    public AjaxResult<List<SysUser>> findAllSysUser(String weUserIds, String positions, String deptIds) {
+        return AjaxResult.success(userService.findAllSysUser(weUserIds, positions, deptIds));
     }
 
     /**
      * 根据weuserid获取员工，如果没有则从企业微信端同步
+     *
      * @param weuserId
      * @return
      */
     @GetMapping("/findOrSynchSysUser/{weuserId}")
-    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId){
+    public AjaxResult<SysUser> findOrSynchSysUser(@PathVariable("weuserId") String weuserId) {
         return AjaxResult.success(
                 userService.findOrSynchSysUser(weuserId)
         );
@@ -510,40 +522,43 @@ public class SysUserController extends BaseController {
 
     /**
      * 更新员工开启会话存档状态
+     *
      * @param query
      * @return
      */
     @PutMapping("/update/chat/status")
-    public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query){
+    public AjaxResult updateUserChatStatus(@RequestBody SysUserQuery query) {
         userService.updateUserChatStatus(query);
         return AjaxResult.success();
     }
 
     /**
      * 通过企微员工ID获取员工信息
+     *
      * @param query
      * @return
      */
     @PostMapping("/getUserListByWeUserIds")
-    public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@Validated @RequestBody SysUserQuery query){
-        List<SysUserVo> sysUserList  = userService.getUserListByWeUserIds(query);
+    public AjaxResult<List<SysUserVo>> getUserListByWeUserIds(@Validated @RequestBody SysUserQuery query) {
+        List<SysUserVo> sysUserList = userService.getUserListByWeUserIds(query);
         return AjaxResult.success(sysUserList);
     }
 
 
     /**
      * 根据职位等条件筛选员工
+     *
      * @param weUserIds
      * @param deptIds
      * @param positions
      * @return
      */
     @GetMapping("/screenConditWeUser")
-    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds,String positions){
+    public AjaxResult<List<String>> screenConditWeUser(String weUserIds, String deptIds, String positions) {
 
 
         return AjaxResult.success(
-                userService.screenConditWeUser(weUserIds,deptIds,positions)
+                userService.screenConditWeUser(weUserIds, deptIds, positions)
         );
 
     }
@@ -551,17 +566,49 @@ public class SysUserController extends BaseController {
 
     /**
      * 批量构建离职员工
+     *
      * @param sysUsers
      * @return
      */
     @PostMapping("/builderLeaveSysUser")
-    public AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers){
+    public AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers) {
 
         userService.builderLeaveSysUser(sysUsers.getSysUsers());
 
 
         return AjaxResult.success();
 
+    }
+
+    /**
+     * 更新用户动态日报开启状态
+     *
+     * @param openDaily 0开启，1关闭
+     * @return {@link AjaxResult}
+     * @author WangYX
+     * @date 2023/07/26 10:04
+     */
+    @PutMapping("/update/open/daily")
+    public AjaxResult updateOpenDaily(@Validated @RequestParam("openDaily") Integer openDaily) {
+        LambdaUpdateWrapper<SysUser> updateWrapper = Wrappers.lambdaUpdate(SysUser.class);
+        updateWrapper.eq(SysUser::getUserId, SecurityUtils.getLoginUser().getSysUser().getUserId());
+        updateWrapper.set(SysUser::getOpenDaily, openDaily);
+        userService.update(updateWrapper);
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 根据id查询指定员工
+     * @param query
+     * @return
+     */
+    @PostMapping("/findSysUser")
+    public AjaxResult<List<SysUser>> findSysUser(@RequestBody SysUserQuery query){
+        return AjaxResult.success(
+                userService.list(new LambdaQueryWrapper<SysUser>()
+                        .in(SysUser::getWeUserId,query.getWeUserIds()))
+        );
     }
 
 

@@ -56,6 +56,9 @@ public class WeIndexController {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private IWeCustomerLinkService iWeCustomerLinkService;
+
     /**
      * 系统首页相关基础数据获取
      *
@@ -224,5 +227,47 @@ public class WeIndexController {
         PrintWriter writer = resp.getWriter();
         writer.write(StringUtils.format(result, short2LongUrl.toJSONString()).toCharArray());
         writer.close();
+    }
+
+
+    @ShortLinkView(prefix = "l:")
+    @ApiOperation(value = "获客助手短链换取长链", httpMethod = "GET")
+    @GetMapping(value = "/l/{shortUrl}")
+    public void getLinkShort2LongUrl(HttpServletRequest request,
+                                     HttpServletResponse resp,
+                                     @PathVariable("shortUrl") String shortUrl) throws IOException {
+        log.info("获客助手短链换取长链 shortUrl:{}", shortUrl);
+
+        if (StringUtils.isEmpty(shortUrl) || Objects.equals("undefined",shortUrl)) {
+            return;
+        }
+        String ipAddr = IpUtils.getIpAddr(request);
+
+        String key = "we:link:linkUrl:" + ipAddr + ":" + shortUrl;
+
+        JSONObject short2LongUrl = new JSONObject();
+        //判断键是否存在
+        Boolean hasKey = redisService.hasKey(key);
+        if (hasKey) {
+            short2LongUrl = (JSONObject) redisService.getCacheObject(key);
+        } else {
+            //尝试加锁
+            Boolean lock = redisService.tryLock(key, "lock", 2L);
+            if (lock) {
+                short2LongUrl = iWeCustomerLinkService.getShort2LongUrl(shortUrl);
+                log.info("活码短链换取长链的数据：{}", short2LongUrl.toJSONString());
+                if (StringUtils.isNotEmpty(short2LongUrl.getString("errorMsg"))) {
+                    redisService.setCacheObject(key, short2LongUrl, 5, TimeUnit.MINUTES);
+                } else {
+                    redisService.setCacheObject(key, short2LongUrl, 1, TimeUnit.DAYS);
+                }
+                //释放锁
+                redisService.unLock(key, "lock");
+            } else {
+                throw new WeComException("操作过于频繁，请稍后再试");
+            }
+        }
+
+        resp.sendRedirect(short2LongUrl.getString("linkUrl"));
     }
 }

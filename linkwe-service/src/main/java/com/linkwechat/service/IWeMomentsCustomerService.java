@@ -27,7 +27,7 @@ public interface IWeMomentsCustomerService extends IService<WeMomentsCustomer> {
      * @author WangYX
      * @date 2023/06/07 17:01
      */
-    Integer estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request);
+    long estimateCustomerNum(WeMomentsTaskEstimateCustomerNumRequest request);
 
     /**
      * 预估客户
@@ -72,5 +72,9 @@ public interface IWeMomentsCustomerService extends IService<WeMomentsCustomer> {
      */
     void syncMomentsCustomerSendSuccess(Long weMomentsTaskId, String momentsId);
 
-
+    /**
+     * 批量插入
+     * @param weMomentsCustomers
+     */
+    void saveBatch(List<WeMomentsCustomer> weMomentsCustomers);
 }

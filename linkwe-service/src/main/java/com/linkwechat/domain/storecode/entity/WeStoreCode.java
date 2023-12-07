@@ -27,6 +27,7 @@ public class WeStoreCode extends BaseEntity {
     @ExcelIgnore
     private Long id;
     //门店名称
+    @Excel(name = "门店名称")
     @ExcelProperty("门店名称")
     private String storeName;
     //省id
@@ -39,9 +40,11 @@ public class WeStoreCode extends BaseEntity {
     @ExcelIgnore
     private Integer areaId;
     //省市区
+    @Excel(name = "所属地区")
     @ExcelProperty("所属地区")
     private String area;
     //详细地址
+    @Excel(name = "详细地址")
     @ExcelProperty("详细地址")
     private String address;
     //经度
@@ -90,4 +93,4 @@ public class WeStoreCode extends BaseEntity {
     @ExcelIgnore
     private String state;
 
- }
+}

@@ -7,6 +7,8 @@ import com.linkwechat.domain.wecom.query.customer.WeBatchCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerListQuery;
 import com.linkwechat.domain.wecom.query.customer.WeCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.*;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerCountQuery;
+import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerListsQuery;
 import com.linkwechat.domain.wecom.query.customer.link.WeLinkCustomerQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeAddMomentQuery;
 import com.linkwechat.domain.wecom.query.customer.moment.WeMomentQuery;
@@ -35,7 +37,10 @@ import com.linkwechat.domain.wecom.vo.customer.WeCustomerDetailVo;
 import com.linkwechat.domain.wecom.vo.customer.WeCustomerListVo;
 import com.linkwechat.domain.wecom.vo.customer.WeFollowUserListVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.*;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerAcquisitionQuotaVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerListsVo;
 import com.linkwechat.domain.wecom.vo.customer.link.WeLinkCustomerVo;
+import com.linkwechat.domain.wecom.vo.customer.link.WeLinkWecustomerCountVo;
 import com.linkwechat.domain.wecom.vo.customer.moment.*;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
@@ -56,6 +61,7 @@ import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayListVo;
 import com.linkwechat.domain.wecom.vo.qr.WeContactWayVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
+import com.linkwechat.wecom.interceptor.WeContactTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 
 /**
@@ -217,11 +223,10 @@ public interface WeCustomerClient {
 
     /**
      * 获取企业标签库
-     *
      * @param query
      * @return WeCorpTagListVo
      */
-    @Request(url = "/externalcontact/get_corp_tag_list", type = "POST")
+    @Request(url = "/externalcontact/get_corp_tag_list", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeCorpTagListVo getCorpTagList(@JSONBody WeCorpTagListQuery query);
 
     /**
@@ -230,7 +235,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeCorpTagVo
      */
-    @Request(url = "/externalcontact/add_corp_tag", type = "POST")
+    @Request(url = "/externalcontact/add_corp_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeCorpTagVo addCorpTag(@JSONBody WeAddCorpTagQuery query);
 
 
@@ -240,7 +245,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeResultVo
      */
-    @Request(url = "/externalcontact/edit_corp_tag", type = "POST")
+    @Request(url = "/externalcontact/edit_corp_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeResultVo editCorpTag(@JSONBody WeUpdateCorpTagQuery query);
 
 
@@ -250,7 +255,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeResultVo
      */
-    @Request(url = "/externalcontact/del_corp_tag", type = "POST")
+    @Request(url = "/externalcontact/del_corp_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeResultVo delCorpTag(@JSONBody WeCorpTagListQuery query);
 
     /**
@@ -259,7 +264,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeResultVo
      */
-    @Request(url = "/externalcontact/mark_tag", type = "POST")
+    @Request(url = "/externalcontact/mark_tag", type = "POST" ,interceptor =WeContactTokenInterceptor.class)
     WeResultVo markCustomerTag(@JSONBody WeMarkTagQuery query);
 
     /**
@@ -322,7 +327,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeGroupChatListVo
      */
-    @Request(url = "/externalcontact/groupchat/list", type = "POST")
+    @Request(url = "/externalcontact/groupchat/list", type = "POST",interceptor= WeContactTokenInterceptor.class)
     WeGroupChatListVo getGroupChatList(@JSONBody WeGroupChatListQuery query);
 
     /**
@@ -331,7 +336,7 @@ public interface WeCustomerClient {
      * @param query
      * @return WeGroupChatDetailVo
      */
-    @Request(url = "/externalcontact/groupchat/get", type = "POST")
+    @Request(url = "/externalcontact/groupchat/get", type = "POST",interceptor= WeContactTokenInterceptor.class)
     WeGroupChatDetailVo getGroupChatDetail(@JSONBody WeGroupChatDetailQuery query);
 
     /**
@@ -592,7 +597,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/create_link")
+    @Post(url="/externalcontact/customer_acquisition/create_link")
     WeLinkCustomerVo createCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -603,7 +608,7 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/update_link")
+    @Post(url="/externalcontact/customer_acquisition/update_link")
     WeResultVo updateCustomerLink(@JSONBody WeLinkCustomerQuery query);
 
 
@@ -614,8 +619,33 @@ public interface WeCustomerClient {
      * @param query
      * @return
      */
-    @Post("/externalcontact/customer_acquisition/delete_link")
+    @Post(url="/externalcontact/customer_acquisition/delete_link")
     WeResultVo deleteCustomerLink(@JSONBody WeLinkCustomerQuery query);
+
+
+    /**
+     * 获取获客列表
+     * @return
+     */
+    @Post(url="/externalcontact/customer_acquisition/customer")
+    WeLinkWecustomerCountVo customerLinkCount(@JSONBody WeLinkCustomerCountQuery query);
+
+
+    /**
+     * 企业可通过此接口查询当前剩余的使用量。
+     * @return
+     */
+    @Get(url="/externalcontact/customer_acquisition_quota")
+    WeLinkCustomerAcquisitionQuotaVo customerAcquisitionQuota(@JSONBody WeBaseQuery query);
+
+
+    /**
+     * 获取获客链接列表
+     * @param customerListsQuery
+     * @return
+     */
+    @Post(url = "/externalcontact/customer_acquisition/list_link")
+    WeLinkCustomerListsVo listCustomerLink(@JSONBody WeLinkCustomerListsQuery customerListsQuery);
 
 
 

@@ -48,11 +48,11 @@
             we_content_send_record
         WHERE
             send_by is not null
-          <if test="contentId != null and contentId != ''">
+          <if test="contentId != null">
               AND  content_id = #{contentId}
           </if>
 
-          <if test="talkId != null and talkId != ''">
+          <if test="talkId != null">
               AND  talk_id = #{talkId}
           </if>
 

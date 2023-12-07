@@ -1,7 +1,9 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFlowerCustomerTagRel;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -56,6 +58,24 @@ public interface IWeFlowerCustomerTagRelService extends IService<WeFlowerCustome
      * @date 2023/06/30 18:35
      */
     List<WeFlowerCustomerTagRel> getListByTagIdAndUserId(List<String> tagIds, List<String> userIds);
+
+
+
+    /**
+     * 批量获取员工对应的标签
+     * @param weCustomers
+     * @return
+     */
+    List<WeFlowerCustomerTagRel> findConcatNowAddWeFlowerCustomerTagRel(List<WeCustomer> weCustomers);
+
+
+
+    /**
+     * 批量删除客户对应的标签关系
+     * @param weCustomers
+     * @return
+     */
+    void removeConcatNowAddWeFlowerCustomerTagRel(List<WeCustomer> weCustomers);
 
 
 }

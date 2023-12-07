@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeLeadsManualAddRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkwechat.domain.leads.leads.entity.WeLeadsManualAddRecord">
+        <id column="id" property="id"/>
+        <result column="we_user_id" property="weUserId"/>
+        <result column="leads_id" property="leadsId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, we_user_id, leads_id
+    </sql>
+
+</mapper>

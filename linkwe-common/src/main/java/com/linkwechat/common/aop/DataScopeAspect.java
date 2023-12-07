@@ -10,6 +10,7 @@ import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.DataScopeType;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
+@Slf4j
 public class DataScopeAspect {
 
     /**
@@ -38,11 +40,14 @@ public class DataScopeAspect {
     protected void handleDataScope(final JoinPoint joinPoint, DataScope controllerDataScope) {
         // 获取当前的用户
         LoginUser loginUser = SecurityUtils.getLoginUser();
+
         if (StringUtils.isNotNull(loginUser)) {
             SysUser currentUser = loginUser.getSysUser();
             // 如果是超级管理员，则不过滤数据
+//        SysUser currentUser = new SysUser();
+//        currentUser.setUserId(new Long(168));
+//        currentUser.setDataScope(5);
             if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin()) {
-//                dataScopeFilterForRole(joinPoint, currentUser, controllerDataScope);
                 dataScopeFilterForSysUser(joinPoint, currentUser, controllerDataScope);
             }
         }
@@ -133,13 +138,13 @@ public class DataScopeAspect {
 
         if(null != user){
             DataScopeType type = DataScopeType.of(String.valueOf(user.getDataScope()));
-
+            log.error("DataScopeType"+type);
             switch (type){
                 case DATA_SCOPE_ALL:
                     sqlString = new StringBuilder();
                     return;
                 case DATA_SCOPE_CUSTOM:
-                    if(type.equals("1")){
+                    if(controllerDataScope.type().equals("1")){
                         sqlString.append(StringUtils.format(
                                 " OR {}.dept_id IN ( SELECT dept_id FROM sys_user_manage_scop WHERE user_id = {} ) ", controllerDataScope.deptAlias(),
                                 user.getUserId()));
@@ -154,7 +159,7 @@ public class DataScopeAspect {
                     }
                     break;
                 case DATA_SCOPE_DEPT:
-                    if(type.equals("1")){
+                    if(controllerDataScope.type().equals("1")){
                         sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", controllerDataScope.deptAlias(), user.getDeptId()));
                     }else {
 
@@ -182,7 +187,7 @@ public class DataScopeAspect {
                     }
                     break;
                 case DATA_SCOPE_DEPT_AND_CHILD:
-                    if(type.equals("1")){
+                    if(controllerDataScope.type().equals("1")){
                         sqlString.append(StringUtils.format(
                                 " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
                                 controllerDataScope.deptAlias(), user.getDeptId(), user.getDeptId()));
@@ -198,9 +203,9 @@ public class DataScopeAspect {
                     }
                     break;
                 case DATA_SCOPE_SELF:
-                    if(type.equals("1")){
+                    if(controllerDataScope.type().equals("1")){
                         if (StringUtils.isNotBlank(controllerDataScope.userAlias())) {
-                            sqlString.append(StringUtils.format(" OR {}.user_id = {} ", controllerDataScope.userAlias(), user.getUserId()));
+                            sqlString.append(StringUtils.format(" AND {}.user_id = {} ", controllerDataScope.userAlias(), user.getUserId()));
                         } else {
                             // 数据权限为仅本人且没有userAlias别名不查询任何数据
                             sqlString.append(" OR 1=0 ");

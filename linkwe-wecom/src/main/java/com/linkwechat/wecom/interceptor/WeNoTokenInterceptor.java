@@ -5,10 +5,16 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.config.WeComeProxyConfig;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.wecom.service.IQwAccessTokenService;
+import com.linkwechat.wecom.utils.ForestProxyUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +26,26 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class WeNoTokenInterceptor implements Interceptor {
+
+
+    @Autowired
+    protected LinkWeChatConfig linkWeChatConfig;
+
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        WeComeProxyConfig weComeProxyConfig
+                = linkWeChatConfig.getWeComeProxyConfig();
+        if(null != weComeProxyConfig){
+            if(weComeProxyConfig.isStartProxy()&&StringUtils.isNotEmpty(weComeProxyConfig.getProxyIp())){
+
+                ForestProxyUtils.setProxy(request,weComeProxyConfig.getProxyIp(),weComeProxyConfig.getProxyPort(),
+                        weComeProxyConfig.getProxyPassword(), weComeProxyConfig.getProxyUserName());
+
+            }
+        }
+
+        return true;
+    }
 
     @Override
     public void onError(ForestRuntimeException e, ForestRequest forestRequest, ForestResponse forestResponse) {

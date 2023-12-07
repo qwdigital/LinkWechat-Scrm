@@ -2,7 +2,7 @@ package com.linkwechat.common.utils.file;
 
 /**
  * 媒体类型工具类
- * 
+ *
  * @author ruoyi
  */
 public class MimeTypeUtils
@@ -30,7 +30,7 @@ public class MimeTypeUtils
             // word excel powerpoint
             "doc", "docx", "xls", "xlsx", "ppt", "pptx", "html", "htm", "txt",
             // 压缩文件
-            "rar", "zip", "gz", "bz2","arm",
+            "rar", "zip", "gz", "bz2","amr",
             // pdf
             "pdf" ,"wav","amr","mp4","mp3","p12","md"};
 

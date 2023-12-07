@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -32,6 +33,7 @@ import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.img.ImageUtils;
 import com.linkwechat.common.utils.img.NetFileUtils;
 import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
 import com.linkwechat.domain.material.ao.*;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.material.entity.WeTalkMaterial;
@@ -50,13 +52,11 @@ import com.linkwechat.handler.TextMaterialImportDataListener;
 import com.linkwechat.mapper.WeMaterialMapper;
 import com.linkwechat.mapper.WeTalkMaterialMapper;
 import com.linkwechat.mapper.WeTlpMaterialMapper;
-import com.linkwechat.service.IWeContentSendRecordService;
-import com.linkwechat.service.IWeContentViewRecordService;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeMaterialService;
+import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,8 +101,10 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     @Resource
     private WeTlpMaterialMapper weTlpMaterialMapper;
 
+
     @Resource
-    private IWeCustomerService weCustomerService;
+    private IWeFormSurveyCatalogueService iWeFormSurveyCatalogueService;
+
 
 
 //    private static Font DEFAULT_FONT;
@@ -331,7 +333,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                 poster.setSampleImgPath(fileEntity.getUrl());
             }
             WeMaterial material = generateMaterialFromPoster(poster);
-            material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
+            material.setPosterSubassembly(JSONUtil.toJsonStr(poster.getPosterSubassemblyList()));
+//            material.setPosterSubassembly(JSONArray.toJSONString(poster.getPosterSubassemblyList()));
             return material;
 
         } catch (Exception e) {
@@ -341,6 +344,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
 
     }
+
+
 
     @Override
     public FileEntity builderPoster(PurePoster purePoster) throws Exception {
@@ -356,8 +361,7 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
 
         //构建海报生成器
         ImageCombiner combiner = new ImageCombiner(purePoster.getBackgroundImgPath(),
-                purePoster.getWidth() >= 375 ? 375 : purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
-
+               purePoster.getWidth(), purePoster.getHeight(), ZoomMode.Height, OutputFormat.JPG);  //v1.1.4之后可以指定背景图新宽高了（不指定则默认用图片原宽高）
 
         //海报中元素
         List<WePosterSubassembly> posterSubassemblyList = purePoster.getPosterSubassemblyList();
@@ -584,7 +588,8 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
     public String mediaGet(String media_id, String fileType, String extentType) {
         byte[] data = mediaClient.mediaGet(new WeMediaQuery(media_id)).getData();
         String fileName = String.valueOf(SnowFlakeUtil.nextId());
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain", data);
+//        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "text/plain", data);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName + "." + extentType, "image/jpeg", data);
         try {
             WeMaterialFileVo weMaterialFileVO = this.uploadWeMaterialFile(mockMultipartFile, fileType);
             return weMaterialFileVO.getMaterialUrl();
@@ -713,6 +718,20 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
                 query.setPixelSize(1555200L);
                 query.setMemorySize(10 * 1024 * 1024L);
             }
+        }
+        if(String.valueOf(CategoryMediaType.ZLBDURL.getType()).equals(query.getMediaType())){
+            WeFormSurveyCatalogueQuery catalogueQuery = WeFormSurveyCatalogueQuery.builder().surveyState(1).surveyName(query.getMaterialName())
+                    .build();
+
+            if(StringUtils.isNotEmpty(query.getCategoryId())){
+                catalogueQuery.setGroupId(
+                        Long.parseLong(query.getCategoryId())
+                        );
+            }
+
+            return iWeFormSurveyCatalogueService.findFormToWeMaterialNewVo(
+                    catalogueQuery
+            );
         }
         return weMaterialMapper.selectListByLkQuery(query);
     }
@@ -979,10 +998,10 @@ public class WeMaterialServiceImpl extends ServiceImpl<WeMaterialMapper, WeMater
             }else if(ObjectUtil.equal(MessageType.POSTERS.getMessageType(), messageTemplate.getMsgType())){
 
 
-                WeMediaVo weMedia = this.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setPicUrl(weMedia.getMediaId());
+//                WeMediaVo weMedia = this.uploadTemporaryMaterial(messageTemplate.getFileUrl()
+//                        , MessageType.IMAGE.getMessageType()
+//                        , FileUtil.getName(messageTemplate.getFileUrl()));
+                messageTemplate.setPicUrl(messageTemplate.getFileUrl());
 
 
             }

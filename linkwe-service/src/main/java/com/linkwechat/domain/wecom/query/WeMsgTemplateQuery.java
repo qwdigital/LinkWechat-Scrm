@@ -45,7 +45,7 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
                     attachments.add(images);
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments links = new Links(messageTemplate.getMsgType(), messageTemplate.getTitle(),
-                            messageTemplate.getPicUrl(), messageTemplate.getDescription(), messageTemplate.getLinkUrl());
+                            messageTemplate.getPicUrl(), StringUtils.isNotEmpty(messageTemplate.getDescription())?messageTemplate.getDescription():messageTemplate.getContent(), messageTemplate.getLinkUrl());
                     attachments.add(links);
                 } else if (ObjectUtil.equal(WeMsgTypeEnum.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
                     Attachments miniprograms = new Miniprograms(messageTemplate.getMsgType(), messageTemplate.getTitle(),
@@ -76,7 +76,8 @@ public class WeMsgTemplateQuery extends WeBaseQuery{
 
 
                 }else if(ObjectUtil.equal(WeMsgTypeEnum.NEWS.getMessageType(), messageTemplate.getMsgType())
-                        ||ObjectUtil.equal(WeMsgTypeEnum.POSTERS.getMessageType(), messageTemplate.getMsgType())){//文章或海报
+                        ||ObjectUtil.equal(WeMsgTypeEnum.POSTERS.getMessageType(), messageTemplate.getMsgType())
+                ||ObjectUtil.equal(WeMsgTypeEnum.MURL.getMessageType(), messageTemplate.getMsgType())){//文章或海报，链接
                     String linkUrl=domain+ "/#/metrialDetail?materiaId=" + messageTemplate.getMaterialId();
 
                     Attachments links = new Links(WeMsgTypeEnum.LINK.getMessageType(), messageTemplate.getTitle(),

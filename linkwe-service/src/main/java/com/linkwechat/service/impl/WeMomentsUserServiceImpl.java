@@ -3,7 +3,6 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -11,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.constant.HttpStatus;
 import com.linkwechat.common.core.domain.AjaxResult;
@@ -18,16 +18,21 @@ import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.exception.ServiceException;
 import com.linkwechat.common.utils.SecurityUtils;
-import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeTag;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.material.entity.WeMaterial;
 import com.linkwechat.domain.moments.dto.MomentsListDetailResultDto;
 import com.linkwechat.domain.moments.dto.MomentsParamDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto;
 import com.linkwechat.domain.moments.dto.MomentsResultDto.TaskList;
-import com.linkwechat.domain.moments.entity.*;
+import com.linkwechat.domain.moments.entity.WeMomentsAttachments;
+import com.linkwechat.domain.moments.entity.WeMomentsEstimateCustomer;
+import com.linkwechat.domain.moments.entity.WeMomentsTask;
+import com.linkwechat.domain.moments.entity.WeMomentsUser;
+import com.linkwechat.domain.moments.query.WeMomentsTaskEstimateCustomerNumRequest;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
+import com.linkwechat.domain.moments.vo.WeMomentsTaskVO;
 import com.linkwechat.domain.system.user.query.SysUserQuery;
 import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.fegin.QwMomentsClient;
@@ -36,6 +41,8 @@ import com.linkwechat.mapper.WeMomentsEstimateCustomerMapper;
 import com.linkwechat.mapper.WeMomentsTaskMapper;
 import com.linkwechat.mapper.WeMomentsUserMapper;
 import com.linkwechat.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -64,21 +71,29 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
     @Resource
     private IWeTagService weTagService;
     @Resource
-    private IWeMomentsCustomerService weMomentsCustomerService;
-    @Resource
-    private IWeFlowerCustomerTagRelService weFlowerCustomerTagRelService;
-    @Resource
-    private IWeCustomerService weCustomerService;
-    @Resource
     private WeMomentsEstimateCustomerMapper weMomentsEstimateCustomerMapper;
+//    @Resource
+//    private WeMomentsTaskMapper weMomentsTaskMapper;
+
+    @Autowired
+    @Lazy
+    private IWeMomentsTaskService iWeMomentsTaskService;
+
     @Resource
-    private WeMomentsTaskMapper weMomentsTaskMapper;
+    private IWeMomentsCustomerService weMomentsCustomerService;
 
     @Override
     public void addMomentsUser(Long momentsTaskId, List<SysUser> users) {
         List<WeMomentsUser> weMomentsUsers = new ArrayList<>();
         users.forEach(user -> weMomentsUsers.add(build(momentsTaskId, null, user, 0)));
-        this.saveBatch(weMomentsUsers);
+        if(CollectionUtil.isNotEmpty(weMomentsUsers)){
+            List<List<WeMomentsUser>> partitions = Lists.partition(weMomentsUsers, 1000);
+            for(List<WeMomentsUser> partition:partitions){
+                this.baseMapper.insertBatchSomeColumn(partition);
+            }
+
+        }
+
     }
 
     @Override
@@ -167,7 +182,6 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             if (CollectionUtil.isNotEmpty(collect)) {
                 LambdaUpdateWrapper<WeMomentsUser> updateWrapper = Wrappers.lambdaUpdate(WeMomentsUser.class);
                 updateWrapper.eq(WeMomentsUser::getMomentsTaskId, momentsTaskId);
-                updateWrapper.eq(WeMomentsUser::getMomentsId, momentsId);
                 updateWrapper.in(WeMomentsUser::getWeUserId, collect);
                 updateWrapper.set(WeMomentsUser::getExecuteStatus, 1);
                 this.update(updateWrapper);
@@ -256,8 +270,10 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             throw new ServiceException("未登录！", HttpStatus.UNAUTHORIZED);
         }
         //数据不存在，直接返回
-        WeMomentsTask weMomentsTask = weMomentsTaskMapper.selectById(weMomentsTaskId);
-        if (BeanUtil.isEmpty(weMomentsTask)) {
+//        WeMomentsTask weMomentsTask = iWeMomentsTaskService.getById(weMomentsTaskId);
+        WeMomentsTaskVO weMomentsTaskVO = iWeMomentsTaskService.get(weMomentsTaskId);
+
+        if (BeanUtil.isEmpty(weMomentsTaskVO)) {
             return null;
         }
 
@@ -272,9 +288,21 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
         wrapper.eq(WeMomentsAttachments::getMomentsTaskId, weMomentsTaskId);
         List<WeMomentsAttachments> attachmentsList = weMomentsAttachmentsService.list(wrapper);
         if (CollectionUtil.isNotEmpty(attachmentsList)) {
-            List<Long> materialIds = attachmentsList.stream().map(WeMomentsAttachments::getMaterialId).collect(Collectors.toList());
+            List<Long> materialIds = new ArrayList<>();
+            attachmentsList.stream().forEach(i -> materialIds.add(i.getMaterialId()));
             List<WeMaterial> weMaterials = weMaterialService.listByIds(materialIds);
-            vo.setMaterialList(weMaterials);
+            //防止重复的素材被过滤掉
+            if (BeanUtil.isNotEmpty(weMaterials)) {
+                Map<Long, WeMaterial> collect = weMaterials.stream().collect(Collectors.toMap(WeMaterial::getId, Function.identity()));
+                List<WeMaterial> materialList = new ArrayList<>();
+                materialIds.forEach(i -> {
+                    WeMaterial weMaterial = collect.get(i);
+                    if (BeanUtil.isNotEmpty(weMaterial)) {
+                        materialList.add(weMaterial);
+                    }
+                });
+                vo.setMaterialList(materialList);
+            }
         }
         //客户标签
         if (StrUtil.isNotBlank(vo.getCustomerTag())) {
@@ -290,13 +318,17 @@ public class WeMomentsUserServiceImpl extends ServiceImpl<WeMomentsUserMapper, W
             }
         }
 
-        //客户数
-        LambdaQueryWrapper<WeMomentsEstimateCustomer> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.eq(WeMomentsEstimateCustomer::getMomentsTaskId, weMomentsTaskId);
-        queryWrapper.eq(WeMomentsEstimateCustomer::getWeUserId, loginUser.getSysUser().getWeUserId());
-        int count = weMomentsEstimateCustomerMapper.selectCount(queryWrapper);
-        vo.setCustomerNum(count);
+        WeCustomersQuery weCustomersQuery = weMomentsTaskVO.getWeCustomersQuery();
+        if(weCustomersQuery !=null){
+            weCustomersQuery.setNoRepeat(true);
+            vo.setCustomerNum(
+                    weMomentsCustomerService.estimateCustomerNum(
+                            WeMomentsTaskEstimateCustomerNumRequest.builder().scopeType( weMomentsTaskVO.getScopeType())
+                                    .weCustomersQuery(weCustomersQuery).build()
+                    )
+            );
 
+        }
         return vo;
     }
 

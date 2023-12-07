@@ -4,10 +4,14 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.google.common.collect.Lists;
+import com.linkwechat.common.config.LinkWeChatConfig;
+import com.linkwechat.common.config.WeComeProxyConfig;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
@@ -15,6 +19,7 @@ import com.linkwechat.common.utils.spring.SpringUtils;
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.service.IQwAccessTokenService;
+import com.linkwechat.wecom.utils.ForestProxyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +32,21 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements Interceptor {
+public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements Interceptor<Object> {
+
+
+
 
     /**
      * 该方法在请求发送之前被调用, 若返回false则不会继续发送请求
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
+
+         setProxy(request);
+
+
+
         if (iQwAccessTokenService == null) {
             iQwAccessTokenService = SpringUtils.getBean(IQwAccessTokenService.class);
         }
@@ -46,7 +59,14 @@ public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements
      * 请求成功调用(微信端错误异常统一处理)
      */
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(Object resultDto, ForestRequest request, ForestResponse response) {
+//        WeErrorCodeEnum weErrorCodeEnum = WeErrorCodeEnum.parseEnum(resultDto.getErrCode());
+//        if(null != weErrorCodeEnum){
+//            if(!resultDto.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+//                saveWeErrorMsg(weErrorCodeEnum,request);
+//            }
+//            resultDto.setErrMsg(weErrorCodeEnum.getErrorMsg());
+//        }
         log.info("url:{},result:{}", request.getUrl(), response.getContent());
     }
 
@@ -82,6 +102,7 @@ public class WeAccessTokenFileInterceptor extends WeForestInterceptor implements
             iQwAccessTokenService.removeCommonAccessToken(corpId);
             String token = iQwAccessTokenService.findCommonAccessToken(corpId);
             request.replaceOrAddQuery("access_token", token);
+            request.execute();
         }
     }
 

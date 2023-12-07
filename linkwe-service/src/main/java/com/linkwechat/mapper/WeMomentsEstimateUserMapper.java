@@ -2,6 +2,7 @@ package com.linkwechat.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.common.config.mybatis.LwBaseMapper;
 import com.linkwechat.domain.moments.entity.WeMomentsEstimateUser;
 import com.linkwechat.domain.moments.query.WeMomentsStatisticUserRecordRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsEstimateUserVO;
@@ -15,7 +16,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2023/06/26 19:24
  */
-public interface WeMomentsEstimateUserMapper extends BaseMapper<WeMomentsEstimateUser> {
+public interface WeMomentsEstimateUserMapper extends LwBaseMapper<WeMomentsEstimateUser> {
 
     /**
      * 获取未执行的员工 （成员群发）

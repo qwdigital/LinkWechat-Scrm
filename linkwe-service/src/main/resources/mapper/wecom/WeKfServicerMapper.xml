@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKfServicerMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+    <select id="getServicerByKfId" resultType="com.linkwechat.domain.kf.WeKfUser">
+        select wks.user_id,
+               department_id,
+               status,
+               (SELECT GROUP_CONCAT(su.user_name) from sys_user su WHERE su.we_user_id=wks.user_id) as userName,
+               (SELECT GROUP_CONCAT(sd.dept_name) FROM sys_dept sd where sd.dept_id=wks.department_id) as deptName
+        from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0
+    </select>
+
+
+    <select id="getKfServicerList" resultType="com.linkwechat.domain.kf.vo.WeKfServicerListVo">
+        select
+        id,
+        kf_id,
+        open_kf_id,
+        user_id,
+        department_id
+        from we_kf_servicer wks
+        <where>
+            <if test="kfId != null">
+                and wks.kf_id = #{kfId}
+            </if>
+            <if test="openKfId != null and openKfId != ''">
+                and wks.open_kf_id = #{openKfId}
+            </if>
+            <if test="status != null">
+                and wks.status = #{status}
+            </if>
+            <if test="userIds != null and userIds.size() > 0">
+                and wks.user_id in
+                <foreach item="userId" collection="userIds" index="index" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="beginTime != null">
+                and DATE_FORMAT(wks.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and DATE_FORMAT(wks.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+            </if>
+            and wks.del_flag = 0
+        </where>
+    </select>
+
+    <select id="getKfUserIdList" resultType="com.linkwechat.domain.kf.WeKfUser">
+        select su.we_user_id as user_id, su.kf_status as status from sys_user su where su.we_user_id in (
+            select distinct ifnull(wks.user_id,
+                                   (select sud.we_user_id from sys_user_dept sud where sud.dept_id = wks.department_id and del_flag = 0)) as user_id
+            from we_kf_servicer wks where kf_id = #{kfId} and del_flag = 0
+            ) and su.del_flag = 0
+    </select>
+
+</mapper>

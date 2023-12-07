@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 public enum WeMomentsTaskSendTypEnum {
 
     ENTERPRISE_GROUP_SEND(0, "企微群发"),
-    USER_GROUP_SEND(1, "成员群发"),
-    PERSON_SEND(2, "个人发送");
+    USER_GROUP_SEND(2, "成员群发"),
+    PERSON_SEND(1, "个人发送");
 
 
     private final Integer code;

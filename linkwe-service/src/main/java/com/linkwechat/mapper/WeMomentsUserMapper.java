@@ -1,6 +1,7 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.common.config.mybatis.LwBaseMapper;
 import com.linkwechat.domain.moments.entity.WeMomentsUser;
 import com.linkwechat.domain.moments.query.WeMomentsTaskMobileRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsTaskMobileVO;
@@ -15,7 +16,7 @@ import java.util.List;
  * @version 2.0.0
  * @date 2023/06/07 9:58
  */
-public interface WeMomentsUserMapper extends BaseMapper<WeMomentsUser> {
+public interface WeMomentsUserMapper extends LwBaseMapper<WeMomentsUser> {
 
 
     /**

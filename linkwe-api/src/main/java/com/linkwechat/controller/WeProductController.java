@@ -1,11 +1,16 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.protobuf.ServiceException;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.domain.WeProduct;
 import com.linkwechat.domain.product.product.query.WeAddProductQuery;
 import com.linkwechat.domain.product.product.query.WeProductLineChartQuery;
 import com.linkwechat.domain.product.product.query.WeProductQuery;
@@ -119,6 +124,32 @@ public class WeProductController extends BaseController {
     public AjaxResult<List<WeUserOrderTop5Vo>> top5(@PathVariable("id") Long id) {
         List<WeUserOrderTop5Vo> weUserOrderTop5Vos = weProductService.userOrderTop5(id);
         return AjaxResult.success(weUserOrderTop5Vos);
+    }
+
+    /**
+     * 商品列表（移动端列表-分页）
+     *
+     * @param
+     * @return {@link AjaxResult< WeProductListVo>}
+     * @author WangYX
+     * @date 2023/08/08 10:54
+     */
+    @ApiOperation("商品列表（移动端列表-分页）")
+    @GetMapping("/mobile/list")
+    public TableDataInfo<WeProductVo> list() {
+        startPage();
+        LambdaQueryWrapper<WeProduct> queryWrapper = Wrappers.lambdaQuery(WeProduct.class);
+        queryWrapper.eq(WeProduct::getDelFlag, Constants.COMMON_STATE);
+        List<WeProduct> list = weProductService.list(queryWrapper);
+        TableDataInfo dataTable = getDataTable(list);
+        List<WeProductVo> weProductVos = BeanUtil.copyToList(list, WeProductVo.class);
+
+        weProductVos.forEach(o -> {
+            o.setPrice(new BigDecimal(o.getPrice()).divide(BigDecimal.valueOf(100L)).toString());
+        });
+
+        dataTable.setRows(weProductVos);
+        return dataTable;
     }
 
 

@@ -68,7 +68,7 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      *
      * @return
      */
-    @DataScope(type = "2", value = @DataColumn(alias = "wc", name = "create_by_id", userid = "user_id"))
+    @DataScope(type = "2", value = @DataColumn(alias = "wcr", name = "create_by_id", userid = "user_id"))
     long noRepeatCountCustomer(@Param("weCustomerList") WeCustomersQuery weCustomersQuery);
 
 
@@ -140,7 +140,7 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      *
      * @return
      */
-    @DataScope(type = "2", value = @DataColumn(name = "create_by_id", userid = "user_id"))
+    @DataScope(value = @DataColumn(name = "create_by_id", userid = "user_id"))
     List<String> findWeUserIds();
 
 
@@ -196,6 +196,14 @@ public interface WeCustomerMapper extends BaseMapper<WeCustomer> {
      * @return
      */
     List<String> findWeCustomerListEuIds(@Param("weCustomerList") WeCustomersQuery weCustomersQuery);
+
+    /**
+     * 通过eid查询客户简单信息
+     * @param externalUserIds
+     */
+    List<WeCustomerSimpleInfoVo> getCustomerSimpleInfo(@Param("externalUserIds") List<String> externalUserIds);
+
+
 
 
     /**

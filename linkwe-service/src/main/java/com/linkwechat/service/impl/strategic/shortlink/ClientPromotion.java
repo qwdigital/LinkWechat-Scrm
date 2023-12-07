@@ -305,7 +305,7 @@ public class ClientPromotion extends PromotionType {
         weAddGroupMessageQuery.setContent(content);
         //是否定时任务 0 立即发送 1 定时发送
         weAddGroupMessageQuery.setIsTask(0);
-        weAddGroupMessageQuery.setMsgSource(4);
+        weAddGroupMessageQuery.setMsgSource(5);
         weAddGroupMessageQuery.setAttachmentsList(attachments);
         weAddGroupMessageQuery.setSenderList(senderList);
         weAddGroupMessageQuery.setBusinessId(businessId);

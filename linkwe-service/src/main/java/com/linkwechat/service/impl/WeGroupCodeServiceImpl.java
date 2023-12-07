@@ -8,6 +8,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.base.Joiner;
 import com.linkwechat.common.config.LinkWeChatConfig;
@@ -21,6 +22,7 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.UUID;
+import com.linkwechat.domain.WeGroupCodeRange;
 import com.linkwechat.domain.WeCommonLinkStat;
 import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.customer.vo.WeCustomerChannelCountVo;
@@ -40,6 +42,10 @@ import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeGroupCodeMapper;
+import com.linkwechat.service.IWeGroupCodeRangeService;
+import com.linkwechat.service.IWeGroupCodeService;
+import com.linkwechat.service.IWeGroupCodeTagRelService;
+import com.linkwechat.service.IWeTagService;
 import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +79,10 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
 
     @Autowired
     private IWeCommonLinkStatService weCommonLinkStatService;
+
+    @Autowired
+    private IWeGroupCodeRangeService iWeGroupCodeRangeService;
+
 
 
     @Override
@@ -257,6 +267,24 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
         if(null != weGroupCode){
             weGroupChatInfoVos=this.baseMapper.findWeGroupChatInfoVo(weGroupCode.getChatIdList(), weGroupCode.getState());
         }
+
+        if(CollectionUtil.isNotEmpty(weGroupChatInfoVos)){
+            //设置关联状态
+            weGroupChatInfoVos.stream().forEach(k->{
+                List<WeGroupCodeRange> weGroupCodeRanges = iWeGroupCodeRangeService.list(new LambdaQueryWrapper<WeGroupCodeRange>()
+                        .eq(WeGroupCodeRange::getCodeId, groupId)
+                        .eq(WeGroupCodeRange::getChatId, k.getChatId()));
+                if(CollectionUtil.isNotEmpty(weGroupCodeRanges)){
+                            k.setStatus(
+                                    weGroupCodeRanges.stream().findFirst().get().getStatus()
+                            );
+                }
+
+
+            });
+
+        }
+
         return weGroupChatInfoVos;
     }
 

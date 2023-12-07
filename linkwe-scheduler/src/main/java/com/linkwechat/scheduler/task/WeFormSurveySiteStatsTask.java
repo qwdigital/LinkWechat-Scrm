@@ -1,10 +1,12 @@
 package com.linkwechat.scheduler.task;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.SiteStasConstants;
 import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
@@ -25,6 +27,7 @@ import javax.annotation.Resource;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.DoubleStream;
 
 /**
@@ -49,24 +52,50 @@ public class WeFormSurveySiteStatsTask {
     @Resource
     private IWeFormSurveyStatisticsService weFormSurveyStatisticsService;
 
+    private ExecutorService executorService = ThreadUtil.newExecutor(5, 10, 10240);
+
 
     @XxlJob("weFormSurveySiteStasTask")
     public void process() {
         String jobParam = XxlJobHelper.getJobParam();
         log.info("智能表单站点统计定时任务>>>>>>>>>>>>>>>>>>启动 params:{}", jobParam);
-        List<WeFormSurveyCatalogue> weFormSurveyCatalogueList = weFormSurveyCatalogueService.getListIgnoreTenantId();
-        if (weFormSurveyCatalogueList != null && weFormSurveyCatalogueList.size() > 0) {
-            for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogueList) {
-                //每天的站点数据统计
-                dayByDaySiteStas(weFormSurveyCatalogue);
+        int count = weFormSurveyCatalogueService.count(new LambdaQueryWrapper<WeFormSurveyCatalogue>().eq(WeFormSurveyCatalogue::getDelFlag, 0));
 
-                //总的站点数据统计
-                siteStas(weFormSurveyCatalogue);
-
-                //每天的站点数据统计
-                dayByDaySiteStas(weFormSurveyCatalogue);
-            }
+        log.info("智能表单站点统计数量 >>>>>>>>>>>>>>count：{}", count);
+        // 手动分页
+        int pageSize = 100;
+        int pageNum = count / pageSize;
+        // 是不是整除
+        int surplus = count % pageSize;
+        if (surplus > 0) {
+            pageNum = pageNum + 1;
         }
+
+        for (int i = 0; i < pageNum; i++) {
+
+            List<WeFormSurveyCatalogue> weFormSurveyCatalogueList = weFormSurveyCatalogueService.list(new LambdaQueryWrapper<WeFormSurveyCatalogue>()
+                    .eq(WeFormSurveyCatalogue::getDelFlag, 0)
+                    .orderByAsc(WeFormSurveyCatalogue::getId)
+                    .last("limit " + i * pageSize + "," + pageSize));
+            if (CollectionUtil.isNotEmpty(weFormSurveyCatalogueList)) {
+                for (WeFormSurveyCatalogue weFormSurveyCatalogue : weFormSurveyCatalogueList) {
+                    executorService.execute(() -> {
+                        try {
+                            //每天的站点数据统计
+                            dayByDaySiteStas(weFormSurveyCatalogue);
+
+                            //总的站点数据统计
+                            siteStas(weFormSurveyCatalogue);
+                        } catch (Exception e) {
+                            log.error("智能表单站点统计定时任务异常 id:{}", weFormSurveyCatalogue.getId(), e);
+                        }
+                    });
+                }
+            }
+
+        }
+
+
     }
 
     /**
@@ -101,25 +130,15 @@ public class WeFormSurveySiteStatsTask {
         answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDelFlag, Constants.NORMAL_CODE);
         List<WeFormSurveyAnswer> list = weFormSurveyAnswerService.list(answerQueryWrapper);
 
-        //上次站点统计的数据
-        QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
-        WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
 
-        if (ObjectUtil.isNull(one)) {
-            //总的数据
-            one = new WeFormSurveySiteStas();
-            one.setBelongId(weFormSurveyCatalogue.getId());
-            one.setTotalVisits(pv);
-            one.setTotalUser(uv.intValue());
-            one.setCollectionVolume(list != null ? list.size() : 0);
-            boolean save = weFormSurveySiteStasService.save(one);
-        } else {
-            one.setTotalVisits(pv);
-            one.setTotalUser(uv.intValue());
-            one.setCollectionVolume(list != null ? list.size() : one.getCollectionVolume());
-            weFormSurveySiteStasService.updateById(one);
-        }
+        //总的数据
+        WeFormSurveySiteStas siteStas = new WeFormSurveySiteStas();
+        siteStas.setBelongId(weFormSurveyCatalogue.getId());
+        siteStas.setTotalVisits(pv);
+        siteStas.setTotalUser(uv.intValue());
+        siteStas.setCollectionVolume(list != null ? list.size() : 0);
+
+        weFormSurveySiteStasService.saveOrUpdate(siteStas, new LambdaQueryWrapper<WeFormSurveySiteStas>().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId()));
     }
 
 
@@ -132,6 +151,9 @@ public class WeFormSurveySiteStatsTask {
      * @date 2022/10/14 15:44
      */
     private void dayByDaySiteStas(WeFormSurveyCatalogue weFormSurveyCatalogue) {
+        String params = XxlJobHelper.getJobParam();
+        String dateStr = StringUtils.isNotBlank(params) ? params : DateUtil.yesterday().toDateStr();
+
         String[] channels = weFormSurveyCatalogue.getChannelsName().split(",");
         for (String channel : channels) {
 
@@ -139,12 +161,12 @@ public class WeFormSurveySiteStatsTask {
             String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channel);
             Integer pv = (Integer) redisTemplate.opsForValue().get(pvKey);
             //IP
-            String ipKey = StringUtils.format(SiteStasConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
+            String ipKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_IP, weFormSurveyCatalogue.getId(), channel);
             Long uv = redisTemplate.opsForSet().size(ipKey) - 1;
 
             //之前总的统计数据
-            QueryWrapper<WeFormSurveySiteStas> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId());
+            LambdaQueryWrapper<WeFormSurveySiteStas> queryWrapper = new LambdaQueryWrapper<WeFormSurveySiteStas>();
+            queryWrapper.eq(WeFormSurveySiteStas::getBelongId, weFormSurveyCatalogue.getId()).last("limit 1");
             WeFormSurveySiteStas one = weFormSurveySiteStasService.getOne(queryWrapper);
             if (ObjectUtil.isNull(one)) {
                 one = new WeFormSurveySiteStas();
@@ -156,7 +178,7 @@ public class WeFormSurveySiteStatsTask {
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getAnEffective, 0);
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDataSource, channel);
             answerQueryWrapper.lambda().eq(WeFormSurveyAnswer::getDelFlag, Constants.COMMON_STATE);
-            answerQueryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + DateUtil.formatDate(new Date()) + "'");
+            answerQueryWrapper.lambda().apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + dateStr + "'");
             List<WeFormSurveyAnswer> list = weFormSurveyAnswerService.list(answerQueryWrapper);
 
             //新增每天的数据统计
@@ -189,10 +211,13 @@ public class WeFormSurveySiteStatsTask {
             } else {
                 weFormSurveyStatistics.setAverageTime(0);
             }
-            weFormSurveyStatistics.setCreateTime(DateUtil.offsetDay(new Date(), -1));
-            weFormSurveyStatistics.setUpdateTime(DateUtil.offsetDay(new Date(), -1));
+            weFormSurveyStatistics.setCreateTime(DateUtil.parseDate(dateStr));
             weFormSurveyStatistics.setDelFlag(Constants.COMMON_STATE);
-            weFormSurveyStatisticsService.save(weFormSurveyStatistics);
+            weFormSurveyStatisticsService.saveOrUpdate(weFormSurveyStatistics, new LambdaQueryWrapper<WeFormSurveyStatistics>()
+                    .eq(WeFormSurveyStatistics::getBelongId, weFormSurveyStatistics.getBelongId())
+                    .eq(WeFormSurveyStatistics::getDataSource, weFormSurveyStatistics.getDataSource())
+                    .apply("DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) = '" + dateStr + "'")
+                    .eq(WeFormSurveyStatistics::getDelFlag, 0));
         }
     }
 

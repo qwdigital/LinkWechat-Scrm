@@ -58,7 +58,7 @@ public class WeTalkController extends BaseController {
         queryWrapper.eq(weTalkQuery.getTalkType() != null, WeContentTalk::getTalkType, weTalkQuery.getTalkType());
         queryWrapper.eq(WeContentTalk::getDelFlag, Constants.COMMON_STATE);
         queryWrapper.like(StringUtils.isNotBlank(weTalkQuery.getTalkTitle()), WeContentTalk::getTalkTitle, weTalkQuery.getTalkTitle());
-        queryWrapper.orderByDesc(WeContentTalk::getCreateTime);
+        queryWrapper.orderByDesc(WeContentTalk::getUpdateTime);
         List<WeContentTalk> list = weContentTalkService.list(queryWrapper);
 
         TableDataInfo dataTable = getDataTable(list);

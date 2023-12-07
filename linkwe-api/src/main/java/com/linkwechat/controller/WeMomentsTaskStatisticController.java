@@ -109,16 +109,44 @@ public class WeMomentsTaskStatisticController extends BaseController {
     @ApiOperation("员工记录")
     @GetMapping("/user/record")
     public TableDataInfo userRecord(@Validated WeMomentsStatisticUserRecordRequest request) {
+        WeMomentsTask weMomentsTask = weMomentsTaskService.getById(request.getWeMomentsTaskId());
+        if (BeanUtil.isEmpty(weMomentsTask)) {
+            return getDataTable(CollectionUtil.newArrayList());
+        }
         startPage();
-        List<WeMomentsUser> list = getWeMomentsUsers(request);
-        //返回结果
-        TableDataInfo dataTable = getDataTable(list);
-        //转换
-        List<WeMomentsUserVO> vos = BeanUtil.copyToList(list, WeMomentsUserVO.class);
-        //获取执行员工的部门数据
-        getDeptData(vos);
-        dataTable.setRows(vos);
-        return dataTable;
+        if (weMomentsTask.getSendType().equals(2)) {
+            //成员群发
+            List<WeMomentsEstimateUserVO> executeUsers = weMomentsEstimateUserService.getExecuteUsers(request);
+            TableDataInfo dataTable = getDataTable(executeUsers);
+            List<WeMomentsUser> list = BeanUtil.copyToList(executeUsers, WeMomentsUser.class);
+            //转换
+            List<WeMomentsUserVO> vos = BeanUtil.copyToList(list, WeMomentsUserVO.class);
+            //获取执行员工的部门数据
+            getDeptData(vos);
+            dataTable.setRows(vos);
+            return dataTable;
+
+        } else {
+            LambdaQueryWrapper<WeMomentsUser> queryWrapper = Wrappers.lambdaQuery(WeMomentsUser.class);
+            queryWrapper.eq(WeMomentsUser::getMomentsTaskId, request.getWeMomentsTaskId());
+            if (StrUtil.isNotBlank(request.getWeUserIds())) {
+                queryWrapper.in(WeMomentsUser::getWeUserId, request.getWeUserIds().split(","));
+            }
+            if (StrUtil.isNotBlank(request.getDeptIds())) {
+                queryWrapper.in(WeMomentsUser::getDeptId, request.getDeptIds().split(","));
+            }
+            queryWrapper.eq(WeMomentsUser::getDelFlag, Constants.COMMON_STATE);
+            queryWrapper.eq(request.getStatus() != null, WeMomentsUser::getExecuteStatus, request.getStatus());
+            List<WeMomentsUser> list = weMomentsUserService.list(queryWrapper);
+            //返回结果
+            TableDataInfo dataTable = getDataTable(list);
+            //转换
+            List<WeMomentsUserVO> vos = BeanUtil.copyToList(list, WeMomentsUserVO.class);
+            //获取执行员工的部门数据
+            getDeptData(vos);
+            dataTable.setRows(vos);
+            return dataTable;
+        }
     }
 
 
@@ -195,7 +223,7 @@ public class WeMomentsTaskStatisticController extends BaseController {
     private void getDeptData(List<WeMomentsUserVO> vos) {
         if (CollectionUtil.isNotEmpty(vos)) {
             //获取部门数据
-            List<Integer> deptIds = vos.stream().filter(i -> i.getDeptId() != null).map(i -> i.getDeptId().intValue()).distinct().collect(Collectors.toList());
+            List<Long> deptIds = vos.stream().filter(i -> i.getDeptId() != null).map(i -> i.getDeptId().longValue()).distinct().collect(Collectors.toList());
 
             if (CollectionUtil.isEmpty(deptIds)) {
                 return;

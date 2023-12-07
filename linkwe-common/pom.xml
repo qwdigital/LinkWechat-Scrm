@@ -5,7 +5,7 @@
     <parent>
         <artifactId>linkwechat-cloud</artifactId>
         <groupId>com.linkwechat</groupId>
-        <version>3.1.0</version>
+        <version>2023-release</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -299,6 +299,12 @@
             <groupId>com.freewayso</groupId>
             <artifactId>image-combiner</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>ma.glasnost.orika</groupId>
+            <artifactId>orika-core</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

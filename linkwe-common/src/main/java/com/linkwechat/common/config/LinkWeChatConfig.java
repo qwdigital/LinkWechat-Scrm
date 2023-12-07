@@ -42,6 +42,11 @@ public class LinkWeChatConfig {
      * 是否是演示环境 true:是 false:不是
      */
     private boolean demoEnviron=false;
+
+    /**
+     * 是否开启文件预览 true:开启 false:不开启
+     */
+    private boolean enableFilePreview=true;
     /**
      * 上传路径
      */
@@ -59,6 +64,10 @@ public class LinkWeChatConfig {
     private String seasRedirectUrl;
 
 
+    /**
+     * 新客拉群h5地址
+     */
+    private String communityNewGroupUrl;
 
     /**
      * 老客标签建群地址
@@ -192,6 +201,7 @@ public class LinkWeChatConfig {
     private String guideGroupUrl;
 
 
+
     /**
      * 裂变url
      */
@@ -201,6 +211,12 @@ public class LinkWeChatConfig {
      * 短链域名
      */
     private String shortLinkDomainName;
+
+
+    /**
+     * 获客助手短链
+     */
+    private String customerShortLinkDomainName;
 
     /**
      * 短链小程序地址
@@ -213,9 +229,10 @@ public class LinkWeChatConfig {
     private String lxQrCodeUrl;
 
     /**
-     * 短链推广-应用消息详情
+     * 短链推广-应用消息页面
      */
     private String appMsgUrl;
+
 
     /**
      * 素材中心素材详情
@@ -226,6 +243,24 @@ public class LinkWeChatConfig {
      * 朋友圈移动端列表页
      */
     private String momentsUrl;
+
+    /**
+     * 线索中心移动端-待办任务-线索长时间未跟进-详情页
+     */
+    private String leadsDetailUrl;
+
+    /**
+     * 线索中心移动端-待办任务-线索约定事项待跟进-详情页
+     */
+    private String leadsCovenantWaitFollowUpUrl;
+
+
+
+    private WeComeProxyConfig weComeProxyConfig;
+
+
+
+    private FincaceProxyConfig fincaceProxyConfig;
 
     /**
      * 活码短链域名
@@ -441,7 +476,27 @@ public class LinkWeChatConfig {
     }
 
 
+    public boolean isEnableFilePreview() {
+        return enableFilePreview;
+    }
 
+    public void setEnableFilePreview(boolean enableFilePreview) {
+        this.enableFilePreview = enableFilePreview;
+    }
 
+    public WeComeProxyConfig getWeComeProxyConfig() {
+        return weComeProxyConfig;
+    }
 
+    public void setWeComeProxyConfig(WeComeProxyConfig weComeProxyConfig) {
+        this.weComeProxyConfig = weComeProxyConfig;
+    }
+
+    public FincaceProxyConfig getFincaceProxyConfig() {
+        return fincaceProxyConfig;
+    }
+
+    public void setFincaceProxyConfig(FincaceProxyConfig fincaceProxyConfig) {
+        this.fincaceProxyConfig = fincaceProxyConfig;
+    }
 }

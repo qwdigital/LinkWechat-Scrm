@@ -2,13 +2,10 @@ package com.linkwechat.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.linkwechat.common.core.domain.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
 import java.util.Date;
 
 
@@ -148,6 +145,7 @@ public class WeCustomer extends BaseEntity {
 
     /**
      *添加方式
+     * @see com.linkwechat.common.enums.CustomerAddWay
      */
     private Integer addMethod;
 
@@ -198,5 +196,18 @@ public class WeCustomer extends BaseEntity {
      * 客户姓名
      */
     private String customerFullName;
+
+    /**
+     * 0:加入黑名单;1:不加入黑名单;
+     */
+    private Integer isJoinBlacklist;
+
+
+    /**
+     * 流失时间
+     */
+    private Date lossTime;
+
+
 
 }

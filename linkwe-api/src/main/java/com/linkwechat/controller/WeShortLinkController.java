@@ -45,6 +45,14 @@ public class WeShortLinkController extends BaseController {
     @Autowired
     private RedisService redisService;
 
+
+    @ApiOperation(value = "校验短链环境", httpMethod = "GET")
+    @GetMapping("/check/env")
+    public AjaxResult<Boolean> checkEnv() {
+        Boolean result = weShortLinkService.checkEnv();
+        return AjaxResult.success(result);
+    }
+
     @ApiOperation(value = "新增短链", httpMethod = "POST")
     @Log(title = "新增短链", businessType = BusinessType.INSERT)
     @PostMapping("/add")

@@ -11,13 +11,13 @@
         SELECT
             wgc.*,
             GROUP_CONCAT(distinct wt.`name`) as tags,
-            GROUP_CONCAT(distinct wt.id) as tagIds,
+            GROUP_CONCAT(distinct wt.tag_id) as tagIds,
             (SELECT GROUP_CONCAT(wg.group_name) FROM we_group wg WHERE FIND_IN_SET(wg.chat_id,wgc.chat_id_list)) as groupNames
         FROM
             we_group_code  wgc
                 LEFT JOIN we_group_code_tag_rel wgctr ON wgc.id = wgctr.group_code_id
-                LEFT JOIN we_tag wt ON wt.tag_id=wgctr.tag_id
-        WHERE wgc.del_flag=0 and wt.del_flag=0
+                LEFT JOIN we_tag wt ON wt.tag_id=wgctr.tag_id and wt.del_flag=0
+        WHERE wgc.del_flag=0
         <if test="activityName != null  and activityName != ''">
          AND wgc.activity_name  like concat('%', #{activityName}, '%')
         </if>

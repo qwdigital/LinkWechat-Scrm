@@ -3,6 +3,8 @@ package com.linkwechat.domain.sop;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
+import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.sop.vo.WeSopExecuteConditVo;
 import com.linkwechat.domain.sop.vo.WeSopExecuteEndVo;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
@@ -13,6 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -36,6 +39,12 @@ public class WeSopBase extends BaseEntity {
      * sop业务类(1:新客sop;2:活动节日sop;3:客户转化sop;4:新群培育sop;5:周期营销sop;6:特定宣发sop)
      */
     private Integer businessType;
+
+    /**
+     * 排除的类型
+     */
+    @TableField(exist = false)
+    private Integer neBusinessType;
 
     /**
      * sop名称
@@ -108,4 +117,25 @@ public class WeSopBase extends BaseEntity {
      */
     @TableLogic
     private Integer delFlag;
+
+
+
+    /**
+     * 发送范围: 0全部客户 1按条件筛选
+     */
+    private Integer scopeType;
+
+
+    /**
+     * 客户查询条件
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
+    private WeCustomersQuery weCustomersQuery;
+
+    /**
+     * 发送人()
+     */
+    @TableField(exist = false)
+    private List<WeAddGroupMessageQuery.SenderInfo> senderList;
+
 }

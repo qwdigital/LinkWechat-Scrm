@@ -1,6 +1,7 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.common.config.mybatis.LwBaseMapper;
 import com.linkwechat.domain.moments.entity.WeMomentsEstimateCustomer;
 import com.linkwechat.domain.moments.query.WeMomentsStatisticCustomerRecordRequest;
 import com.linkwechat.domain.moments.vo.WeMomentsEstimateCustomerVO;
@@ -14,7 +15,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2023/07/03 10:13
  */
-public interface WeMomentsEstimateCustomerMapper extends BaseMapper<WeMomentsEstimateCustomer> {
+public interface WeMomentsEstimateCustomerMapper extends LwBaseMapper<WeMomentsEstimateCustomer> {
 
     /**
      * 获取预估客户数据

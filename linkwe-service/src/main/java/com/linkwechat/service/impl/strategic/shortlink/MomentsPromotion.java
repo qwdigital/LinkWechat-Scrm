@@ -13,7 +13,6 @@ import com.linkwechat.domain.WeShortLinkPromotionTemplateMoments;
 import com.linkwechat.domain.WeShortLinkUserPromotionTask;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
-//import com.linkwechat.domain.moments.entity.WeMoments;
 import com.linkwechat.domain.shortlink.dto.WeShortLinkPromotionMomentsDto;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionAddQuery;
 import com.linkwechat.domain.shortlink.query.WeShortLinkPromotionTemplateMomentsAddQuery;

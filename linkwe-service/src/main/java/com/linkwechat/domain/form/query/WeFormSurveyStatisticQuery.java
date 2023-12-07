@@ -28,7 +28,7 @@ public class WeFormSurveyStatisticQuery {
      * 问卷id
      */
     @ApiModelProperty(value = "问卷id")
-    @NotNull(message = "问卷ID不能为空")
+    //@NotNull(message = "问卷ID不能为空")
     private Long belongId;
 
 

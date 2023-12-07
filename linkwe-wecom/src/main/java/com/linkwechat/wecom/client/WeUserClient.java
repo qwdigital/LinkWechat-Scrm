@@ -1,7 +1,6 @@
 package com.linkwechat.wecom.client;
 
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
-import com.linkwechat.domain.wecom.query.WeThirdLoginQuery;
 import com.linkwechat.domain.wecom.query.user.*;
 import com.linkwechat.domain.wecom.vo.user.*;
 import com.linkwechat.domain.wecom.vo.WeCorpQrVo;
@@ -9,7 +8,6 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.wecom.interceptor.WeAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAddressBookAccessTokenInterceptor;
 import com.linkwechat.wecom.interceptor.WeAppAccessTokenInterceptor;
-import com.linkwechat.wecom.interceptor.WeProviderTokenInterceptor;
 import com.linkwechat.wecom.retry.WeCommonRetryWhen;
 import com.dtflys.forest.annotation.*;
 

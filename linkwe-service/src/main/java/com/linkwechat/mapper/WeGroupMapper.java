@@ -4,6 +4,7 @@ package com.linkwechat.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.customer.vo.WeCustomerAddGroupVo;
 import com.linkwechat.domain.groupchat.query.WeGroupChatQuery;
@@ -26,12 +27,22 @@ import java.util.List;
 public interface WeGroupMapper extends BaseMapper<WeGroup> {
 
 
-    List<Long> getGroupChatIdList(WeGroupChatQuery query);
+//    List<Long> getGroupChatIdList(WeGroupChatQuery query);
 
-    List<LinkGroupChatVo> getGroupChatListByIds(@Param("groupIdList") List<Long> groupIdList);
+//    List<LinkGroupChatVo> getGroupChatListByIds(@Param("groupIdList") List<Long> groupIdList);
+    @DataScope(type = "2", value = @DataColumn(alias = "wg", name = "owner", userid = "we_user_id"))
+    List<String> findWeGroupListIds(@Param("query") WeGroupChatQuery query,@Param("pageDomain") PageDomain pageDomain);
+
+
+    @DataScope(type = "2", value = @DataColumn(alias = "wg", name = "owner", userid = "we_user_id"))
+    long countWeGroupListIds(@Param("query") WeGroupChatQuery query);
 
     @DataScope(type = "2", value = @DataColumn(alias = "wg", name = "owner", userid = "we_user_id"))
     List<LinkGroupChatListVo> selectWeGroupList(WeGroupChatQuery query);
+
+
+    List<LinkGroupChatListVo> selectWeGroupListByIds(@Param("ids") List<String> ids);
+
 
     List<LinkGroupChatListVo> selectWeGroupListByApp(WeGroupChatQuery query);
 
@@ -42,6 +53,12 @@ public interface WeGroupMapper extends BaseMapper<WeGroup> {
 
     
     LinkGroupChatListVo selectWeGroupDetail(@Param("chatId") String chatId);
+
+    //根据群成员id获取渠道id
+    List<WeGroup> findGroupByUserId(@Param("chatUserId") String chatUserId,@Param("state") String state);
+
+    //根据群成员相关id查询群
+     List<LinkGroupChatListVo> selectChatByMember(@Param("query") WeGroupChatQuery query);
 
 }
 

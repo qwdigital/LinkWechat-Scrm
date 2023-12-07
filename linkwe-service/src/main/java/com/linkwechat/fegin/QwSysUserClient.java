@@ -1,5 +1,6 @@
 package com.linkwechat.fegin;
 
+import com.alibaba.fastjson.JSONObject;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.dto.SysUserDTO;
 import com.linkwechat.common.core.domain.entity.SysUser;
@@ -19,27 +20,50 @@ import java.util.List;
  */
 @FeignClient(value = "${wecom.serve.linkwe-auth}", fallback = QwSysUserFallbackFactory.class, contextId = "linkwe-auth-user")
 public interface QwSysUserClient {
+
+
     @GetMapping("/system/user/listAll")
     AjaxResult<List<SysUser>> listAll();
 
-    @GetMapping("/system/user/syncUserAndDeptHandler")
-    AjaxResult syncUserAndDeptHandler(@RequestParam("msg") String msg);
+    /**
+     * 同步组织架构
+     * @param msg
+     * @return
+     */
+    @PostMapping("/system/user/syncUserHandler")
+    AjaxResult syncUserHandler(@RequestBody JSONObject msg);
+
+    /**
+     * 回调删除
+     * @param weUserIds 企微员工ID
+     * @return
+     */
+    @DeleteMapping("/system/user/callback/{userIds}")
+    AjaxResult delete(@PathVariable("userIds") List<String> weUserIds);
+
+    /**
+     * 回调新增
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/user/callback/add")
+    AjaxResult add(@RequestBody SysUserQuery query);
+
+    /**
+     * 回调更新
+     * @param query
+     * @return
+     */
+    @PutMapping("/system/user/callback/edit")
+    AjaxResult edit(@RequestBody SysUserQuery query);
 
 
-    @DeleteMapping("/system/user/callBackRemove/{corpId}/{userIds}")
-    AjaxResult callBackRemove(@PathVariable("corpId") String corpId, @PathVariable("userIds") String[] userIds);
-
-    @PostMapping("/system/user")
-    AjaxResult add(@RequestBody SysUserDTO sysUser);
-
-    @PutMapping("/system/user")
-    AjaxResult edit(@RequestBody SysUserDTO sysUser);
 
     @GetMapping("/system/user/info/{id}")
     AjaxResult getUserInfoById(@PathVariable("id") Long userId);
 
-    @PostMapping("/system/user/listByQuery")
-    AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
+//    @PostMapping("/system/user/listByQuery")
+//    AjaxResult<List<SysUser>> list(@RequestBody SysUser sysUser);
 
     @GetMapping("/system/user/getUserInfo/{weUserId}")
     AjaxResult<SysUser> getInfo(@PathVariable("weUserId") String weUserId);
@@ -84,6 +108,15 @@ public interface QwSysUserClient {
 
 
     /**
+     * 根据员工条件查询员工
+     * @param query
+     * @return
+     */
+    @PostMapping("/system/user/findSysUser")
+    AjaxResult<List<SysUser>> findSysUser(@RequestBody SysUserQuery query);
+
+
+    /**
      * 根据职位等条件筛选员工
      * @param weUserIds
      * @param deptIds
@@ -104,6 +137,10 @@ public interface QwSysUserClient {
      */
     @PostMapping("/system/user/builderLeaveSysUser")
     AjaxResult builderLeaveSysUser(@RequestBody SysUserQuery sysUsers);
+
+
+    @PostMapping("/system/user/listByQuery")
+    AjaxResult<List<SysUser>> listByQuery(@RequestBody SysUser sysUser);
 
 
 

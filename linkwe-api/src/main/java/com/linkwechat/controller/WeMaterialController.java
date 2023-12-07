@@ -1,8 +1,8 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linkwechat.common.annotation.DataColumn;
@@ -14,12 +14,13 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.enums.MediaType;
 import com.linkwechat.common.exception.CustomException;
-import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.bean.BeanUtils;
-import com.linkwechat.domain.WeCustomer;
+import com.linkwechat.domain.WeTag;
 import com.linkwechat.domain.material.ao.PurePoster;
 import com.linkwechat.domain.material.ao.WePoster;
 import com.linkwechat.domain.material.ao.WePosterFontAO;
@@ -30,17 +31,17 @@ import com.linkwechat.domain.material.query.ContentDetailQuery;
 import com.linkwechat.domain.material.query.LinkMediaQuery;
 import com.linkwechat.domain.material.vo.*;
 import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
-import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeMaterialService;
+import com.linkwechat.service.IWeTagService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +54,9 @@ import java.util.stream.Collectors;
 public class WeMaterialController extends BaseController {
     @Resource
     private IWeMaterialService materialService;
+
+    @Autowired
+    private IWeTagService iWeTagService;
 
     @GetMapping("/material/list")
     @ApiOperation("查询素材列表")
@@ -126,6 +130,11 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/material/temporaryMaterialMediaId")
     @ApiOperation("H5端发送获取素材media_id")
     public AjaxResult temporaryMaterialMediaId(String url, String type, String name) {
+
+        if (StringUtils.isEmpty(name)) {
+            name = SnowFlakeUtil.nextId().toString();
+        }
+
         WeMediaVo weMediaDto = materialService.uploadTemporaryMaterial(url, type,
                 name + "." + url.substring(url.lastIndexOf(".") + 1, url.length()));
         return AjaxResult.success(weMediaDto);
@@ -165,6 +174,7 @@ public class WeMaterialController extends BaseController {
         WeMaterial material = materialService.builderSimpleImg(poster);
         material.setMediaType(MediaType.POSTER.getType());
         material.setModuleType(poster.getModuleType());
+        material.setTagIds(poster.getTagIds());
         boolean b = materialService.saveOrUpdate(material);
         WeMaterialVo weMaterialVo = new WeMaterialVo();
         BeanUtils.copyProperties(material, weMaterialVo);
@@ -202,6 +212,7 @@ public class WeMaterialController extends BaseController {
         }
         poster.setMediaType(null);
         WeMaterial material = materialService.builderSimpleImg(poster);
+        material.setTagIds(poster.getTagIds());
         materialService.saveOrUpdate(material);
         return AjaxResult.success(material);
     }
@@ -214,6 +225,16 @@ public class WeMaterialController extends BaseController {
         WePosterVo vo = BeanUtil.copyProperties(material, WePosterVo.class);
         if (StringUtils.isNotBlank(material.getMaterialName())) {
             vo.setTitle(material.getMaterialName());
+        }
+        if(StringUtils.isNotEmpty(vo.getTagIds())){
+            List<WeTag> weTags = iWeTagService.list(new LambdaQueryWrapper<WeTag>()
+                    .in(WeTag::getTagId, ListUtil.toList(vo.getTagIds().split(","))));
+            if(CollectionUtil.isNotEmpty(weTags)){
+                vo.setTagNames(
+                        weTags.stream().map(WeTag::getName).collect(Collectors.joining(","))
+                );
+            }
+
         }
         vo.setSampleImgPath(material.getMaterialUrl());
         vo.setBackgroundImgPath(material.getBackgroundImgUrl());
@@ -360,19 +381,22 @@ public class WeMaterialController extends BaseController {
     @GetMapping("/material/media/type")
     public AjaxResult getMaterialMediaType() {
 
-        //素材类型：需要参考 CategoryMediaType类中的定义
-        //由于枚举类定义了很多不属于素材中的类型，所以需要把用到的素材类型挑选出来
-        List<MaterialMediaTypeVO> result = new ArrayList<>();
-        result.add(MaterialMediaTypeVO.builder().type(4).name("文本").sort(1).build());
-        result.add(MaterialMediaTypeVO.builder().type(0).name("图片").sort(2).build());
-        result.add(MaterialMediaTypeVO.builder().type(9).name("图文").sort(3).build());
-        result.add(MaterialMediaTypeVO.builder().type(11).name("小程序").sort(4).build());
-        result.add(MaterialMediaTypeVO.builder().type(12).name("文章").sort(5).build());
-        result.add(MaterialMediaTypeVO.builder().type(2).name("视频").sort(6).build());
-        result.add(MaterialMediaTypeVO.builder().type(3).name("文件").sort(7).build());
-        result.add(MaterialMediaTypeVO.builder().type(5).name("海报").sort(8).build());
-        result = result.stream().sorted(Comparator.comparing(MaterialMediaTypeVO::getSort)).collect(Collectors.toList());
-        return AjaxResult.success(result);
+//        //素材类型：需要参考 CategoryMediaType类中的定义
+//        //由于枚举类定义了很多不属于素材中的类型，所以需要把用到的素材类型挑选出来
+//        List<MaterialMediaTypeVO> result = new ArrayList<>();
+//        result.add(MaterialMediaTypeVO.builder().type(4).name("文本").sort(1).build());
+//        result.add(MaterialMediaTypeVO.builder().type(0).name("图片").sort(2).build());
+//        result.add(MaterialMediaTypeVO.builder().type(9).name("图文").sort(3).build());
+//        result.add(MaterialMediaTypeVO.builder().type(11).name("小程序").sort(4).build());
+//        result.add(MaterialMediaTypeVO.builder().type(12).name("文章").sort(5).build());
+//        result.add(MaterialMediaTypeVO.builder().type(2).name("视频").sort(6).build());
+//        result.add(MaterialMediaTypeVO.builder().type(3).name("文件").sort(7).build());
+//        result.add(MaterialMediaTypeVO.builder().type(5).name("海报").sort(8).build());
+//        result.add(MaterialMediaTypeVO.builder().type(18).name("智能表单").sort(9).build());
+//        result = result.stream().sorted(Comparator.comparing(MaterialMediaTypeVO::getSort)).collect(Collectors.toList());
+        return AjaxResult.success(
+                CategoryMediaType.sideMaterialType()
+        );
     }
 
 

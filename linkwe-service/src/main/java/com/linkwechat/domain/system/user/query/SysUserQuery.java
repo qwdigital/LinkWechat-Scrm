@@ -27,11 +27,16 @@ public class SysUserQuery {
     @ApiModelProperty("员工ID")
     private Long userId;
 
+    @ApiModelProperty("企微员工ID")
+    private String weUserId;
+
+    @ApiModelProperty("员工ID")
+    private List<Long> userIds;
+
+
     @ApiModelProperty("员工名称")
     private String userName;
 
-    @ApiModelProperty("企微员工ID")
-    private String weUserId;
 
     @ApiModelProperty("企微员工ID")
     private List<String> weUserIds;
@@ -60,6 +65,8 @@ public class SysUserQuery {
     @ApiModelProperty("性别（0男 1女 2未知）")
     private Integer sex;
 
+
+    private Integer isUserLeave;
 
     private List<SysUser> sysUsers;
 

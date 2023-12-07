@@ -55,6 +55,9 @@ public class QwChatMsgAuditListener {
     @Resource
     private QwFileClient qwFileClient;
 
+    @Autowired
+    private LinkWeChatConfig linkWeChatConfig;
+
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.chat-msg-audit:Qu_ChatMsgAudit}")
     public void subscribe(String msg, Channel channel, Message message) throws IOException {
@@ -212,26 +215,35 @@ public class QwChatMsgAuditListener {
 
     private void getPath(JSONObject realJsonData, String msgType, String fileName) {
         WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
-        FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey());
 
-        String filePath = getFilePath(msgType);
-        JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
-                .orElse(realJsonData.getJSONObject("content"));
-        String sdkfileid = data.getString("sdkfileid");
-        try {
-            financeService.getMediaData(sdkfileid,filePath, fileName);
-            File file = new File(filePath, fileName);
-            MockMultipartFile multipartFile = new MockMultipartFile(FileUtil.getPrefix(fileName), fileName,null, new FileInputStream(file));
-            FileEntity fileEntity = qwFileClient.upload(multipartFile).getData();
-            data.put("attachment", fileEntity.getUrl());
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(null != corpAccount){
+
+            FinanceService financeService = new FinanceService(corpAccount.getCorpId(), corpAccount.getChatSecret(), corpAccount.getFinancePrivateKey(),
+                    linkWeChatConfig.getFincaceProxyConfig().getProxy(),
+                    linkWeChatConfig.getFincaceProxyConfig().getPaswd()
+            );
+
+            String filePath = getFilePath(msgType);
+            JSONObject data = Optional.ofNullable(realJsonData.getJSONObject(msgType))
+                    .orElse(realJsonData.getJSONObject("content"));
+            String sdkfileid = data.getString("sdkfileid");
+            try {
+                financeService.getMediaData(sdkfileid,filePath, fileName);
+                File file = new File(filePath, fileName);
+                MockMultipartFile multipartFile = new MockMultipartFile(FileUtil.getPrefix(fileName), fileName,null, new FileInputStream(file));
+                FileEntity fileEntity = qwFileClient.upload(multipartFile).getData();
+                data.put("attachment", fileEntity.getUrl());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (realJsonData.containsKey("content")) {
+                realJsonData.put("content", data);
+            } else {
+                realJsonData.put(msgType, data);
+            }
+
         }
-        if (realJsonData.containsKey("content")) {
-            realJsonData.put("content", data);
-        } else {
-            realJsonData.put(msgType, data);
-        }
+
 
     }
 

@@ -4,8 +4,11 @@ package com.linkwechat.domain.customer.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.domain.WeCustomerInfoExpand;
 import com.linkwechat.domain.WeCustomerTrajectory;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 import java.util.List;
 
@@ -102,6 +105,9 @@ public class WeCustomerDetailInfoVo {
     }
 
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class  Groups{
 
         //群id

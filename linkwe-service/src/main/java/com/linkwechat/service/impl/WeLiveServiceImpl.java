@@ -51,6 +51,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -116,7 +118,7 @@ implements IWeLiveService {
 
     @Override
     @Transactional
-    public void addOrUpdate(WeLive weLive) {
+    public void addOrUpdate(WeLive weLive) throws ParseException {
 
         if(saveOrUpdate(weLive)){
             //附件入库
@@ -136,10 +138,17 @@ implements IWeLiveService {
         }
 
         weLive.setLivingDuration(
-                new Long( ((weLive.getLiveEndTime().getTime()+weLive.getLiveEndDate().getTime())-
-                        (weLive.getLiveStartTime().getTime()+weLive.getLiveStartDate().getTime()))/1000L)
-                        .intValue()
+                new Long( (((
+                        DateUtils.parseDate( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,weLive.getLiveEndDate())+" "+DateUtils.parseDateToStr("HH:mm",weLive.getLiveEndTime()))
+                                .getTime()
+
+                        )-
+                        (
+                                DateUtils.parseDate( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,weLive.getLiveStartDate())+" "+DateUtils.parseDateToStr("HH:mm",weLive.getLiveStartTime()))
+                                        .getTime()
+                                )))/1000L).intValue()
         );
+
 
         if(StringUtils.isNotEmpty(weLive.getLivingId())){//更新
 
@@ -147,7 +156,8 @@ implements IWeLiveService {
                     WeModifyLivingQuery.builder()
                             .livingid(weLive.getLivingId())
                             .theme(weLive.getLiveTitle())
-                            .living_start((weLive.getLiveStartTime().getTime()+weLive.getLiveStartDate().getTime())/1000L)
+                            .living_start((DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,weLive.getLiveStartDate())+" "+DateUtils.parseDateToStr("HH:mm",weLive.getLiveStartTime()),"yyyy-MM-dd HH:mm")
+                                    .getTime())/1000L)
                             .living_duration(weLive.getLivingDuration())
                             .description(weLive.getLiveDesc())
                             .remind_time(weLive.getStartReminder())
@@ -164,7 +174,8 @@ implements IWeLiveService {
                     WeAddLivingQuery.builder()
                             .anchor_userid(weLive.getLiveWeUserid())
                             .theme(weLive.getLiveTitle())
-                            .living_start((weLive.getLiveStartTime().getTime()+weLive.getLiveStartDate().getTime())/1000L)
+                            .living_start((DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,weLive.getLiveStartDate())+" "+DateUtils.parseDateToStr("HH:mm",weLive.getLiveStartTime()),"yyyy-MM-dd HH:mm")
+                                    .getTime())/1000L)
                             .living_duration(
                                     weLive.getLivingDuration())
                             .description(weLive.getLiveDesc())

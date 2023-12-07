@@ -1,18 +1,21 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.domain.form.query.WeAddFormSurveyAnswerQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyAnswerQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyStatisticQuery;
 import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
+import com.linkwechat.service.IWeCustomerService;
 import com.linkwechat.service.IWeFormSurveyAnswerService;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
 import com.linkwechat.service.IWeFormSurveyStatisticsService;
@@ -22,8 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 答题-用户主表(WeFormSurveyAnswer)
@@ -41,15 +47,19 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
     @Resource
     private WeFormSurveyAnswerMapper weFormSurveyAnswerMapper;
 
+
+    @Autowired
+    private IWeCustomerService weCustomerService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addAnswer(WeAddFormSurveyAnswerQuery query) {
         WeFormSurveyCatalogue formSurveyCatalogue = weFormSurveyCatalogueService.getWeFormSurveyCatalogueById(query.getBelongId());
-        Long rules = formSurveyCatalogue.getFillingRules().longValue();
-        if (rules != null && rules == 0) {
+        Integer rules = formSurveyCatalogue.getFillingRules();
+        if(Objects.nonNull(rules) && Objects.equals(0,rules)){
             int count = count(new LambdaQueryWrapper<WeFormSurveyAnswer>()
                     .eq(WeFormSurveyAnswer::getBelongId, query.getBelongId())
-                    .eq(WeFormSurveyAnswer::getIpAddr, query.getIpAddr())
+                    .eq(WeFormSurveyAnswer::getUnionId, query.getUnionId())
                     .eq(WeFormSurveyAnswer::getDataSource, query.getDataSource())
                     .eq(WeFormSurveyAnswer::getAnEffective, 0)
                     .eq(WeFormSurveyAnswer::getDelFlag, 0));
@@ -57,10 +67,10 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
                 throw new WeComException("该用户已填写");
             }
         }
-        if (rules != null && rules == 1) {
+        if (Objects.nonNull(rules) && Objects.equals(1,rules)) {
             int count = count(new LambdaQueryWrapper<WeFormSurveyAnswer>()
                     .eq(WeFormSurveyAnswer::getBelongId, query.getBelongId())
-                    .eq(WeFormSurveyAnswer::getIpAddr, query.getIpAddr())
+                    .eq(WeFormSurveyAnswer::getUnionId, query.getUnionId())
                     .eq(WeFormSurveyAnswer::getDataSource, query.getDataSource())
                     .eq(WeFormSurveyAnswer::getAnEffective, 0)
                     .eq(WeFormSurveyAnswer::getDelFlag, 0)
@@ -74,15 +84,6 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         BeanUtil.copyProperties(query, weFormSurveyAnswer);
         weFormSurveyAnswer.setIpAddr(query.getIpAddr());
         save(weFormSurveyAnswer);
-
-//        WeFormSurveyStatistics surveyStatistics = new WeFormSurveyStatistics();
-//        surveyStatistics.setBelongId(weFormSurveyAnswer.getBelongId());
-//        surveyStatistics.setDataSource(weFormSurveyAnswer.getDataSource());
-//        surveyStatistics.setCollectionRate(weFormSurveyAnswer.getIpAddr());
-//        weFormSurveyStatisticsService.delStatistics(surveyStatistics);
-//        weFormSurveyStatisticsService.addStatistics(surveyStatistics);
-
-
     }
 
     @Override
@@ -93,7 +94,6 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), WeFormSurveyAnswer::getDataSource, query.getDataSource());
         queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
         queryWrapper.apply(Objects.nonNull(query.getEndDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndDate()) + "'");
-        queryWrapper.isNotNull(WeFormSurveyAnswer::getMobile);
         return list(queryWrapper);
     }
 
@@ -109,7 +109,7 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         }
         LambdaQueryWrapper<WeFormSurveyAnswer> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WeFormSurveyAnswer::getBelongId, query.getBelongId());
-        queryWrapper.eq(WeFormSurveyAnswer::getIpAddr, query.getIpAddr());
+        queryWrapper.eq(WeFormSurveyAnswer::getOpenId, query.getOpenId());
         queryWrapper.eq(WeFormSurveyAnswer::getDataSource, query.getDataSource());
         queryWrapper.eq(WeFormSurveyAnswer::getAnEffective, 0);
         queryWrapper.eq(WeFormSurveyAnswer::getDelFlag, 0);
@@ -133,14 +133,32 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
     @Override
     public List<WeFormSurveyAnswer> selectCustomerList(WeFormSurveyStatisticQuery query) {
         QueryWrapper<WeFormSurveyAnswer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("distinct mobile,name,avatar,addr,city,open_id,union_id,create_Time,COUNT(DISTINCT mobile)");
+        queryWrapper.select("mobile,name,avatar,addr,city,open_id,union_id,create_time");
         queryWrapper.eq("belong_id", query.getBelongId());
         queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), "data_source", query.getDataSource());
         queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
         queryWrapper.apply(Objects.nonNull(query.getEndDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndDate()) + "'");
-        queryWrapper.apply("mobile is not null");
-        queryWrapper.groupBy("mobile");
-        return list(queryWrapper);
+        queryWrapper.orderByDesc("create_time");
+        List<WeFormSurveyAnswer> resultList = list(queryWrapper);
+        if (CollectionUtil.isNotEmpty(resultList)) {
+            List<String> unionIds = resultList.stream().map(WeFormSurveyAnswer::getUnionId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+            if(CollectionUtil.isNotEmpty(unionIds)){
+                List<WeCustomer> weCustomers = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>().select(WeCustomer::getId, WeCustomer::getUnionid).in(WeCustomer::getUnionid, unionIds).eq(WeCustomer::getDelFlag, 0));
+
+                Map<String, Long> unionIdAndCountMap = new HashMap<>(16);
+                if (CollectionUtil.isNotEmpty(weCustomers)) {
+                    unionIdAndCountMap = weCustomers.stream().collect(Collectors.groupingBy(WeCustomer::getUnionid, Collectors.counting()));
+                }
+                for (WeFormSurveyAnswer list : resultList) {
+                    if (unionIdAndCountMap.containsKey(list.getUnionId())) {
+                        list.setIsOfficeCustomer(true);
+                    } else {
+                        list.setIsOfficeCustomer(false);
+                    }
+                }
+            }
+        }
+        return resultList;
     }
 
 

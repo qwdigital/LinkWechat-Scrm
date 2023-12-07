@@ -76,7 +76,13 @@ public enum WeMsgTypeEnum {
     /**
      * 海报
      */
-    POSTERS("13","posters")
+    POSTERS("13","posters"),
+
+
+    /**
+     * 外链
+     */
+    MURL("14","murl")
 
     ;
     /**

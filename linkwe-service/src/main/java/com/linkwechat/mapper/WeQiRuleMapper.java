@@ -23,5 +23,7 @@ public interface WeQiRuleMapper extends BaseMapper<WeQiRule> {
     List<WeQiRuleListVo> getQiRuleList(WeQiRuleListQuery query);
 
     List<WeQiRuleListVo> getQiRuleListByUserId(WeQiRuleListQuery query);
+
+    List<Long> getQiIdsByQuery(WeQiRuleListQuery query);
 }
 
