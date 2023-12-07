@@ -64,7 +64,11 @@
         where id in (select max(id)
                      from we_ai_msg
                      where user_id = #{userId}
-                     group by session_id)
+                     <if test="content !=null and content != ''">
+                         and content like concat('%', #{content}, '%')
+                     </if>
+                     group by session_id
+        order by id desc
     </select>
 
 </mapper>

@@ -11,10 +11,7 @@ import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
-import com.linkwechat.domain.AiMessage;
-import com.linkwechat.domain.WeAiMsg;
-import com.linkwechat.domain.WeAiMsgQuery;
-import com.linkwechat.domain.WeAiMsgVo;
+import com.linkwechat.domain.*;
 import com.linkwechat.service.HunYuanService;
 import com.linkwechat.service.IWeAiMsgService;
 import com.linkwechat.service.IWeAiSessionService;
@@ -172,9 +169,9 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     }
 
     @Override
-    public PageInfo<WeAiMsgVo> list(WeAiMsgQuery query) {
+    public PageInfo<WeAiMsgVo> list(WeAiMsgListQuery query) {
         PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
-        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId());
+        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId(),query.getContent());
         if (CollectionUtil.isNotEmpty(weAiMsgList)) {
             List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
                 WeAiMsgVo weAiMsgVo = new WeAiMsgVo();

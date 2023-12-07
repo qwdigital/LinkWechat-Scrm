@@ -5,6 +5,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.domain.WeAiMsg;
+import com.linkwechat.domain.WeAiMsgListQuery;
 import com.linkwechat.domain.WeAiMsgQuery;
 import com.linkwechat.domain.WeAiMsgVo;
 import com.linkwechat.service.IWeAiSessionService;
@@ -55,7 +56,7 @@ public class WeAiAssistantController extends BaseController {
 
     @ApiOperation(value = "消息列表",httpMethod = "POST")
     @PostMapping("/msg/list")
-    public TableDataInfo<List<WeAiMsgVo>> list(@RequestBody WeAiMsgQuery query){
+    public TableDataInfo<List<WeAiMsgVo>> list(@RequestBody WeAiMsgListQuery query){
         startPage(query.getPageIndex(),query.getPageSize());
         PageInfo<WeAiMsgVo> reslut =  iWeAiSessionService.list(query);
         return getDataTable(reslut);

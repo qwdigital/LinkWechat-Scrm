@@ -13,5 +13,5 @@ import java.util.List;
  */
 public interface IWeAiMsgService extends IService<WeAiMsg> {
 
-    List<WeAiMsg> getSessionList(Long userId);
+    List<WeAiMsg> getSessionList(Long userId, String content);
 }

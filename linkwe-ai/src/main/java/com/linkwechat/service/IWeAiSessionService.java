@@ -1,6 +1,7 @@
 package com.linkwechat.service;
 
 import com.github.pagehelper.PageInfo;
+import com.linkwechat.domain.WeAiMsgListQuery;
 import com.linkwechat.domain.WeAiMsgQuery;
 import com.linkwechat.domain.WeAiMsgVo;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -17,7 +18,7 @@ public interface IWeAiSessionService {
 
     void sendAiMsg(WeAiMsgQuery query);
 
-    PageInfo<WeAiMsgVo> list(WeAiMsgQuery query);
+    PageInfo<WeAiMsgVo> list(WeAiMsgListQuery query);
 
     List<WeAiMsgVo> getDetail(String sessionId);
 

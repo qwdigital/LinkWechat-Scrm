@@ -2,7 +2,6 @@ package com.linkwechat.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.annotation.SqlParser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -22,6 +21,6 @@ import com.linkwechat.domain.WeAiMsg;
 public interface WeAiMsgMapper extends BaseMapper<WeAiMsg> {
 
 
-    List<WeAiMsg> getSessionList(@Param("userId") Long userId);
+    List<WeAiMsg> getSessionList(@Param("userId") Long userId, @Param("content") String content);
 }
 
