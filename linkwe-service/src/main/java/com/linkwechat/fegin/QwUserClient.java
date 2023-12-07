@@ -1,6 +1,7 @@
 package com.linkwechat.fegin;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
 import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
@@ -81,4 +82,8 @@ public interface QwUserClient {
      */
     @PostMapping("/user/getUnassignedList")
     AjaxResult<WeLeaveUserVo>  getUnassignedList(@RequestBody WeLeaveUserQuery query);
+
+
+    @PostMapping("/usr/listByQuery")
+    AjaxResult<SysUser> listByQuery(@RequestBody SysUser sysUser);
 }

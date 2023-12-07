@@ -49,7 +49,8 @@ public class SecurityConstants {
     /**公众号密钥*/
     public static final String WE_APP_SECRET="weAppSecret";
 
-
+    /**Feign请求标识*/
+    public static final String IS_FEGIN="isFeign";
 
 
     /** 授权字段 */

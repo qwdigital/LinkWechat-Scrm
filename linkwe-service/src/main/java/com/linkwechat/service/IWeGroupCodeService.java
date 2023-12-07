@@ -1,16 +1,15 @@
 package com.linkwechat.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
-import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatAddJoinWayQuery;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
-import org.apache.ibatis.annotations.Param;
 
-import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -90,5 +89,15 @@ public interface IWeGroupCodeService extends IService<WeGroupCode> {
      * @return
      */
     WeGroupChatAddJoinWayVo builderGroupCodeConfig(WeGroupCode weGroupCode);
+
+    JSONObject getShort2LongUrl(String shortUrl);
+
+    WeGroupCode getDetail(String id);
+
+    WeQrCodeScanCountVo getWeQrCodeScanTotalCount(WeGroupCode weGroupCode);
+
+    List<WeQrCodeScanLineCountVo> getWeQrCodeScanLineCount(WeGroupCode weGroupCode);
+
+    List<WeQrCodeScanLineCountVo> getWeQrCodeScanSheetCount(WeGroupCode weGroupCode);
 
 }

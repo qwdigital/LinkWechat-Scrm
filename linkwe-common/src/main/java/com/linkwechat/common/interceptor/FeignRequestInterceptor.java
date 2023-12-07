@@ -2,16 +2,23 @@ package com.linkwechat.common.interceptor;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.constant.SecurityConstants;
 import com.linkwechat.common.constant.TokenConstants;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.utils.SecurityUtils;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.Enumeration;
 
 /**
  * feign 请求拦截器
@@ -23,6 +30,26 @@ import java.util.Collection;
 public class FeignRequestInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate requestTemplate) {
+
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            Enumeration<String> headerNames = request.getHeaderNames();
+            String name;
+            // 将原有请求中的header，数据转移至新的请求中
+            if (headerNames != null) {
+                while(headerNames.hasMoreElements()) {
+                    name = (String)headerNames.nextElement();
+                    String values = request.getHeader(name);
+                    if (!name.equalsIgnoreCase("content-length")) {
+                        requestTemplate.header(name, new String[]{values});
+                    }
+                }
+            }
+
+        }
+
 
         String corpId = SecurityUtils.getCorpId();
         if (StringUtils.isNotEmpty(corpId)) {

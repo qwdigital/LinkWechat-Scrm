@@ -10,9 +10,7 @@
                        we_store_code_count where source=1
                )  as totalShopGuideScannNumber,
                (
-                   SELECT count(DISTINCT external_userid) from we_customer where state in (
-                       SELECT state from we_store_code
-                   )
+                   SELECT count(DISTINCT external_userid) from we_customer where state = #{state}
 
                ) as customerTotalNumber,
                (
@@ -28,14 +26,10 @@
                        we_store_code_count  where source=1 and date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
                ) as ydShopGuideScannNumber,
                (
-                   SELECT count(DISTINCT external_userid) from we_customer where state in (
-                       SELECT state from we_store_code
-                   ) AND  date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                   SELECT count(DISTINCT external_userid) from we_customer where state = #{state} AND  date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
                ) as ydCustomerNumber,
                (
-                   SELECT count(DISTINCT external_userid) from we_customer where state in (
-                       SELECT state from we_store_code
-                   ) AND  date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                   SELECT count(DISTINCT external_userid) from we_customer where state = #{state} AND  date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
                ) as tdCustomerNumber
     </select>
 

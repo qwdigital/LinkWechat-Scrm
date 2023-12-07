@@ -24,7 +24,7 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      * @return
      */
 
-    WeStoreShopGuideTabVo countWeStoreShopGuideTab();
+    WeStoreShopGuideTabVo countWeStoreShopGuideTab(@Param("state") String state);
 
     /**
      * 门店统计-头部tab

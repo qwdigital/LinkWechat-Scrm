@@ -124,4 +124,18 @@ public class WeQrCode extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "删除标识 0 有效 1删除",hidden = true)
     @TableField("del_flag")
     private Integer delFlag;
+
+    /**
+     * 欢迎语开关
+     */
+    @ApiModelProperty("欢迎语开关 1-不发送欢迎语，2-发送欢迎语")
+    @TableField("qr_welcome_open")
+    private Integer qrWelcomeOpen;
+
+    /**
+     * 是否优先员工欢迎语
+     */
+    @ApiModelProperty("是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）")
+    @TableField("qr_priority_user_welcome")
+    private Integer qrPriorityUserWelcome;
 }

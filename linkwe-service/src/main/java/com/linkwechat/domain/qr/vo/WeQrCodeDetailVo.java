@@ -1,5 +1,6 @@
 package com.linkwechat.domain.qr.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.qr.WeQrCode;
 import com.linkwechat.domain.tag.vo.WeTagVo;
@@ -29,4 +30,8 @@ public class WeQrCodeDetailVo extends WeQrCode {
 
     @ApiModelProperty("素材")
     private List<WeQrAttachments> qrAttachments;
+
+
+    @ApiModelProperty("活码短链")
+    private String qrShortLink;
 }

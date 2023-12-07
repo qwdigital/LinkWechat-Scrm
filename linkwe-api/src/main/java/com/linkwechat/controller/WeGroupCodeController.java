@@ -1,17 +1,29 @@
 package com.linkwechat.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.page.TableSupport;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
+import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
+import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.service.IWeGroupCodeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/groupCode")
+@Api(tags = "群活码管理")
 public class WeGroupCodeController extends BaseController {
 
     @Autowired
@@ -74,7 +88,7 @@ public class WeGroupCodeController extends BaseController {
     @GetMapping("/getActualCode/{id}")
     public AjaxResult<WeGroupCode> getWeGroupCode(@PathVariable String id){
         return AjaxResult.success(
-                groupCodeService.getById(id)
+                groupCodeService.getDetail(id)
         );
     }
 
@@ -183,7 +197,47 @@ public class WeGroupCodeController extends BaseController {
         );
     }
 
+    @ApiOperation(value = "获取群活码总数统计", httpMethod = "GET")
+    @GetMapping("/scan/total")
+    public AjaxResult<WeQrCodeScanCountVo> getWeQrCodeScanTotalCount(WeGroupCode weGroupCode) {
+        WeQrCodeScanCountVo weQrCodeScanCount = groupCodeService.getWeQrCodeScanTotalCount(weGroupCode);
+        return AjaxResult.success(weQrCodeScanCount);
+    }
 
+    @ApiOperation(value = "获取群活码折线图统计", httpMethod = "GET")
+    @GetMapping("/scan/line")
+    public AjaxResult<List<WeQrCodeScanLineCountVo>> getWeQrCodeScanLineCount(WeGroupCode weGroupCode) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCount = groupCodeService.getWeQrCodeScanLineCount(weGroupCode);
+        return AjaxResult.success(weQrCodeScanCount);
+    }
 
+    @ApiOperation(value = "获取群活码表格统计", httpMethod = "GET")
+    @GetMapping("/scan/sheet")
+    public TableDataInfo<List<WeQrCodeScanLineCountVo>> getWeQrCodeScanSheetCount(WeGroupCode weGroupCode) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCount = groupCodeService.getWeQrCodeScanSheetCount(weGroupCode);
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        Integer pageNum = pageDomain.getPageNum();
+        Integer pageSize = pageDomain.getPageSize();
+        PageInfo<WeQrCodeScanLineCountVo> pageInfo = new PageInfo<>();
+        pageInfo.setTotal(weQrCodeScanCount.size());
+        pageInfo.setList(startPage(weQrCodeScanCount,pageNum,pageSize));
+        return getDataTable(pageInfo);
+    }
 
+    @ApiOperation(value = "获取群活码表格统计导出", httpMethod = "GET")
+    @GetMapping("/scan/sheet/export")
+    public void getWeQrCodeScanSheetExport(WeGroupCode weGroupCode) {
+        List<WeQrCodeScanLineCountVo> weQrCodeScanCount = groupCodeService.getWeQrCodeScanSheetCount(weGroupCode);
+        try {
+            HttpServletResponse response = ServletUtils.getResponse();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("群活码数据报表", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            ExcelWriterBuilder write = EasyExcel.write(response.getOutputStream(), WeQrCodeScanLineCountVo.class);
+            write.sheet("数据明细").doWrite(weQrCodeScanCount);
+        } catch (IOException e) {
+            log.error("获取活码表格统计导出异常：query:{}", JSONObject.toJSONString(weGroupCode), e);
+        }
+    }
 }

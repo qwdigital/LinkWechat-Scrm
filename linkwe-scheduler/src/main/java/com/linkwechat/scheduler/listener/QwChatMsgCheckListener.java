@@ -20,6 +20,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -49,7 +50,7 @@ public class QwChatMsgCheckListener {
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.chat-msg-check:Qu_ChatMsgCheck}")
-    public void subscribe(String msg, Channel channel, Message message) {
+    public void subscribe(String msg, Channel channel, Message message) throws IOException {
         try {
             log.info("会话存档消息审核监听：msg:{}", msg);
 
@@ -58,6 +59,7 @@ public class QwChatMsgCheckListener {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
             log.error("会话存档消息监听-消息处理失败 msg:{},error:{}", msg, e);
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), true, true);
         }
     }
 
