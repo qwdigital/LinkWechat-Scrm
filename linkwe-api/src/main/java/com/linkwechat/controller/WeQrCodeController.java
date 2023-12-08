@@ -1,19 +1,23 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.core.page.TableSupport;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
@@ -21,6 +25,7 @@ import com.linkwechat.domain.qirule.vo.WeQiRuleWeeklyDetailListVo;
 import com.linkwechat.domain.qr.query.WeQrAddQuery;
 import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
 import com.linkwechat.domain.qr.vo.*;
+import com.linkwechat.domain.shortlink.vo.WeShortLinkVo;
 import com.linkwechat.handler.WeQiRuleWeeklyUserDetailWriteHandler;
 import com.linkwechat.service.IWeQrCodeService;
 import io.swagger.annotations.Api;
@@ -47,6 +52,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "qr")
 @Api(tags = "活码管理")
 public class WeQrCodeController extends BaseController {
+
+    @Autowired
+    private RedisService redisService;
 
     @Autowired
     private IWeQrCodeService weQrCodeService;
@@ -171,6 +179,14 @@ public class WeQrCodeController extends BaseController {
         return AjaxResult.success();
     }
 
+    @ApiOperation(value = "通过短链接获取活码详情", httpMethod = "GET")
+    @GetMapping("/getByDetail/{shortUrl}")
+    public AjaxResult<WeQrCodeDetailVo> getQrCodeInfoByShortUrl(@PathVariable("shortUrl") String shortUrl) {
+        long id = Base62NumUtil.decode(shortUrl);
+        WeQrCodeDetailVo qrDetail = weQrCodeService.getQrDetail(id);
+        redisService.increment(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.OPEN_APPLET + "qr:" +shortUrl);
+        return AjaxResult.success(qrDetail);
+    }
 
     @ApiOperation(value = "获取活码总数统计", httpMethod = "GET")
     @GetMapping("/scan/total")

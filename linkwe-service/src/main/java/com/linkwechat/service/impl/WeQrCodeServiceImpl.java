@@ -653,7 +653,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
         WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
         wxa.setPath(linkWeChatConfig.getShortAppletUrl());
-        wxa.setQuery("id=" + shortUrl);
+        wxa.setQuery("id=" + shortUrl + "&sence=qr");
         wxa.setEnv_version(shortEnvVersion);
         wxaQuery.setJump_wxa(wxa);
         WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
@@ -665,7 +665,7 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
         }
         resObj.put("user_name", corpAccount.getWxAppletOriginalId());
         resObj.put("path", linkWeChatConfig.getShortAppletUrl());
-        resObj.put("query", "id=" + shortUrl);
+        resObj.put("query", "id=" + shortUrl + "&sence=qr");
         return resObj;
     }
 
