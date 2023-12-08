@@ -141,7 +141,7 @@ public class WeIndexController {
 
     @ShortLinkView(prefix = "qr:")
     @ApiOperation(value = "活码短链换取长链", httpMethod = "GET")
-    @GetMapping(value = "/qr/{shortUrl}")
+    @GetMapping(value = "/pqr/{shortUrl}")
     public void getQrShort2LongUrl(HttpServletRequest request,
                                  HttpServletResponse resp,
                                  @PathVariable("shortUrl") String shortUrl) throws IOException {
