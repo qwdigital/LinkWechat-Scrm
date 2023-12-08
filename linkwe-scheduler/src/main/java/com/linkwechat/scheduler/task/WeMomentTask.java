@@ -86,6 +86,7 @@ public class WeMomentTask {
 //                weMomentsTaskService.update(WeMomentsTask.builder().status(3).build(),new LambdaQueryWrapper<WeMomentsTask>()
 //                        .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
                 List<WeMomentsTask> expiredWeMomentsTasks = weMomentsTaskService.list(new LambdaQueryWrapper<WeMomentsTask>()
+                        .eq(WeMomentsTask::getStatus,2)
                         .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')", new Date()));
 
                 if(CollectionUtil.isNotEmpty(expiredWeMomentsTasks)){
