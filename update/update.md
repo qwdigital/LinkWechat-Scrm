@@ -201,8 +201,14 @@
        ● yml文件更新 
            linkwe-common.yml
                 linkwechat:
-                     qrShortLinkDomainName: sl.linkwechat.net/st/qr/
+                     qrShortLinkDomainName: sl.linkwechat.net/st/pqr/
                      qrGroupShortLinkDomainName: sl.linkwechat.net/st/gqr/ 
+           linkwe-gateway.yml
+                security:
+                    ignore:
+                      whites:
+                          - /open/gqr/**
+                          - /open/pqr/**
        ● 菜单更新日志
          UPDATE `sys_menu` SET `menu_name` = '员工活码', `parent_id` = 2218, `order_num` = 1, `path` = 'staff', `component` = ' ', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-11-08 12:13:21', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-07 21:06:31', `remark` = '' WHERE `menu_id` = 2053;
          UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2053, `order_num` = 11, `path` = 'detail', `component` = 'drainageCode/staff/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:staff:detail', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-22 16:32:05', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-11-30 17:17:33', `remark` = '' WHERE `menu_id` = 2159;

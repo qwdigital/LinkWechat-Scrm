@@ -139,7 +139,7 @@ public class WeIndexController {
     }
 
 
-    @ShortLinkView(prefix = "qr:")
+    @ShortLinkView(prefix = "pqr:")
     @ApiOperation(value = "活码短链换取长链", httpMethod = "GET")
     @GetMapping(value = "/pqr/{shortUrl}")
     public void getQrShort2LongUrl(HttpServletRequest request,
