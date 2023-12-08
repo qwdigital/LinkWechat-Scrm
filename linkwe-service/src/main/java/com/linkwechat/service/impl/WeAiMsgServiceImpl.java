@@ -19,7 +19,15 @@ public class WeAiMsgServiceImpl extends ServiceImpl<WeAiMsgMapper, WeAiMsg> impl
 
 
     @Override
-    public List<WeAiMsg> getSessionList(Long userId, String content) {
-        return this.baseMapper.getSessionList(userId,content);
+    public List<WeAiMsg> getSessionList(Long userId, String content, Integer collection) {
+        return this.baseMapper.getSessionList(userId,content,collection);
+    }
+
+    @Override
+    public void collectionMsg(Long id) {
+        WeAiMsg weAiMsg = new WeAiMsg();
+        weAiMsg.setCollection(1);
+        weAiMsg.setId(id);
+        updateById(weAiMsg);
     }
 }

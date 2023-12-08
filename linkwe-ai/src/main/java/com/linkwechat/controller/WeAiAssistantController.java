@@ -69,4 +69,11 @@ public class WeAiAssistantController extends BaseController {
         return AjaxResult.success(reslut);
     }
 
+
+    @ApiOperation(value = "收藏对话",httpMethod = "POST")
+    @PostMapping("/msg/collection/{id}")
+    public AjaxResult collectionMsg(@PathVariable("id") Long id, @RequestBody WeAiMsgQuery query){
+        iWeAiSessionService.collectionMsg(id);
+        return AjaxResult.success();
+    }
 }

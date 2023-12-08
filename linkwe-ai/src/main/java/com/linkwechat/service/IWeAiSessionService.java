@@ -24,4 +24,6 @@ public interface IWeAiSessionService {
 
 
     SseEmitter createAndSendMsg(WeAiMsgQuery query);
+
+    void collectionMsg(Long id);
 }

@@ -14,6 +14,7 @@
         <result property="requestId" column="request_id" jdbcType="VARCHAR"/>
         <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
         <result property="note" column="note" jdbcType="VARCHAR"/>
+        <result property="collection" column="collection" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
         <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
@@ -33,6 +34,7 @@
                request_id,
                send_time,
                note,
+               collection,
                create_time,
                create_by,
                create_by_id,
@@ -43,7 +45,7 @@
         from we_ai_msg
     </sql>
 
-    <select id="getSessionList" resultType="com.linkwechat.domain.WeAiMsg">
+    <select id="getSessionList" resultMap="WeAiMsgResult">
         select id,
                session_id,
                msg_id,
@@ -53,6 +55,7 @@
                request_id,
                send_time,
                note,
+               collection,
                create_time,
                create_by,
                create_by_id,
@@ -67,7 +70,11 @@
                      <if test="content !=null and content != ''">
                          and content like concat('%', #{content}, '%')
                      </if>
-                     group by session_id
+                     <if test="collection != null">
+                         and collection = #{collection}
+                     </if>
+                     and role = 'user'
+                     group by session_id)
         order by id desc
     </select>
 

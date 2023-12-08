@@ -103,21 +103,12 @@ public class WeAiMsg extends BaseEntity implements Serializable {
     @TableField("note")
     private String note;
 
-
     /**
-     * 创建人id
+     * 收藏 0-未收藏 1-收藏
      */
-    @ApiModelProperty(value = "创建人id")
-    @TableField("create_by_id")
-    private Long createById;
-
-
-    /**
-     * 更新人id
-     */
-    @ApiModelProperty(value = "更新人id")
-    @TableField("update_by_id")
-    private Long updateById;
+    @ApiModelProperty(value = "收藏 0-未收藏 1-收藏")
+    @TableField("collection")
+   private Integer collection;
 
 
     /**

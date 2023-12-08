@@ -171,7 +171,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     @Override
     public PageInfo<WeAiMsgVo> list(WeAiMsgListQuery query) {
         PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
-        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId(),query.getContent());
+        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId(),query.getContent(),query.getCollection());
         if (CollectionUtil.isNotEmpty(weAiMsgList)) {
             List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
                 WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
@@ -228,5 +228,13 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             throw new WeComException("连接异常！");
         }
         return sseEmitter;
+    }
+
+    @Override
+    public void collectionMsg(Long id) {
+        if(id == null){
+            return;
+        }
+        iWeAiMsgService.collectionMsg(id);
     }
 }
