@@ -103,6 +103,7 @@
             and content like concat('%', #{content}, '%')
         </if>
         and role = 'user'
+        and collection = 1
         group by session_id)
         order by id desc
     </select>
