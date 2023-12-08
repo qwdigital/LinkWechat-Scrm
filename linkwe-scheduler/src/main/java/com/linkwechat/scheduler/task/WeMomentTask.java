@@ -83,8 +83,19 @@ public class WeMomentTask {
                 }
 
                 //到期结束任务
-                weMomentsTaskService.update(WeMomentsTask.builder().status(3).build(),new LambdaQueryWrapper<WeMomentsTask>()
-                        .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
+//                weMomentsTaskService.update(WeMomentsTask.builder().status(3).build(),new LambdaQueryWrapper<WeMomentsTask>()
+//                        .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')",new Date()));
+                List<WeMomentsTask> expiredWeMomentsTasks = weMomentsTaskService.list(new LambdaQueryWrapper<WeMomentsTask>()
+                        .apply("date_format (execute_end_time,'%Y-%m-%d %H:%i') <= date_format ({0},'%Y-%m-%d %H:%i')", new Date()));
+
+                if(CollectionUtil.isNotEmpty(expiredWeMomentsTasks)){
+                    expiredWeMomentsTasks.stream().forEach(k->{
+
+                        weMomentsTaskService.cancelSendMoments(k.getId());
+                    });
+
+                }
+
 
 
             }finally {
