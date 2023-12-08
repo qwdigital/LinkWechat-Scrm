@@ -70,4 +70,11 @@ public class WeAiMsgVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "发送时间")
     private Date sendTime;
+
+
+    /**
+     * 收藏 0-未收藏 1-收藏
+     */
+    @ApiModelProperty(value = "收藏 0-未收藏 1-收藏")
+    private Integer collection;
 }
