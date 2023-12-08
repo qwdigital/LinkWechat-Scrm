@@ -21,6 +21,8 @@ import com.linkwechat.domain.WeAiMsg;
 public interface WeAiMsgMapper extends BaseMapper<WeAiMsg> {
 
 
-    List<WeAiMsg> getSessionList(@Param("userId") Long userId, @Param("content") String content, @Param("collection") Integer collection);
+    List<WeAiMsg> getSessionList(@Param("userId") Long userId, @Param("content") String content);
+
+    List<WeAiMsg> collectionList(@Param("userId") Long userId, @Param("content") String content);
 }
 

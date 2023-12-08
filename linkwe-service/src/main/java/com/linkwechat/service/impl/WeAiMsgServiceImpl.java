@@ -1,5 +1,6 @@
 package com.linkwechat.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.domain.WeAiMsg;
 import com.linkwechat.mapper.WeAiMsgMapper;
@@ -19,15 +20,26 @@ public class WeAiMsgServiceImpl extends ServiceImpl<WeAiMsgMapper, WeAiMsg> impl
 
 
     @Override
-    public List<WeAiMsg> getSessionList(Long userId, String content, Integer collection) {
-        return this.baseMapper.getSessionList(userId,content,collection);
+    public List<WeAiMsg> getSessionList(Long userId, String content) {
+        return this.baseMapper.getSessionList(userId,content);
     }
 
     @Override
-    public void collectionMsg(Long id) {
+    public void collectionMsg(String msgId, Integer status) {
         WeAiMsg weAiMsg = new WeAiMsg();
-        weAiMsg.setCollection(1);
-        weAiMsg.setId(id);
-        updateById(weAiMsg);
+        weAiMsg.setCollection(status);
+        update(weAiMsg,new LambdaQueryWrapper<WeAiMsg>().eq(WeAiMsg::getMsgId,msgId));
+    }
+
+    @Override
+    public void delMsg(String sessionId) {
+        WeAiMsg weAiMsg = new WeAiMsg();
+        weAiMsg.setDelFlag(1);
+        update(weAiMsg,new LambdaQueryWrapper<WeAiMsg>().eq(WeAiMsg::getSessionId,sessionId));
+    }
+
+    @Override
+    public List<WeAiMsg> collectionList(Long userId, String content) {
+        return this.baseMapper.collectionList(userId,content);
     }
 }

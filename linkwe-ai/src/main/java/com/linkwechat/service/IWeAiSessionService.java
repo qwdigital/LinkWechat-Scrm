@@ -1,6 +1,7 @@
 package com.linkwechat.service;
 
 import com.github.pagehelper.PageInfo;
+import com.linkwechat.domain.WeAiCollectionMsgQuery;
 import com.linkwechat.domain.WeAiMsgListQuery;
 import com.linkwechat.domain.WeAiMsgQuery;
 import com.linkwechat.domain.WeAiMsgVo;
@@ -22,8 +23,31 @@ public interface IWeAiSessionService {
 
     List<WeAiMsgVo> getDetail(String sessionId);
 
-
+    /**
+     * 创建连接并发送消息
+     * @param query
+     * @return
+     */
     SseEmitter createAndSendMsg(WeAiMsgQuery query);
 
-    void collectionMsg(Long id);
+    /**
+     * 删除会话
+     * @param query
+     */
+    void delMsg(WeAiMsgQuery query);
+
+    /**
+     * 收藏/取消消息
+     * @param query
+     * @return
+     */
+    void collectionMsg(WeAiCollectionMsgQuery query);
+
+
+    /**
+     * 收藏列表
+     * @param query
+     * @return
+     */
+    PageInfo<WeAiMsgVo> collectionList(WeAiMsgListQuery query);
 }

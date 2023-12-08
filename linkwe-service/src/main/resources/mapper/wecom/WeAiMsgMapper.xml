@@ -70,11 +70,40 @@
                      <if test="content !=null and content != ''">
                          and content like concat('%', #{content}, '%')
                      </if>
-                     <if test="collection != null">
-                         and collection = #{collection}
-                     </if>
                      and role = 'user'
+                     and del_flag = 0
                      group by session_id)
+        order by id desc
+    </select>
+
+    <select id="collectionList" resultMap="WeAiMsgResult">
+        select
+            id,
+            session_id,
+            msg_id,
+            user_id,
+            role,
+            content,
+            request_id,
+            send_time,
+            note,
+            collection,
+            create_time,
+            create_by,
+            create_by_id,
+            update_time,
+            update_by,
+            update_by_id,
+            del_flag
+        from we_ai_msg
+            where id in
+            (select max(id) from we_ai_msg
+        where user_id = #{userId}
+        <if test="content !=null and content != ''">
+            and content like concat('%', #{content}, '%')
+        </if>
+        and role = 'user'
+        group by session_id)
         order by id desc
     </select>
 

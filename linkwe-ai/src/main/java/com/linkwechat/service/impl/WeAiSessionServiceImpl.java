@@ -157,6 +157,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
         WeAiMsg sendMsg = new WeAiMsg();
         sendMsg.setSessionId(query.getSessionId());
+        sendMsg.setMsgId(IdUtil.simpleUUID());
         sendMsg.setSendTime(new Date());
         sendMsg.setRole(query.getMsg().getRole());
         sendMsg.setContent(query.getMsg().getContent());
@@ -171,7 +172,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     @Override
     public PageInfo<WeAiMsgVo> list(WeAiMsgListQuery query) {
         PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
-        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId(),query.getContent(),query.getCollection());
+        List<WeAiMsg> weAiMsgList = iWeAiMsgService.getSessionList(SecurityUtils.getUserId(),query.getContent());
         if (CollectionUtil.isNotEmpty(weAiMsgList)) {
             List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
                 WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
@@ -231,10 +232,32 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     }
 
     @Override
-    public void collectionMsg(Long id) {
-        if(id == null){
+    public void delMsg(WeAiMsgQuery query) {
+        iWeAiMsgService.delMsg(query.getSessionId());
+    }
+
+    @Override
+    public void collectionMsg(WeAiCollectionMsgQuery query) {
+        if(StringUtils.isEmpty(query.getMsgId())){
             return;
         }
-        iWeAiMsgService.collectionMsg(id);
+        iWeAiMsgService.collectionMsg(query.getMsgId(),query.getStatus());
+    }
+
+    @Override
+    public PageInfo<WeAiMsgVo> collectionList(WeAiMsgListQuery query) {
+        PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
+        List<WeAiMsg> weAiMsgList = iWeAiMsgService.collectionList(SecurityUtils.getUserId(),query.getContent());
+        if (CollectionUtil.isNotEmpty(weAiMsgList)) {
+            List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
+                WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
+                BeanUtil.copyProperties(item, weAiMsgVo);
+                return weAiMsgVo;
+            }).collect(Collectors.toList());
+            pageInfo.setList(weAiMsgVos);
+        }
+        PageInfo<WeAiMsg> msgPageInfo = new PageInfo<>(weAiMsgList);
+        pageInfo.setTotal(msgPageInfo.getTotal());
+        return pageInfo;
     }
 }

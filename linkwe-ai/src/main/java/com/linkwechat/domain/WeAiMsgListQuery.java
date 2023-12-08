@@ -15,7 +15,4 @@ public class WeAiMsgListQuery extends WeAiMsgQuery {
 
     @ApiModelProperty(value = "员工ID",hidden = true)
     private Long userId;
-
-    @ApiModelProperty("收藏 0-未收藏 1-已收藏")
-    private Integer collection;
 }

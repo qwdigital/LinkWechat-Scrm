@@ -13,7 +13,17 @@ import java.util.List;
  */
 public interface IWeAiMsgService extends IService<WeAiMsg> {
 
-    List<WeAiMsg> getSessionList(Long userId, String content, Integer collection);
+    List<WeAiMsg> getSessionList(Long userId, String content);
 
-    void collectionMsg(Long id);
+    void collectionMsg(String msgId, Integer status);
+
+    void delMsg(String sessionId);
+
+    /**
+     * 收藏列表
+     * @param userId
+     * @param content
+     * @return
+     */
+    List<WeAiMsg> collectionList(Long userId, String content);
 }
