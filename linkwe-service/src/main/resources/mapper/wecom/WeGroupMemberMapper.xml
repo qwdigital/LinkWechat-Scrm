@@ -145,7 +145,7 @@
            and  wc.customer_name LIKE CONCAT('%', #{customerName}, '%')
         </if>
         GROUP BY
-            wc.external_userid;
+            wc.external_userid
     </select>
 
 
