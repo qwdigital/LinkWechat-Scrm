@@ -39,4 +39,11 @@ public class WeCustomerDeduplicationVo {
      * 当前客户加入的群名,多个使用逗号隔开
      */
     private String joinGroupNames;
+
+
+
+    /**
+     * 0:加入黑名单;1:不加入黑名单;
+     */
+    private Integer isJoinBlacklist;
 }
