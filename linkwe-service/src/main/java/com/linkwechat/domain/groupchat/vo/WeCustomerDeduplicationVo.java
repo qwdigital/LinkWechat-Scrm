@@ -1,7 +1,10 @@
 package com.linkwechat.domain.groupchat.vo;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 public class WeCustomerDeduplicationVo {
@@ -46,4 +49,12 @@ public class WeCustomerDeduplicationVo {
      * 0:加入黑名单;1:不加入黑名单;
      */
     private Integer isJoinBlacklist;
+
+
+    /**
+     * 更新时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date updateTime;
+
 }

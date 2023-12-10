@@ -133,6 +133,7 @@
             wc.gender,
             wc.customer_type,
             wc.is_join_blacklist,
+            wc.update_time,
             GROUP_CONCAT(DISTINCT su.user_name) AS addWeUserNames,
             GROUP_CONCAT(DISTINCT wg.group_name) AS joinGroupNames
         FROM
