@@ -522,7 +522,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         List<WeGroupSopContentVo> weGroupSopContentVos=new ArrayList<>();
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             groupExecuteContent.stream().collect(Collectors.groupingBy(WeGroupSopBaseContentVo::getPushTimePre))
                     .forEach((k,v)->{
@@ -579,7 +579,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         }
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
 
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             List<WeSendGroupSopContentVo.WeGroupSop> weGroupSops =new ArrayList<>();
