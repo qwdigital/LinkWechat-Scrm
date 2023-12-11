@@ -49,6 +49,7 @@
             (SELECT
                  IFNULL(SUM(wfsc.total_visits), 0) as totalVisits,
                  count(wfsc.id) as totalUser,
+                 wfsc.create_time,
                  IFNULL((SELECT count(wfsa.id) from we_form_survey_answer wfsa WHERE wfsa.belong_id=wfsc.belong_id
                <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
                   AND date_format(wfsa.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
