@@ -136,8 +136,8 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         queryWrapper.select("mobile,name,avatar,addr,city,open_id,union_id,create_time");
         queryWrapper.eq("belong_id", query.getBelongId());
         queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), "data_source", query.getDataSource());
-        queryWrapper.apply(Objects.nonNull(query.getStartDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" + DateUtil.formatDate(query.getStartDate()) + "'");
-        queryWrapper.apply(Objects.nonNull(query.getEndDate()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + DateUtil.formatDate(query.getEndDate()) + "'");
+        queryWrapper.apply(Objects.nonNull(query.getBeginTime()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" +query.getBeginTime() + "'");
+        queryWrapper.apply(Objects.nonNull(query.getEndTime()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + query.getEndTime() + "'");
         queryWrapper.orderByDesc("create_time");
         List<WeFormSurveyAnswer> resultList = list(queryWrapper);
         if (CollectionUtil.isNotEmpty(resultList)) {

@@ -16,6 +16,7 @@ import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.ip.IpUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
 import com.linkwechat.domain.form.query.WeAddFormSurveyCatalogueQuery;
@@ -27,6 +28,7 @@ import com.linkwechat.mapper.WeCategoryMapper;
 import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
 import com.linkwechat.mapper.WeFormSurveyCatalogueMapper;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
+import com.linkwechat.service.IWeFormSurveyCountService;
 import com.linkwechat.service.IWeFormSurveyStatisticsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +67,10 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
 
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
+
+
+    @Resource
+    private IWeFormSurveyCountService iWeFormSurveyCountService;
 
     @Override
     public Long add(WeAddFormSurveyCatalogueQuery query) {
@@ -108,9 +114,11 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
         update(catalogue, new LambdaQueryWrapper<WeFormSurveyCatalogue>().eq(WeFormSurveyCatalogue::getId, query.getId()));
     }
 
+
     @Override
     public WeFormSurveyCatalogue getInfo(Long id) {
         WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueMapper.getWeFormSurveyCatalogueById(id);
+        iWeFormSurveyCountService.weFormCount(id,IpUtils.getHostIp());
         return weFormSurveyCatalogue;
     }
 
@@ -253,6 +261,7 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
     public void updateByIdIgnoreTenantId(WeFormSurveyCatalogue weFormSurveyCatalogue) {
         weFormSurveyCatalogueMapper.updateByIdIgnoreTenantId(weFormSurveyCatalogue);
     }
+
 
 
 }

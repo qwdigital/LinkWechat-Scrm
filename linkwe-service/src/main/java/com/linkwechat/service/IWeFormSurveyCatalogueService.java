@@ -23,6 +23,11 @@ public interface IWeFormSurveyCatalogueService extends IService<WeFormSurveyCata
 
     void updateSurvey(WeAddFormSurveyCatalogueQuery query);
 
+    /**
+     * 查询表单详情
+     * @param id
+     * @return
+     */
     WeFormSurveyCatalogue getInfo(Long id);
 
     List<WeFormSurveyCatalogue> getList(WeFormSurveyCatalogueQuery query);
@@ -56,6 +61,9 @@ public interface IWeFormSurveyCatalogueService extends IService<WeFormSurveyCata
      * @param weFormSurveyCatalogue
      */
     void updateByIdIgnoreTenantId(WeFormSurveyCatalogue weFormSurveyCatalogue);
+
+
+
 
 
 

@@ -10,6 +10,9 @@ public enum LockEnums {
 
     WE_FASSION_LOCK("fissionKey::lock","任务裂变发送锁"),
 
+
+    WE_FORM_SURVEY_COUNT_LOCK("formSurvey::lock","表单统计锁"),
+
     WE_MOMENTS_ID_LOCK("jobIdToMomentId","通过jobId换取momentsId");
 
 
