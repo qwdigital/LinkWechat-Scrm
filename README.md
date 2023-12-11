@@ -266,7 +266,7 @@ LinkWeChat 凭借着出色的产品能力和专业的技术能力，已经获取
 
 `LinkWeChat` 全体开发团队感谢以下全部小伙伴们的赞助（排名不分先后）：
 
-[LinkWeChat 捐赠记录](https://www.yuque.com/linkwechat/help/vhqs4i?singleDoc# 《捐赠记录》)
+[LinkWeChat 捐赠记录](https://www.yuque.com/linkwechat/help/vhqs4i?singleDoc)
 
 ## 7.4 优秀开源社区
 
