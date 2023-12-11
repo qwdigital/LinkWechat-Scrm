@@ -2,11 +2,21 @@ package com.linkwechat.service.impl;
 
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
+import com.linkwechat.common.constant.WeComeStateContants;
+import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
+import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.uuid.UUID;
+import com.linkwechat.domain.WeBuildUserOrGroupConditVo;
+import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
+import com.linkwechat.domain.groupcode.entity.WeGroupCode;
+import com.linkwechat.domain.qr.query.WeQrAddQuery;
+import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
@@ -20,12 +30,21 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
+import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
+import com.linkwechat.domain.wecom.vo.WeResultVo;
+import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
+import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
+import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.mapper.WeStoreCodeCountMapper;
 import com.linkwechat.mapper.WeStoreCodeMapper;
+import com.linkwechat.service.IWeGroupCodeService;
 import com.linkwechat.service.IWeStoreCodeConfigService;
 import com.linkwechat.service.IWeStoreCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -42,6 +61,16 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Autowired
     private IWeStoreCodeConfigService iWeStoreCodeConfigService;
+
+
+    @Autowired
+    private IWeGroupCodeService iWeGroupCodeService;
+
+
+
+    @Autowired
+    private QwCustomerClient qwCustomerClient;
+
 
 
 
@@ -66,29 +95,91 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
     @Override
     public void createOrUpdateStoreCode(WeStoreCode weStoreCode) {
 
-//            if(StringUtils.isNotEmpty(weStoreCode.getShopGuideId())){
-//                if(StringUtils.isNotEmpty(weStoreCode.getConfigId())){
-//                    qwCustomerClient.updateContactWay(WeAddWayQuery.builder()
-//                            .config_id(weStoreCode.getConfigId())
-//                            .user(ListUtil.toList(weStoreCode.getShopGuideId().split(",")))
-//                            .build());
-//                }else{
-//                    weStoreCode.setState(WeConstans.WE_STORE_CODE_PREFIX +SnowFlakeUtil.nextId());
-//                    WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(WeAddWayQuery.builder()
-//                            .type(2)
-//                            .state(weStoreCode.getState())
-//                            .scene(2)
-//                            .user(ListUtil.toList(weStoreCode.getShopGuideId().split(",")))
-//                            .build()).getData();
-//                    weStoreCode.setConfigId(weAddWayResult.getConfigId());
-//                    weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
-//                }
-//            }else if(null != weStoreCode.getGroupCodeId()){ //群
-//                WeGroupCode weGroupCode = weGroupCodeService.getById(weStoreCode.getGroupCodeId());
-//                if(null != weGroupCode){
-//                    weStoreCode.setState(weGroupCode.getState());
-//                }
-//            }
+        if(weStoreCode.getId() != null){ //新增
+            weStoreCode.setId(SnowFlakeUtil.nextId());
+
+            WeBuildUserOrGroupConditVo addWeUserOrGroupCode =
+                    weStoreCode.getAddWeUserOrGroupCode();
+
+            if(null != addWeUserOrGroupCode){
+                WeGroupCode addGroupCode = addWeUserOrGroupCode.getAddGroupCode();
+
+                //创建群活码
+                if(null != addGroupCode){
+                    weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
+                    //配置进群方式
+                    WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
+                            WeGroupCode.builder()
+                                    .autoCreateRoom(addGroupCode.getAutoCreateRoom())
+                                    .roomBaseId(addGroupCode.getRoomBaseId())
+                                    .roomBaseName(addGroupCode.getRoomBaseName())
+                                    .chatIdList(addGroupCode.getChatIdList())
+                                    .state(weStoreCode.getGroupCodeState())
+                                    .build()
+                    );
+
+                    if(null != addJoinWayVo&&addJoinWayVo.getJoin_way() != null){
+                        WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
+                        weStoreCode.setGroupCodeConfigId(joinWay.getConfig_id());
+                        weStoreCode.setGroupCodeUrl(joinWay.getQr_code());
+                    }
+
+
+                }
+
+
+
+                WeQrAddQuery weQrAddQuery = addWeUserOrGroupCode.getWeQrAddQuery();
+
+                //创建员工活码
+                if(null != weQrAddQuery){
+                    weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
+                    WeAddWayVo weContactWay =  qwCustomerClient.addContactWay(WeAddWayQuery.builder()
+                            .type(2)
+                            .scene(2)
+                            .state(weStoreCode.getShopGuideState())
+                            .user(ListUtil.toList(communityNewGroup.getEmplList().split(",")))
+                            .skip_verify(communityNewGroup.getSkipVerify())
+                            .build()).getData();
+
+                }
+
+            }
+
+
+
+
+
+        }else{
+
+            WeExecuteUserOrGroupConditVo groupCode = weStoreCode.getAddWeUserOrGroupCode();
+            //更新群活码
+            if(null != groupCode) {
+                WeGroupCode addGroupCode = groupCode.getAddGroupCode();
+                if (null != addGroupCode) {
+
+                    //更新群活码
+                    WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
+                            WeGroupChatUpdateJoinWayQuery.builder()
+                                    .config_id(weStoreCode.getGroupCodeConfigId())
+                                    .scene(2)
+                                    .auto_create_room(addGroupCode.getAutoCreateRoom())
+                                    .room_base_id(addGroupCode.getRoomBaseId())
+                                    .room_base_name(addGroupCode.getRoomBaseName())
+                                    .chat_id_list(Arrays.asList(addGroupCode.getChatIdList().split(",")))
+                                    .build()
+                    ).getData();
+
+
+
+
+                }
+            }
+
+
+        }
+
+
 
               saveOrUpdate(weStoreCode);
     }

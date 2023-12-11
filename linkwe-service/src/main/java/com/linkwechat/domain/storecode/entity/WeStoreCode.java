@@ -2,12 +2,12 @@ package com.linkwechat.domain.storecode.entity;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.linkwechat.common.annotation.Excel;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.WeBuildUserOrGroupConditVo;
+import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -53,25 +53,21 @@ public class WeStoreCode extends BaseEntity {
     //纬度
     @ExcelIgnore
     private String latitude;
-    //导购id(we_user_id)，多个使用逗号隔开
-    @ExcelIgnore
-    private String shopGuideId;
-    //导购名称，多个使用逗号隔开
-    @ExcelIgnore
-    private String shopGuideName;
-    //导购活码url
-    @ExcelIgnore
-    private String shopGuideUrl;
-    //群活码
-    @ExcelIgnore
-    private String groupCodeUrl;
+
+
+
     //门店状态(0:启用;1:关闭)
     @ExcelIgnore
     private Integer storeState;
 
-    //导购二维码configId
-    @ExcelIgnore
-    private String configId;
+
+
+
+    /**
+     * 添加员工或群活码
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
+    private WeBuildUserOrGroupConditVo addWeUserOrGroupCode;
 
     @TableLogic
     @ExcelIgnore
@@ -81,16 +77,58 @@ public class WeStoreCode extends BaseEntity {
     @ExcelIgnore
     private Long storeCodeId;
 
+
+//    //导购id(we_user_id)，多个使用逗号隔开
+//    @ExcelIgnore
+//    private String shopGuideId;
+
+    //导购名称，多个使用逗号隔开
+    @ExcelIgnore
+    private String shopGuideName;
+    //导购活码url
+    @ExcelIgnore
+    private String shopGuideUrl;
+
+    //导购码渠道标识
+    @ExcelIgnore
+    private String shopGuideState;
+
+
+    //导购二维码configId
+    @ExcelIgnore
+    private String shopGuideConfigId;
+
+
+//    //导购二维码configId
+//    @ExcelIgnore
+//    private String configId;
+//
+//
+//    //渠道标识
+//    @ExcelIgnore
+//    private String state;
+
+
     //群活码名称
     @ExcelIgnore
     private String groupCodeName;
 
     //群活码id
-    @ExcelIgnore
-    private Long groupCodeId;
+//    @ExcelIgnore
+//    private Long groupCodeId;
 
-    //渠道标识
+
+
+    //群码渠道标识
     @ExcelIgnore
-    private String state;
+    private String groupCodeState;
+
+    //群码config
+    @ExcelIgnore
+    private String groupCodeConfigId;
+
+    //群活码
+    @ExcelIgnore
+    private String groupCodeUrl;
 
 }
