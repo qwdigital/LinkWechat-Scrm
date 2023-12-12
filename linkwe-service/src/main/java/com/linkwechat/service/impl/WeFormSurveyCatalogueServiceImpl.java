@@ -19,6 +19,7 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.ip.IpUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
+import com.linkwechat.domain.WeFormSurveyCount;
 import com.linkwechat.domain.form.query.WeAddFormSurveyCatalogueQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
 import com.linkwechat.domain.material.entity.WeCategory;
@@ -155,19 +156,22 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
                     weFormSurveyCatalogue.setGroupName(category.getName());
                 }
                 //总访问量和有效收集量
-                String channelsName = weFormSurveyCatalogue.getChannelsName();
-                Integer pv = 0;
-                String[] split = channelsName.split(",");
-                for (String channelName : split) {
-                    //PV
-                    String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
-                    Object o = redisTemplate.opsForValue().get(pvKey);
-                    if (o != null) {
-                        pv += (Integer) o;
-                    }
-                }
+//                String channelsName = weFormSurveyCatalogue.getChannelsName();
+//                Integer pv = 0;
+//                String[] split = channelsName.split(",");
+//                for (String channelName : split) {
+//                    //PV
+//                    String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
+//                    Object o = redisTemplate.opsForValue().get(pvKey);
+//                    if (o != null) {
+//                        pv += (Integer) o;
+//                    }
+//                }
                 //总访问数
-                weFormSurveyCatalogue.setTotalVisits(pv);
+                weFormSurveyCatalogue.setTotalVisits(
+                        iWeFormSurveyCountService.count(new LambdaQueryWrapper<WeFormSurveyCount>()
+                                .eq(WeFormSurveyCount::getBelongId,weFormSurveyCatalogue.getId()))
+                );
                 //有效的收集量
                 QueryWrapper<WeFormSurveyAnswer> wrapper = new QueryWrapper<>();
                 wrapper.lambda().eq(WeFormSurveyAnswer::getBelongId, weFormSurveyCatalogue.getId());
