@@ -96,4 +96,14 @@
         GROUP BY date_format( sdd.date, '%Y-%m-%d' )
     </select>
 
+    <select id="sumTotalVisits" resultType="int">
+        SELECT
+            sum(total_visits)
+        FROM
+            we_form_survey_count
+        <where>
+            belong_id=#{belongId}
+        </where>
+    </select>
+
 </mapper>

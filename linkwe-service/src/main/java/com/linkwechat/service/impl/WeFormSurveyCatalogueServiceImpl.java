@@ -167,10 +167,11 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
 //                        pv += (Integer) o;
 //                    }
 //                }
+
+
                 //总访问数
                 weFormSurveyCatalogue.setTotalVisits(
-                        iWeFormSurveyCountService.count(new LambdaQueryWrapper<WeFormSurveyCount>()
-                                .eq(WeFormSurveyCount::getBelongId,weFormSurveyCatalogue.getId()))
+                        iWeFormSurveyCountService.sumTotalVisits(weFormSurveyCatalogue.getId())
                 );
                 //有效的收集量
                 QueryWrapper<WeFormSurveyAnswer> wrapper = new QueryWrapper<>();

@@ -48,4 +48,12 @@ public interface IWeFormSurveyCountService extends IService<WeFormSurveyCount> {
     List<WeFormSurveyStatistics> lineChart(WeFormSurveyCount weFormSurveyCount);
 
 
+    /**
+     * 总访问量
+     * @param belongId
+     * @return
+     */
+    Integer sumTotalVisits(@Param("belongId") Long belongId);
+
+
 }

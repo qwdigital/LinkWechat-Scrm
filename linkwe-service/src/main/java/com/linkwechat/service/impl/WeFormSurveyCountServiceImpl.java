@@ -82,6 +82,11 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
         return this.baseMapper.lineChart(weFormSurveyCount);
     }
 
+    @Override
+    public Integer sumTotalVisits(Long belongId) {
+        return this.baseMapper.sumTotalVisits(belongId);
+    }
+
 
 }
 

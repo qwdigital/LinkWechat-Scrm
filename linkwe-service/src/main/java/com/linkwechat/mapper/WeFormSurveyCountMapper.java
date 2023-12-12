@@ -24,6 +24,8 @@ public interface WeFormSurveyCountMapper extends BaseMapper<WeFormSurveyCount> {
 
      List<WeFormSurveyStatistics> lineChart(@Param("weFormSurveyCount") WeFormSurveyCount weFormSurveyCount);
 
+    Integer sumTotalVisits(@Param("belongId") Long belongId);
+
 }
 
 
