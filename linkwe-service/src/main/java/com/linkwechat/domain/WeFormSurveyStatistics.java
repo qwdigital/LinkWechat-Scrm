@@ -87,7 +87,7 @@ public class WeFormSurveyStatistics extends BaseEntity {
      */
     @TableField("average_time")
     @ExcelProperty(value = "平均完成时间", index = 6)
-    private Integer averageTime;
+    private String averageTime;
 
 
     /**

@@ -67,7 +67,7 @@ public class WeFormSurveyController extends BaseController {
     @GetMapping(value = "/survey/getInfo/{id}")
     @ApiOperation(value = "查询表单详情", httpMethod = "GET")
     public AjaxResult<WeFormSurveyCatalogue> getInfo(@PathVariable("id") Long id) {
-        WeFormSurveyCatalogue info = weFormSurveyCatalogueService.getInfo(id);
+        WeFormSurveyCatalogue info = weFormSurveyCatalogueService.getInfo(id,true);
         return AjaxResult.success(info);
     }
 

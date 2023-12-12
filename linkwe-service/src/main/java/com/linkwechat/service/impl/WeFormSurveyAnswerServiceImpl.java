@@ -100,7 +100,7 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
     @Override
     public Integer isCompleteSurvey(WeFormSurveyAnswerQuery query) {
         //获取表单信息
-        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId());
+        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId(),false);
         //判断表单填写规则
         Integer fillingRules = weFormSurveyCatalogue.getFillingRules();
         if (fillingRules.equals(2)) {
