@@ -28,7 +28,7 @@ public interface IWeFormSurveyCatalogueService extends IService<WeFormSurveyCata
      * @param id
      * @return
      */
-    WeFormSurveyCatalogue getInfo(Long id,boolean isCount);
+    WeFormSurveyCatalogue getInfo(Long id,String ipAddress,boolean isCount);
 
     List<WeFormSurveyCatalogue> getList(WeFormSurveyCatalogueQuery query);
 

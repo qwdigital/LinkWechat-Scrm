@@ -25,6 +25,15 @@ public interface IWeFormSurveyCountService extends IService<WeFormSurveyCount> {
 
 
     /**
+     * 设置总访问时长
+     * @param belongId
+     * @param visitorIp
+     * @param visitTime
+     */
+    void setVisitTime(Long belongId,String visitorIp,Long visitTime);
+
+
+    /**
      * 查询头部统计
      * @param weFormSurveyCount
      * @return

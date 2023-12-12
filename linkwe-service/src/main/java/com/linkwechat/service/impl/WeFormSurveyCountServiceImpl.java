@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.enums.LockEnums;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.ip.IpUtils;
 import com.linkwechat.domain.WeFormSurveyCount;
 import com.linkwechat.domain.WeFormSurveyStatistics;
@@ -15,6 +16,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -66,6 +68,22 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
 
     }
 
+
+    @Override
+    public void setVisitTime(Long belongId,String visitorIp,Long visitTime){
+        List<WeFormSurveyCount> weFormSurveyCounts = this.list(new LambdaQueryWrapper<WeFormSurveyCount>()
+                .eq(WeFormSurveyCount::getBelongId, belongId)
+                .eq(WeFormSurveyCount::getVisitorIp, visitorIp)
+                .apply("date_format (create_time,'%Y-%m-%d') = date_format ({0},'%Y-%m-%d')", new Date()));
+
+        if(CollectionUtil.isNotEmpty(weFormSurveyCounts)){
+            WeFormSurveyCount weFormSurveyCount = weFormSurveyCounts.stream().findFirst().get();
+            weFormSurveyCount.setTotalVisits(visitTime);
+            this.updateById(weFormSurveyCount);
+        }
+
+
+    }
     @Override
     public WeFormSurveyStatistics getStatistics(WeFormSurveyCount weFormSurveyCount) {
         return this.baseMapper.getStatistics(weFormSurveyCount);

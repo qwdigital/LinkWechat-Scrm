@@ -3,12 +3,10 @@ package com.linkwechat.common.utils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -651,6 +649,21 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 
         // 将昨天的日期转换为字符串
         return yesterday.format(formatter);
+    }
+
+
+    /**
+     * 获取二个间的秒数
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static long timeDifference(Date startTime,Date endTime){
+
+        // 计算两个时间点之间的秒数
+        Duration duration = Duration.between(LocalDateTime.ofInstant(endTime.toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(startTime.toInstant(), ZoneId.systemDefault()));
+       return duration.getSeconds();
     }
 
 

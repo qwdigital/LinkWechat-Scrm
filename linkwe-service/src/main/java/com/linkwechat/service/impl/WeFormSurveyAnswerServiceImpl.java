@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.exception.wecom.WeComException;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeFormSurveyAnswer;
@@ -15,20 +16,14 @@ import com.linkwechat.domain.form.query.WeAddFormSurveyAnswerQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyAnswerQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyStatisticQuery;
 import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeFormSurveyAnswerService;
-import com.linkwechat.service.IWeFormSurveyCatalogueService;
-import com.linkwechat.service.IWeFormSurveyStatisticsService;
+import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,12 +35,13 @@ import java.util.stream.Collectors;
 @Service
 public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswerMapper, WeFormSurveyAnswer> implements IWeFormSurveyAnswerService {
 
-    @Autowired
-    private IWeFormSurveyStatisticsService weFormSurveyStatisticsService;
+
     @Autowired
     private IWeFormSurveyCatalogueService weFormSurveyCatalogueService;
-    @Resource
-    private WeFormSurveyAnswerMapper weFormSurveyAnswerMapper;
+
+
+    @Autowired
+    private IWeFormSurveyCountService iWeFormSurveyCountService;
 
 
     @Autowired
@@ -83,7 +79,12 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         WeFormSurveyAnswer weFormSurveyAnswer = new WeFormSurveyAnswer();
         BeanUtil.copyProperties(query, weFormSurveyAnswer);
         weFormSurveyAnswer.setIpAddr(query.getIpAddr());
-        save(weFormSurveyAnswer);
+        if(save(weFormSurveyAnswer)){
+            //设置时长
+            iWeFormSurveyCountService.setVisitTime(query.getBelongId(),query.getIpAddr()
+                    ,DateUtils.timeDifference(new Date(),query.getAnTime()));
+        }
+
     }
 
     @Override
@@ -100,7 +101,7 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
     @Override
     public Integer isCompleteSurvey(WeFormSurveyAnswerQuery query) {
         //获取表单信息
-        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId(),false);
+        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId(),null,false);
         //判断表单填写规则
         Integer fillingRules = weFormSurveyCatalogue.getFillingRules();
         if (fillingRules.equals(2)) {
@@ -132,14 +133,13 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
 
     @Override
     public List<WeFormSurveyAnswer> selectCustomerList(WeFormSurveyStatisticQuery query) {
-        QueryWrapper<WeFormSurveyAnswer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("mobile,name,avatar,addr,city,open_id,union_id,create_time");
-        queryWrapper.eq("belong_id", query.getBelongId());
-        queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), "data_source", query.getDataSource());
-        queryWrapper.apply(Objects.nonNull(query.getBeginTime()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) >= '" +query.getBeginTime() + "'");
-        queryWrapper.apply(Objects.nonNull(query.getEndTime()), "DATE_FORMAT(CREATE_TIME, '%Y-%m-%d' ) <= '" + query.getEndTime() + "'");
-        queryWrapper.orderByDesc("create_time");
-        List<WeFormSurveyAnswer> resultList = list(queryWrapper);
+        LambdaQueryWrapper<WeFormSurveyAnswer> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(WeFormSurveyAnswer::getBelongId, query.getBelongId());
+        queryWrapper.eq(StringUtils.isNotBlank(query.getDataSource()), WeFormSurveyAnswer::getDataSource, query.getDataSource());
+        queryWrapper.apply(StringUtils.isNotEmpty(query.getBeginTime())&&StringUtils.isNotEmpty(query.getEndTime()),"date_format(CREATE_TIME,'%Y-%m-%d') BETWEEN '"+query.getBeginTime()+"' and '"+query.getEndTime()+ "'" );
+        queryWrapper.orderByDesc(WeFormSurveyAnswer::getCreateTime);
+        List<WeFormSurveyAnswer> resultList = this.list(queryWrapper);
         if (CollectionUtil.isNotEmpty(resultList)) {
             List<String> unionIds = resultList.stream().map(WeFormSurveyAnswer::getUnionId).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
             if(CollectionUtil.isNotEmpty(unionIds)){
