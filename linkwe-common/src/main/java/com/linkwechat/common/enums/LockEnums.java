@@ -13,7 +13,8 @@ public enum LockEnums {
 
     WE_FORM_SURVEY_COUNT_LOCK("formSurvey::lock","表单统计锁"),
 
-    WE_MOMENTS_ID_LOCK("jobIdToMomentId","通过jobId换取momentsId");
+    WE_MOMENTS_ID_LOCK("jobIdToMomentId","通过jobId换取momentsId"),
+    WE_FORM_SURVEY_STATE_LOCK("formSurveyState::lock","表单定时状态维护");
 
 
     private final String code;
