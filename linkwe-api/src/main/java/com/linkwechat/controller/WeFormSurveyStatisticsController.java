@@ -17,7 +17,9 @@ import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.*;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.form.query.WeFormSurveyRadioQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyStatisticQuery;
 import com.linkwechat.domain.form.vo.WeFormSurveyAnswerVO;
@@ -83,8 +85,8 @@ public class WeFormSurveyStatisticsController extends BaseController {
      * @param query
      * @return
      */
-    @PostMapping("/lineChart")
-    public AjaxResult lineChart(@RequestBody @Validated WeFormSurveyStatisticQuery query) {
+    @GetMapping("/lineChart")
+    public AjaxResult lineChart(WeFormSurveyStatisticQuery query) {
         WeFormSurveyCount weFormSurveyCount = WeFormSurveyCount.builder()
                 .channelsName(query.getDataSource())
                 .belongId(query.getBelongId())
@@ -118,14 +120,28 @@ public class WeFormSurveyStatisticsController extends BaseController {
      * @param query
      * @return
      */
-    @PostMapping("/dataList")
-    public TableDataInfo dataList(@RequestBody WeFormSurveyStatisticQuery query) {
+    @GetMapping("/dataList")
+    public TableDataInfo dataList(WeFormSurveyStatisticQuery query) {
 
         startPage();
         List<WeFormSurveyStatistics> weFormSurveyStatistics = weFormSurveyStatisticsService.dataList(query);
 
         return getDataTable(
                 weFormSurveyStatistics
+        );
+    }
+
+
+    /**
+     * 数据概览列表
+     * @param query
+     * @return
+     */
+    @GetMapping("/dataListExport")
+    public void dataListExport(WeFormSurveyStatisticQuery query) {
+        List<WeFormSurveyStatistics> weFormSurveyStatistics = weFormSurveyStatisticsService.dataList(query);
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeFormSurveyStatistics.class,weFormSurveyStatistics,"智能表单数据报表_" + System.currentTimeMillis()
         );
     }
 
