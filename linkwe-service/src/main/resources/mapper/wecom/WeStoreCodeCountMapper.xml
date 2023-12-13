@@ -452,4 +452,41 @@
     </select>
 
 
+    <select id="findWeStoreCodeTables" resultType="com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo">
+        SELECT
+        wc.avatar,
+        wc.customer_name,
+        wc.customer_type,
+        wc.external_userid AS externalUserid,
+        wc.add_user_id,
+        wc.add_time,
+        wc.gender,
+        (SELECT GROUP_CONCAT(su.user_name) FROM sys_user su WHERE su.we_user_id=wc.add_user_id) as addUserName,
+        (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupCodeState} and wgm.quit_scene  IS  NULL) as joinGroupNumber,
+        IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupCodeState}  and wgm.quit_scene  IS  NULL)>0,1,0) as isJoinGroup
+        FROM
+        we_customer wc
+        <where>
+            <if test="query.shopGuideState != null and query.shopGuideState !=''">
+                and wc.state = #{query.shopGuideState}
+            </if>
+            <if test="query.customerName != null and query.customerName !='' ">
+                and  wc.customer_name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
+            </if>
+
+            <if test="query.startAddTime != null and query.startAddTime !='' and query.endAddTime != null and query.endAddTime !='' ">
+                AND  date_format(wcr.add_time,'%Y-%m-%d') BETWEEN #{query.startAddTime} AND #{query.endAddTime}
+            </if>
+            <choose>
+                <when test="query.isJoinGroup != null">
+                    <if test="query.isJoinGroup ==1 ">
+                        HAVING(joinGroupNumber)>0
+                    </if>
+                </when>
+            </choose>
+        </where>
+    </select>
+
+
+
 </mapper>

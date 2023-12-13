@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
  * 门店活码
  */
 @Data
-@TableName("we_store_code")
+@TableName(value ="we_store_code",autoResultMap = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -109,7 +109,7 @@ public class WeStoreCode extends BaseEntity {
 //    private String state;
 
 
-    //群活码名称
+    //群活码名称,多个使用逗号隔开
     @ExcelIgnore
     private String groupCodeName;
 

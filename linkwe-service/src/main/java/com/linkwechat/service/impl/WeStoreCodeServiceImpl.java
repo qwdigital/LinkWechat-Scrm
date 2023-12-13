@@ -3,12 +3,15 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
 import com.linkwechat.common.constant.WeComeStateContants;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
+import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.UUID;
@@ -20,6 +23,8 @@ import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo;
@@ -122,6 +127,8 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                         WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
                         weStoreCode.setGroupCodeConfigId(joinWay.getConfig_id());
                         weStoreCode.setGroupCodeUrl(joinWay.getQr_code());
+                    }else{
+                        throw new WeComException(addJoinWayVo.getErrMsg());
                     }
 
 
@@ -134,13 +141,18 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                 //创建员工活码
                 if(null != weQrAddQuery){
                     weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
-                    WeAddWayVo weContactWay =  qwCustomerClient.addContactWay(WeAddWayQuery.builder()
-                            .type(2)
-                            .scene(2)
-                            .state(weStoreCode.getShopGuideState())
-                            .user(ListUtil.toList(communityNewGroup.getEmplList().split(",")))
-                            .skip_verify(communityNewGroup.getSkipVerify())
-                            .build()).getData();
+                    weQrAddQuery.setQrType(2);
+                    WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
+
+                    WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
+
+
+                    if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
+                        weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
+                        weStoreCode.setShopGuideConfigId(weAddWayResult.getConfigId());
+                    }else{
+                        throw new WeComException(weAddWayResult.getErrMsg());
+                    }
 
                 }
 
@@ -152,10 +164,13 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
         }else{
 
-            WeExecuteUserOrGroupConditVo groupCode = weStoreCode.getAddWeUserOrGroupCode();
+            WeBuildUserOrGroupConditVo addWeUserOrGroupCode =
+                    weStoreCode.getAddWeUserOrGroupCode();
+
+
             //更新群活码
-            if(null != groupCode) {
-                WeGroupCode addGroupCode = groupCode.getAddGroupCode();
+            if(null != addWeUserOrGroupCode) {
+                WeGroupCode addGroupCode = addWeUserOrGroupCode.getAddGroupCode();
                 if (null != addGroupCode) {
 
                     //更新群活码
@@ -170,18 +185,33 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                                     .build()
                     ).getData();
 
+                    if(!weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+
+                        throw new WeComException(weResultVo.getErrMsg());
+                    }
+
 
 
 
                 }
             }
 
+            WeQrAddQuery weQrAddQuery = addWeUserOrGroupCode.getWeQrAddQuery();
+
+            if(null != weQrAddQuery){
+                WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
+                WeResultVo weResultVo = qwCustomerClient.updateContactWay(weContactWay).getData();
+                if(!weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
+                    throw new WeComException(weResultVo.getErrMsg());
+                }
+            }
+
+
+
 
         }
 
-
-
-              saveOrUpdate(weStoreCode);
+       saveOrUpdate(weStoreCode);
     }
 
 
@@ -204,7 +234,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public WeStoreTabVo countWeStoreTab(Long storeCodeId) {
-        return weStoreCodeCountMapper.countWeStoreTab(storeCodeId,getById(storeCodeId).getGroupCodeId());
+        return weStoreCodeCountMapper.countWeStoreTab(storeCodeId,getById(storeCodeId).getId());
     }
 
     @Override
@@ -272,6 +302,17 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
     public void countUserBehavior(WeStoreCodeCount weStoreCodeCount) {
         weStoreCodeCountMapper.insert(weStoreCodeCount);
     }
+
+        @Override
+        public List<WeStoreCodeTableVo> findWeStoreCodeTables(WeStoreCodeQuery weStoreCodeQuery) {
+            WeStoreCode weStoreCode = this.getById(weStoreCodeQuery.getStoreCodeId());
+            if(null != weStoreCode){
+                weStoreCodeQuery.setGroupCodeState(weStoreCode.getGroupCodeState());
+                weStoreCodeQuery.setShopGuideState(weStoreCode.getShopGuideState());
+            }
+
+            return weStoreCodeCountMapper.findWeStoreCodeTables(weStoreCodeQuery);
+        }
 
 
 }

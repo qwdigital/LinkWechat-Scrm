@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo;
@@ -14,6 +16,7 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -128,4 +131,12 @@ public interface IWeStoreCodeService extends IService<WeStoreCode> {
      * @param weStoreCodeCount
      */
     void countUserBehavior(WeStoreCodeCount weStoreCodeCount);
+
+
+  /**
+   * 数据明细获取
+   * @param weStoreCodeQuery
+   * @return
+   */
+  List<WeStoreCodeTableVo> findWeStoreCodeTables(WeStoreCodeQuery weStoreCodeQuery);
 }

@@ -6,6 +6,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysDictData;
@@ -19,11 +20,18 @@ import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
 import com.linkwechat.domain.WeCustomerSeas;
+import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.community.WeCommunityNewGroup;
+import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.qr.WeQrAttachments;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo;
@@ -34,9 +42,11 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
+import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWeQrAttachmentsService;
 import com.linkwechat.service.IWeStoreCodeConfigService;
 import com.linkwechat.service.IWeStoreCodeService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -65,6 +75,9 @@ public class WeStoreCodeController extends BaseController {
 
     @Autowired
     private IWeQrAttachmentsService attachmentsService;
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
 
     @Autowired
     private MapUtils mapUtils;
@@ -391,6 +404,61 @@ public class WeStoreCodeController extends BaseController {
                 ServletUtils.getResponse(), WeStoreGroupReportVo.class,  iWeStoreCodeService.countStoreGroupReport(weStoreCode),DateUtils.dateTimeNow(DateUtils.YYYY_MM_DD) + "_门店群码统计"
         );
 
+    }
+
+
+    /**
+     * 数据明细获取
+     * @param weStoreCodeQuery
+     * @return
+     */
+    @GetMapping("/findWeStoreCodeTables")
+    public TableDataInfo<List<WeStoreCodeTableVo>>  findWeStoreCodeTables(WeStoreCodeQuery weStoreCodeQuery){
+        startPage();
+        return getDataTable(
+                iWeStoreCodeService.findWeStoreCodeTables(weStoreCodeQuery)
+        );
+    }
+
+
+    /**
+     * 数据明细导出
+     * @param weStoreCodeQuery
+     * @return
+     */
+    @GetMapping("/weStoreCodeTablesExport")
+    public void weStoreCodeTablesExport(WeStoreCodeQuery weStoreCodeQuery) {
+
+        List<WeStoreCodeTableVo> weStoreCodeTables = iWeStoreCodeService.findWeStoreCodeTables(weStoreCodeQuery);
+
+
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeStoreCodeTableVo.class,weStoreCodeTables,"数据明细_" + System.currentTimeMillis()
+        );
+
+    }
+
+
+
+
+    /**
+     * 获取当前客户对应的群
+     * @param weStoreCodeQuery
+     * @return
+     */
+    @GetMapping("/findWeStoreCodeGroupTables")
+    public TableDataInfo<WeGroup> findWeStoreCodeGroupTables(WeStoreCodeQuery weStoreCodeQuery){
+        List<WeGroup> weGroups =new ArrayList<>();
+        WeStoreCode weStoreCode = iWeStoreCodeService.getById(weStoreCodeQuery.getStoreCodeId());
+
+        if(null != weStoreCode){
+            startPage();
+            weGroups=iWeGroupService
+                    .findGroupByUserId(weStoreCodeQuery.getExternalUserid()
+                            , weStoreCodeQuery.getGroupCodeState());
+        }
+
+        return getDataTable(weGroups);
     }
 
 
