@@ -153,7 +153,8 @@
             wc.is_join_blacklist,
             wc.update_time,
             GROUP_CONCAT(DISTINCT su.user_name) AS addWeUserNames,
-            GROUP_CONCAT(DISTINCT wg.group_name) AS joinGroupNames
+            GROUP_CONCAT(DISTINCT wg.group_name) AS joinGroupNames,
+            count(DISTINCT wg.chat_id) as groupNumber
         FROM
             we_group_member wgm
                 LEFT JOIN we_customer wc ON wgm.user_id = wc.external_userid
@@ -166,6 +167,8 @@
         </if>
         GROUP BY
             wc.external_userid
+        HAVING
+            groupNumber > 1
     </select>
 
 

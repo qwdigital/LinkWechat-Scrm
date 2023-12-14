@@ -58,107 +58,107 @@ public class WeGroupChatController extends BaseController {
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
-//
-//    /**
-//     * 客户群列表
-//     * @param query
-//     * @return
-//     */
-//    @GetMapping("/page/list")
-//    public TableDataInfo<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
-//        List<LinkGroupChatListVo> pageList = weGroupService.getPageList(query, TableSupport.buildPageRequest());
-//        TableDataInfo dataTable = getDataTable(pageList);
-//
-//        dataTable.setLastSyncTime(
-//                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
-//        );//最近同步时间
-//
-//        dataTable.setTotal(
-//                weGroupService.countWeGroupListIds(query)
-//        );
-//
-//        return dataTable;
-//    }
-//
-//
-//    /**
-//     * 应用客户群列表
-//     * @param query
-//     * @return
-//     */
-//    @GetMapping("/page/listByApp")
-//    public TableDataInfo<LinkGroupChatListVo> getPageListByApp(WeGroupChatQuery query) {
-//        startPage();
-//
-//        SysUser sysUser
-//                = iWeCustomerService.findCurrentSysUserInfo(SecurityUtils.getUserId());
-//
-//        if(!query.isDataScope()){//个人数据
-//            query.setUserIds(sysUser.getWeUserId());
-//            return getDataTable(weGroupService.selectWeGroupListByApp(query));
-//        }
-//
-//        //全部数据(根据设定角色的数据权限范围来)
-//        return getDataTable(weGroupService.getPageList(query));
-//    }
-//
-//
-//    /**
-//     * 客户群详情
-//     * @param chatId
-//     * @return
-//     */
-//    @GetMapping("/get/{chatId}")
-//    public AjaxResult<LinkGroupChatListVo> getInfo(@PathVariable("chatId") String chatId) {
-//        return AjaxResult.success(weGroupService.getInfo(chatId));
-//    }
-//
-//
-//    /**
-//     * 客户群成员列表
-//     * @param weGroupMember
-//     * @return
-//     */
-//    @GetMapping({"/member/page/list"})
-//    public TableDataInfo<List<WeGroupMember>> pageList(WeGroupMember weGroupMember) {
-//        startPage();
-//        List<WeGroupMember> list = this.weGroupMemberService.getPageList(weGroupMember);
-//        return getDataTable(list);
-//    }
-//
-//    /**
-//     * 同步客户群
-//     * @return
-//     */
-//    @GetMapping("/synch")
-//    public AjaxResult synchWeGroup() {
-//        weGroupService.synchWeGroup();
-//        return AjaxResult.success(WeConstans.SYNCH_TIP);
-//    }
-//
-//    /**
-//     * 编辑群标签
-//     * @return
-//     */
-//    @PostMapping("/makeGroupTag")
-//    public AjaxResult makeGroupTag(@RequestBody WeMakeGroupTagQuery query){
-//        weGroupTagRelService.makeGroupTag(query);
-//        return AjaxResult.success();
-//    }
-//
-//    /**
-//     * 获取指定群相关轨迹
-//     * @param chatId
-//     * @return
-//     */
-//    @GetMapping("/findGroupTrajectory/{chatId}")
-//    public TableDataInfo<WeCustomerTrajectory> findGroupTrajectory(@PathVariable String chatId){
-//        startPage();
-//        return getDataTable(
-//                iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
-//                        .eq(WeCustomerTrajectory::getExternalUseridOrChatid,chatId))
-//        );
-//    }
+
+    /**
+     * 客户群列表
+     * @param query
+     * @return
+     */
+    @GetMapping("/page/list")
+    public TableDataInfo<LinkGroupChatListVo> getPageList(WeGroupChatQuery query) {
+        List<LinkGroupChatListVo> pageList = weGroupService.getPageList(query, TableSupport.buildPageRequest());
+        TableDataInfo dataTable = getDataTable(pageList);
+
+        dataTable.setLastSyncTime(
+                iWeSynchRecordService.findUpdateLatestTime(SynchRecordConstants.SYNCH_CUSTOMER_GROUP)
+        );//最近同步时间
+
+        dataTable.setTotal(
+                weGroupService.countWeGroupListIds(query)
+        );
+
+        return dataTable;
+    }
+
+
+    /**
+     * 应用客户群列表
+     * @param query
+     * @return
+     */
+    @GetMapping("/page/listByApp")
+    public TableDataInfo<LinkGroupChatListVo> getPageListByApp(WeGroupChatQuery query) {
+        startPage();
+
+        SysUser sysUser
+                = iWeCustomerService.findCurrentSysUserInfo(SecurityUtils.getUserId());
+
+        if(!query.isDataScope()){//个人数据
+            query.setUserIds(sysUser.getWeUserId());
+            return getDataTable(weGroupService.selectWeGroupListByApp(query));
+        }
+
+        //全部数据(根据设定角色的数据权限范围来)
+        return getDataTable(weGroupService.getPageList(query));
+    }
+
+
+    /**
+     * 客户群详情
+     * @param chatId
+     * @return
+     */
+    @GetMapping("/get/{chatId}")
+    public AjaxResult<LinkGroupChatListVo> getInfo(@PathVariable("chatId") String chatId) {
+        return AjaxResult.success(weGroupService.getInfo(chatId));
+    }
+
+
+    /**
+     * 客户群成员列表
+     * @param weGroupMember
+     * @return
+     */
+    @GetMapping({"/member/page/list"})
+    public TableDataInfo<List<WeGroupMember>> pageList(WeGroupMember weGroupMember) {
+        startPage();
+        List<WeGroupMember> list = this.weGroupMemberService.getPageList(weGroupMember);
+        return getDataTable(list);
+    }
+
+    /**
+     * 同步客户群
+     * @return
+     */
+    @GetMapping("/synch")
+    public AjaxResult synchWeGroup() {
+        weGroupService.synchWeGroup();
+        return AjaxResult.success(WeConstans.SYNCH_TIP);
+    }
+
+    /**
+     * 编辑群标签
+     * @return
+     */
+    @PostMapping("/makeGroupTag")
+    public AjaxResult makeGroupTag(@RequestBody WeMakeGroupTagQuery query){
+        weGroupTagRelService.makeGroupTag(query);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 获取指定群相关轨迹
+     * @param chatId
+     * @return
+     */
+    @GetMapping("/findGroupTrajectory/{chatId}")
+    public TableDataInfo<WeCustomerTrajectory> findGroupTrajectory(@PathVariable String chatId){
+        startPage();
+        return getDataTable(
+                iWeCustomerTrajectoryService.list(new LambdaQueryWrapper<WeCustomerTrajectory>()
+                        .eq(WeCustomerTrajectory::getExternalUseridOrChatid,chatId))
+        );
+    }
 
 
     /**
