@@ -77,14 +77,11 @@ public class SopTaskServiceImpl implements SopTaskService {
                         iWeSopBaseService.builderExecuteCustomerSopPlan(weSopBase, builderExecuteWeCustomer(weSopBase,false), isCreateOrUpdate, false);
                     }else if (weSopBase.getBaseType() == 2) { //客群sop
 
-//                            Set<String> executeWeUserIds
-//                                    = iWeSopBaseService.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
-//                        if (CollectionUtil.isNotEmpty(executeWeUserIds)) {
                             //构建客群sop执行计划
                             iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
                                     , iWeSopBaseService.builderExecuteGroup(weSopBase,null), isCreateOrUpdate,false);
 
-//                        }
+
 
                 }
 
