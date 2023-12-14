@@ -436,10 +436,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             //数据不存在，不处理
             return;
         }
-        if (weMomentsTask.getStatus().equals(3)) {
-            //任务已结束不处理
-            return;
-        }
+//        if (weMomentsTask.getStatus().equals(3)) {
+//            //任务已结束不处理
+//            return;
+//        }
         if (weMomentsTask.getStatus().equals(1)) {
             //任务未开始,直接设置为任务状态为已结束
             LambdaUpdateWrapper<WeMomentsTask> updateWrapper = Wrappers.lambdaUpdate(WeMomentsTask.class);
@@ -447,10 +447,8 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
             updateWrapper.eq(WeMomentsTask::getId, weMomentsTaskId);
             this.update(updateWrapper);
             return;
-        }
+        }else{ //进行中获取已经结束的，取消发送
 
-        //朋友圈任务状态为进行中
-        if (weMomentsTask.getStatus().equals(2)) {
             //1.修改朋友圈任务状态为已结束
             LambdaUpdateWrapper<WeMomentsTask> updateWrapper = Wrappers.lambdaUpdate(WeMomentsTask.class);
             updateWrapper.set(WeMomentsTask::getStatus, 3);
@@ -467,7 +465,10 @@ public class WeMomentsTaskServiceImpl extends ServiceImpl<WeMomentsTaskMapper, W
                     qwMomentsClient.cancel_moment_task(MomentsCancelDTO.builder().moment_id(relation.getMomentId()).build());
                 }
             }
+
+
         }
+
     }
 
     /**

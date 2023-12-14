@@ -372,4 +372,9 @@ public interface IWeCustomerService extends IService<WeCustomer> {
 
 
     List<WeCustomerChannelCountVo> getCustomerNumByState(String state, Date startTime, Date endTime);
+
+
+
+
+
 }

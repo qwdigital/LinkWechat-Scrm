@@ -201,8 +201,14 @@
        ● yml文件更新 
            linkwe-common.yml
                 linkwechat:
-                     qrShortLinkDomainName: sl.linkwechat.net/st/qr/
+                     qrShortLinkDomainName: sl.linkwechat.net/st/pqr/
                      qrGroupShortLinkDomainName: sl.linkwechat.net/st/gqr/ 
+           linkwe-gateway.yml
+                security:
+                    ignore:
+                      whites:
+                          - /open/gqr/**
+                          - /open/pqr/**
        ● 菜单更新日志
          UPDATE `sys_menu` SET `menu_name` = '员工活码', `parent_id` = 2218, `order_num` = 1, `path` = 'staff', `component` = ' ', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-11-08 12:13:21', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-07 21:06:31', `remark` = '' WHERE `menu_id` = 2053;
          UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2053, `order_num` = 11, `path` = 'detail', `component` = 'drainageCode/staff/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:staff:detail', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-22 16:32:05', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-11-30 17:17:33', `remark` = '' WHERE `menu_id` = 2159;
@@ -213,6 +219,29 @@
          UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2056, `order_num` = 10, `path` = 'detail', `component` = 'drainageCode/group/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:group:detail', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-23 00:14:50', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-12-03 21:31:35', `remark` = '' WHERE `menu_id` = 2165;
          UPDATE `sys_menu` SET `menu_name` = '列表', `parent_id` = 2056, `order_num` = 1, `path` = 'list', `component` = 'drainageCode/group/list', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2022-09-12 23:08:33', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2022-09-13 00:09:31', `remark` = '' WHERE `menu_id` = 2284;
          UPDATE `sys_menu` SET `menu_name` = '统计', `parent_id` = 2056, `order_num` = 2, `path` = 'analyse', `component` = 'drainageCode/group/analyse', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-02-22 12:42:39', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-28 16:34:07', `remark` = '' WHERE `menu_id` = 2364;
-  
-  
+       ● xxl-job更新日志
+         INSERT INTO `xxl_job_info` ( `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES ( 3, '通用短链统计任务', '2023-07-24 16:41:02', '2023-11-23 11:33:15', 'sxw', '', 'CRON', '59 59 23 * * ?', 'DO_NOTHING', 'ROUND', 'weCommonLinkStatisticTask', '', 'SERIAL_EXECUTION', 60, 3, 'BEAN', '', 'GLUE代码初始化', '2023-07-24 16:41:02', '', 1, 1701878399000, 1701964799000);
+
+## V5.0.2 (2023-12-07) 
+      ● 升级日志
+         1.新增客群去重功能。
+         2.客户SOP与客群SOP新增一键复制功能,同时移除编辑功能。
+         3.系统相关bug修复,以及yml相关文件优化。
       
+     ● yml文件更新 
+        linkwe-common.yml
+                linkwechat:
+                     shortDomain: sl.linkwechat.net #短域名
+                     shortLinkDomainName: ${linkwechat.shortDomain}/st/t/
+                     customerShortLinkDomainName: ${linkwechat.shortDomain}/st/l/
+                     qrShortLinkDomainName: ${linkwechat.shortDomain}/st/pqr/
+                     qrGroupShortLinkDomainName: ${linkwechat.shortDomain}/st/gqr/
+        linkwe-gateway.yml
+            security:
+                ignore:
+                   whites:
+                      - /open/qr/getBydetail/**
+                      - /open/groupCode/getBydetail/**
+     ● 菜单更新日志
+      UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2102, `order_num` = 10, `path` = 'detail', `component` = 'communityOperating/oldCustomer/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = 'code', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-11-13 14:12:12', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-12-13 15:33:53', `remark` = '' WHERE `menu_id` = 2476;
+      INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2482, '客群去重', 2223, 15, 'groupRepeat', 'customerManage/groupRepeat/list', 1, 'C', '0', '0', '', '#', 'admin', NULL, '2023-12-09 01:42:33', 'admin', NULL, '2023-12-14 13:12:36', '');

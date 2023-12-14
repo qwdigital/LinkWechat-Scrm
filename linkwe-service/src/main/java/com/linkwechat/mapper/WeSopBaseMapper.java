@@ -69,11 +69,12 @@ public interface WeSopBaseMapper extends BaseMapper<WeSopBase> {
      * @param executeSubState
      * @param sopBaseId
      * @param executeTargetId 执行目标id
+     * @param  executeWeUserId 执行成员id
      * @return
      */
     List<WeGroupSopBaseContentVo> findGroupExecuteContent(@Param("chatId") String chatId,
                                                           @Param("executeSubState") Integer executeSubState,@Param("sopBaseId") String sopBaseId,@Param("executeTargetId") String executeTargetId
-            ,@Param("checkAll") boolean checkAll);
+            ,@Param("checkAll") boolean checkAll,@Param("executeWeUserId") String executeWeUserId);
 
 
     /**

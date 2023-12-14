@@ -412,8 +412,8 @@ public class QwCustomerController {
      * @param joinWayQuery
      * @return
      */
-    @DeleteMapping("/delJoinWayForGroupChat")
-    public AjaxResult<WeResultVo> delJoinWayForGroupChat(WeGroupChatJoinWayQuery joinWayQuery) {
+    @PostMapping("/delJoinWayForGroupChat")
+    public AjaxResult<WeResultVo> delJoinWayForGroupChat(@RequestBody WeGroupChatJoinWayQuery joinWayQuery) {
 
         return AjaxResult.success(
                 qwCustomerService.delJoinWayForGroupChat(joinWayQuery)
