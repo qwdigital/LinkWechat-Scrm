@@ -19,11 +19,7 @@ public interface IWeAiMsgService extends IService<WeAiMsg> {
 
     void delMsg(String sessionId);
 
-    /**
-     * 收藏列表
-     * @param userId
-     * @param content
-     * @return
-     */
-    List<WeAiMsg> collectionList(Long userId, String content);
+
+    List<String> collectionMsgIdByQuery(Long userId, String content);
+    List<WeAiMsg> collectionList(List<String> msgIds);
 }

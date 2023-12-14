@@ -17,4 +17,7 @@ public class WeAiMsgQuery extends PostBaseQuery {
     @NotNull(message = "消息不能为空")
     @ApiModelProperty(value = "消息", required = true)
     private AiMessage msg;
+
+    @ApiModelProperty(hidden = true)
+    private Long userId;
 }

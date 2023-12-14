@@ -7,6 +7,7 @@ import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageInfo;
+import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
@@ -99,6 +100,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
 
     public void sendAiMsg(WeAiMsgQuery query) {
+        log.info("sendAiMsg---{}",JSONObject.toJSONString(query));
         if (Objects.isNull(query.getMsg())) {
             return;
         }
@@ -153,15 +155,15 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             }
         });
         replyMsg.setContent(replyContent.toString());
-        replyMsg.setUserId(SecurityUtils.getUserId());
+        replyMsg.setUserId(query.getUserId());
 
         WeAiMsg sendMsg = new WeAiMsg();
         sendMsg.setSessionId(query.getSessionId());
-        sendMsg.setMsgId(IdUtil.simpleUUID());
+        sendMsg.setMsgId(replyMsg.getMsgId());
         sendMsg.setSendTime(new Date());
         sendMsg.setRole(query.getMsg().getRole());
         sendMsg.setContent(query.getMsg().getContent());
-        sendMsg.setUserId(SecurityUtils.getUserId());
+        sendMsg.setUserId(query.getUserId());
 
         List<WeAiMsg> addMsgList = new ArrayList<>();
         addMsgList.add(sendMsg);
@@ -202,7 +204,8 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
     @Override
     public SseEmitter createAndSendMsg(WeAiMsgQuery query) {
-
+        query.setUserId(SecurityUtils.getUserId());
+        log.info("createAndSendMsg---{}",JSONObject.toJSONString(query));
         if (StringUtils.isEmpty(query.getSessionId())) {
             query.setSessionId(IdUtil.simpleUUID());
         }
@@ -245,18 +248,28 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
     }
 
     @Override
-    public PageInfo<WeAiMsgVo> collectionList(WeAiMsgListQuery query) {
-        PageInfo<WeAiMsgVo> pageInfo = new PageInfo<>();
-        List<WeAiMsg> weAiMsgList = iWeAiMsgService.collectionList(SecurityUtils.getUserId(),query.getContent());
-        if (CollectionUtil.isNotEmpty(weAiMsgList)) {
-            List<WeAiMsgVo> weAiMsgVos = weAiMsgList.stream().map(item -> {
-                WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
-                BeanUtil.copyProperties(item, weAiMsgVo);
-                return weAiMsgVo;
-            }).collect(Collectors.toList());
-            pageInfo.setList(weAiMsgVos);
+    public PageInfo<WeAiCollectionMsgVo> collectionList(WeAiMsgListQuery query) {
+        PageInfo<WeAiCollectionMsgVo> pageInfo = new PageInfo<>();
+        List<String> msgIds = iWeAiMsgService.collectionMsgIdByQuery(SecurityUtils.getUserId(),query.getContent());
+        if (CollectionUtil.isNotEmpty(msgIds)) {
+            List<WeAiMsg> weAiMsgList = iWeAiMsgService.collectionList(msgIds);
+            Map<String, List<WeAiMsg>> msgMap = weAiMsgList.stream().collect(Collectors.groupingBy(WeAiMsg::getMsgId));
+            List<WeAiCollectionMsgVo> reustList = new ArrayList<>();
+            for (String msgId : msgIds) {
+                WeAiCollectionMsgVo weAiCollectionMsg = new WeAiCollectionMsgVo();
+                weAiCollectionMsg.setMsgId(msgId);
+                List<WeAiMsgVo> weAiMsgVoList = msgMap.get(msgId).stream().map(item -> {
+                    weAiCollectionMsg.setSessionId(item.getSessionId());
+                    WeAiMsgVo weAiMsgVo = new WeAiMsgVo();
+                    BeanUtil.copyProperties(item, weAiMsgVo);
+                    return weAiMsgVo;
+                }).sorted(Comparator.comparing(WeAiMsgVo::getId)).collect(Collectors.toList());
+                weAiCollectionMsg.setContentList(weAiMsgVoList);
+                reustList.add(weAiCollectionMsg);
+            }
+            pageInfo.setList(reustList);
         }
-        PageInfo<WeAiMsg> msgPageInfo = new PageInfo<>(weAiMsgList);
+        PageInfo<String> msgPageInfo = new PageInfo<>(msgIds);
         pageInfo.setTotal(msgPageInfo.getTotal());
         return pageInfo;
     }

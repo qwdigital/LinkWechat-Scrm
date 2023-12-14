@@ -55,7 +55,6 @@ public class WeAiMsg extends BaseEntity implements Serializable {
     @TableField("msg_id")
     private String msgId;
 
-
     /**
      * 员工ID
      */

@@ -1,10 +1,7 @@
 package com.linkwechat.service;
 
 import com.github.pagehelper.PageInfo;
-import com.linkwechat.domain.WeAiCollectionMsgQuery;
-import com.linkwechat.domain.WeAiMsgListQuery;
-import com.linkwechat.domain.WeAiMsgQuery;
-import com.linkwechat.domain.WeAiMsgVo;
+import com.linkwechat.domain.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
@@ -49,5 +46,5 @@ public interface IWeAiSessionService {
      * @param query
      * @return
      */
-    PageInfo<WeAiMsgVo> collectionList(WeAiMsgListQuery query);
+    PageInfo<WeAiCollectionMsgVo> collectionList(WeAiMsgListQuery query);
 }

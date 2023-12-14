@@ -39,7 +39,12 @@ public class WeAiMsgServiceImpl extends ServiceImpl<WeAiMsgMapper, WeAiMsg> impl
     }
 
     @Override
-    public List<WeAiMsg> collectionList(Long userId, String content) {
-        return this.baseMapper.collectionList(userId,content);
+    public List<String> collectionMsgIdByQuery(Long userId, String content) {
+        return this.baseMapper.collectionMsgIdByQuery(userId,content);
+    }
+
+    @Override
+    public List<WeAiMsg> collectionList(List<String> msgIds) {
+        return this.baseMapper.collectionList(msgIds);
     }
 }

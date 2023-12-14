@@ -4,10 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
-import com.linkwechat.domain.WeAiCollectionMsgQuery;
-import com.linkwechat.domain.WeAiMsgListQuery;
-import com.linkwechat.domain.WeAiMsgQuery;
-import com.linkwechat.domain.WeAiMsgVo;
+import com.linkwechat.domain.*;
 import com.linkwechat.service.IWeAiSessionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -85,9 +82,9 @@ public class WeAiAssistantController extends BaseController {
 
     @ApiOperation(value = "收藏列表", httpMethod = "POST")
     @PostMapping("/msg/collection/list")
-    public TableDataInfo<List<WeAiMsgVo>>collectionList(@RequestBody WeAiMsgListQuery query) {
+    public TableDataInfo<List<WeAiCollectionMsgVo>>collectionList(@RequestBody WeAiMsgListQuery query) {
         startPage(query.getPageIndex(), query.getPageSize());
-        PageInfo<WeAiMsgVo> reslut = iWeAiSessionService.collectionList(query);
+        PageInfo<WeAiCollectionMsgVo> reslut = iWeAiSessionService.collectionList(query);
         return getDataTable(reslut);
     }
 }
