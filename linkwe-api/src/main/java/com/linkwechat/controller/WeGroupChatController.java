@@ -204,7 +204,7 @@ public class WeGroupChatController extends BaseController {
      * @return
      */
    @PostMapping("/remindDuplicateMembers")
-   public AjaxResult remindDuplicateMembers(WeCustomersQuery query){
+   public AjaxResult remindDuplicateMembers(@RequestBody WeCustomersQuery query){
 
         weGroupMemberService.remindDuplicateMembers(query.getExternalUserids());
 

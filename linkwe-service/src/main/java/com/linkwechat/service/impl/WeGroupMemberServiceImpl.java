@@ -87,7 +87,7 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
         }
 
         List<WeCustomer> weCustomers = iWeCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-                .eq(WeCustomer::getExternalUserid, externalUserids.split(",")));
+                .in(WeCustomer::getExternalUserid, externalUserids.split(",")));
 
         if(CollectionUtil.isNotEmpty(weCustomers)){
             QwAppMsgBody body = new QwAppMsgBody();
@@ -100,7 +100,7 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
             //设置应用id
             template.setAppId(weCorpAccount.getAgentId());
 
-            String content = "【群去重提醒】<br/> 管理员提醒你的客户"+weCustomers.stream().findFirst().get().getCustomerName()+"等"+weCustomers.size()+"人存在多个群中，为保证群质量，请尽快通过企业微信手机端【工作台-客户群-群成员去重】进行处理。";
+            String content = "【群去重提醒】<br/> <br/>管理员提醒你的客户"+weCustomers.stream().findFirst().get().getCustomerName()+"等"+weCustomers.size()+"人存在多个群中，为保证群质量，请尽快通过企业微信手机端【工作台-客户群-群成员去重】进行处理。";
 
             template.setContent(content);
             body.setMessageTemplates(template);
