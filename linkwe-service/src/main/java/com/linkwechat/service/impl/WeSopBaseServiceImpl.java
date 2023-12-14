@@ -43,12 +43,15 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
 import com.linkwechat.service.*;
+import com.linkwechat.transaction.BuilderSopTransactionSynchronization;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -115,6 +118,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
+
+
     @Override
     @Transactional
     public void createWeSop(WeSopBase weSopBase) {
@@ -130,14 +135,24 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                     = iWeSopAttachmentsService
                                     .saveBatchBySopBaseId(weSopPushTime.getId(), weSopBase.getId(), weMessageTemplates);
                             if(tip!=null){
-                                //发送mq消息生成执行任务
-                                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
-                                        WeSopBaseDto.builder()
+
+                                //数据提交后出发相关逻辑
+                                TransactionSynchronizationManager.registerSynchronization(
+                                        new BuilderSopTransactionSynchronization(rabbitTemplate, rabbitMQSettingConfig,  WeSopBaseDto.builder()
                                                 .sopBaseId(weSopBase.getId())
                                                 .isCreateOrUpdate(true).loginUser(
                                                         SecurityUtils.getLoginUser()
-                                                ).build()
-                                ));
+                                                ).build())
+                                );
+
+                                //发送mq消息生成执行任务
+//                                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
+//                                        WeSopBaseDto.builder()
+//                                                .sopBaseId(weSopBase.getId())
+//                                                .isCreateOrUpdate(true).loginUser(
+//                                                        SecurityUtils.getLoginUser()
+//                                                ).build()
+//                                ));
 
                             }
 
