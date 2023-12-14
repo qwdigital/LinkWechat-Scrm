@@ -5,13 +5,16 @@ import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.core.page.TableSupport;
+import com.linkwechat.common.core.redis.RedisService;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.exception.CustomException;
+import com.linkwechat.common.utils.Base62NumUtil;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
@@ -19,6 +22,7 @@ import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.groupcode.vo.WeGroupChatInfoVo;
 import com.linkwechat.domain.groupcode.vo.WeGroupCodeCountTrendVo;
 import com.linkwechat.domain.qr.query.WeQrCodeListQuery;
+import com.linkwechat.domain.qr.vo.WeQrCodeDetailVo;
 import com.linkwechat.domain.qr.vo.WeQrCodeScanCountVo;
 import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.service.IWeGroupCodeService;
@@ -52,6 +56,9 @@ public class WeGroupCodeController extends BaseController {
 
     @Autowired
     private IWeGroupCodeService groupCodeService;
+
+    @Autowired
+    private RedisService redisService;
 
 
 
@@ -195,6 +202,15 @@ public class WeGroupCodeController extends BaseController {
         return AjaxResult.success(
                 groupCodeService.findWeGroupCodeCountTrend(state,beginTime,endTime)
         );
+    }
+
+    @ApiOperation(value = "通过短链接获取群活码详情", httpMethod = "GET")
+    @GetMapping("/getByDetail/{shortUrl}")
+    public AjaxResult<WeQrCodeDetailVo> getGroupCodeInfoByShortUrl(@PathVariable("shortUrl") String shortUrl) {
+        long id = Base62NumUtil.decode(shortUrl);
+        WeGroupCode detail = groupCodeService.getDetail(String.valueOf(id));
+        redisService.increment(WeConstans.WE_SHORT_LINK_COMMON_KEY + WeConstans.OPEN_APPLET + "gqr:" +shortUrl);
+        return AjaxResult.success(detail);
     }
 
     @ApiOperation(value = "获取群活码总数统计", httpMethod = "GET")

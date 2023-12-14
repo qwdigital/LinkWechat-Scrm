@@ -205,6 +205,9 @@
         <if test="executeTargetId != null and executeTargetId !=''">
             and wseca.execute_target_id=#{executeTargetId}
         </if>
+        <if test="executeWeUserId != null and executeWeUserId !=''">
+            and wset.execute_we_user_id=#{executeWeUserId}
+        </if>
     </select>
 
     <select id="findTdSendSopCustomers" resultType="com.linkwechat.domain.sop.vo.content.WeCustomerSopToBeSentVo">

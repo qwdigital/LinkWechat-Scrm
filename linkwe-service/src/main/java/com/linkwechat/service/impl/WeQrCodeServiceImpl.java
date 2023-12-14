@@ -9,6 +9,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -41,14 +42,18 @@ import com.linkwechat.domain.qr.query.WeQrUserInfoQuery;
 import com.linkwechat.domain.qr.vo.*;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
+import com.linkwechat.domain.wecom.query.weixin.WxJumpWxaQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
+import com.linkwechat.domain.wecom.vo.weixin.WxJumpWxaVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QxAppletClient;
 import com.linkwechat.mapper.WeQrCodeMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -101,6 +106,12 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
 
     @Autowired
     private IWeCommonLinkStatService weCommonLinkStatService;
+
+    @Value("${weixin.short.env-version:develop}")
+    private String shortEnvVersion;
+
+    @Resource
+    private QxAppletClient qxAppletClient;
 
     /**
      * 新增员工活码
@@ -621,11 +632,40 @@ public class WeQrCodeServiceImpl extends ServiceImpl<WeQrCodeMapper, WeQrCode> i
             resObj.put("errorMsg", "无效链接");
             return resObj;
         }
-        resObj.put("type",0);
+        resObj.put("type",4);
 
         if (StringUtils.isNotEmpty(weQrCode.getQrCode())) {
             resObj.put("qrCode", weQrCode.getQrCode());
         }
+
+        WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+        if (Objects.isNull(corpAccount)) {
+            resObj.put("errorMsg", "请未配置企业信息");
+            return resObj;
+            //throw new WeComException("请未配置企业信息");
+        }
+        if (StringUtils.isEmpty(corpAccount.getWxAppletOriginalId())) {
+            resObj.put("errorMsg", "请未配置小程序原始ID");
+            return resObj;
+            //throw new WeComException("请未配置小程序原始ID");
+        }
+
+        WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
+        WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
+        wxa.setPath(linkWeChatConfig.getShortAppletUrl());
+        wxa.setQuery("id=" + shortUrl + "&sence=qr");
+        wxa.setEnv_version(shortEnvVersion);
+        wxaQuery.setJump_wxa(wxa);
+        WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
+        if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
+            resObj.put("url_scheme", wxJumpWxa.getOpenLink());
+        } else {
+            resObj.put("errorMsg", "生成小程序跳转链接失败");
+            //throw new WeComException("生成小程序跳转链接失败");
+        }
+        resObj.put("user_name", corpAccount.getWxAppletOriginalId());
+        resObj.put("path", linkWeChatConfig.getShortAppletUrl());
+        resObj.put("query", "id=" + shortUrl + "&sence=qr");
         return resObj;
     }
 
