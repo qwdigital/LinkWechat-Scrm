@@ -77,7 +77,7 @@
     </select>
 
     <select id="collectionMsgIdByQuery" resultType="java.lang.String">
-        select distinct msg_id
+        select distinct msg_id from  we_ai_msg
         <where>
             and user_id = #{userId}
             <if test="content !=null and content != ''">
