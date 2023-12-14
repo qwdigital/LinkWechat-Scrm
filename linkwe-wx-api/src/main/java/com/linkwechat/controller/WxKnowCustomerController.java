@@ -78,9 +78,9 @@ public class WxKnowCustomerController {
                 }else{//已添加指定成员
                     String weUserIds=null;String deptIds=null;String positions=null;
 
-                    WeUserScreenConditVo addWeUser = weKnowCustomerCode.getAddWeUser();
-                    if(null != addWeUser){
-                        WeUserScreenConditVo.ExecuteUserCondit executeUserCondit = addWeUser.getExecuteUserCondit();
+                    WeUserScreenConditVo appointWeUser = weKnowCustomerCode.getAppointWeUser();
+                    if(null != appointWeUser){
+                        WeUserScreenConditVo.ExecuteUserCondit executeUserCondit = appointWeUser.getExecuteUserCondit();
                         if(null != executeUserCondit){
                             List<String> weUserIdss = executeUserCondit.getWeUserIds();
                             if(CollectionUtil.isNotEmpty(weUserIdss)){
@@ -88,7 +88,7 @@ public class WxKnowCustomerController {
                             }
                         }
 
-                        WeUserScreenConditVo.ExecuteDeptCondit executeDeptCondit = addWeUser.getExecuteDeptCondit();
+                        WeUserScreenConditVo.ExecuteDeptCondit executeDeptCondit = appointWeUser.getExecuteDeptCondit();
                         if(null != executeDeptCondit){
                             List<String> deptIdss = executeDeptCondit.getDeptIds();
                             if(CollectionUtil.isNotEmpty(deptIdss)){
