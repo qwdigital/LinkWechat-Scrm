@@ -57,4 +57,10 @@ public class WeCustomerDeduplicationVo {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
 
+
+    /**
+     * 添加人id，多个使用逗号隔开
+     */
+    private String weUserIds;
+
 }
