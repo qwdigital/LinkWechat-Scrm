@@ -126,15 +126,20 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     if(iWeSopPushTimeService.save(weSopPushTime)){
                         List<WeMessageTemplate> weMessageTemplates = weSopPushTime.getAttachments();
                         if(CollectionUtil.isNotEmpty(weMessageTemplates)){
-                            iWeSopAttachmentsService.saveBatchBySopBaseId(weSopPushTime.getId(),weSopBase.getId(),weMessageTemplates);
-                            //发送mq消息生成执行任务
-                            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
-                                    WeSopBaseDto.builder()
-                                            .sopBaseId(weSopBase.getId())
-                                            .isCreateOrUpdate(true).loginUser(
-                                                    SecurityUtils.getLoginUser()
-                                            ).build()
-                            ));
+                            Integer tip
+                                    = iWeSopAttachmentsService
+                                    .saveBatchBySopBaseId(weSopPushTime.getId(), weSopBase.getId(), weMessageTemplates);
+                            if(tip!=null){
+                                //发送mq消息生成执行任务
+                                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
+                                        WeSopBaseDto.builder()
+                                                .sopBaseId(weSopBase.getId())
+                                                .isCreateOrUpdate(true).loginUser(
+                                                        SecurityUtils.getLoginUser()
+                                                ).build()
+                                ));
+
+                            }
 
                         }
                     }

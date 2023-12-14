@@ -67,10 +67,7 @@ public class SopTaskServiceImpl implements SopTaskService {
             boolean isCreateOrUpdate = weSopBaseDto.isCreateOrUpdate();
 
             WeSopBase weSopBase = iWeSopBaseService.getById(weSopBaseDto.getSopBaseId());
-
             if (null != weSopBase) {
-
-
 
                     if (weSopBase.getBaseType() == 1) { //客户sop
                         //构建客户sop执行计划
@@ -80,8 +77,6 @@ public class SopTaskServiceImpl implements SopTaskService {
                             //构建客群sop执行计划
                             iWeSopBaseService.builderExecuteGroupSopPlan(weSopBase
                                     , iWeSopBaseService.builderExecuteGroup(weSopBase,null), isCreateOrUpdate,false);
-
-
 
                 }
 

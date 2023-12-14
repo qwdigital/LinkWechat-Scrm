@@ -27,7 +27,7 @@ public class WeSopAttachmentsServiceImpl extends ServiceImpl<WeSopAttachmentsMap
 implements IWeSopAttachmentsService {
 
     @Override
-    public void saveBatchBySopBaseId(Long sopPushTimeId,Long sopBaseId, List<WeMessageTemplate> attachments) {
+    public Integer saveBatchBySopBaseId(Long sopPushTimeId,Long sopBaseId, List<WeMessageTemplate> attachments) {
         List<WeSopAttachments> attachmentsList = Optional.ofNullable(attachments)
                 .orElseGet(ArrayList::new).stream().map(weQrAttachmentsQuery -> {
                     WeSopAttachments weQrAttachments = new WeSopAttachments();
@@ -36,7 +36,7 @@ implements IWeSopAttachmentsService {
                     weQrAttachments.setSopPushTimeId(sopPushTimeId);
                     return weQrAttachments;
                 }).collect(Collectors.toList());
-        saveOrUpdateBatch(attachmentsList);
+        return this.baseMapper.insertBatchSomeColumn(attachmentsList);
     }
 
     @Override
