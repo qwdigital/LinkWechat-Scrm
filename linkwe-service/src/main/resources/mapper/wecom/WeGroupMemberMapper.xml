@@ -109,6 +109,24 @@
         </where>
     </select>
 
+    <select id="getMemberNumByState" resultType="com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo">
+        select
+        date_format(join_time,'%Y-%m-%d') as `date`,
+        count(distinct user_id) as member_number,
+        count(distinct case when del_flag = 0 then user_id end) as  efficient_number
+        from we_group_member
+        where id in (select id
+        from we_group_member where state=#{state}
+        <if test="startTime != null "><!-- 开始时间检索 -->
+            and date_format(join_time,'%y-%m-%d') &gt;= date_format(#{startTime},'%y-%m-%d')
+        </if>
+        <if test="endTime != null "><!-- 结束时间检索 -->
+            and date_format(join_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+        </if>
+        )
+        group by join_time
+    </select>
+
     <update id="quitGroup">
         UPDATE we_group_member
         SET quit_scene = #{quitScene},

@@ -10,6 +10,7 @@ import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.groupchat.vo.WeCustomerDeduplicationVo;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,5 +110,10 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
 
         }
 
+    }
+
+    @Override
+    public List<WeGroupChannelCountVo> getMemberNumByState(String state, Date startTime, Date endTime) {
+        return this.baseMapper.getMemberNumByState(state,startTime,endTime);
     }
 }

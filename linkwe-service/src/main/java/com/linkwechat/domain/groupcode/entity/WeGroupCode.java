@@ -36,6 +36,8 @@ public class WeGroupCode extends BaseEntity {
      */
     private String codeUrl;
 
+
+
     /**
      * 活码名称
      */
@@ -164,6 +166,8 @@ public class WeGroupCode extends BaseEntity {
     private String groupNames;
 
 
-
+    @ApiModelProperty("活码短链")
+    @TableField(exist = false)
+    private String qrShortLink;
 
 }

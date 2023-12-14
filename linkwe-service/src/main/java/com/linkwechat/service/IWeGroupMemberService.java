@@ -3,9 +3,11 @@ package com.linkwechat.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.groupchat.vo.WeCustomerDeduplicationVo;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,6 +59,8 @@ public interface IWeGroupMemberService extends IService<WeGroupMember> {
      * @param userId
      */
     void physicalDelete(String chatId,String userId);
+
+    List<WeGroupChannelCountVo> getMemberNumByState(String state, Date startTime, Date endTime);
 
 
     /**

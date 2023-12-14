@@ -192,3 +192,33 @@
          ALTER TABLE we_sop_base ADD COLUMN scope_type tinyint  COMMENT '发送范围: 0全部客户 1按条件筛选';
          ALTER TABLE we_group_message_task ADD COLUMN we_customers_query text  COMMENT '客户查询条件';
          ALTER TABLE we_group_message_task ADD COLUMN scope_type tinyint  COMMENT '发送范围: 0全部客户 1按条件筛选';
+## V5.0.2 (2023-12-07)
+      ● 升级日志
+         1.员工活码新增H5链接与智能短链功能,与活码统计升级。
+         2.客群活码活码新增H5链接与智能短链功能,与活码统计升级。
+         3.系统相关bug修复。
+
+       ● yml文件更新 
+           linkwe-common.yml
+                linkwechat:
+                     qrShortLinkDomainName: sl.linkwechat.net/st/pqr/
+                     qrGroupShortLinkDomainName: sl.linkwechat.net/st/gqr/ 
+           linkwe-gateway.yml
+                security:
+                    ignore:
+                      whites:
+                          - /open/gqr/**
+                          - /open/pqr/**
+       ● 菜单更新日志
+         UPDATE `sys_menu` SET `menu_name` = '员工活码', `parent_id` = 2218, `order_num` = 1, `path` = 'staff', `component` = ' ', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-11-08 12:13:21', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-07 21:06:31', `remark` = '' WHERE `menu_id` = 2053;
+         UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2053, `order_num` = 11, `path` = 'detail', `component` = 'drainageCode/staff/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:staff:detail', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-22 16:32:05', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-11-30 17:17:33', `remark` = '' WHERE `menu_id` = 2159;
+         UPDATE `sys_menu` SET `menu_name` = '{新建}', `parent_id` = 2053, `order_num` = 12, `path` = 'add', `component` = 'drainageCode/staff/add', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:staff:add', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-22 16:38:11', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-11-30 17:18:06', `remark` = '' WHERE `menu_id` = 2160;
+         UPDATE `sys_menu` SET `menu_name` = '列表', `parent_id` = 2053, `order_num` = 1, `path` = 'list', `component` = 'drainageCode/staff/list', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2022-09-12 23:07:48', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2022-09-14 22:11:13', `remark` = '' WHERE `menu_id` = 2283;
+         UPDATE `sys_menu` SET `menu_name` = '客群活码', `parent_id` = 2218, `order_num` = 2, `path` = 'customerGroup', `component` = 'Layout', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-11-08 12:26:15', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-28 16:35:30', `remark` = '' WHERE `menu_id` = 2056;
+         UPDATE `sys_menu` SET `menu_name` = '{新增}', `parent_id` = 2056, `order_num` = 50, `path` = 'add', `component` = 'drainageCode/group/baseInfo', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:group:add', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-23 00:11:41', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-12-03 21:33:08', `remark` = '' WHERE `menu_id` = 2164;
+         UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2056, `order_num` = 10, `path` = 'detail', `component` = 'drainageCode/group/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:group:detail', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-23 00:14:50', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-12-03 21:31:35', `remark` = '' WHERE `menu_id` = 2165;
+         UPDATE `sys_menu` SET `menu_name` = '列表', `parent_id` = 2056, `order_num` = 1, `path` = 'list', `component` = 'drainageCode/group/list', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2022-09-12 23:08:33', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2022-09-13 00:09:31', `remark` = '' WHERE `menu_id` = 2284;
+         UPDATE `sys_menu` SET `menu_name` = '统计', `parent_id` = 2056, `order_num` = 2, `path` = 'analyse', `component` = 'drainageCode/group/analyse', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-02-22 12:42:39', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-28 16:34:07', `remark` = '' WHERE `menu_id` = 2364;
+       ● xxl-job更新日志
+         INSERT INTO `xxl_job_info` ( `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES ( 3, '通用短链统计任务', '2023-07-24 16:41:02', '2023-11-23 11:33:15', 'sxw', '', 'CRON', '59 59 23 * * ?', 'DO_NOTHING', 'ROUND', 'weCommonLinkStatisticTask', '', 'SERIAL_EXECUTION', 60, 3, 'BEAN', '', 'GLUE代码初始化', '2023-07-24 16:41:02', '', 1, 1701878399000, 1701964799000);
+      

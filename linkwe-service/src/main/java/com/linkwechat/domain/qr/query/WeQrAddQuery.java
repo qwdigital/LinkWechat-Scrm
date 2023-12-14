@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -77,7 +78,18 @@ public class WeQrAddQuery {
     @ApiModelProperty(value = "渠道",hidden = true)
     private String state;
 
+    /**
+     * 欢迎语开关
+     */
+    @ApiModelProperty("欢迎语开关 1-不发送欢迎语，2-发送欢迎语")
+    private Integer qrWelcomeOpen;
 
+
+    /**
+     * 是否优先员工欢迎语
+     */
+    @ApiModelProperty("是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）")
+    private Integer qrPriorityUserWelcome;
 
     /**
      * 企微接口参数生成方法
@@ -137,6 +149,8 @@ public class WeQrAddQuery {
         }
         weQrCode.setConfigId(configId);
         weQrCode.setQrCode(qrCode);
+        weQrCode.setQrWelcomeOpen(this.qrWelcomeOpen);
+        weQrCode.setQrPriorityUserWelcome(this.qrPriorityUserWelcome);
         return weQrCode;
     }
 

@@ -33,6 +33,8 @@ public class WeTaskFissionStatusTask {
             try {
                 log.info("裂变相关处理--------------------------start");
                 iWeFissionService.handleFission();
+                //处理过期任务
+                iWeFissionService.handleExpireFission();
                 log.info("裂变相关处理--------------------------end");
             }finally {
                lock.unlock();

@@ -522,7 +522,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         List<WeGroupSopContentVo> weGroupSopContentVos=new ArrayList<>();
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             groupExecuteContent.stream().collect(Collectors.groupingBy(WeGroupSopBaseContentVo::getPushTimePre))
                     .forEach((k,v)->{
@@ -579,7 +579,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         }
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
 
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             List<WeSendGroupSopContentVo.WeGroupSop> weGroupSops =new ArrayList<>();
@@ -810,7 +810,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
         //1.查询执行成员
         if(Objects.isNull(executeWeUser)){//全部成员
-            AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.list(new SysUser());
+            AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.listByQuery(new SysUser());
 
             if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                 executeWeUserIds.addAll(

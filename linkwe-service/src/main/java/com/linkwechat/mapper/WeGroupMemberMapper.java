@@ -4,11 +4,13 @@ package com.linkwechat.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.WeGroupMember;
 import com.linkwechat.domain.groupchat.vo.WeCustomerDeduplicationVo;
+import com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo;
 import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,5 +46,6 @@ public interface WeGroupMemberMapper extends BaseMapper<WeGroupMember> {
     List<WeCustomerDeduplicationVo> findWeCustomerDeduplication(@Param("customerName") String customerName);
 
 
+    List<WeGroupChannelCountVo> getMemberNumByState(@Param("state") String state, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }
 
