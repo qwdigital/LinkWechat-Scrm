@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -43,15 +42,14 @@ import com.linkwechat.fegin.QwSysUserClient;
 import com.linkwechat.mapper.WeSopBaseMapper;
 import com.linkwechat.mapper.WeSopPushTimeMapper;
 import com.linkwechat.service.*;
-import com.linkwechat.transaction.BuilderSopTransactionSynchronization;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,25 +133,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                     = iWeSopAttachmentsService
                                     .saveBatchBySopBaseId(weSopPushTime.getId(), weSopBase.getId(), weMessageTemplates);
                             if(tip!=null){
-
-                                //数据提交后出发相关逻辑
-                                TransactionSynchronizationManager.registerSynchronization(
-                                        new BuilderSopTransactionSynchronization(rabbitTemplate, rabbitMQSettingConfig,  WeSopBaseDto.builder()
-                                                .sopBaseId(weSopBase.getId())
-                                                .isCreateOrUpdate(true).loginUser(
-                                                        SecurityUtils.getLoginUser()
-                                                ).build())
-                                );
-
                                 //发送mq消息生成执行任务
-//                                rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
-//                                        WeSopBaseDto.builder()
-//                                                .sopBaseId(weSopBase.getId())
-//                                                .isCreateOrUpdate(true).loginUser(
-//                                                        SecurityUtils.getLoginUser()
-//                                                ).build()
-//                                ));
-
+                                this.sendCreateSopMessage(weSopBase.getId());
                             }
 
                         }
@@ -161,6 +142,20 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                 });
             }
         }
+    }
+
+
+    //最大尝试次数为 3，初始延迟为 1000 毫秒，倍数为 2，最大延迟为 6000 毫秒。
+    @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 6000))
+    public void sendCreateSopMessage(Long sopBaseId) {
+        //发送mq消息生成执行任务
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
+                WeSopBaseDto.builder()
+                        .sopBaseId(sopBaseId)
+                        .isCreateOrUpdate(true).loginUser(
+                                SecurityUtils.getLoginUser()
+                        ).build()
+        ));
     }
 
 

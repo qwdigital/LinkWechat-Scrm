@@ -14,6 +14,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 /**
  * sop相关监听
  */
@@ -29,17 +31,17 @@ public class QwSopListener {
 
     @RabbitHandler
     @RabbitListener(queues = "${wecom.mq.queue.sop:Qu_Sop}")
-    public void sopSubscribe(String msg, Channel channel, Message message){
+    public void sopSubscribe(String msg, Channel channel, Message message) throws IOException {
 
         try {
             log.info("sop任务构建：msg:{}", msg);
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             WeSopBaseDto weSopBaseDto = JSONObject.parseObject(msg, WeSopBaseDto.class);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             abstractSopTaskService.createOrUpdateSop(weSopBaseDto);
 
         }catch (Exception e){
-
             log.error("sop任务构建-消息处理失败 msg:{},error:{}", msg, e);
+            throw e;
         }
 
     }

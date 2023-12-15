@@ -6,6 +6,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.setting.SettingUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.context.SecurityContextHolder;
@@ -17,7 +18,9 @@ import com.linkwechat.common.enums.strategiccrowd.CrowdSwipeTypeEnum;
 import com.linkwechat.common.enums.strategiccrowd.CustomerAttributesEnum;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.MapUtils;
+import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.spring.SpringUtils;
+import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeSopChange;
@@ -35,6 +38,7 @@ import com.linkwechat.scheduler.service.SopTaskService;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.SetUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +54,13 @@ public class SopTaskServiceImpl implements SopTaskService {
 
     @Autowired
     private IWeCustomerService iWeCustomerService;
+
+
+    @Autowired
+    private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
 
@@ -79,6 +90,9 @@ public class SopTaskServiceImpl implements SopTaskService {
                                     , iWeSopBaseService.builderExecuteGroup(weSopBase,null), isCreateOrUpdate,false);
 
                 }
+            }else{
+                // 抛出异常以触发重试
+                throw new RuntimeException("Error processing message");
 
             }
 
