@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler.listener;
 
 import com.alibaba.fastjson.JSONObject;
+import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeCustomer;
 import com.linkwechat.domain.WeSopChange;
 import com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo;
@@ -34,13 +35,15 @@ public class QwSopListener {
     public void sopSubscribe(String msg, Channel channel, Message message) throws IOException {
 
         try {
-            log.info("sop任务构建：msg:{}", msg);
-            WeSopBaseDto weSopBaseDto = JSONObject.parseObject(msg, WeSopBaseDto.class);
+            if(StringUtils.isNotEmpty(msg)){
+                log.info("sop任务构建：msg:{}", msg);
+                WeSopBaseDto weSopBaseDto = JSONObject.parseObject(msg, WeSopBaseDto.class);
+                abstractSopTaskService.createOrUpdateSop(weSopBaseDto);
+            }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-            abstractSopTaskService.createOrUpdateSop(weSopBaseDto);
 
         }catch (Exception e){
-            log.error("sop任务构建-消息处理失败 msg:{},error:{}", msg, e);
+            log.error("sop任务构建-消息处理失败 msg:{},error:{}", msg);
             throw e;
         }
 
