@@ -7,6 +7,7 @@ import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageInfo;
+import com.linkwechat.annotation.AiMsgAop;
 import com.linkwechat.common.context.SecurityContextHolder;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -205,6 +206,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         return null;
     }
 
+    @AiMsgAop
     @Override
     public SseEmitter createAndSendMsg(WeAiMsgQuery query) {
         query.setUserId(SecurityUtils.getUserId());
@@ -227,9 +229,9 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             if (StringUtils.isEmpty(query.getMsg().getContent())) {
                 throw new WeComException("消息内容不能为空！");
             }
-            sseThread.execute(() -> {
+            /*sseThread.execute(() -> {
                 sendAiMsg(query);
-            });
+            });*/
         } catch (IOException e) {
             log.error("链接异常，sessionId:{}", query.getSessionId(), e);
             throw new WeComException("连接异常！");
