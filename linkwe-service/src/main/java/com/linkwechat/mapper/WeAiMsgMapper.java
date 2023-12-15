@@ -25,5 +25,8 @@ public interface WeAiMsgMapper extends BaseMapper<WeAiMsg> {
 
     List<String> collectionMsgIdByQuery(@Param("userId") Long userId, @Param("content") String content);
     List<WeAiMsg> collectionList(@Param("msgIds") List<String> msgIds);
+
+    Integer computeTodayToken();
+
 }
 

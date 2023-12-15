@@ -47,4 +47,9 @@ public class WeAiMsgServiceImpl extends ServiceImpl<WeAiMsgMapper, WeAiMsg> impl
     public List<WeAiMsg> collectionList(List<String> msgIds) {
         return this.baseMapper.collectionList(msgIds);
     }
+
+    @Override
+    public Integer computeTodayToken() {
+        return this.baseMapper.computeTodayToken();
+    }
 }

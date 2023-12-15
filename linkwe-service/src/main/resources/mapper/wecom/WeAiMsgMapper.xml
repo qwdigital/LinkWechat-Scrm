@@ -99,4 +99,8 @@
         order by id desc
     </select>
 
+    <select id="computeTodayToken" resultType="java.lang.Integer">
+        SELECT sum(total_tokens) as token_total from we_ai_msg where DATE_FORMAT(send_time,'%Y-%m-%d') =  DATE_FORMAT(now(),'%Y-%m-%d')
+    </select>
+
 </mapper>

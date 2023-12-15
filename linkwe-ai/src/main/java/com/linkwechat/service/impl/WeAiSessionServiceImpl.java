@@ -149,6 +149,9 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
                 } catch (IOException e) {
                     log.error("发送客户端异常 query：{}", JSONObject.toJSONString(query), e);
                 }
+                replyMsg.setPromptTokens(response.getUsage().getPromptTokens().intValue());
+                replyMsg.setCompletionTokens(response.getUsage().getCompletionTokens().intValue());
+                replyMsg.setTotalTokens(response.getUsage().getTotalTokens().intValue());
                 replyContent.append(Arrays.stream(response.getChoices()).map(Choice::getDelta).map(Delta::getContent).findFirst().orElse(""));
                 String role = Arrays.stream(response.getChoices()).map(Choice::getDelta).map(Delta::getRole).findFirst().orElse("assistant");
                 replyMsg.setRole(role);

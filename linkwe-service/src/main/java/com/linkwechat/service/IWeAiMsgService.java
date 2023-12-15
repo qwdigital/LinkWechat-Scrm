@@ -22,4 +22,6 @@ public interface IWeAiMsgService extends IService<WeAiMsg> {
 
     List<String> collectionMsgIdByQuery(Long userId, String content);
     List<WeAiMsg> collectionList(List<String> msgIds);
+
+    Integer computeTodayToken();
 }
