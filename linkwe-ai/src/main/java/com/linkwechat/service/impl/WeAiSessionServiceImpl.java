@@ -229,9 +229,9 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             if (StringUtils.isEmpty(query.getMsg().getContent())) {
                 throw new WeComException("消息内容不能为空！");
             }
-            /*sseThread.execute(() -> {
+            sseThread.execute(() -> {
                 sendAiMsg(query);
-            });*/
+            });
         } catch (IOException e) {
             log.error("链接异常，sessionId:{}", query.getSessionId(), e);
             throw new WeComException("连接异常！");
