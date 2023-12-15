@@ -49,12 +49,12 @@ public class WeSopTask {
 //    }
 
 
-     @XxlJob("builderXkSopPlanTip")
-     public void builderXkSopPlanTip(String params){
-         log.info("企业微信发送方式新客sop提醒发送>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
-         iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(null);
-
-     }
+//     @XxlJob("builderXkSopPlanTip")
+//     public void builderXkSopPlanTip(String params){
+//         log.info("企业微信发送方式新客sop提醒发送>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+//         iWeSopExecuteTargetAttachmentsService.weChatPushTypeSopTaskTip(null);
+//
+//     }
 
 
     @XxlJob("earlyEndSopTask")
@@ -77,11 +77,11 @@ public class WeSopTask {
         iWeSopExecuteTargetAttachmentsService.manualPushTypeSopTaskTip(false);
     }
 
-    @XxlJob("pushSopAppMsgDailyTipTask")
-    public void pushSopAppMsgDailyTip(String params){
-        log.info("执行sop任务每日即将过期sop任务提醒>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
-        iWeSopExecuteTargetAttachmentsService.manualPushTypeSopTaskTip(true);
-    }
+//    @XxlJob("pushSopAppMsgDailyTipTask")
+//    public void pushSopAppMsgDailyTip(String params){
+//        log.info("执行sop任务每日即将过期sop任务提醒>>>>>>>>>>>>>>>>>>>启动 params:{}", params);
+//        iWeSopExecuteTargetAttachmentsService.manualPushTypeSopTaskTip(true);
+//    }
 
 
 
