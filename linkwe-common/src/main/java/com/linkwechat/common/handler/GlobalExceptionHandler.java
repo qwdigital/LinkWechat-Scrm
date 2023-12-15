@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author ruoyi
  */
-@Order(-10)
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

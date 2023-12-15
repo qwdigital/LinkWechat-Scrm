@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 
 @MapperScan("com.linkwechat.**.mapper")
-@SpringBootApplication(exclude = {PageHelperAutoConfiguration.class})
+@SpringBootApplication(exclude = {PageHelperAutoConfiguration.class},scanBasePackages = "com.linkwechat.*")
 @EnableAsync
 @EnableFeignClients(defaultConfiguration = FeginConfig.class)
 public class LinkweAiApplication {
