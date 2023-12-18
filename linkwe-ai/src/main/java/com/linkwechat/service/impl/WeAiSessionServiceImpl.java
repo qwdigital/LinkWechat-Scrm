@@ -26,6 +26,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -51,6 +52,9 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
 
     @Autowired
     private RabbitMQSettingConfig rabbitMQSettingConfig;
+
+    @Value("${ai.token.num:10000}")
+    private int tokenTotalNum;
 
     private static ExecutorService sseThread = new ScheduledThreadPoolExecutor(1, new DefaultThreadFactory("we-sse-pool-%d"));
 
@@ -158,6 +162,9 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
                 replyMsg.setRole(role);
             }
         });
+        if (Objects.nonNull(sseEmitter)) {
+            sseEmitter.complete();
+        }
         replyMsg.setContent(replyContent.toString());
         replyMsg.setUserId(query.getUserId());
 
@@ -206,7 +213,7 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
         return null;
     }
 
-    @AiMsgAop
+    //@AiMsgAop
     @Override
     public SseEmitter createAndSendMsg(WeAiMsgQuery query) {
         query.setUserId(SecurityUtils.getUserId());
@@ -225,13 +232,18 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
             WeAiSessionUtil.removeAndClose(query.getSessionId());
         });
         try {
-            sseEmitter.send(SseEmitter.event().id("sessionId").data(query.getSessionId()));
-            if (StringUtils.isEmpty(query.getMsg().getContent())) {
-                throw new WeComException("消息内容不能为空！");
+            Integer todayToken = iWeAiMsgService.computeTodayToken();
+            if(todayToken != null && todayToken >= tokenTotalNum){
+                sseEmitter.send(SseEmitter.event().name("error").data("今天已超过配额限制"));
+            }else {
+                sseEmitter.send(SseEmitter.event().id("sessionId").data(query.getSessionId()));
+                if (StringUtils.isEmpty(query.getMsg().getContent())) {
+                    throw new WeComException("消息内容不能为空！");
+                }
+                sseThread.execute(() -> {
+                    sendAiMsg(query);
+                });
             }
-            sseThread.execute(() -> {
-                sendAiMsg(query);
-            });
         } catch (IOException e) {
             log.error("链接异常，sessionId:{}", query.getSessionId(), e);
             throw new WeComException("连接异常！");
