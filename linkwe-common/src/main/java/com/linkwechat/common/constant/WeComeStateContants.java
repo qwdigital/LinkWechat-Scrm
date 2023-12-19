@@ -20,4 +20,10 @@ public class WeComeStateContants {
      * 标签建群
      */
     public final static String BQJQ_STATE="bqjq_";
+
+
+    /**
+     * 关键词群
+     */
+    public final static String GJCQ_STATE="gjcq_";
 }

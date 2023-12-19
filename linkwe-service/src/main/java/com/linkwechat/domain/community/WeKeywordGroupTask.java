@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.linkwechat.common.core.domain.BaseEntity;
+import com.linkwechat.domain.WeKeyWordGroupSub;
 import com.linkwechat.domain.community.vo.WeGroupCodeVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,6 +15,7 @@ import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * 社区运营 - 关键词拉群任务实体
@@ -25,35 +27,31 @@ public class WeKeywordGroupTask extends BaseEntity{
     /**
      * 主键id
      */
-    @TableId("id")
-    private Long taskId;
+    @TableId
+    private Long id;
 
     /**
-     * 任务名称
+     * 标题
      */
-    @Size(max = 100, message = "任务名最大长度100")
-    @NotNull(message = "任务名不能为空")
-    private String taskName;
+    private String title;
 
     /**
-     * 群活码id
+     * 描述
      */
-    @NotNull(message = "群活码不能为空")
-    private Long groupCodeId;
+    private String descrition;
 
-    /**
-     * 加群引导语
-     */
-    @Size(max = 255, message = "引导语过长,最大长度255")
-    @NotNull(message = "引导语不可为空")
-    private String welcomeMsg;
+
 
     /**
      * 关键词
      */
-    @Size(max = 255, message = "关键词长度过长。最大长度255")
-    @NotNull(message = "关键词不可为空")
-    private String keywords;
+    private String keywordGroupUrl;
+
+
+    /**
+     * 关键词群链接二维码链接
+     */
+    private String keywordGroupQrUrl;
 
     /**
      * 逻辑删除
@@ -63,21 +61,9 @@ public class WeKeywordGroupTask extends BaseEntity{
 
 
     /**
-     * 实际群聊名称
+     * 关键词群
      */
     @TableField(exist = false)
-    private String groupNameList;
+    private List<WeKeyWordGroupSub> keyWordGroupSubs;
 
-    /**
-     * 群活码信息
-     */
-    @TableField(exist = false)
-    private WeGroupCodeVo groupCodeInfo;
-
-
-    /**
-     * 任务名称或关键词
-     */
-    @TableField(exist = false)
-    private String taskNameOrKeys;
  }
