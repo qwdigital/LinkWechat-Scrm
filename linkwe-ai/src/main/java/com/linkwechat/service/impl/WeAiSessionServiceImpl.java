@@ -148,8 +148,6 @@ public class WeAiSessionServiceImpl implements IWeAiSessionService {
                 replyMsg.setRequestId(response.getRequestId());
                 replyMsg.setSendTime(new Date(response.getCreated() * 1000));
                 try {
-                    threadPoolExecutor.execute(() -> {
-                    });
                     sseEmitter.send(SseEmitter.event().name("msg").data(response));
                 } catch (IOException e) {
                     log.error("发送客户端异常 query：{}", JSONObject.toJSONString(query), e);
