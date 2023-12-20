@@ -102,7 +102,11 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
 
     @Override
     public Integer sumTotalVisits(Long belongId) {
-        return this.baseMapper.sumTotalVisits(belongId);
+        Integer sumTotalVisits = this.baseMapper.sumTotalVisits(belongId);
+        if(null != sumTotalVisits){
+            return sumTotalVisits;
+        }
+        return new Integer(0);
     }
 
 
