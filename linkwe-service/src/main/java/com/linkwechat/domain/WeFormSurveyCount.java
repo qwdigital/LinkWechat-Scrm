@@ -33,6 +33,11 @@ public class WeFormSurveyCount extends BaseEntity {
     private Long totalVisits;
 
     /**
+     * 完成总时间
+     */
+     private Long totalTime;
+
+    /**
      * 问卷id
      */
     private Long belongId;

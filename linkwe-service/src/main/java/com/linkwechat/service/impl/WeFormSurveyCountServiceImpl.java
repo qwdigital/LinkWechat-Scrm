@@ -78,7 +78,7 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
 
         if(CollectionUtil.isNotEmpty(weFormSurveyCounts)){
             WeFormSurveyCount weFormSurveyCount = weFormSurveyCounts.stream().findFirst().get();
-            weFormSurveyCount.setTotalVisits(visitTime);
+            weFormSurveyCount.setTotalTime(visitTime);
             this.updateById(weFormSurveyCount);
         }
 
