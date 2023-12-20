@@ -81,7 +81,7 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
         weFormSurveyAnswer.setIpAddr(query.getIpAddr());
         if(save(weFormSurveyAnswer)){
             //设置时长
-            iWeFormSurveyCountService.setVisitTime(query.getBelongId(),query.getIpAddr()
+            iWeFormSurveyCountService.setVisitTime(query.getBelongId(),query.getIpAddr(),query.getDataSource()
                     ,DateUtils.timeDifference(new Date(),query.getAnTime()));
         }
 
@@ -101,7 +101,7 @@ public class WeFormSurveyAnswerServiceImpl extends ServiceImpl<WeFormSurveyAnswe
     @Override
     public Integer isCompleteSurvey(WeFormSurveyAnswerQuery query) {
         //获取表单信息
-        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId(),null,false);
+        WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueService.getInfo(query.getBelongId(),null,null,false);
         //判断表单填写规则
         Integer fillingRules = weFormSurveyCatalogue.getFillingRules();
         if (fillingRules.equals(2)) {

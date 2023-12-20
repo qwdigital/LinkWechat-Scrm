@@ -66,7 +66,7 @@ public class WeFormSurveyController extends BaseController {
      */
     @GetMapping(value = "/survey/getInfo")
     public AjaxResult<WeFormSurveyCatalogue> getInfo(WeAddFormSurveyAnswerQuery query) {
-        WeFormSurveyCatalogue info = weFormSurveyCatalogueService.getInfo(query.getId(),query.getAddr(),true);
+        WeFormSurveyCatalogue info = weFormSurveyCatalogueService.getInfo(query.getId(),query.getAddr(), query.getDataSource(), true);
         return AjaxResult.success(info);
     }
 

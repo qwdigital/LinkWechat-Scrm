@@ -33,7 +33,7 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
     private RedissonClient redissonClient;
 
     @Override
-    public void weFormCount(Long belongId, String visitorIp) {
+    public void weFormCount(Long belongId,String dataSource, String visitorIp) {
 
         RLock lock = redissonClient.getLock(LockEnums.WE_FORM_SURVEY_COUNT_LOCK.getCode());
         if(lock.tryLock()){
@@ -41,6 +41,7 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
                 List<WeFormSurveyCount> weFormSurveyCounts = this.list(new LambdaQueryWrapper<WeFormSurveyCount>()
                         .eq(WeFormSurveyCount::getBelongId, belongId)
                         .eq(WeFormSurveyCount::getVisitorIp, visitorIp)
+                        .eq(WeFormSurveyCount::getDataSource,dataSource)
                         .apply("date_format (create_time,'%Y-%m-%d') = date_format ({0},'%Y-%m-%d')", new Date()));
                 if(CollectionUtil.isNotEmpty(weFormSurveyCounts)){
                     WeFormSurveyCount weFormSurveyCount = weFormSurveyCounts.stream().findFirst().get();
@@ -57,6 +58,7 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
                                     .totalVisits(new Long(1))
                                     .belongId(belongId)
                                     .visitorIp(visitorIp)
+                                    .dataSource(dataSource)
                                     .build()
                     );
                 }
@@ -70,10 +72,11 @@ public class WeFormSurveyCountServiceImpl extends ServiceImpl<WeFormSurveyCountM
 
 
     @Override
-    public void setVisitTime(Long belongId,String visitorIp,Long visitTime){
+    public void setVisitTime(Long belongId,String visitorIp,String dataSource,Long visitTime){
         List<WeFormSurveyCount> weFormSurveyCounts = this.list(new LambdaQueryWrapper<WeFormSurveyCount>()
                 .eq(WeFormSurveyCount::getBelongId, belongId)
                 .eq(WeFormSurveyCount::getVisitorIp, visitorIp)
+                .eq(WeFormSurveyCount::getDataSource,dataSource)
                 .apply("date_format (create_time,'%Y-%m-%d') = date_format ({0},'%Y-%m-%d')", new Date()));
 
         if(CollectionUtil.isNotEmpty(weFormSurveyCounts)){

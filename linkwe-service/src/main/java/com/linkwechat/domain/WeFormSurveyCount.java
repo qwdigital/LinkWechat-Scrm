@@ -59,4 +59,10 @@ public class WeFormSurveyCount extends BaseEntity {
     private String channelsName;
 
 
+    /**
+     * 数据来源
+     */
+    private String dataSource;
+
+
 }

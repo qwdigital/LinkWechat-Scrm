@@ -117,10 +117,10 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
 
 
     @Override
-    public WeFormSurveyCatalogue getInfo(Long id,String ipAddress,boolean isCount) {
+    public WeFormSurveyCatalogue getInfo(Long id,String ipAddress,String dataSource,boolean isCount) {
         WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueMapper.getWeFormSurveyCatalogueById(id);
         if(isCount){
-            iWeFormSurveyCountService.weFormCount(id,ipAddress);
+            iWeFormSurveyCountService.weFormCount(id,dataSource,ipAddress);
         }
 
         return weFormSurveyCatalogue;
