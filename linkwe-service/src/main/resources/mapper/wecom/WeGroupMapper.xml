@@ -113,6 +113,7 @@
             </foreach>
         </if>
         GROUP BY wg.id
+        ORDER BY wg.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
                 limit ${pageDomain.pageSize * (pageDomain.pageNum-1)}, #{pageDomain.pageSize}
@@ -386,11 +387,14 @@
             wgm.join_time
         FROM
             we_group wg
-                LEFT JOIN we_group_member wgm on wg.chat_id=wgm.chat_id
+        LEFT JOIN we_group_member wgm on wg.chat_id=wgm.chat_id
         where
-            wgm.quit_scene IS  NULL
-            <if test="chatUserId != null and chatUserId !=''">
-               and wgm.user_id = #{chatUserId}
+           wg.del_flag=0 and wgm.quit_scene IS  NULL
+            <if test="chatUserId !=null and chatUserId !=''">
+                AND wgm.user_id in
+                <foreach collection="chatUserId.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="state != null and state !=''">
                 AND wgm.state = #{state}

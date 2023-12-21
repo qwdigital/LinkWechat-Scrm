@@ -15,10 +15,7 @@ import com.linkwechat.domain.groupchat.vo.WeGroupMemberVo;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.msg.QwAppMsgBody;
 import com.linkwechat.mapper.WeGroupMemberMapper;
-import com.linkwechat.service.IWeCorpAccountService;
-import com.linkwechat.service.IWeCustomerService;
-import com.linkwechat.service.IWeGroupMemberService;
-import com.linkwechat.service.QwAppSendMsgService;
+import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +42,7 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
 
     @Autowired
     private QwAppSendMsgService qwAppSendMsgService;
+
 
     @Override
     public List<WeGroupMember> getPageList(WeGroupMember weGroupMember) {
@@ -78,6 +76,7 @@ public class WeGroupMemberServiceImpl extends ServiceImpl<WeGroupMemberMapper, W
 
     @Override
     public List<WeCustomerDeduplicationVo> findWeCustomerDeduplication(String customerName) {
+
         return this.baseMapper.findWeCustomerDeduplication(customerName);
     }
 

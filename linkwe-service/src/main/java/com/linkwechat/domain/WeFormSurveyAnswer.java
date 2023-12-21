@@ -1,6 +1,8 @@
 package com.linkwechat.domain;
 
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -19,25 +21,23 @@ import java.util.Date;
  * @author danmo
  * @since 2022-09-20 18:02:56
  */
-@ApiModel
 @Data
 @SuppressWarnings("serial")
 @TableName("we_form_survey_answer")
-public class WeFormSurveyAnswer extends BaseEntity implements Serializable {
+@ColumnWidth(25)
+public class WeFormSurveyAnswer extends BaseEntity {
 
-    private static final long serialVersionUID = 1L; //1
 
 
-    @ApiModelProperty(value = "id")
     @TableId(type = IdType.AUTO)
     @TableField("id")
+    @ExcelIgnore
     private Long id;
 
 
     /**
      * 手机号
      */
-    @ApiModelProperty(value = "手机号")
     @TableField("mobile")
     private String mobile;
 
@@ -45,7 +45,6 @@ public class WeFormSurveyAnswer extends BaseEntity implements Serializable {
     /**
      * 用户姓名
      */
-    @ApiModelProperty(value = "用户姓名")
     @TableField("name")
     private String name;
 
@@ -53,31 +52,30 @@ public class WeFormSurveyAnswer extends BaseEntity implements Serializable {
     /**
      * 用户头像
      */
-    @ApiModelProperty(value = "用户头像")
     @TableField("avatar")
+    @ExcelIgnore
     private String avatar;
 
 
     /**
      * 详细地址
      */
-    @ApiModelProperty(value = "详细地址")
     @TableField("addr")
+    @ExcelIgnore
     private String addr;
 
 
     /**
      * 城市
      */
-    @ApiModelProperty(value = "城市")
     @TableField("city")
+    @ExcelIgnore
     private String city;
 
 
     /**
      * 微信openID
      */
-    @ApiModelProperty(value = "微信openID")
     @TableField("open_id")
     private String openId;
 
@@ -85,7 +83,6 @@ public class WeFormSurveyAnswer extends BaseEntity implements Serializable {
     /**
      * 微信unionID
      */
-    @ApiModelProperty(value = "微信unionID")
     @TableField("union_id")
     private String unionId;
 
@@ -93,74 +90,77 @@ public class WeFormSurveyAnswer extends BaseEntity implements Serializable {
     /**
      * 答题开始时间
      */
-    @ApiModelProperty(value = "答题开始时间")
     @TableField("an_time")
+
     private Date anTime;
 
 
     /**
      * 答题用时
      */
-    @ApiModelProperty(value = "答题用时")
     @TableField("total_time")
+    @ExcelIgnore
     private Float totalTime;
 
 
     /**
      * ip地址
      */
-    @ApiModelProperty(value = "ip地址")
     @TableField("ip_addr")
+    @ExcelIgnore
     private String ipAddr;
 
 
     /**
      * 答案
      */
-    @ApiModelProperty(value = "答案")
     @TableField("answer")
+    @ExcelIgnore
     private String answer;
 
 
     /**
      * 问卷id
      */
-    @ApiModelProperty(value = "问卷id")
     @TableField("belong_id")
+    @ExcelIgnore
     private Long belongId;
 
 
     /**
      * 是否完成;0完成，1未完成
      */
-    @ApiModelProperty(value = "是否完成;0完成，1未完成")
     @TableField("an_effective")
+    @ExcelIgnore
     private Integer anEffective;
 
 
     /**
      * 答题数
      */
-    @ApiModelProperty(value = "答题数")
     @TableField("qu_num")
+    @ExcelIgnore
     private Integer quNum;
 
 
     /**
      * 数据来源
      */
-    @ApiModelProperty(value = "数据来源")
     @TableField("data_source")
+    @ExcelIgnore
     private String dataSource;
 
     /**
      * 删除标识 0 正常 1 删除
      */
-    @ApiModelProperty(value = "删除标识 0 正常 1 删除")
     @TableField("del_flag")
+    @ExcelIgnore
     private Integer delFlag;
 
-    @ApiModelProperty(value = "是否为客户")
+
+    /**
+     * 是否为客户
+     */
     @TableField(exist = false)
     private Boolean isOfficeCustomer;
 }

@@ -6,7 +6,9 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.annotation.SynchRecord;
 import com.linkwechat.common.constant.ProductOrderConstants;
+import com.linkwechat.common.constant.SynchRecordConstants;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
@@ -87,6 +89,7 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
     }
 
     @Override
+    @SynchRecord(synchType = SynchRecordConstants.SYNCH_SPTC_ORDER)
     public void orderSync() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getWeSyncEx(), rabbitMQSettingConfig.getWeProductOrderQu(), loginUser.getCorpId());
@@ -141,6 +144,8 @@ public class WeProductOrderServiceImpl extends ServiceImpl<WeProductOrderMapper,
             }
         }
     }
+
+
 
     /**
      * 添加订单
