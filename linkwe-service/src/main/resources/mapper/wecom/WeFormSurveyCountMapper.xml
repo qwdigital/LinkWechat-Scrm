@@ -68,6 +68,7 @@
             AND wfsc.data_source=#{weFormSurveyCount.channelsName}
         </if>
         ) as subquery
+        WHERE date_format(create_time, '%Y-%m-%d' ) IS NOT NULL
         GROUP BY 	create_time
     </select>
 
