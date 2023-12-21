@@ -61,12 +61,6 @@ public class WeCorpAccountController extends BaseController {
             return AjaxResult.error("当前为演示环境,无法修改配置");
         }
 
-        if (iWeCorpAccountService.saveOrUpdate(weCorpAccount)) {
-            qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
-            //商城配置
-//            saveOrUpdateShopConfig(weCorpAccount);
-        }
-
         iWeCorpAccountService.addOrUpdate(weCorpAccount);
         return AjaxResult.success();
     }

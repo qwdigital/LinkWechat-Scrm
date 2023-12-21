@@ -863,7 +863,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate, boolean buildXkSopPlan) {
+    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate1, boolean buildXkSopPlan) {
         if(CollectionUtil.isNotEmpty(executeWeCustomers)){
             List<WeSopExecuteTarget> weSopExecuteTargets=new ArrayList<>();
             executeWeCustomers.forEach((k,v)->{
@@ -883,10 +883,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
             if(CollectionUtil.isNotEmpty(weSopExecuteTargets)){
 
                 //处理不满足当前条件的生效客户(针对客户sop编辑)
-                if(!isCreateOrUpdate){
-                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
-                }
+//                if(!isCreateOrUpdate){
+//                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
+//                }
 
 
                 if(executeTargetService.saveOrUpdateBatch(weSopExecuteTargets)){
@@ -1006,12 +1006,13 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             }
-        } else{
-
-            //处理不满足当前条件的生效客群(针对客客户sop编辑)
-            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                    new ArrayList<>());
         }
+//        else{
+//
+//            //处理不满足当前条件的生效客群(针对客客户sop编辑)
+//            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                    new ArrayList<>());
+//        }
     }
 
     @Override
@@ -1039,11 +1040,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
             if(CollectionUtil.isNotEmpty(weSopExecuteTargets)) {
 
-                if(!isCreateOrUpdate){
-                    //处理不满足当前条件的生效客群(针对客群sop编辑)
-                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
-                }
+//                if(!isCreateOrUpdate){
+//                    //处理不满足当前条件的生效客群(针对客群sop编辑)
+//                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
+//                }
 
                 if (executeTargetService.saveOrUpdateBatch(weSopExecuteTargets)) {
 
@@ -1197,11 +1198,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
-        else{
-                //处理不满足当前条件的生效客群(针对客群sop编辑)
-                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                        new ArrayList<>());
-        }
+//        else{
+//                //处理不满足当前条件的生效客群(针对客群sop编辑)
+//                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                        new ArrayList<>());
+//        }
     }
 
 

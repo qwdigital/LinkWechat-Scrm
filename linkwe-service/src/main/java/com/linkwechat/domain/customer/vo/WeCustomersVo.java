@@ -214,4 +214,7 @@ public class WeCustomersVo {
     private Date lossTime;
 
 
+
+
+
 }

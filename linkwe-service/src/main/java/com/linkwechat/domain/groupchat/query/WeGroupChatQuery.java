@@ -70,4 +70,7 @@ public class WeGroupChatQuery{
     private Integer groupMemberUp;
     //群人数下限
     private Integer groupMemberDown;
+
+    //群成员名称
+    private String memberName;
 }
