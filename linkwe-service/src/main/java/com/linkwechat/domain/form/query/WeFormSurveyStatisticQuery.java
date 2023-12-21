@@ -1,6 +1,7 @@
 package com.linkwechat.domain.form.query;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.linkwechat.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +14,7 @@ import java.util.Date;
  * @date 2022年09月20日 18:24
  */
 @Data
-public class WeFormSurveyStatisticQuery {
+public class WeFormSurveyStatisticQuery extends BaseEntity {
 
     /**
      * 查询时间类型

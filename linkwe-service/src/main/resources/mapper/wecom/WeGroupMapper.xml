@@ -113,6 +113,7 @@
             </foreach>
         </if>
         GROUP BY wg.id
+        ORDER BY wg.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
                 limit ${pageDomain.pageSize * (pageDomain.pageNum-1)}, #{pageDomain.pageSize}
