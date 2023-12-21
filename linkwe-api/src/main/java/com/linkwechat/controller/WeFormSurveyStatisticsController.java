@@ -15,6 +15,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.domain.vo.SysAreaVo;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.ServletUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
@@ -91,8 +92,9 @@ public class WeFormSurveyStatisticsController extends BaseController {
                 .channelsName(query.getDataSource())
                 .belongId(query.getBelongId())
                 .build();
-        weFormSurveyCount.setBeginTime(query.getBeginTime());
-        weFormSurveyCount.setEndTime(query.getEndTime());
+
+        weFormSurveyCount.setBeginTime(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,query.getStartDate()));
+        weFormSurveyCount.setEndTime(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,query.getEndDate()));
         List<WeFormSurveyStatistics> weFormSurveyStatistics = iWeFormSurveyCountService.lineChart(weFormSurveyCount);
 
         return AjaxResult.success(weFormSurveyStatistics);

@@ -102,8 +102,8 @@ public class WeFormSurveyStatisticsServiceImpl extends ServiceImpl<WeFormSurveyS
                 .belongId(query.getBelongId())
                 .channelsName(query.getDataSource())
                 .build();
-        weFormSurveyCount.setBeginTime(query.getBeginTime());
-        weFormSurveyCount.setEndTime(query.getEndTime());
+        weFormSurveyCount.setBeginTime(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,query.getStartDate()));
+        weFormSurveyCount.setEndTime(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD,query.getEndDate()));
         return iWeFormSurveyCountService.findDataList(weFormSurveyCount);
     }
 }
