@@ -152,6 +152,7 @@
             wc.customer_type,
             wc.is_join_blacklist,
             wc.update_time,
+            GROUP_CONCAT(DISTINCT su.we_user_id) AS weUserIds,
             GROUP_CONCAT(DISTINCT su.user_name) AS addWeUserNames,
             GROUP_CONCAT(DISTINCT wg.group_name) AS joinGroupNames,
             count(DISTINCT wg.chat_id) as groupNumber

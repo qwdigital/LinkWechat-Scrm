@@ -142,7 +142,6 @@ public class WeFissionController  extends BaseController {
     @GetMapping("/findWeFissionTrend")
     public AjaxResult<List<WeFissionTrendVo>> findWeFissionTrend(WeFission weFission){
 
-        startPage();
 
         return AjaxResult.success(
                 iWeFissionService.findWeFissionTrend(weFission)
