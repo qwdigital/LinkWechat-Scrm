@@ -59,14 +59,13 @@
         IFNULL(SUM(wfsc.total_time),0) as totalTime
         FROM
         we_form_survey_count wfsc
-        LEFT JOIN we_form_survey_catalogue wfsce ON wfsc.belong_id=wfsce.id
         WHERE  wfsc.belong_id = #{weFormSurveyCount.belongId}
         <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
             and date_format(wfsc.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
         </if>
 
         <if test="weFormSurveyCount.channelsName != null and weFormSurveyCount.channelsName !=''">
-            AND wfsce.channels_name=#{weFormSurveyCount.channelsName}
+            AND wfsc.data_source=#{weFormSurveyCount.channelsName}
         </if>
         ) as subquery
         GROUP BY 	create_time
@@ -85,13 +84,12 @@
         FROM
         sys_dim_date sdd
         LEFT JOIN 	we_form_survey_count wfsc ON date_format( sdd.date, '%Y-%m-%d' ) =date_format( wfsc.create_time, '%Y-%m-%d' )
-        LEFT JOIN we_form_survey_catalogue wfsce ON wfsc.belong_id=wfsce.id
         <if test="weFormSurveyCount.belongId !=null">
             and wfsc.belong_id = #{weFormSurveyCount.belongId}
         </if>
 
         <if test="weFormSurveyCount.channelsName != null and weFormSurveyCount.channelsName !=''">
-            AND wfsce.channels_name=#{weFormSurveyCount.channelsName}
+            AND wfsc.data_source=#{weFormSurveyCount.channelsName}
         </if>
         <where>
             <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
