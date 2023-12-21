@@ -246,7 +246,7 @@
       UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2102, `order_num` = 10, `path` = 'detail', `component` = 'communityOperating/oldCustomer/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = 'code', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-11-13 14:12:12', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-12-13 15:33:53', `remark` = '' WHERE `menu_id` = 2476;
       INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2482, '客群去重', 2223, 15, 'groupRepeat', 'customerManage/groupRepeat/list', 1, 'C', '0', '0', '', '#', 'admin', NULL, '2023-12-09 01:42:33', 'admin', NULL, '2023-12-14 13:12:36', '');
 
-## V5.0.3 (2023-12-21)
+## V5.0.4 (2023-12-21)
       ● 升级日志
          1.智能表单统计优化重构
          2.更新企微配置重构缓存。
