@@ -18,7 +18,7 @@ public interface IWeCommunityKeywordToGroupService extends IService<WeKeywordGro
      * @param isCount true 统计 false不统计
      * @return
      */
-    WeKeywordGroupTask findBaseInfo(Long id,Boolean isCount);
+    WeKeywordGroupTask findBaseInfo(Long id,String unionId,Boolean isCount);
 
 
     /**

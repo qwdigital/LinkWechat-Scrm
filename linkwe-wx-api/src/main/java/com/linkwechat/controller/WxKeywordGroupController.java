@@ -7,6 +7,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeKeyWordGroupSub;
+import com.linkwechat.domain.WeKeywordGroupViewCount;
 import com.linkwechat.service.IWeCommunityKeywordToGroupService;
 import com.linkwechat.service.IWeKeyWordGroupSubService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +40,13 @@ public class WxKeywordGroupController extends BaseController {
 
     /**
      * 获取关键词群基础信息
-     * @param id
      * @return
      */
-    @GetMapping("/getKeyWordGroupBaseInfo/{id}")
-    public AjaxResult getKeyWordGroupBaseInfo(@PathVariable Long id){
+    @GetMapping("/getBaseInfo")
+    public AjaxResult getKeyWordGroupBaseInfo(WeKeywordGroupViewCount keywordGroupViewCount){
 
         return AjaxResult.success(
-                keywordToGroupService.findBaseInfo(id,true)
+                keywordToGroupService.findBaseInfo(keywordGroupViewCount.getKeywordGroupId(),keywordGroupViewCount.getUnionId(),true)
         );
     }
 
@@ -56,7 +56,7 @@ public class WxKeywordGroupController extends BaseController {
      * 关键词群列表
      * @return
      */
-    @GetMapping("/findWeKeyWordGroupSubs")
+    @GetMapping("/findGroupSubs")
     public TableDataInfo<List<WeKeyWordGroupSub>> findWeKeyWordGroupSubs(WeKeyWordGroupSub keyWordGroupSub){
         startPage();
         List<WeKeyWordGroupSub> weKeyWordGroupSubs = iWeKeyWordGroupSubService.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()

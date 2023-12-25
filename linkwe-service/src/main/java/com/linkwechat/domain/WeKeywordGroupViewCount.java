@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.linkwechat.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 关键词群访问统计
@@ -12,6 +15,9 @@ import lombok.Data;
  */
 @Data
 @TableName(value ="we_keyword_group_view_count")
+@AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class WeKeywordGroupViewCount extends BaseEntity {
     /**
      * 主键
@@ -22,7 +28,7 @@ public class WeKeywordGroupViewCount extends BaseEntity {
     /**
      * 访问数量
      */
-    private Long viewNum;
+    private Integer viewNum;
 
     /**
      * 关键词主表主键
