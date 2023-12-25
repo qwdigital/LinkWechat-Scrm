@@ -13,6 +13,15 @@ public interface IWeCommunityKeywordToGroupService extends IService<WeKeywordGro
 
 
     /**
+     * 查看基础消息，是否统计埋点
+     * @param id 关键词主键
+     * @param isCount true 统计 false不统计
+     * @return
+     */
+    WeKeywordGroupTask findBaseInfo(Long id,Boolean isCount);
+
+
+    /**
      * 新建或更新关键词群信息
      * @param groupTask
      */

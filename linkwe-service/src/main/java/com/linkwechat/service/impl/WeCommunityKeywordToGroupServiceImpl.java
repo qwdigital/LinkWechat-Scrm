@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.core.domain.FileEntity;
@@ -10,17 +9,19 @@ import com.linkwechat.domain.community.WeKeywordGroupTask;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.mapper.WeKeywordGroupTaskMapper;
 import com.linkwechat.service.IWeCommunityKeywordToGroupService;
+import com.linkwechat.service.IWeKeywordGroupViewCountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.List;
 
 @Service
 public class WeCommunityKeywordToGroupServiceImpl  extends ServiceImpl<WeKeywordGroupTaskMapper, WeKeywordGroupTask> implements IWeCommunityKeywordToGroupService {
 
+
+
+    @Autowired
+    private IWeKeywordGroupViewCountService iWeKeywordGroupViewCountService;
 
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
@@ -28,6 +29,15 @@ public class WeCommunityKeywordToGroupServiceImpl  extends ServiceImpl<WeKeyword
 
     @Autowired
     private QwFileClient qwFileClient;
+
+    @Override
+    public WeKeywordGroupTask findBaseInfo(Long id, Boolean isCount) {
+        if(isCount){
+//            iWeKeywordGroupViewCountService
+        }
+
+        return this.getById(id);
+    }
 
     @Override
     public void createOrUpdate(WeKeywordGroupTask groupTask) throws IOException {

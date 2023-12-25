@@ -94,7 +94,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
     public AjaxResult getKeyWordGroupBaseInfo(@PathVariable Long id){
 
         return AjaxResult.success(
-                keywordToGroupService.getById(id)
+                keywordToGroupService.findBaseInfo(id,false)
         );
     }
 
