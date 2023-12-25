@@ -100,7 +100,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
     @Override
     public void createOrUpdateStoreCode(WeStoreCode weStoreCode) {
 
-        if(weStoreCode.getId() != null){ //新增
+        if(weStoreCode.getId() == null){ //新增
             weStoreCode.setId(SnowFlakeUtil.nextId());
 
             WeBuildUserOrGroupConditVo addWeUserOrGroupCode =
