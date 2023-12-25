@@ -392,8 +392,11 @@
             <if test="chatUserId != null and chatUserId !=''">
                and wgm.user_id = #{chatUserId}
             </if>
-            <if test="state != null and state !=''">
-                AND wgm.state = #{state}
+            <if test="states !=null and states !=''">
+                AND wgm.state IN
+                <foreach collection="states.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
     </select>
     <select id="selectChatByMember" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo">

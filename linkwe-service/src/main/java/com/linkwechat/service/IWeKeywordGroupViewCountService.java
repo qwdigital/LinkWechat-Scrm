@@ -1,7 +1,15 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.domain.WeKeywordGroupViewCount;
+import com.linkwechat.domain.community.query.WeCommunityKeyWordGroupTableQuery;
+import com.linkwechat.domain.community.vo.WeCommunityKeyWordGroupTableVo;
+import com.linkwechat.domain.community.vo.WeKeywordGroupViewCountVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author robin
@@ -10,4 +18,35 @@ import com.linkwechat.domain.WeKeywordGroupViewCount;
 */
 public interface IWeKeywordGroupViewCountService extends IService<WeKeywordGroupViewCount> {
 
+    /**
+     * 头部tab统计
+     * @param keywordGroupId
+     * @return
+     */
+    WeKeywordGroupViewCountVo countTab(Long keywordGroupId);
+
+
+    /**
+     * 折现统计图
+     * @param groupViewCount
+     * @return
+     */
+    List<WeKeywordGroupViewCountVo> countTrend(WeKeywordGroupViewCount groupViewCount);
+
+
+
+    /**
+     * 数据明细
+     * @param query
+     * @return
+     */
+    PageInfo<WeCommunityKeyWordGroupTableVo> findKeyWordGroupTable(WeCommunityKeyWordGroupTableQuery query, PageDomain pageDomain);
+
+
+    /**
+     * 获取导出数据
+     * @param query
+     * @return
+     */
+    List<WeCommunityKeyWordGroupTableVo> exprotKeyWordGroupTable(WeCommunityKeyWordGroupTableQuery query);
 }
