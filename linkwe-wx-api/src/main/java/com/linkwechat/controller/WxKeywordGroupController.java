@@ -8,6 +8,7 @@ import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.WeKeyWordGroupSub;
 import com.linkwechat.domain.WeKeywordGroupViewCount;
+import com.linkwechat.domain.community.WeKeywordGroupTask;
 import com.linkwechat.service.IWeCommunityKeywordToGroupService;
 import com.linkwechat.service.IWeKeyWordGroupSubService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class WxKeywordGroupController extends BaseController {
      * @return
      */
     @GetMapping("/getBaseInfo")
-    public AjaxResult getKeyWordGroupBaseInfo(WeKeywordGroupViewCount keywordGroupViewCount){
+    public AjaxResult<WeKeywordGroupTask> getKeyWordGroupBaseInfo(WeKeywordGroupViewCount keywordGroupViewCount){
 
         return AjaxResult.success(
                 keywordToGroupService.findBaseInfo(keywordGroupViewCount.getKeywordGroupId(),keywordGroupViewCount.getUnionId(),true)

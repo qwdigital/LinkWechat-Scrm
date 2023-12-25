@@ -66,4 +66,24 @@ public class WeKeywordGroupTask extends BaseEntity{
     @TableField(exist = false)
     private List<WeKeyWordGroupSub> keyWordGroupSubs;
 
+
+    /**
+     * 关键词数量
+     */
+    @TableField(exist = false)
+    private Integer keyWordGroupNumber;
+
+    /**
+     * 总访问数量
+     */
+    @TableField(exist = false)
+    private Integer totalViewNumber;
+
+    /**
+     * 总入群数量
+     */
+    @TableField(exist = false)
+    private Integer totalJoinGroupNmber;
+
+
  }

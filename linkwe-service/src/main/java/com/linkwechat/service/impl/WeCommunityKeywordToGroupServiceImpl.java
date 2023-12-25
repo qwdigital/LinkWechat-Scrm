@@ -8,11 +8,15 @@ import com.linkwechat.common.config.LinkWeChatConfig;
 import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.domain.FileEntity;
 import com.linkwechat.common.utils.QREncode;
+import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeKeyWordGroupSub;
 import com.linkwechat.domain.WeKeywordGroupViewCount;
 import com.linkwechat.domain.community.WeKeywordGroupTask;
+import com.linkwechat.domain.community.vo.WeKeywordGroupViewCountVo;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.mapper.WeKeywordGroupTaskMapper;
 import com.linkwechat.service.IWeCommunityKeywordToGroupService;
+import com.linkwechat.service.IWeKeyWordGroupSubService;
 import com.linkwechat.service.IWeKeywordGroupViewCountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,11 +34,44 @@ public class WeCommunityKeywordToGroupServiceImpl  extends ServiceImpl<WeKeyword
     private IWeKeywordGroupViewCountService iWeKeywordGroupViewCountService;
 
     @Autowired
+    private IWeKeyWordGroupSubService iWeKeyWordGroupSubService;
+
+    @Autowired
     private LinkWeChatConfig linkWeChatConfig;
 
 
     @Autowired
     private QwFileClient qwFileClient;
+
+    @Override
+    public List<WeKeywordGroupTask> findLists(WeKeywordGroupTask task) {
+
+        List<WeKeywordGroupTask> groupTasks = this.list(new LambdaQueryWrapper<WeKeywordGroupTask>()
+                .like(StringUtils.isNotEmpty(task.getTitle()), WeKeywordGroupTask::getTitle, task.getTitle()));
+
+
+        if(CollectionUtil.isNotEmpty(groupTasks)){
+            groupTasks.stream().forEach(k->{
+
+                WeKeywordGroupViewCountVo groupViewCountVo = iWeKeywordGroupViewCountService.countTab(k.getId());
+
+                   if(null != groupViewCountVo){
+                       k.setTotalJoinGroupNmber(groupViewCountVo.getTotalJoinGroupNmber());
+                       k.setTotalViewNumber(groupViewCountVo.getTotalViewNumber());
+                   }
+                //设置关键词数量
+                k.setKeyWordGroupNumber(
+                        iWeKeyWordGroupSubService.count(new LambdaQueryWrapper<WeKeyWordGroupSub>()
+                                .eq(WeKeyWordGroupSub::getKeywordGroupId,k.getId()))
+                );
+
+
+            });
+        }
+
+
+        return groupTasks;
+    }
 
     @Override
     public WeKeywordGroupTask findBaseInfo(Long id,String unionId, Boolean isCount) {

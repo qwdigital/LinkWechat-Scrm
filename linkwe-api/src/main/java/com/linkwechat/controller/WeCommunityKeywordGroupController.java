@@ -112,12 +112,26 @@ public class WeCommunityKeywordGroupController extends BaseController {
 
 
     /**
+     * 获取关键词群列表
+     * @param task
+     * @return
+     */
+    @GetMapping("/findLists")
+    public TableDataInfo<List<WeKeywordGroupTask>> findLists(WeKeywordGroupTask task){
+        startPage();
+        List<WeKeywordGroupTask> groupTasks = keywordToGroupService.findLists(task);
+
+        return getDataTable(groupTasks);
+    }
+
+
+    /**
      * 获取关键词群基础信息
      * @param id
      * @return
      */
     @GetMapping("/getKeyWordGroupBaseInfo/{id}")
-    public AjaxResult getKeyWordGroupBaseInfo(@PathVariable Long id){
+    public AjaxResult<WeKeywordGroupTask> getKeyWordGroupBaseInfo(@PathVariable Long id){
 
         return AjaxResult.success(
                 keywordToGroupService.findBaseInfo(id,null,false)
@@ -143,7 +157,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @return
      */
     @PostMapping("/createKeyWordGroupSub")
-    public AjaxResult createKeyWordGroupSub(@RequestBody WeKeyWordGroupSub weKeyWordGroupSub){
+    public AjaxResult<WeKeyWordGroupSub> createKeyWordGroupSub(@RequestBody WeKeyWordGroupSub weKeyWordGroupSub){
 
         if(weKeyWordGroupSub.getKeywordGroupId()==null){
             return AjaxResult.error("关键词群主键不可为空");
@@ -151,7 +165,7 @@ public class WeCommunityKeywordGroupController extends BaseController {
 
         iWeKeyWordGroupSubService.createWeKeyWordGroup(weKeyWordGroupSub);
 
-        return AjaxResult.success();
+        return AjaxResult.success(weKeyWordGroupSub);
     }
 
 
@@ -162,12 +176,12 @@ public class WeCommunityKeywordGroupController extends BaseController {
      * @return
      */
     @PostMapping("/updateKeyWordGroupSub")
-    public AjaxResult updateKeyWordGroupSub(@RequestBody WeKeyWordGroupSub weKeyWordGroupSub){
+    public AjaxResult<WeKeyWordGroupSub> updateKeyWordGroupSub(@RequestBody WeKeyWordGroupSub weKeyWordGroupSub){
 
 
         iWeKeyWordGroupSubService.updateWeKeyWordGroup(weKeyWordGroupSub);
 
-        return AjaxResult.success();
+        return AjaxResult.success(weKeyWordGroupSub);
     }
 
 
