@@ -201,8 +201,14 @@
        ● yml文件更新 
            linkwe-common.yml
                 linkwechat:
-                     qrShortLinkDomainName: sl.linkwechat.net/st/qr/
+                     qrShortLinkDomainName: sl.linkwechat.net/st/pqr/
                      qrGroupShortLinkDomainName: sl.linkwechat.net/st/gqr/ 
+           linkwe-gateway.yml
+                security:
+                    ignore:
+                      whites:
+                          - /open/gqr/**
+                          - /open/pqr/**
        ● 菜单更新日志
          UPDATE `sys_menu` SET `menu_name` = '员工活码', `parent_id` = 2218, `order_num` = 1, `path` = 'staff', `component` = ' ', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-11-08 12:13:21', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-07 21:06:31', `remark` = '' WHERE `menu_id` = 2053;
          UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2053, `order_num` = 11, `path` = 'detail', `component` = 'drainageCode/staff/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'drainageCode:staff:detail', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2021-02-22 16:32:05', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-11-30 17:17:33', `remark` = '' WHERE `menu_id` = 2159;
@@ -215,4 +221,64 @@
          UPDATE `sys_menu` SET `menu_name` = '统计', `parent_id` = 2056, `order_num` = 2, `path` = 'analyse', `component` = 'drainageCode/group/analyse', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-02-22 12:42:39', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-28 16:34:07', `remark` = '' WHERE `menu_id` = 2364;
        ● xxl-job更新日志
          INSERT INTO `xxl_job_info` ( `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES ( 3, '通用短链统计任务', '2023-07-24 16:41:02', '2023-11-23 11:33:15', 'sxw', '', 'CRON', '59 59 23 * * ?', 'DO_NOTHING', 'ROUND', 'weCommonLinkStatisticTask', '', 'SERIAL_EXECUTION', 60, 3, 'BEAN', '', 'GLUE代码初始化', '2023-07-24 16:41:02', '', 1, 1701878399000, 1701964799000);
+
+## V5.0.2 (2023-12-07) 
+      ● 升级日志
+         1.新增客群去重功能。
+         2.客户SOP与客群SOP新增一键复制功能,同时移除编辑功能。
+         3.系统相关bug修复,以及yml相关文件优化。
       
+     ● yml文件更新 
+        linkwe-common.yml
+                linkwechat:
+                     shortDomain: sl.linkwechat.net #短域名
+                     shortLinkDomainName: ${linkwechat.shortDomain}/st/t/
+                     customerShortLinkDomainName: ${linkwechat.shortDomain}/st/l/
+                     qrShortLinkDomainName: ${linkwechat.shortDomain}/st/pqr/
+                     qrGroupShortLinkDomainName: ${linkwechat.shortDomain}/st/gqr/
+        linkwe-gateway.yml
+            security:
+                ignore:
+                   whites:
+                      - /open/qr/getBydetail/**
+                      - /open/groupCode/getBydetail/**
+     ● 菜单更新日志
+      UPDATE `sys_menu` SET `menu_name` = '详情', `parent_id` = 2102, `order_num` = 10, `path` = 'detail', `component` = 'communityOperating/oldCustomer/detail', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = '', `icon` = 'code', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-11-13 14:12:12', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-12-13 15:33:53', `remark` = '' WHERE `menu_id` = 2476;
+      INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2482, '客群去重', 2223, 15, 'groupRepeat', 'customerManage/groupRepeat/list', 1, 'C', '0', '0', '', '#', 'admin', NULL, '2023-12-09 01:42:33', 'admin', NULL, '2023-12-14 13:12:36', '');
+
+## V5.0.4 (2023-12-21)
+      ● 升级日志
+         1.智能表单统计优化重构
+         2.更新企微配置重构缓存。
+         3.相关功能bug修复。
+
+     ● yml文件更新
+        linkwe-gateway.yml
+            security:
+                ignore:
+                   whites:
+                      - /wx-api/form/survey/getInfo/**
+     ● 菜单更新日志
+       INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2453, '销售洞察', 2366, 1, 'saleInsight', NULL, 1, 'M', '0', '0', '', '#', 'admin', NULL, '2023-08-07 11:34:28', 'admin', NULL, '2023-08-07 11:35:15', '');
+       INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2454, '线索分析', 2453, 5, 'clueAnalysis', 'clue/clueAnalysis/index', 1, 'C', '0', '0', NULL, '#', 'admin', NULL, '2023-08-07 11:35:08', NULL, NULL, NULL, '');
+    
+     ● sql更新日志
+       CREATE TABLE `we_form_survey_count` (
+            `id` bigint(11) NOT NULL COMMENT '主键',
+            `total_visits` bigint(20) DEFAULT NULL COMMENT '总访问量(每天记录对应当天对应ip的访问量)',
+            `belong_id` bigint(20) DEFAULT NULL COMMENT '问卷id',
+            `total_time` bigint(20) DEFAULT NULL COMMENT '完成总时间',
+            `data_source` varchar(255) DEFAULT NULL COMMENT '数据来源',
+            `visitor_ip` varchar(255) DEFAULT NULL COMMENT '访问ip',
+            `create_by` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '创建人',
+            `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+            `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+            `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+            `update_by` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '更新人',
+            `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+            `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识 0 正常 1 删除',
+            PRIMARY KEY (`id`) USING BTREE
+       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='智能表单统计(按照每天的维度统计相关客户数据；ip+当天定位每一条记录)';
+
+     ● xxl-job更新日志
+      DELETE  FROM xxl_job_info WHERE id=2

@@ -72,7 +72,7 @@ public class WeLeadsFollowerVO {
     /**
      * 客户Id
      */
-    private Integer customerId;
+    private Long customerId;
 
     /**
      * 绑定客户时间

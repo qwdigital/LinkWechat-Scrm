@@ -96,10 +96,9 @@ public class WeCorpAccountServiceImpl extends ServiceImpl<WeCorpAccountMapper, W
 
     @Override
     public void addOrUpdate(WeCorpAccount weCorpAccount) {
-        redisService.deleteObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, weCorpAccount.getCorpId()));
+
         if (saveOrUpdate(weCorpAccount)) {
-            redisService.deleteObject(StringUtils.format(Constants.CORP_ACCOUNT_KEY, weCorpAccount.getCorpId()));
-            qwCorpClient.removeAllWeAccessToken(weCorpAccount.getCorpId());
+            redisService.deleteObject(Constants.CORP_ACCOUNT_KEY);
         }
     }
 

@@ -28,4 +28,7 @@ public class WeKfGetMsgQuery extends WeBaseQuery {
      */
     private String limit;
 
+    private Integer voice_format = 0;
+
+    private String open_kfid;
 }

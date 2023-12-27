@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeFormSurveyCountMapper">
+
+    <select id="getStatistics" resultType="com.linkwechat.domain.WeFormSurveyStatistics">
+        SELECT
+            totalVisits,
+            totalUser,
+            collectionVolume,
+            CONCAT(IFNULL(ROUND(collectionVolume / totalUser * 100, 2),0), '%') as collectionRate,
+            IFNULL(CONCAT(
+                           FLOOR(totalTime / totalUser / 60),
+                           ' 分钟 ',
+                           ROUND(totalTime / totalUser % 60,0),
+                           ' 秒'
+                       ),0) as averageTime
+        FROM
+            (SELECT
+                 IFNULL(SUM(wfsc.total_visits), 0) as totalVisits,
+                 count(wfsc.id) as totalUser,
+                 IFNULL((SELECT count(wfsa.id) from we_form_survey_answer wfsa WHERE wfsa.belong_id=wfsc.belong_id
+                                                                                 AND date_format(wfsa.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
+                        ), 0) as collectionVolume,
+                 IFNULL(SUM(wfsc.total_time),0) as totalTime
+             FROM
+                 we_form_survey_count wfsc
+             WHERE
+                 date_format(wfsc.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
+               and wfsc.belong_id = #{weFormSurveyCount.belongId}
+            ) as subquery
+    </select>
+
+    <select id="findDataList" resultType="com.linkwechat.domain.WeFormSurveyStatistics">
+        SELECT
+        date_format(create_time, '%Y-%m-%d' ) as date,
+        totalVisits,
+        totalUser,
+        collectionVolume,
+        create_time,
+        CONCAT(IFNULL(ROUND(collectionVolume / totalUser * 100, 2),0), '%') as collectionRate,
+        IFNULL(CONCAT(
+        FLOOR(totalTime / totalUser / 60),
+        ' 分钟 ',
+        ROUND(totalTime / totalUser % 60,0),
+        ' 秒'
+        ),0) as averageTime
+        FROM
+        (SELECT
+        IFNULL(SUM(wfsc.total_visits), 0) as totalVisits,
+        count(wfsc.id) as totalUser,
+        wfsc.create_time,
+        IFNULL((SELECT count(wfsa.id) from we_form_survey_answer wfsa WHERE wfsa.belong_id=wfsc.belong_id
+        <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
+            AND date_format(wfsa.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
+        </if>
+        ), 0) as collectionVolume,
+        IFNULL(SUM(wfsc.total_time),0) as totalTime
+        FROM
+        we_form_survey_count wfsc
+        WHERE  wfsc.belong_id = #{weFormSurveyCount.belongId}
+        <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
+            and date_format(wfsc.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
+        </if>
+
+        <if test="weFormSurveyCount.channelsName != null and weFormSurveyCount.channelsName !=''">
+            AND wfsc.data_source=#{weFormSurveyCount.channelsName}
+        </if>
+        ) as subquery
+        WHERE date_format(create_time, '%Y-%m-%d' ) IS NOT NULL
+        GROUP BY 	create_time
+    </select>
+
+    <select id="lineChart" resultType="com.linkwechat.domain.WeFormSurveyStatistics">
+        SELECT
+        date_format( sdd.date, '%Y-%m-%d' ) AS  date,
+        IFNULL(SUM(wfsc.total_visits), 0) as totalVisits,
+        count(wfsc.id) as totalUser,
+        IFNULL((SELECT count(wfsa.id) from we_form_survey_answer wfsa WHERE wfsa.belong_id=wfsc.belong_id
+        <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
+            AND date_format(wfsa.create_time, '%Y-%m-%d' ) BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
+        </if>
+        ), 0) as collectionVolume
+        FROM
+        sys_dim_date sdd
+        LEFT JOIN 	we_form_survey_count wfsc ON date_format( sdd.date, '%Y-%m-%d' ) =date_format( wfsc.create_time, '%Y-%m-%d' )
+        <if test="weFormSurveyCount.belongId !=null">
+            and wfsc.belong_id = #{weFormSurveyCount.belongId}
+        </if>
+
+        <if test="weFormSurveyCount.channelsName != null and weFormSurveyCount.channelsName !=''">
+            AND wfsc.data_source=#{weFormSurveyCount.channelsName}
+        </if>
+        <where>
+            <if test="weFormSurveyCount.beginTime != null and weFormSurveyCount.beginTime !='' and weFormSurveyCount.endTime !=''  and weFormSurveyCount.endTime !=null">
+                date_format( sdd.date, '%Y-%m-%d' )    BETWEEN #{weFormSurveyCount.beginTime} and #{weFormSurveyCount.endTime}
+            </if>
+        </where>
+        GROUP BY date_format( sdd.date, '%Y-%m-%d' )
+    </select>
+
+    <select id="sumTotalVisits" resultType="int">
+        SELECT
+        sum(total_visits)
+        FROM
+        we_form_survey_count
+        <where>
+            belong_id=#{belongId}
+        </where>
+    </select>
+
+</mapper>

@@ -22,6 +22,7 @@ import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.uuid.UUID;
+import com.linkwechat.domain.WeCorpAccount;
 import com.linkwechat.domain.WeGroupCodeRange;
 import com.linkwechat.domain.WeCommonLinkStat;
 import com.linkwechat.domain.WeTag;
@@ -37,10 +38,13 @@ import com.linkwechat.domain.qr.vo.WeQrCodeScanLineCountVo;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatAddJoinWayQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatJoinWayQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
+import com.linkwechat.domain.wecom.query.weixin.WxJumpWxaQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatAddJoinWayVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
+import com.linkwechat.domain.wecom.vo.weixin.WxJumpWxaVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QxAppletClient;
 import com.linkwechat.mapper.WeGroupCodeMapper;
 import com.linkwechat.service.IWeGroupCodeRangeService;
 import com.linkwechat.service.IWeGroupCodeService;
@@ -48,8 +52,11 @@ import com.linkwechat.service.IWeGroupCodeTagRelService;
 import com.linkwechat.service.IWeTagService;
 import com.linkwechat.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,6 +89,16 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
 
     @Autowired
     private IWeGroupCodeRangeService iWeGroupCodeRangeService;
+
+
+    @Autowired
+    private IWeCorpAccountService weCorpAccountService;
+
+    @Value("${weixin.short.env-version:develop}")
+    private String shortEnvVersion;
+
+    @Resource
+    private QxAppletClient qxAppletClient;
 
 
 
@@ -342,11 +359,39 @@ public class WeGroupCodeServiceImpl extends ServiceImpl<WeGroupCodeMapper, WeGro
             resObj.put("errorMsg", "无效链接");
             return resObj;
         }
-        resObj.put("type",0);
+        resObj.put("type",3);
 
         if (StringUtils.isNotEmpty(groupCode.getCodeUrl())) {
             resObj.put("qrCode", groupCode.getCodeUrl());
         }
+        WeCorpAccount corpAccount = weCorpAccountService.getCorpAccountByCorpId(null);
+        if (Objects.isNull(corpAccount)) {
+            resObj.put("errorMsg", "请未配置企业信息");
+            return resObj;
+            //throw new WeComException("请未配置企业信息");
+        }
+        if (StringUtils.isEmpty(corpAccount.getWxAppletOriginalId())) {
+            resObj.put("errorMsg", "请未配置小程序原始ID");
+            return resObj;
+            //throw new WeComException("请未配置小程序原始ID");
+        }
+
+        WxJumpWxaQuery wxaQuery = new WxJumpWxaQuery();
+        WxJumpWxaQuery.JumpWxa wxa = new WxJumpWxaQuery.JumpWxa();
+        wxa.setPath(linkWeChatConfig.getShortAppletUrl());
+        wxa.setQuery("id=" + shortUrl + "&sence=gqr");
+        wxa.setEnv_version(shortEnvVersion);
+        wxaQuery.setJump_wxa(wxa);
+        WxJumpWxaVo wxJumpWxa = qxAppletClient.generateScheme(wxaQuery).getData();
+        if (Objects.nonNull(wxJumpWxa) && StringUtils.isNotEmpty(wxJumpWxa.getOpenLink())) {
+            resObj.put("url_scheme", wxJumpWxa.getOpenLink());
+        } else {
+            resObj.put("errorMsg", "生成小程序跳转链接失败");
+            //throw new WeComException("生成小程序跳转链接失败");
+        }
+        resObj.put("user_name", corpAccount.getWxAppletOriginalId());
+        resObj.put("path", linkWeChatConfig.getShortAppletUrl());
+        resObj.put("query", "id=" + shortUrl + "&sence=gqr");
         return resObj;
     }
 

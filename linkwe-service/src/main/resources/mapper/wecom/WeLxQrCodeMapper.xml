@@ -130,10 +130,12 @@
         select t.date_time, ifnull(c.num, 0) as today_num
         from (select date as date_time
               from sys_dim_date
-              where `date` &gt;= DATE_FORMAT(#{beginTime}
-                  , '%Y-%m-%d')
-                and `date` &lt;= DATE_FORMAT(#{endTime}
-                  , '%Y-%m-%d')
+              <where>
+                  <if test="beginTime != null and beginTime !='' and endTime != null and endTime !=''">
+                      date_format(date,'%Y-%m-%d') BETWEEN #{beginTime} AND #{endTime}
+                  </if>
+              </where>
+
              ) t
                  left join
              (select date_format(add_time, '%Y-%m-%d') as date_time, count(1) as num

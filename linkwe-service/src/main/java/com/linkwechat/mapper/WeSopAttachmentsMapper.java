@@ -1,6 +1,7 @@
 package com.linkwechat.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkwechat.common.config.mybatis.LwBaseMapper;
 import com.linkwechat.domain.sop.WeSopAttachments;
 
 /**
@@ -9,7 +10,7 @@ import com.linkwechat.domain.sop.WeSopAttachments;
 * @createDate 2022-09-07 15:23:33
 * @Entity generator.domain.WeSopAttachments
 */
-public interface WeSopAttachmentsMapper extends BaseMapper<WeSopAttachments> {
+public interface WeSopAttachmentsMapper extends LwBaseMapper<WeSopAttachments> {
 
 
 }

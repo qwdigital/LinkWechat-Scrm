@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,6 +46,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -115,6 +116,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
+
+
     @Override
     @Transactional
     public void createWeSop(WeSopBase weSopBase) {
@@ -126,21 +129,33 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     if(iWeSopPushTimeService.save(weSopPushTime)){
                         List<WeMessageTemplate> weMessageTemplates = weSopPushTime.getAttachments();
                         if(CollectionUtil.isNotEmpty(weMessageTemplates)){
-                            iWeSopAttachmentsService.saveBatchBySopBaseId(weSopPushTime.getId(),weSopBase.getId(),weMessageTemplates);
-                            //发送mq消息生成执行任务
-                            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
-                                    WeSopBaseDto.builder()
-                                            .sopBaseId(weSopBase.getId())
-                                            .isCreateOrUpdate(true).loginUser(
-                                                    SecurityUtils.getLoginUser()
-                                            ).build()
-                            ));
+                            Integer tip
+                                    = iWeSopAttachmentsService
+                                    .saveBatchBySopBaseId(weSopPushTime.getId(), weSopBase.getId(), weMessageTemplates);
+                            if(tip!=null){
+                                //发送mq消息生成执行任务
+                                this.sendCreateSopMessage(weSopBase.getId());
+                            }
 
                         }
                     }
                 });
             }
         }
+    }
+
+
+    //最大尝试次数为 3，初始延迟为 1000 毫秒，倍数为 2，最大延迟为 6000 毫秒。
+    @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 6000))
+    public void sendCreateSopMessage(Long sopBaseId) {
+        //发送mq消息生成执行任务
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
+                WeSopBaseDto.builder()
+                        .sopBaseId(sopBaseId)
+                        .isCreateOrUpdate(true).loginUser(
+                                SecurityUtils.getLoginUser()
+                        ).build()
+        ));
     }
 
 
@@ -522,7 +537,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         List<WeGroupSopContentVo> weGroupSopContentVos=new ArrayList<>();
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             groupExecuteContent.stream().collect(Collectors.groupingBy(WeGroupSopBaseContentVo::getPushTimePre))
                     .forEach((k,v)->{
@@ -579,7 +594,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         }
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
 
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             List<WeSendGroupSopContentVo.WeGroupSop> weGroupSops =new ArrayList<>();
@@ -863,7 +878,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate, boolean buildXkSopPlan) {
+    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate1, boolean buildXkSopPlan) {
         if(CollectionUtil.isNotEmpty(executeWeCustomers)){
             List<WeSopExecuteTarget> weSopExecuteTargets=new ArrayList<>();
             executeWeCustomers.forEach((k,v)->{
@@ -883,10 +898,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
             if(CollectionUtil.isNotEmpty(weSopExecuteTargets)){
 
                 //处理不满足当前条件的生效客户(针对客户sop编辑)
-                if(!isCreateOrUpdate){
-                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
-                }
+//                if(!isCreateOrUpdate){
+//                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
+//                }
 
 
                 if(executeTargetService.saveOrUpdateBatch(weSopExecuteTargets)){
@@ -1006,12 +1021,13 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             }
-        } else{
-
-            //处理不满足当前条件的生效客群(针对客客户sop编辑)
-            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                    new ArrayList<>());
         }
+//        else{
+//
+//            //处理不满足当前条件的生效客群(针对客客户sop编辑)
+//            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                    new ArrayList<>());
+//        }
     }
 
     @Override
@@ -1039,11 +1055,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
             if(CollectionUtil.isNotEmpty(weSopExecuteTargets)) {
 
-                if(!isCreateOrUpdate){
-                    //处理不满足当前条件的生效客群(针对客群sop编辑)
-                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
-                }
+//                if(!isCreateOrUpdate){
+//                    //处理不满足当前条件的生效客群(针对客群sop编辑)
+//                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
+//                }
 
                 if (executeTargetService.saveOrUpdateBatch(weSopExecuteTargets)) {
 
@@ -1197,11 +1213,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
-        else{
-                //处理不满足当前条件的生效客群(针对客群sop编辑)
-                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                        new ArrayList<>());
-        }
+//        else{
+//                //处理不满足当前条件的生效客群(针对客群sop编辑)
+//                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                        new ArrayList<>());
+//        }
     }
 
 

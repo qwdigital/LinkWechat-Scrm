@@ -21,7 +21,7 @@ public interface IWeSopAttachmentsService extends IService<WeSopAttachments> {
      * @param sopBaseId sop主键
      * @param attachments 素材列表
      */
-    void saveBatchBySopBaseId(Long sopPushTimeId,Long sopBaseId, List<WeMessageTemplate> attachments);
+    Integer saveBatchBySopBaseId(Long sopPushTimeId,Long sopBaseId, List<WeMessageTemplate> attachments);
 
 
     /**
