@@ -284,11 +284,11 @@
             wsc.area,
             wsc.store_name,
             COUNT(IF(date_format( wscc.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime},unionid,0)) as totalScannNumber,
-            (SELECT COUNT(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.state=wsc.state
+            (SELECT COUNT(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.state=wsc.shop_guide_state
                                                                              AND date_format(wc.add_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
             ) as customerTotalNumber,
             COUNT(DISTINCT if(date_format(wscc.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0)) as tdScannNumber,
-            (SELECT COUNT(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.state=wsc.state
+            (SELECT COUNT(DISTINCT wc.external_userid) FROM we_customer wc WHERE wc.state=wsc.shop_guide_state
                                                                              AND date_format(wc.add_time, '%Y-%m-%d' )  = date_format(curdate(),'%Y-%m-%d')
             ) as tdCustomerNumber
         FROM
@@ -349,15 +349,15 @@
                         WHERE ws.source=1 and
                         DATE_FORMAT( ws.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
 
-                        <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
+
                         <choose>
-                            <when test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                            <when test="weStoreCode.storeCodeId != null and weStoreCode.area ！=null and weStoreCode.area !=''">
                                 AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                             </when>
-                            <when test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                            <when test="weStoreCode.storeCodeId != null and  weStoreCode.area ==null and weStoreCode.area ==''">
                                 AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
                             </when>
-                            <when test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                            <when test="weStoreCode.storeCodeId == null and  weStoreCode.area ！=null and weStoreCode.area !=''">
                                 AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
                             </when>
                         </choose>
@@ -370,20 +370,18 @@
                         WHERE
                         DATE_FORMAT( wc.add_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
 
-                        <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
-
                         <choose>
                             <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
                                 and wc.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
                             </when>
                             <otherwise>
-                                <if test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                                <if test="weStoreCode.storeCodeId != null and weStoreCode.area ！=null and weStoreCode.area !=''">
                                     AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                                 </if>
-                                <if test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                                <if test="weStoreCode.storeCodeId != null and  weStoreCode.area ==null and weStoreCode.area ==''">
                                     AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
                                 </if>
-                                <if test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                                <if test="weStoreCode.storeCodeId == null and  weStoreCode.area ！=null and weStoreCode.area !=''">
                                     AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
                                 </if>
                             </otherwise>
@@ -407,15 +405,14 @@
         we_store_code_count ws
         WHERE
         DATE_FORMAT( ws.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' ) and ws.source=2
-         <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
           <choose>
-              <when test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+              <when test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">
                   AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
               </when>
-              <when test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+              <when test="weStoreCode.storeCodeId != null and  weStoreCode.area==null and weStoreCode.area ==''">
                   AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
               </when>
-              <when test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+              <when test="weStoreCode.storeCodeId == null and weStoreCode.area != null and weStoreCode.area !=''">
                   AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
               </when>
           </choose>
@@ -424,20 +421,18 @@
             SELECT count(DISTINCT wgm.user_id) from we_group_member wgm
             WHERE wgm.quit_scene IS NULL
 
-            <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
-
             <choose>
                 <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
                     and wgm.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
                 </when>
                 <otherwise>
-                    <if test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                    <if test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">
                         AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                     </if>
-                    <if test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                    <if test="weStoreCode.storeCodeId != null and  weStoreCode.area==null and weStoreCode.area ==''">
                         AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
                     </if>
-                    <if test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                    <if test="weStoreCode.storeCodeId == null and weStoreCode.area != null and weStoreCode.area !=''">
                         AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
                     </if>
                 </otherwise>
@@ -447,19 +442,18 @@
         (
         SELECT count(DISTINCT wgm.user_id) from we_group_member wgm
         WHERE wgm.quit_scene IS NOT NULL
-        <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
         <choose>
             <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
                 and wgm.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
             </when>
             <otherwise>
-                <if test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                <if test="weStoreCode.storeCodeId != null and weStoreCode.area != null and weStoreCode.area !=''">
                     AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                 </if>
-                <if test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                <if test="weStoreCode.storeCodeId != null and  weStoreCode.area == null and weStoreCode.area ==''">
                     AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
                 </if>
-                <if test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                <if test="weStoreCode.storeCodeId == null and weStoreCode.area != null and weStoreCode.area !=''">
                     AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
                 </if>
             </otherwise>
