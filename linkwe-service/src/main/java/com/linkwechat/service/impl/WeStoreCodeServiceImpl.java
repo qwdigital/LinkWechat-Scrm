@@ -295,7 +295,12 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                                 storeCode
                         );
                         if(wxStoreCodeQuery.getIsCount()){
-                            this.countUserBehavior(wxStoreCodeQuery);
+                            storeCode.stream().forEach(kk->{
+                                wxStoreCodeQuery.setStoreCodeId(kk.getId());
+                                this.countUserBehavior(wxStoreCodeQuery);
+
+                            });
+
                         }
 
                 }
