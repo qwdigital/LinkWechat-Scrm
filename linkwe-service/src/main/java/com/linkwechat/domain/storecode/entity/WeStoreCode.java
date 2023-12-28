@@ -87,48 +87,42 @@ public class WeStoreCode extends BaseEntity {
     private String shopGuideName;
     //导购活码url
     @ExcelIgnore
+    @TableField(insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private String shopGuideUrl;
 
     //导购码渠道标识
     @ExcelIgnore
+    @TableField(insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private String shopGuideState;
 
 
     //导购二维码configId
     @ExcelIgnore
+    @TableField(insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private String shopGuideConfigId;
 
 
-//    //导购二维码configId
-//    @ExcelIgnore
-//    private String configId;
-//
-//
-//    //渠道标识
-//    @ExcelIgnore
-//    private String state;
 
 
     //群活码名称,多个使用逗号隔开
     @ExcelIgnore
     private String groupCodeName;
 
-    //群活码id
-//    @ExcelIgnore
-//    private Long groupCodeId;
-
 
 
     //群码渠道标识
     @ExcelIgnore
+    @TableField(insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private String groupCodeState;
 
     //群码config
     @ExcelIgnore
+    @TableField(insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private String groupCodeConfigId;
 
     //群活码
     @ExcelIgnore
+    @TableField(insertStrategy = FieldStrategy.IGNORED, updateStrategy = FieldStrategy.IGNORED)
     private String groupCodeUrl;
 
 }

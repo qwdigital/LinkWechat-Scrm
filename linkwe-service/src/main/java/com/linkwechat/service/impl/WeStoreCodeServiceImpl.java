@@ -186,9 +186,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
             if(null != weQrAddQuery){
                 List<WeQrUserInfoQuery> qrUserInfos = weQrAddQuery.getQrUserInfos();
                 if(CollectionUtil.isNotEmpty(qrUserInfos)){
-                    weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
-                    weQrAddQuery.setQrType(2);
-                    WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
+                    WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
                     List<String> user = weContactWayByState.getUser();
                     if(CollectionUtil.isNotEmpty(user)){
 
@@ -197,6 +195,8 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                                 .filter(str -> str != null)
                                 .collect(Collectors.toList());
                         if(CollectionUtil.isNotEmpty(filteredUserIds)){
+                            weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
+                            weQrAddQuery.setQrType(2);
                             WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
                             if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
                                 weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
