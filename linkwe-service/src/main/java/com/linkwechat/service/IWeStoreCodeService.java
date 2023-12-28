@@ -5,6 +5,7 @@ import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
 import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
 import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
@@ -116,21 +117,17 @@ public interface IWeStoreCodeService extends IService<WeStoreCode> {
 
     /**
      * 根据定位获取门店
-     * @param storeCodeType
-     * @param unionid
-     * @param longitude
-     * @param latitude
-     * @Param area
+     * @param wxStoreCodeQuery
      * @return
      */
-    WeStoreCodesVo findStoreCode(Integer storeCodeType, String unionid, String longitude, String latitude, String area);
+    WeStoreCodesVo findStoreCode(WxStoreCodeQuery wxStoreCodeQuery);
 
 
     /**
      * 记录用户扫码行为
-     * @param weStoreCodeCount
+     * @param wxStoreCodeQuery
      */
-    void countUserBehavior(WeStoreCodeCount weStoreCodeCount);
+    void countUserBehavior(WxStoreCodeQuery wxStoreCodeQuery);
 
 
   /**

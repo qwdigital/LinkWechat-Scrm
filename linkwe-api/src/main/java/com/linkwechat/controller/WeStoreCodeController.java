@@ -21,8 +21,8 @@ import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.qr.WeQrAttachments;
-import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
 import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
 import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
@@ -522,9 +522,7 @@ public class WeStoreCodeController extends BaseController {
                     k.setLatitude(lMap.get(MapUtils.lat));
                     k.setLongitude(lMap.get(MapUtils.lng));
                 });
-//                List<WeStoreCode> weStoreCodeList = iWeStoreCodeService.getBaseMapper().selectList(new LambdaQueryWrapper<WeStoreCode>()
-//                        .eq(WeStoreCode::getDelFlag, 0));
-//                List<String> lst = weStoreCodeList.stream().map(WeStoreCode::getStoreName).collect(Collectors.toList());
+
                 deduplicationSeasNoRepeat = deduplicationSeasNoRepeat.stream().filter(item -> item.getStoreName().length()<30).collect(Collectors.toList());
                 if(iWeStoreCodeService.saveBatch(deduplicationSeasNoRepeat)){
                     tip = MessageFormat.format(tip, new Object[]{new Integer(deduplicationSeasNoRepeat.size()).toString()});
@@ -545,18 +543,14 @@ public class WeStoreCodeController extends BaseController {
 
     /**
      * 获取附件门店
-     * @param storeCodeType 门店码类型(1:门店导购码;2:门店群活码)
-     * @param unionid 微信unionid
-     * @param longitude 经度
-     * @param latitude 纬度
-     * @param area 区域
+     * @param wxStoreCodeQuery 门店码类型(1:门店导购码;2:门店群活码)
      * @return
      */
     @GetMapping("/findStoreCode")
-    public AjaxResult<WeStoreCodesVo> findStoreCode(Integer storeCodeType, String unionid, String longitude, String latitude, String area){
+    public AjaxResult<WeStoreCodesVo> findStoreCode(WxStoreCodeQuery wxStoreCodeQuery){
 
         return AjaxResult.success(
-                iWeStoreCodeService.findStoreCode(storeCodeType,unionid,longitude,latitude,area)
+                iWeStoreCodeService.findStoreCode(wxStoreCodeQuery)
         );
     }
 
@@ -568,23 +562,30 @@ public class WeStoreCodeController extends BaseController {
      */
     @GetMapping("/findWeStoreCodeConfig")
     public AjaxResult<WeStoreCodeConfig> findWeStoreCodeConfig(Integer storeCodeType){
+        WeStoreCodeConfig weStoreCodeConfig=new WeStoreCodeConfig();
+        List<WeStoreCodeConfig> weStoreCodeConfigList = iWeStoreCodeConfigService.list(new LambdaQueryWrapper<WeStoreCodeConfig>()
+                .eq(WeStoreCodeConfig::getStoreCodeType, storeCodeType));
+
+        if(CollectionUtil.isNotEmpty(weStoreCodeConfigList)){
+            weStoreCodeConfig=weStoreCodeConfigList.stream().findFirst().get();
+        }
 
 
         return AjaxResult.success(
-                iWeStoreCodeConfigService.getWeStoreCodeConfig(storeCodeType)
+                weStoreCodeConfig
         );
     }
 
 
-    /**
-     * 记录用户扫码行为
-     * @return
-     */
-    @PostMapping("/countUserBehavior")
-    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
-        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
-        return AjaxResult.success();
-    }
+//    /**
+//     * 记录用户扫码行为
+//     * @return
+//     */
+//    @PostMapping("/countUserBehavior")
+//    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
+//        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
+//        return AjaxResult.success();
+//    }
 
 
 

@@ -24,6 +24,7 @@ import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
 import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
 import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
@@ -50,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -218,18 +220,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public WeStoreShopGuideTabVo countWeStoreShopGuideTab() {
-        List<WeStoreCodeConfig> weStoreCodeConfigs = iWeStoreCodeConfigService.list(new LambdaQueryWrapper<WeStoreCodeConfig>()
-                .eq(WeStoreCodeConfig::getStoreCodeType, 1));
-
-        if(CollectionUtil.isNotEmpty(weStoreCodeConfigs)){
-            String state = weStoreCodeConfigs.stream().findFirst().get().getState();
-            if(StringUtils.isNotEmpty(state)){
-                return weStoreCodeCountMapper.countWeStoreShopGuideTab(state);
-            }
-
-        }
-
-        return new WeStoreShopGuideTabVo();
+        return weStoreCodeCountMapper.countWeStoreShopGuideTab(WeComeStateContants.MDDG_STATE);
     }
 
     @Override
@@ -239,7 +230,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public WeStoreGroupTabVo countWeStoreGroupTab() {
-        return weStoreCodeCountMapper.countWeStoreGroupTab();
+        return weStoreCodeCountMapper.countWeStoreGroupTab(WeComeStateContants.MDQM_STATE);
     }
 
     @Override
@@ -249,7 +240,9 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public List<WeStoreGroupTrendVo> countStoreGroupTrend(WeStoreCode weStoreCode) {
-
+        if(weStoreCode.getStoreCodeId()==null && StringUtils.isEmpty(weStoreCode.getArea())){
+            weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE);
+        }
         return weStoreCodeCountMapper.countStoreGroupTrend(weStoreCode);
     }
 
@@ -274,33 +267,66 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
     }
 
     @Override
-    public  WeStoreCodesVo findStoreCode(Integer storeCodeType, String unionid, String longitude, String latitude,String area) {
+    public  WeStoreCodesVo findStoreCode(WxStoreCodeQuery wxStoreCodeQuery) {
         WeStoreCodesVo weStoreCodesVo=new WeStoreCodesVo();
 
-        if(StringUtils.isNotEmpty(longitude) && StringUtils.isNotEmpty(latitude)){
-            WeStoreCodeConfig weStoreCodeConfig = iWeStoreCodeConfigService.getWeStoreCodeConfig(storeCodeType);
-            if(null != weStoreCodeConfig){
+        if(StringUtils.isNotEmpty(wxStoreCodeQuery.getLongitude()) && StringUtils.isNotEmpty(wxStoreCodeQuery.getLatitude())){
+
+            List<WeStoreCodeConfig> weStoreCodeConfigList = iWeStoreCodeConfigService.list(new LambdaQueryWrapper<WeStoreCodeConfig>()
+                    .eq(WeStoreCodeConfig::getStoreCodeType, wxStoreCodeQuery.getStoreCodeType()));
+
+
+            if(CollectionUtil.isNotEmpty(weStoreCodeConfigList)){
+
+                WeStoreCodeConfig weStoreCodeConfig = weStoreCodeConfigList.stream().findFirst().get();
+
                 weStoreCodesVo.setWelcomeMsg(weStoreCodeConfig.getWelcomeMsg());
 
-                weStoreCodesVo.setWeStoreCodes(
-                        this.baseMapper.findStoreCode(longitude, latitude, area, weStoreCodeConfig.getRaidus())
-                );
+                List<WeStoreCode> storeCode
+                        = this.baseMapper
+                        .findStoreCode(wxStoreCodeQuery.getLongitude(), wxStoreCodeQuery.getLatitude(), wxStoreCodeQuery.getArea(), weStoreCodeConfig.getRaidus());
+
+                if(CollectionUtil.isNotEmpty(storeCode)){
+                        weStoreCodesVo.setWeStoreCodes(
+                                storeCode
+                        );
+                        if(wxStoreCodeQuery.getIsCount()){
+                            this.countUserBehavior(wxStoreCodeQuery);
+                        }
+
+                }
+
 
             }
         }
 
 
-        if(StringUtils.isNotEmpty(area)){
+        if(StringUtils.isNotEmpty(wxStoreCodeQuery.getArea())){
             weStoreCodesVo.setWeStoreCodes(
-                    this.baseMapper.findStoreCode(longitude, latitude,area,null)
+                    this.baseMapper.findStoreCode(wxStoreCodeQuery.getLongitude(), wxStoreCodeQuery.getLatitude(),wxStoreCodeQuery.getArea(),null)
             );
         }
         return weStoreCodesVo;
     }
 
     @Override
-    public void countUserBehavior(WeStoreCodeCount weStoreCodeCount) {
-        weStoreCodeCountMapper.insert(weStoreCodeCount);
+    public void countUserBehavior(WxStoreCodeQuery wxStoreCodeQuery) {
+        List<WeStoreCodeCount> weStoreCodeCounts = weStoreCodeCountMapper.selectList(new LambdaQueryWrapper<WeStoreCodeCount>()
+                .eq(WeStoreCodeCount::getUnionid, wxStoreCodeQuery.getUnionid())
+                .eq(wxStoreCodeQuery.getStoreCodeId()!=null,WeStoreCodeCount::getStoreCodeId,wxStoreCodeQuery.getStoreCodeId())
+                .apply("date_format (create_time,'%Y-%m-%d') = date_format ({0},'%Y-%m-%d')", new Date()));
+        if(CollectionUtil.isNotEmpty(weStoreCodeCounts)){
+            weStoreCodeCountMapper.insert(WeStoreCodeCount.builder()
+                            .storeCodeId(wxStoreCodeQuery.getStoreCodeId())
+                            .currentLat(wxStoreCodeQuery.getLatitude())
+                            .currentLng(wxStoreCodeQuery.getLongitude())
+                            .unionid(wxStoreCodeQuery.getUnionid())
+                            .source(wxStoreCodeQuery.getStoreCodeType())
+                    .build());
+        }
+
+
+
     }
 
         @Override

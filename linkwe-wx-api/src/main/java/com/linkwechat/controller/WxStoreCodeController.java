@@ -4,6 +4,7 @@ import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.service.IWeStoreCodeConfigService;
 import com.linkwechat.service.IWeStoreCodeService;
@@ -26,45 +27,41 @@ public class WxStoreCodeController extends BaseController {
 
     /**
      * 获取附件门店
-     * @param storeCodeType 门店码类型(1:门店导购码;2:门店群活码)
-     * @param unionid 微信unionid
-     * @param longitude 经度
-     * @param latitude 纬度
-     * @param area 区域
+     * @param wxStoreCodeQuery
      * @return
      */
     @GetMapping("/findStoreCode")
-    public AjaxResult<WeStoreCodesVo> findStoreCode(Integer storeCodeType, String unionid, String longitude, String latitude, String area){
-
+    public AjaxResult<WeStoreCodesVo> findStoreCode(WxStoreCodeQuery wxStoreCodeQuery){
+        wxStoreCodeQuery.setIsCount(true);
         return AjaxResult.success(
-                iWeStoreCodeService.findStoreCode(storeCodeType,unionid,longitude,latitude,area)
+                iWeStoreCodeService.findStoreCode(wxStoreCodeQuery)
         );
     }
 
 
     /**
      * 获取门店对应的配置相关
-     * @param storeCodeType
+     * @param wxStoreCodeQuery
      * @return
      */
     @GetMapping("/findWeStoreCodeConfig")
-    public AjaxResult<WeStoreCodeConfig> findWeStoreCodeConfig(Integer storeCodeType){
+    public AjaxResult<WeStoreCodeConfig> findWeStoreCodeConfig(WxStoreCodeQuery wxStoreCodeQuery){
 
-
+        wxStoreCodeQuery.setIsCount(true);
         return AjaxResult.success(
-                iWeStoreCodeConfigService.getWeStoreCodeConfig(storeCodeType)
+                iWeStoreCodeConfigService.getWeStoreCodeConfig(wxStoreCodeQuery)
         );
     }
 
 
-    /**
-     * 记录用户扫码行为
-     * @return
-     */
-    @PostMapping("/countUserBehavior")
-    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
-        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
-        return AjaxResult.success();
-    }
+//    /**
+//     * 记录用户扫码行为
+//     * @return
+//     */
+//    @PostMapping("/countUserBehavior")
+//    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
+//        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
+//        return AjaxResult.success();
+//    }
 
 }

@@ -43,7 +43,7 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      *
      * @return
      */
-    WeStoreGroupTabVo countWeStoreGroupTab();
+    WeStoreGroupTabVo countWeStoreGroupTab(@Param("state") String state);
 
 
     /**

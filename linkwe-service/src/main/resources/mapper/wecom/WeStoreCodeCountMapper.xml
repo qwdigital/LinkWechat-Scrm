@@ -10,26 +10,25 @@
                        we_store_code_count where source=1
                )  as totalShopGuideScannNumber,
                (
-                   SELECT count(DISTINCT external_userid) from we_customer where state = #{state}
-
-               ) as customerTotalNumber,
-               (
                    SELECT
                        COUNT(DISTINCT unionid)
                    from
-                       we_store_code_count where date_format( create_time, '%y%m%d' ) = date_format( curdate(), '%y%m%d' ) AND source=1
+                       we_store_code_count where date_format( create_time, '%y%m%d' ) = date_format( curdate(), '%y%m%d' ) and  source=1
                ) as tdShopGuideScannNumber,
                (
                    SELECT
                        COUNT(DISTINCT unionid)
                    from
-                       we_store_code_count  where source=1 and date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                       we_store_code_count  where  date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d') and  source=1
                ) as ydShopGuideScannNumber,
                (
-                   SELECT count(DISTINCT external_userid) from we_customer where state = #{state} AND  date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                   SELECT count(DISTINCT external_userid) from we_customer where state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+               ) as customerTotalNumber,
+               (
+                   SELECT count(DISTINCT external_userid) from we_customer where state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%') AND  date_format(add_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
                ) as ydCustomerNumber,
                (
-                   SELECT count(DISTINCT external_userid) from we_customer where state = #{state} AND  date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
+                   SELECT count(DISTINCT external_userid) from we_customer where state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%') AND  date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
                ) as tdCustomerNumber
     </select>
 
@@ -53,7 +52,7 @@
 
             (
                 SELECT count(DISTINCT external_userid) from we_customer where state in (
-                    SELECT state from we_store_code
+                    SELECT shop_guide_state from we_store_code
                     <where>
                         <if test="storeCodeId !=null">id=#{storeCodeId}</if>
                     </where>
@@ -61,7 +60,7 @@
             ) as customerTotalNumber,
             (
                 SELECT count(DISTINCT external_userid) from we_customer where state in (
-                    SELECT state from we_store_code
+                    SELECT shop_guide_state from we_store_code
                 <where>
                     <if test="storeCodeId !=null">id=#{storeCodeId}</if>
                 </where>
@@ -87,12 +86,12 @@
                 SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
-                    SELECT state from we_group_code
+                    SELECT group_code_state from we_group_code
                     <where>
                         <if test="groupCodeId !=null">id=#{groupCodeId}</if>
                     </where>
                 )
-                AND wgm.del_flag=0
+                AND wgm.quit_scene IS NULL
 
             ) as totalJoinGroupMemberNumber,
 
@@ -100,22 +99,22 @@
                 SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
-                    SELECT state from we_group_code
+                    SELECT group_code_state from we_group_code
                     <where>
                         <if test="groupCodeId !=null">id=#{groupCodeId}</if>
                     </where>
-            ) and date_format(join_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+            ) and date_format(join_time,'%y%m%d') = date_format(curdate(),'%y%m%d') AND wgm.quit_scene IS NULL
             ) as tdJoinGroupMemberNumber,
 
             (
                 SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
-                SELECT state from we_group_code
+                SELECT group_code_state from we_group_code
                     <where>
                         <if test="groupCodeId !=null">id=#{groupCodeId}</if>
                     </where>
-            ) 	AND wgm.del_flag=1
+            ) 	AND wgm.quit_scene IS NOT NULL
 
             ) as totalExitGroupMemberNumber,
 
@@ -123,11 +122,11 @@
                 SELECT COUNT(DISTINCT wgm.user_id)
                 FROM we_group_member wgm
                 where wgm.state in (
-                    SELECT state from we_group_code
+                    SELECT group_code_state from we_group_code
                     <where>
                         <if test="groupCodeId !=null">id=#{groupCodeId}</if>
                     </where>
-                )  	AND wgm.del_flag=1 AND  date_format(quit_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
+                )  AND wgm.quit_scene IS NOT NULL AND  date_format(quit_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
             ) as tdExitGroupMemberNumber
     </select>
 
@@ -136,73 +135,86 @@
         SELECT
             (
                 SELECT
-                    COUNT(DISTINCT unionid)
-                from
-                    we_store_code_count where source=2
-            ) as totalStoreGroupScannNumber,
-
-        (
-            SELECT COUNT(DISTINCT wgm.user_id)
-            FROM we_group_member wgm
-            where wgm.state in (
-                    SELECT state from we_group_code
-                )
-        ) as totalJoinGroupMemberNumber,
-
-        (
-            SELECT COUNT(*)
-            FROM we_group_member wgm
-            where wgm.state in (
-                SELECT state from we_group_code
-            )
-            and wgm.del_flag=1
-        ) as totalExitGroupMemberNumber,
-
+                    COUNT( DISTINCT unionid )
+                FROM
+                    we_store_code_count
+                WHERE
+                    source = 2
+            ) AS totalStoreGroupScannNumber,
             (
                 SELECT
-                COUNT(DISTINCT unionid)
-                from
-                we_store_code_count where source=2 and date_format(create_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
-            ) as tdStoreGroupScannNumber,
-
-            (
-                SELECT COUNT(DISTINCT wgm.user_id)
-                FROM we_group_member wgm
-                where wgm.state in (
-                    SELECT state from we_group_code)
-                and  date_format(wgm.join_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
-            ) as tdJoinGroupMemberNumber,
-
-            (
-                SELECT COUNT(DISTINCT wgm.user_id)
-                FROM we_group_member wgm
-                where wgm.state in (
-                    SELECT state from we_group_code
-              )  and wgm.del_flag=1 and date_format(wgm.quit_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
-            ) as tdExitGroupMemberNumber,
-
+                    COUNT( DISTINCT unionid )
+                FROM
+                    we_store_code_count
+                WHERE
+                    source = 2
+                  AND date_format( create_time, '%y%m%d' ) = date_format( curdate(), '%y%m%d' )
+            ) AS tdStoreGroupScannNumber,
             (
                 SELECT
-                    COUNT(id)
-                from
-                    we_store_code_count where source=2 and date_format(create_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
-            ) as ydStoreGroupScannNumber,
-
+                    COUNT( DISTINCT unionid )
+                FROM
+                    we_store_code_count
+                WHERE
+                    source = 2
+                  AND date_format( create_time, '%y%m%d' ) = date_format( date_sub( curdate(), INTERVAL 1 DAY ), '%y%m%d' )
+            ) AS ydStoreGroupScannNumber,
             (
-                SELECT COUNT(DISTINCT wgm.user_id)
-                FROM we_group_member wgm
-                where wgm.state in (
-                    SELECT state from we_group_code
-                ) and date_format(wgm.join_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
-            ) as ydJoinGroupMemberNumber,
-
+                SELECT
+                    COUNT( DISTINCT wgm.user_id )
+                FROM
+                    we_group_member wgm
+                WHERE
+                    wgm.state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+            ) AS totalJoinGroupMemberNumber,
             (
-                SELECT COUNT(DISTINCT wgm.user_id)
-                FROM we_group_member wgm
-                where wgm.state in (
-                    SELECT state from we_store_code
-                ) and wgm.del_flag=1 and date_format(wgm.quit_time,'%y%m%d') = date_format(date_sub(curdate(),interval 1 day),'%y%m%d')
-            ) as ydExitGroupMemberNumber
+                SELECT
+                    COUNT( DISTINCT wgm.user_id )
+                FROM
+                    we_group_member wgm
+                WHERE
+                    wgm.state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+                  AND wgm.quit_scene IS NOT NULL
+            ) AS totalExitGroupMemberNumber,
+            (
+                SELECT
+                    COUNT( DISTINCT wgm.user_id )
+                FROM
+                    we_group_member wgm
+                WHERE
+                    wgm.state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+                  AND date_format( wgm.join_time, '%y%m%d' ) = date_format( curdate(), '%y%m%d' )
+            ) AS tdJoinGroupMemberNumber,
+            (
+                SELECT
+                    COUNT( DISTINCT wgm.user_id )
+                FROM
+                    we_group_member wgm
+                WHERE
+                    wgm.state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+                  AND wgm.quit_scene IS NOT NULL
+                  AND date_format( wgm.quit_time, '%y%m%d' ) = date_format( curdate(), '%y%m%d' )
+            ) AS tdExitGroupMemberNumber,
+            (
+                SELECT
+                    COUNT( DISTINCT wgm.user_id )
+                FROM
+                    we_group_member wgm
+                WHERE
+                    wgm.state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+                  AND wgm.quit_scene IS NOT NULL
+                  AND date_format( wgm.join_time, '%y%m%d' ) = date_format( date_sub( curdate(), INTERVAL 1 DAY ), '%y%m%d' )
+            ) AS ydJoinGroupMemberNumber,
+            (
+                SELECT
+                    COUNT( DISTINCT wgm.user_id )
+                FROM
+                    we_group_member wgm
+                WHERE
+                    wgm.state  LIKE CONCAT('%',#{state,jdbcType=VARCHAR},'%')
+                  AND wgm.quit_scene IS NOT NULL
+                  AND date_format( wgm.quit_time, '%y%m%d' ) = date_format( date_sub( curdate(), INTERVAL 1 DAY ), '%y%m%d' )
+            ) AS ydExitGroupMemberNumber
     </select>
 
 
@@ -220,7 +232,7 @@
                         FROM
                             we_customer wc
                         WHERE
-                            wc.state = wsc.state
+                            wc.state = wsc.shop_guide_state
                           AND date_format( wc.add_time, '%Y-%m-%d' ) BETWEEN #{beginTime}
                             AND #{endTime}
                     ) AS customerNumber
@@ -249,7 +261,7 @@
                         FROM
                             we_group_member wgm
                         WHERE
-                            wgm.state = wsc.state AND wgm.quit_scene IS NULL
+                            wgm.state = wsc.group_code_state AND wgm.quit_scene IS NULL
                           AND date_format( wgm.join_time, '%Y-%m-%d' ) BETWEEN #{beginTime}
                             AND #{endTime}
                     ) AS customerNumber
@@ -298,21 +310,21 @@
             wsc.area,
             wsc.store_name,
             COUNT(IF(date_format( wscc.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime},unionid,0)) as totalStoreGroupScannNumber,
-            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state and wgm.quit_scene IS NULL
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.group_code_state and wgm.quit_scene IS NULL
                                                                            AND date_format(wgm.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
             ) as totalJoinGroupMemberNumber,
 
-            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state and wgm.quit_scene IS NOT NULL
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.group_code_state and wgm.quit_scene IS NOT NULL
                                                                            AND date_format(wgm.create_time, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
             ) as totalExitGroupMemberNumber,
 
             COUNT(DISTINCT if(date_format(wscc.create_time,'%y%m%d') = date_format(curdate(),'%y%m%d'),unionid,0)) as tdStoreGroupScannNumber,
 
-            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state  and wgm.quit_scene IS NULL
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.group_code_state  and wgm.quit_scene IS NULL
                                                                            AND date_format(wgm.create_time, '%Y-%m-%d' )  = date_format(curdate(),'%Y-%m-%d')
             ) as tdJoinGroupMemberNumber,
 
-            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.state  and wgm.quit_scene IS NOT NULL
+            (SELECT COUNT(DISTINCT wgm.user_id) FROM we_group_member wgm WHERE wgm.state=wsc.group_code_state  and wgm.quit_scene IS NOT NULL
                                                                            AND date_format(wgm.create_time, '%Y-%m-%d' )  = date_format(curdate(),'%Y-%m-%d')
             ) as tdExitGroupMemberNumber
 
@@ -327,128 +339,137 @@
     </select>
 
     <select id="countStoreShopGuideTrend" resultType="com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo">
-        SELECT _date as dataTime,IFNULL(totalShopGuideScannNumber,0) as totalShopGuideScannNumber,IFNULL(customerTotalNumber,0) as customerTotalNumber
-        FROM
-        (
-        SELECT
-        (@s := @s + 1 ) AS _index,
-        STR_TO_DATE(
-        DATE(
-        DATE_SUB( DATE_FORMAT( #{weStoreCode.endTime}, '%Y-%m-%d' ), INTERVAL @s DAY )),
-        '%Y-%m-%d'
-        ) AS _date
-        FROM
-        information_schema.CHARACTER_SETS,(
-        SELECT
-        @s :=- 1
-        ) AS init
-        WHERE
-        @s &lt; datediff(
-        DATE_FORMAT( #{weStoreCode.endTime}, '%Y-%m-%d' ),
-        DATE_FORMAT( #{weStoreCode.beginTime}, '%Y-%m-%d' ))
-        ORDER BY
-        _date
-        ) tmp
-        LEFT JOIN
-        (
-        SELECT
-        DATE_FORMAT(wscc.create_time, '%Y-%m-%d' ) AS dateTime,
-        count(DISTINCT unionid) as totalShopGuideScannNumber,
-        (SELECT count(DISTINCT wc.external_userid) from we_customer wc where wc.state=wsc.state) as customerTotalNumber
-        FROM
-        we_store_code_count 	wscc
-        LEFT JOIN we_store_code wsc	ON wscc.store_code_id=wsc.id and wsc.del_flag=0
-        WHERE    date_format(wscc.create_time,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime} AND wscc.source=1
-        <if test="weStoreCode.storeCodeId !=null"> and wsc.id=#{weStoreCode.storeCodeId}</if>
-        <if test="weStoreCode.area !=null  and weStoreCode.area !=''">and wsc.area = #{weStoreCode.area}</if>
-        <if test="weStoreCode.storeName != null and weStoreCode.storeName != ''">and wsc.store_name = #{weStoreCode.storeName}</if>
-        GROUP BY
-        DATE_FORMAT(wscc.create_time, '%Y-%m-%d' )
-        ) tmpp  on tmp._date=tmpp.dateTime
+                        SELECT
+                        sdd.date as dataTime,
+                        (
+                        SELECT
+                        count(DISTINCT ws.unionid)
+                        FROM
+                        we_store_code_count ws
+                        WHERE ws.source=1 and
+                        DATE_FORMAT( ws.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
 
-        ORDER BY _date ASC
+                        <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
+                        <choose>
+                            <when test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
+                            </when>
+                            <when test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+                            </when>
+                            <when test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+                            </when>
+                        </choose>
+                        ) AS totalShopGuideScannNumber,
+                        (
+                        SELECT
+                        count(*)
+                        FROM
+                        we_customer wc
+                        WHERE
+                        DATE_FORMAT( wc.add_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
+
+                        <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
+
+                        <choose>
+                            <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
+                                and wc.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
+                            </when>
+                            <otherwise>
+                                <if test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
+                                </if>
+                                <if test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+                                </if>
+                                <if test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+                                </if>
+                            </otherwise>
+                        </choose>
+
+                        ) AS customerTotalNumber
+                        FROM
+                        sys_dim_date sdd
+                        WHERE
+                        DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN  #{weStoreCode.endTime} AND  #{weStoreCode.beginTime}
     </select>
 
 
     <select id="countStoreGroupTrend" resultType="com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo">
         SELECT
-            a.date as dataTime,IFNULL(b.totalExitGroupMemberNumber,0) as totalExitGroupMemberNumber
-                ,IFNULL(c.totalJoinGroupMemberNumber,0) as totalJoinGroupMemberNumber,
-            IFNULL(d.totalStoreGroupScannNumber,0) as totalStoreGroupScannNumber
+        sdd.date as dataTime,
+        (
+        SELECT
+        count(DISTINCT ws.unionid)
         FROM
+        we_store_code_count ws
+        WHERE
+        DATE_FORMAT( ws.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' ) and ws.source=2
+         <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
+          <choose>
+              <when test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                  AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
+              </when>
+              <when test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                  AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+              </when>
+              <when test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                  AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+              </when>
+          </choose>
+        ) AS totalStoreGroupScannNumber,
+        (
+            SELECT count(DISTINCT wgm.user_id) from we_group_member wgm
+            WHERE wgm.quit_scene IS NULL
 
-            (
-                SELECT
-                    date
-                FROM
-                    sys_dim_date WHERE date_format(date,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
-                GROUP BY 	date
-            ) a
-                LEFT JOIN
-            (
+            <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
 
-                SELECT
-                    wgm.quit_time,
-                    count( DISTINCT wgm.user_id ) as totalExitGroupMemberNumber
-                FROM
-                    we_group_member wgm
-                WHERE
-                        wgm.state IN (
-                        SELECT
-                            wgc.state
-                        FROM
-                            we_store_code wsc
-                                LEFT JOIN we_group_code wgc ON wgc.id = wsc.group_code_id
-                        <where>
-                           <if test="weStoreCode.storeCodeId != null">
-                               wsc.id=#{weStoreCode.storeCodeId}
-                           </if>
-                        </where>
+            <choose>
+                <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
+                    and wgm.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
+                </when>
+                <otherwise>
+                    <if test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                        AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
+                    </if>
+                    <if test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                        AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+                    </if>
+                    <if test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                        AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+                    </if>
+                </otherwise>
+            </choose>
+        ) AS totalJoinGroupMemberNumber,
 
-
-                    ) and date_format(wgm.quit_time,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime} AND wgm.del_flag=1
-                GROUP BY date_format(wgm.quit_time,'%Y-%m-%d')
-                ORDER BY wgm.quit_time desc
-            ) b ON a.date=date_format(b.quit_time,'%Y-%m-%d')
-
-                LEFT JOIN
-            (
-
-                SELECT
-                    wgm.join_time,
-                    count( DISTINCT wgm.user_id ) as totalJoinGroupMemberNumber
-                FROM
-                    we_group_member wgm
-                WHERE
-                        wgm.state IN (
-                        SELECT
-                            wgc.state
-                        FROM
-                            we_store_code wsc
-                                LEFT JOIN we_group_code wgc ON wgc.id = wsc.group_code_id
-                        <where>
-                            <if test="weStoreCode.storeCodeId != null">
-                                wsc.id=#{weStoreCode.storeCodeId}
-                            </if>
-                        </where>
-                    ) and date_format(wgm.join_time,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
-                GROUP BY date_format(wgm.join_time,'%Y-%m-%d')
-                ORDER BY wgm.join_time desc
-            ) c ON a.date=date_format(c.join_time,'%Y-%m-%d')
-
-                LEFT JOIN
-            (
-
-                SELECT 	create_time,count(DISTINCT unionid) as totalStoreGroupScannNumber  from we_store_code_count where  source=2
-                 and  date_format(create_time,'%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} AND #{weStoreCode.endTime}
-                <if test="weStoreCode.storeCodeId != null">
-                    AND store_code_id=#{weStoreCode.storeCodeId}
+        (
+        SELECT count(DISTINCT wgm.user_id) from we_group_member wgm
+        WHERE wgm.quit_scene IS NOT NULL
+        <bind name="isNotEmptyArea" value="StringUtils.isNotEmpty(weStoreCode.area)"/>
+        <choose>
+            <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
+                and wgm.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
+            </when>
+            <otherwise>
+                <if test="weStoreCode.storeCodeId != null and isNotEmptyArea">
+                    AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                 </if>
-                GROUP BY date_format(create_time,'%Y-%m-%d')
-                ORDER BY create_time desc
+                <if test="weStoreCode.storeCodeId != null and  !isNotEmptyArea">
+                    AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+                </if>
+                <if test="weStoreCode.storeCodeId == null and isNotEmptyArea">
+                    AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+                </if>
+            </otherwise>
+        </choose>
+        ) AS totalExitGroupMemberNumber
 
-            ) d ON a.date=date_format(d.create_time,'%Y-%m-%d')
-        ORDER BY  a.date asc
+        FROM
+        sys_dim_date sdd
+        WHERE
+        DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN  #{weStoreCode.endTime} AND  #{weStoreCode.beginTime}
     </select>
 
 
