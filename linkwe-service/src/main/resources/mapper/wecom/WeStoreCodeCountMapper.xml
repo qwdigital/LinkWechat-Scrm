@@ -391,7 +391,7 @@
                         FROM
                         sys_dim_date sdd
                         WHERE
-                        DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN  #{weStoreCode.endTime} AND  #{weStoreCode.beginTime}
+                        DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} and #{weStoreCode.endTime}
     </select>
 
 
@@ -463,7 +463,7 @@
         FROM
         sys_dim_date sdd
         WHERE
-        DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN  #{weStoreCode.endTime} AND  #{weStoreCode.beginTime}
+        DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN #{weStoreCode.beginTime} and #{weStoreCode.endTime}
     </select>
 
 
