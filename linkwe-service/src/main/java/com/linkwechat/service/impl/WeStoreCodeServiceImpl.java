@@ -56,7 +56,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 @Service
@@ -191,13 +191,22 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                     WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
                     List<String> user = weContactWayByState.getUser();
                     if(CollectionUtil.isNotEmpty(user)){
-                        WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
-                        if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
-                            weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
-                            weStoreCode.setShopGuideConfigId(weAddWayResult.getConfigId());
-                        }else{
-                            throw new WeComException(weAddWayResult.getErrMsg());
+
+                        // 使用Stream API过滤掉null字符串
+                        List<String> filteredUserIds = user.stream()
+                                .filter(str -> str != null)
+                                .collect(Collectors.toList());
+                        if(CollectionUtil.isNotEmpty(filteredUserIds)){
+                            WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
+                            if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
+                                weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
+                                weStoreCode.setShopGuideConfigId(weAddWayResult.getConfigId());
+                            }else{
+                                throw new WeComException(weAddWayResult.getErrMsg());
+                            }
                         }
+
+
                     }
 
 
