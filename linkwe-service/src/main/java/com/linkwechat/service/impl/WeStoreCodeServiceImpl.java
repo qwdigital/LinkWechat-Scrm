@@ -154,7 +154,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
             if(null != addGroupCode){
                 if(StringUtils.isNotEmpty(addGroupCode.getChatIdList())){
                     weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
-
+                    addGroupCode.setGroupNames(weStoreCode.getGroupCodeName());
                     //配置进群方式
                     WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
                             WeGroupCode.builder()
