@@ -19,6 +19,7 @@ import com.linkwechat.domain.WeBuildUserOrGroupConditVo;
 import com.linkwechat.domain.fission.vo.WeExecuteUserOrGroupConditVo;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.qr.query.WeQrAddQuery;
+import com.linkwechat.domain.qr.query.WeQrUserInfoQuery;
 import com.linkwechat.domain.sop.vo.WeSopExecuteUserConditVo;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
@@ -113,24 +114,27 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
                 //创建群活码
                 if(null != addGroupCode){
-                    weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
-                    //配置进群方式
-                    WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
-                            WeGroupCode.builder()
-                                    .autoCreateRoom(addGroupCode.getAutoCreateRoom())
-                                    .roomBaseId(addGroupCode.getRoomBaseId())
-                                    .roomBaseName(addGroupCode.getRoomBaseName())
-                                    .chatIdList(addGroupCode.getChatIdList())
-                                    .state(weStoreCode.getGroupCodeState())
-                                    .build()
-                    );
+                    if(StringUtils.isNotEmpty(addGroupCode.getChatIdList())){
+                        weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
+                        //配置进群方式
+                        WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
+                                WeGroupCode.builder()
+                                        .autoCreateRoom(addGroupCode.getAutoCreateRoom())
+                                        .roomBaseId(addGroupCode.getRoomBaseId())
+                                        .roomBaseName(addGroupCode.getRoomBaseName())
+                                        .chatIdList(addGroupCode.getChatIdList())
+                                        .state(weStoreCode.getGroupCodeState())
+                                        .build()
+                        );
 
-                    if(null != addJoinWayVo&&addJoinWayVo.getJoin_way() != null){
-                        WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
-                        weStoreCode.setGroupCodeConfigId(joinWay.getConfig_id());
-                        weStoreCode.setGroupCodeUrl(joinWay.getQr_code());
-                    }else{
-                        throw new WeComException(addJoinWayVo.getErrMsg());
+                        if(null != addJoinWayVo&&addJoinWayVo.getJoin_way() != null){
+                            WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
+                            weStoreCode.setGroupCodeConfigId(joinWay.getConfig_id());
+                            weStoreCode.setGroupCodeUrl(joinWay.getQr_code());
+                        }else{
+                            throw new WeComException(addJoinWayVo.getErrMsg());
+                        }
+
                     }
 
 
@@ -142,20 +146,22 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
                 //创建员工活码
                 if(null != weQrAddQuery){
-                    weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
-                    weQrAddQuery.setQrType(2);
-                    WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
+                    List<WeQrUserInfoQuery> qrUserInfos = weQrAddQuery.getQrUserInfos();
+                    if(CollectionUtil.isNotEmpty(qrUserInfos)){
+                        weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
+                        weQrAddQuery.setQrType(2);
+                        WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
 
-                    WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
+                        WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
 
 
-                    if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
-                        weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
-                        weStoreCode.setShopGuideConfigId(weAddWayResult.getConfigId());
-                    }else{
-                        throw new WeComException(weAddWayResult.getErrMsg());
+                        if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
+                            weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
+                            weStoreCode.setShopGuideConfigId(weAddWayResult.getConfigId());
+                        }else{
+                            throw new WeComException(weAddWayResult.getErrMsg());
+                        }
                     }
-
                 }
 
             }
