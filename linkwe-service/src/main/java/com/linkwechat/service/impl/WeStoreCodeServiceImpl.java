@@ -37,8 +37,10 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
+import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatJoinWayQuery;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoinWayQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
+import com.linkwechat.domain.wecom.query.qr.WeContactWayQuery;
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
@@ -106,55 +108,90 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
         if(weStoreCode.getId() == null){ //新增
             weStoreCode.setId(SnowFlakeUtil.nextId());
 
-            WeBuildUserOrGroupConditVo addWeUserOrGroupCode =
-                    weStoreCode.getAddWeUserOrGroupCode();
 
-            if(null != addWeUserOrGroupCode){
-                WeGroupCode addGroupCode = addWeUserOrGroupCode.getAddGroupCode();
 
-                //创建群活码
-                if(null != addGroupCode){
-                    if(StringUtils.isNotEmpty(addGroupCode.getChatIdList())){
-                        weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
-                        //配置进群方式
-                        WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
-                                WeGroupCode.builder()
-                                        .autoCreateRoom(addGroupCode.getAutoCreateRoom())
-                                        .roomBaseId(addGroupCode.getRoomBaseId())
-                                        .roomBaseName(addGroupCode.getRoomBaseName())
-                                        .chatIdList(addGroupCode.getChatIdList())
-                                        .state(weStoreCode.getGroupCodeState())
-                                        .build()
-                        );
+        }else{
 
-                        if(null != addJoinWayVo&&addJoinWayVo.getJoin_way() != null){
-                            WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
-                            weStoreCode.setGroupCodeConfigId(joinWay.getConfig_id());
-                            weStoreCode.setGroupCodeUrl(joinWay.getQr_code());
-                        }else{
-                            throw new WeComException(addJoinWayVo.getErrMsg());
-                        }
+            WeStoreCode oldWeStoreCode = this.getById(weStoreCode.getId());
+            if(oldWeStoreCode != null){
 
+                //员工活码操作
+                String shopGuideConfigId = oldWeStoreCode.getShopGuideConfigId();
+                if(StringUtils.isNotEmpty(shopGuideConfigId)){
+                    qwCustomerClient.delContactWay(WeContactWayQuery.builder().config_id(shopGuideConfigId).build());
+                    weStoreCode.setShopGuideUrl(null);
+                    weStoreCode.setShopGuideState(null);
+                    weStoreCode.setShopGuideConfigId(null);
+                }
+
+                //群活码
+                String groupCodeConfigId = oldWeStoreCode.getGroupCodeConfigId();
+                if(StringUtils.isNotEmpty(groupCodeConfigId)){
+                    qwCustomerClient.delJoinWayForGroupChat(WeGroupChatJoinWayQuery.builder().config_id(groupCodeConfigId).build());
+                    weStoreCode.setGroupCodeUrl(null);
+                    weStoreCode.setGroupCodeState(null);
+                    weStoreCode.setGroupCodeConfigId(null);
+                }
+            }
+        }
+
+        WeBuildUserOrGroupConditVo addWeUserOrGroupCode =
+                weStoreCode.getAddWeUserOrGroupCode();
+
+        this.builderStoreCode(addWeUserOrGroupCode,weStoreCode);
+
+       saveOrUpdate(weStoreCode);
+    }
+
+
+
+    private void builderStoreCode( WeBuildUserOrGroupConditVo addWeUserOrGroupCode,WeStoreCode weStoreCode){
+
+        if(null != addWeUserOrGroupCode){
+            WeGroupCode addGroupCode = addWeUserOrGroupCode.getAddGroupCode();
+
+            //创建群活码
+            if(null != addGroupCode){
+                if(StringUtils.isNotEmpty(addGroupCode.getChatIdList())){
+                    weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
+                    //配置进群方式
+                    WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
+                            WeGroupCode.builder()
+                                    .autoCreateRoom(addGroupCode.getAutoCreateRoom())
+                                    .roomBaseId(addGroupCode.getRoomBaseId())
+                                    .roomBaseName(addGroupCode.getRoomBaseName())
+                                    .chatIdList(addGroupCode.getChatIdList())
+                                    .state(weStoreCode.getGroupCodeState())
+                                    .build()
+                    );
+
+                    if(null != addJoinWayVo&&addJoinWayVo.getJoin_way() != null){
+                        WeGroupChatGetJoinWayVo.JoinWay joinWay = addJoinWayVo.getJoin_way();
+                        weStoreCode.setGroupCodeConfigId(joinWay.getConfig_id());
+                        weStoreCode.setGroupCodeUrl(joinWay.getQr_code());
+                    }else{
+                        throw new WeComException(addJoinWayVo.getErrMsg());
                     }
-
 
                 }
 
 
+            }
 
-                WeQrAddQuery weQrAddQuery = addWeUserOrGroupCode.getWeQrAddQuery();
 
-                //创建员工活码
-                if(null != weQrAddQuery){
-                    List<WeQrUserInfoQuery> qrUserInfos = weQrAddQuery.getQrUserInfos();
-                    if(CollectionUtil.isNotEmpty(qrUserInfos)){
-                        weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
-                        weQrAddQuery.setQrType(2);
-                        WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
 
+            WeQrAddQuery weQrAddQuery = addWeUserOrGroupCode.getWeQrAddQuery();
+
+            //创建员工活码
+            if(null != weQrAddQuery){
+                List<WeQrUserInfoQuery> qrUserInfos = weQrAddQuery.getQrUserInfos();
+                if(CollectionUtil.isNotEmpty(qrUserInfos)){
+                    weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE + weStoreCode.getId());
+                    weQrAddQuery.setQrType(2);
+                    WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(weStoreCode.getShopGuideState());
+                    List<String> user = weContactWayByState.getUser();
+                    if(CollectionUtil.isNotEmpty(user)){
                         WeAddWayVo weAddWayResult = qwCustomerClient.addContactWay(weContactWayByState).getData();
-
-
                         if (weAddWayResult != null && ObjectUtil.equal(0, weAddWayResult.getErrCode())) {
                             weStoreCode.setShopGuideUrl(weAddWayResult.getQrCode());
                             weStoreCode.setShopGuideConfigId(weAddWayResult.getConfigId());
@@ -162,68 +199,14 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                             throw new WeComException(weAddWayResult.getErrMsg());
                         }
                     }
-                }
-
-            }
-
-
-
-
-
-        }else{
-
-            WeBuildUserOrGroupConditVo addWeUserOrGroupCode =
-                    weStoreCode.getAddWeUserOrGroupCode();
-
-
-            //更新群活码
-            if(null != addWeUserOrGroupCode) {
-                WeGroupCode addGroupCode = addWeUserOrGroupCode.getAddGroupCode();
-                if (null != addGroupCode) {
-
-                    //更新群活码
-                    WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
-                            WeGroupChatUpdateJoinWayQuery.builder()
-                                    .config_id(weStoreCode.getGroupCodeConfigId())
-                                    .scene(2)
-                                    .auto_create_room(addGroupCode.getAutoCreateRoom())
-                                    .room_base_id(addGroupCode.getRoomBaseId())
-                                    .room_base_name(addGroupCode.getRoomBaseName())
-                                    .chat_id_list(Arrays.asList(addGroupCode.getChatIdList().split(",")))
-                                    .build()
-                    ).getData();
-
-                    if(!weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-
-                        throw new WeComException(weResultVo.getErrMsg());
-                    }
-
-
 
 
                 }
             }
-
-            WeQrAddQuery weQrAddQuery = addWeUserOrGroupCode.getWeQrAddQuery();
-
-            if(null != weQrAddQuery){
-                WeAddWayQuery weContactWay = weQrAddQuery.getWeContactWay();
-                WeResultVo weResultVo = qwCustomerClient.updateContactWay(weContactWay).getData();
-                if(!weResultVo.getErrCode().equals(WeConstans.WE_SUCCESS_CODE)){
-                    throw new WeComException(weResultVo.getErrMsg());
-                }
-            }
-
-
-
 
         }
 
-       saveOrUpdate(weStoreCode);
     }
-
-
-
     @Override
     public WeStoreShopGuideTabVo countWeStoreShopGuideTab() {
         return weStoreCodeCountMapper.countWeStoreShopGuideTab(WeComeStateContants.MDDG_STATE);
