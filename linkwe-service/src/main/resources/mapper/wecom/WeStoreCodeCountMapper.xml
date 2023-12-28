@@ -86,9 +86,9 @@
         SELECT COUNT(DISTINCT wgm.user_id)
         FROM we_group_member wgm
         where wgm.state in (
-        SELECT group_code_state from we_group_code
+        SELECT group_code_state from we_store_code
         <where>
-            <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+            <if test="storeCodeId !=null">id=#{storeCodeId}</if>
         </where>
         )
         AND wgm.quit_scene IS NULL
@@ -99,9 +99,9 @@
         SELECT COUNT(DISTINCT wgm.user_id)
         FROM we_group_member wgm
         where wgm.state in (
-        SELECT group_code_state from we_group_code
+        SELECT group_code_state from we_store_code
         <where>
-            <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+            <if test="storeCodeId !=null">id=#{storeCodeId}</if>
         </where>
         ) and date_format(join_time,'%y%m%d') = date_format(curdate(),'%y%m%d') AND wgm.quit_scene IS NULL
         ) as tdJoinGroupMemberNumber,
@@ -110,9 +110,9 @@
         SELECT COUNT(DISTINCT wgm.user_id)
         FROM we_group_member wgm
         where wgm.state in (
-        SELECT group_code_state from we_group_code
+        SELECT group_code_state from we_store_code
         <where>
-            <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+            <if test="storeCodeId !=null">id=#{storeCodeId}</if>
         </where>
         ) 	AND wgm.quit_scene IS NOT NULL
 
@@ -122,9 +122,9 @@
         SELECT COUNT(DISTINCT wgm.user_id)
         FROM we_group_member wgm
         where wgm.state in (
-        SELECT group_code_state from we_group_code
+        SELECT group_code_state from we_store_code
         <where>
-            <if test="groupCodeId !=null">id=#{groupCodeId}</if>
+            <if test="storeCodeId !=null">id=#{storeCodeId}</if>
         </where>
         )  AND wgm.quit_scene IS NOT NULL AND  date_format(quit_time,'%y%m%d') = date_format(curdate(),'%y%m%d')
         ) as tdExitGroupMemberNumber
@@ -381,15 +381,15 @@
                     <when test="weStoreCode.storeCodeId != null">
                         <choose>
                             <when test="weStoreCode.area !=null and weStoreCode.area !=''">
-                                AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
+                                AND wc.state in (SELECT wsc.shop_guide_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
                             </when>
                             <otherwise>
-                                AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
+                                AND wc.state in (SELECT wsc.shop_guide_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
                             </otherwise>
                         </choose>
                     </when>
                     <when test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
-                        AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
+                        AND wc.state in (SELECT wsc.shop_guide_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
                     </when>
                 </choose>
             </otherwise>

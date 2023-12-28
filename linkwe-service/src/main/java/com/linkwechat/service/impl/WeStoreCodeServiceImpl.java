@@ -226,7 +226,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public WeStoreTabVo countWeStoreTab(Long storeCodeId) {
-        return weStoreCodeCountMapper.countWeStoreTab(storeCodeId,getById(storeCodeId).getId());
+        return weStoreCodeCountMapper.countWeStoreTab(storeCodeId);
     }
 
     @Override

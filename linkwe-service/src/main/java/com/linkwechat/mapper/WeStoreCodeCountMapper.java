@@ -35,7 +35,7 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      * @param groupCodeId
      * @return
      */
-    WeStoreTabVo countWeStoreTab(@Param("storeCodeId") Long storeCodeId, @Param("groupCodeId") Long groupCodeId);
+    WeStoreTabVo countWeStoreTab(@Param("storeCodeId") Long storeCodeId);
 
 
     /**
