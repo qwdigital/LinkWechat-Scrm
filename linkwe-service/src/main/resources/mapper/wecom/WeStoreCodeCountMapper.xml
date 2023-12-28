@@ -349,16 +349,15 @@
                         WHERE ws.source=1 and
                         DATE_FORMAT( ws.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
 
-
                         <choose>
                             <when test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">
-                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
+                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
                             </when>
                             <when test="weStoreCode.storeCodeId != null and  weStoreCode.area ==null and weStoreCode.area ==''">
-                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
                             </when>
                             <when test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
-                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+                                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
                             </when>
                         </choose>
                         ) AS totalShopGuideScannNumber,
@@ -376,13 +375,13 @@
                             </when>
                             <otherwise>
                                 <if test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">
-                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
+                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
                                 </if>
                                 <if test="weStoreCode.storeCodeId != null and  weStoreCode.area ==null and weStoreCode.area ==''">
-                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
+                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
                                 </if>
                                 <if test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
-                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
+                                    AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
                                 </if>
                             </otherwise>
                         </choose>
