@@ -316,7 +316,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                 .eq(WeStoreCodeCount::getUnionid, wxStoreCodeQuery.getUnionid())
                 .eq(wxStoreCodeQuery.getStoreCodeId()!=null,WeStoreCodeCount::getStoreCodeId,wxStoreCodeQuery.getStoreCodeId())
                 .apply("date_format (create_time,'%Y-%m-%d') = date_format ({0},'%Y-%m-%d')", new Date()));
-        if(CollectionUtil.isNotEmpty(weStoreCodeCounts)){
+        if(CollectionUtil.isEmpty(weStoreCodeCounts)){
             weStoreCodeCountMapper.insert(WeStoreCodeCount.builder()
                             .storeCodeId(wxStoreCodeQuery.getStoreCodeId())
                             .currentLat(wxStoreCodeQuery.getLatitude())

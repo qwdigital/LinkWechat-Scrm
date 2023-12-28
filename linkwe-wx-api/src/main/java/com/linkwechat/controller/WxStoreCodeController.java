@@ -54,14 +54,5 @@ public class WxStoreCodeController extends BaseController {
     }
 
 
-//    /**
-//     * 记录用户扫码行为
-//     * @return
-//     */
-//    @PostMapping("/countUserBehavior")
-//    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
-//        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
-//        return AjaxResult.success();
-//    }
 
 }
