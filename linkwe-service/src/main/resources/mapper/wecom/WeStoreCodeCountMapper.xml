@@ -416,51 +416,79 @@
         WHERE
         DATE_FORMAT(ws.create_time, '%Y-%m-%d') = DATE_FORMAT(sdd.date, '%Y-%m-%d')
         AND ws.source = 2
-        <if test="weStoreCode.storeCodeId != null and weStoreCode.area != null and weStoreCode.area != ''">
-            AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc where wsc.id = #{weStoreCode.storeCodeId} and wsc.area = #{weStoreCode.area})
-        </if>
-        <if test="weStoreCode.storeCodeId != null and weStoreCode.area == null or weStoreCode.area == ''">
-            AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc where wsc.id = #{weStoreCode.storeCodeId})
-        </if>
-        <if test="weStoreCode.storeCodeId == null and weStoreCode.area != null and weStoreCode.area != ''">
-            AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc where wsc.area = #{weStoreCode.area})
-        </if>
+        <choose>
+            <when test="weStoreCode.storeCodeId != null">
+                <choose>
+                    <when test="weStoreCode.area !=null and weStoreCode.area !=''">
+                        AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
+                    </when>
+                    <otherwise>
+                        AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
+                    </otherwise>
+                </choose>
+            </when>
+            <when test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
+                AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
+            </when>
+        </choose>
         ) AS totalStoreGroupScannNumber,
 
         -- 加入群组会员数
         (
         SELECT count(DISTINCT wgm.user_id) from we_group_member wgm
         WHERE wgm.quit_scene IS NULL
-        <if test="weStoreCode.groupCodeState != null and weStoreCode.groupCodeState != ''">
-            AND wgm.state LIKE CONCAT('%', #{weStoreCode.groupCodeState}, '%')
-        </if>
-        <if test="weStoreCode.storeCodeId != null and weStoreCode.area != null and weStoreCode.area != ''">
-            AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc where wsc.id = #{weStoreCode.storeCodeId} and wsc.area = #{weStoreCode.area})
-        </if>
-        <if test="weStoreCode.storeCodeId != null and weStoreCode.area == null or weStoreCode.area == ''">
-            AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc where wsc.id = #{weStoreCode.storeCodeId})
-        </if>
-        <if test="weStoreCode.storeCodeId == null and weStoreCode.area != null and weStoreCode.area != ''">
-            AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc where wsc.area = #{weStoreCode.area})
-        </if>
+
+        <choose>
+            <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
+                and wc.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
+            </when>
+            <otherwise>
+                <choose>
+                    <when test="weStoreCode.storeCodeId != null">
+                        <choose>
+                            <when test="weStoreCode.area !=null and weStoreCode.area !=''">
+                                AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
+                            </when>
+                            <otherwise>
+                                AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
+                        AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
+                    </when>
+                </choose>
+            </otherwise>
+        </choose>
+
         ) AS totalJoinGroupMemberNumber,
 
         -- 退出群组会员数
         (
         SELECT count(DISTINCT wgm.user_id) from we_group_member wgm
         WHERE wgm.quit_scene IS NOT NULL
-        <if test="weStoreCode.groupCodeState != null and weStoreCode.groupCodeState != ''">
-            AND wgm.state LIKE CONCAT('%', #{weStoreCode.groupCodeState}, '%')
-        </if>
-        <if test="weStoreCode.storeCodeId != null and weStoreCode.area != null and weStoreCode.area != ''">
-            AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc where wsc.id = #{weStoreCode.storeCodeId} and wsc.area = #{weStoreCode.area})
-        </if>
-        <if test="weStoreCode.storeCodeId != null and weStoreCode.area == null or weStoreCode.area == ''">
-            AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc where wsc.id = #{weStoreCode.storeCodeId})
-        </if>
-        <if test="weStoreCode.storeCodeId == null and weStoreCode.area != null and weStoreCode.area != ''">
-            AND wgm.state in (SELECT wsc.group_code_state from we_store_code wsc where wsc.area = #{weStoreCode.area})
-        </if>
+        <choose>
+            <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
+                and wc.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
+            </when>
+            <otherwise>
+                <choose>
+                    <when test="weStoreCode.storeCodeId != null">
+                        <choose>
+                            <when test="weStoreCode.area !=null and weStoreCode.area !=''">
+                                AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area})
+                            </when>
+                            <otherwise>
+                                AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId})
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
+                        AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area})
+                    </when>
+                </choose>
+            </otherwise>
+        </choose>
         ) AS totalExitGroupMemberNumber
 
         FROM
@@ -468,7 +496,6 @@
         WHERE
         DATE_FORMAT(sdd.date, '%Y-%m-%d') BETWEEN #{weStoreCode.beginTime} and #{weStoreCode.endTime}
     </select>
-
 
     <select id="findWeStoreCodeTables" resultType="com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo">
         SELECT
