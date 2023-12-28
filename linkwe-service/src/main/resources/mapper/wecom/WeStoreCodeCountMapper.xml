@@ -351,13 +351,13 @@
 
 
                         <choose>
-                            <when test="weStoreCode.storeCodeId != null and weStoreCode.area ！=null and weStoreCode.area !=''">
+                            <when test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">
                                 AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                             </when>
                             <when test="weStoreCode.storeCodeId != null and  weStoreCode.area ==null and weStoreCode.area ==''">
                                 AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
                             </when>
-                            <when test="weStoreCode.storeCodeId == null and  weStoreCode.area ！=null and weStoreCode.area !=''">
+                            <when test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
                                 AND ws.store_code_id in (SELECT wsc.id from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
                             </when>
                         </choose>
@@ -375,13 +375,13 @@
                                 and wc.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
                             </when>
                             <otherwise>
-                                <if test="weStoreCode.storeCodeId != null and weStoreCode.area ！=null and weStoreCode.area !=''">
+                                <if test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">
                                     AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId} and wsc.area =  #{weStoreCode.area}))
                                 </if>
                                 <if test="weStoreCode.storeCodeId != null and  weStoreCode.area ==null and weStoreCode.area ==''">
                                     AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.id=#{weStoreCode.storeCodeId}))
                                 </if>
-                                <if test="weStoreCode.storeCodeId == null and  weStoreCode.area ！=null and weStoreCode.area !=''">
+                                <if test="weStoreCode.storeCodeId == null and  weStoreCode.area !=null and weStoreCode.area !=''">
                                     AND wc.state in (SELECT wsc.group_code_state from we_store_code wsc  where wsc.area =  #{weStoreCode.area}))
                                 </if>
                             </otherwise>
