@@ -40,7 +40,7 @@
         COUNT(DISTINCT unionid)
         from
         we_store_code_count where source=1
-        <if test="storeCodeId !=null">and store_code_id=#{storeCodeId}</if>
+         <if test="storeCodeId !=null">and store_code_id=#{storeCodeId}</if>
         )  as totalShopGuideScannNumber,
         (
         SELECT

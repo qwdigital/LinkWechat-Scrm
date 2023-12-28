@@ -445,9 +445,12 @@ public class WeStoreCodeController extends BaseController {
 
         if(null != weStoreCode){
             startPage();
-            weGroups=iWeGroupService
-                    .findGroupByUserId(weStoreCodeQuery.getExternalUserid()
-                            , weStoreCode.getGroupCodeState());
+            if(StringUtils.isNotEmpty(weStoreCode.getGroupCodeState())){
+                weGroups=iWeGroupService
+                        .findGroupByUserId(weStoreCodeQuery.getExternalUserid()
+                                , weStoreCode.getGroupCodeState());
+            }
+
         }
 
         return getDataTable(weGroups);
