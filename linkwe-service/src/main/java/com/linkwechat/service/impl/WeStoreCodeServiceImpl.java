@@ -297,6 +297,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                         if(wxStoreCodeQuery.getIsCount()){
                             storeCode.stream().forEach(kk->{
                                 wxStoreCodeQuery.setStoreCodeId(kk.getId());
+                                wxStoreCodeQuery.setStoreCodeType(weStoreCodeConfig.getStoreCodeType());
                                 this.countUserBehavior(wxStoreCodeQuery);
 
                             });
@@ -322,6 +323,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
     public void countUserBehavior(WxStoreCodeQuery wxStoreCodeQuery) {
         List<WeStoreCodeCount> weStoreCodeCounts = weStoreCodeCountMapper.selectList(new LambdaQueryWrapper<WeStoreCodeCount>()
                 .eq(WeStoreCodeCount::getUnionid, wxStoreCodeQuery.getUnionid())
+                .eq(WeStoreCodeCount::getSource,wxStoreCodeQuery.getStoreCodeType())
                 .eq(wxStoreCodeQuery.getStoreCodeId()!=null,WeStoreCodeCount::getStoreCodeId,wxStoreCodeQuery.getStoreCodeId())
                 .apply("date_format (create_time,'%Y-%m-%d') = date_format ({0},'%Y-%m-%d')", new Date()));
         if(CollectionUtil.isEmpty(weStoreCodeCounts)){
