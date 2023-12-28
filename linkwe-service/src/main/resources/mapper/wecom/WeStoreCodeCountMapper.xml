@@ -371,8 +371,8 @@
                         DATE_FORMAT( wc.add_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
 
                         <choose>
-                            <when test="weStoreCode.groupCodeState != null  and weStoreCode.groupCodeState !=''">
-                                and wc.state  LIKE CONCAT('%',#{weStoreCode.groupCodeState,jdbcType=VARCHAR},'%')
+                            <when test="weStoreCode.shopGuideState != null  and weStoreCode.shopGuideState !=''">
+                                and wc.state  LIKE CONCAT('%',#{weStoreCode.shopGuideState,jdbcType=VARCHAR},'%')
                             </when>
                             <otherwise>
                                 <if test="weStoreCode.storeCodeId != null and weStoreCode.area !=null and weStoreCode.area !=''">

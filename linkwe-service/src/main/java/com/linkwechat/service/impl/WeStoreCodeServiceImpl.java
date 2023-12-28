@@ -236,6 +236,9 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
 
     @Override
     public List<WeStoreShopGuideTrendVo> countStoreShopGuideTrend(WeStoreCode weStoreCode) {
+        if(StringUtils.isEmpty(weStoreCode.getArea())&&weStoreCode.getStoreCodeId()==null){
+            weStoreCode.setShopGuideState(WeComeStateContants.MDDG_STATE);
+        }
         return weStoreCodeCountMapper.countStoreShopGuideTrend(weStoreCode);
     }
 

@@ -270,6 +270,7 @@ public class WeStoreCodeController extends BaseController {
     public AjaxResult<List<WeStoreShopGuideTrendVo>> countStoreShopGuideTrend(WeStoreCode weStoreCode){
 
 
+
         return AjaxResult.success(
                 iWeStoreCodeService.countStoreShopGuideTrend(weStoreCode)
         );
