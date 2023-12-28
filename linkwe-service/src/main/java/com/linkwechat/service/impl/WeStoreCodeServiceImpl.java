@@ -120,7 +120,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                 if(StringUtils.isNotEmpty(shopGuideConfigId)){
                     qwCustomerClient.delContactWay(WeContactWayQuery.builder().config_id(shopGuideConfigId).build());
                     weStoreCode.setShopGuideUrl(null);
-                    weStoreCode.setShopGuideState(oldWeStoreCode.getShopGuideState());
+                    weStoreCode.setShopGuideState(null);
                     weStoreCode.setShopGuideConfigId(null);
                 }
 
@@ -129,7 +129,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                 if(StringUtils.isNotEmpty(groupCodeConfigId)){
                     qwCustomerClient.delJoinWayForGroupChat(WeGroupChatJoinWayQuery.builder().config_id(groupCodeConfigId).build());
                     weStoreCode.setGroupCodeUrl(null);
-                    weStoreCode.setGroupCodeState(oldWeStoreCode.getGroupCodeState());
+                    weStoreCode.setGroupCodeState(null);
                     weStoreCode.setGroupCodeConfigId(null);
                 }
             }
@@ -153,9 +153,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
             //创建群活码
             if(null != addGroupCode){
                 if(StringUtils.isNotEmpty(addGroupCode.getChatIdList())){
-                    if(StringUtils.isEmpty(weStoreCode.getGroupCodeState())){
-                        weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
-                    }
+                    weStoreCode.setGroupCodeState(WeComeStateContants.MDQM_STATE +weStoreCode.getId());
 
                     //配置进群方式
                     WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
@@ -191,7 +189,7 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
                 if(CollectionUtil.isNotEmpty(qrUserInfos)){
                     weQrAddQuery.setQrType(2);
                     WeAddWayQuery weContactWayByState = weQrAddQuery.getWeContactWayByState(
-                            StringUtils.isEmpty(weStoreCode.getShopGuideState())?WeComeStateContants.MDDG_STATE + weStoreCode.getId():weStoreCode.getShopGuideState());
+                            WeComeStateContants.MDDG_STATE + weStoreCode.getId());
                     List<String> user = weContactWayByState.getUser();
                     if(CollectionUtil.isNotEmpty(user)){
 
