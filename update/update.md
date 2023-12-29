@@ -282,3 +282,41 @@
 
      ● xxl-job更新日志
       DELETE  FROM xxl_job_info WHERE id=2
+## V5.0.5 (2023-12-21)
+      ● 升级日志
+         1.门店活码相关功能升级。
+         2.相关功能bug修复。
+
+     ● sql更新日志
+        DROP TABLE IF EXISTS `we_store_code`;
+        CREATE TABLE `we_store_code` (
+                `id` bigint(20) NOT NULL COMMENT '主键',
+                `store_name` varchar(100) CHARACTER SET utf8 DEFAULT NULL COMMENT '门店名称',
+                `province_id` int(11) DEFAULT NULL COMMENT '省id',
+                `city_id` int(11) DEFAULT NULL COMMENT '市id',
+                `area_id` int(11) DEFAULT NULL COMMENT '区id',
+                `area` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '省/市/区',
+                `address` varchar(300) CHARACTER SET utf8 DEFAULT NULL COMMENT '详细地址',
+                `longitude` varchar(100) CHARACTER SET utf8 DEFAULT NULL COMMENT '纬度',
+                `latitude` varchar(100) CHARACTER SET utf8 DEFAULT NULL COMMENT '经度',
+                `shop_guide_id` text CHARACTER SET utf8 COMMENT '导购id(we_user_id)，多个使用逗号隔开',
+                `shop_guide_name` text CHARACTER SET utf8 COMMENT '导购名称，多个使用逗号隔开',
+                `shop_guide_url` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '导购活码url',
+                `shop_guide_state` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '导购码渠道标识',
+                `shop_guide_config_id` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '导购码configId',
+                `group_code_url` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码',
+                `group_code_id` bigint(20) DEFAULT NULL COMMENT '群活码id',
+                `group_code_name` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码名称',
+                `group_code_config_id` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群码config',
+                `group_code_state` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群渠道标识',
+                `add_we_user_or_group_code` text CHARACTER SET utf8 COMMENT '添加员工或群活码',
+                `store_state` tinyint(1) DEFAULT '1' COMMENT '门店状态(0:启用;1:关闭)',
+                `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+                `create_by_id` bigint(20) DEFAULT NULL COMMENT '创建人id',
+                `create_time` datetime DEFAULT NULL COMMENT '创建人时间',
+                `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+                `update_by_id` bigint(20) DEFAULT NULL COMMENT '更新人id',
+                `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+                `del_flag` tinyint(1) DEFAULT '0' COMMENT '0:正常;1:删除;',
+                 PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
