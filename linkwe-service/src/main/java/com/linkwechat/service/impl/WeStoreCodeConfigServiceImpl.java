@@ -11,13 +11,16 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
 import com.linkwechat.domain.wecom.query.qr.WeAddWayQuery;
 import com.linkwechat.domain.wecom.vo.qr.WeAddWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.fegin.QwFileClient;
 import com.linkwechat.mapper.WeStoreCodeConfigMapper;
+import com.linkwechat.mapper.WeStoreCodeCountMapper;
 import com.linkwechat.service.IWeQrAttachmentsService;
 import com.linkwechat.service.IWeStoreCodeConfigService;
+import com.linkwechat.service.IWeStoreCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +44,12 @@ public class WeStoreCodeConfigServiceImpl extends ServiceImpl<WeStoreCodeConfigM
 
     @Autowired
     private LinkWeChatConfig linkWeChatConfig;
+
+
+    @Autowired
+    private IWeStoreCodeService iWeStoreCodeService;
+
+
 
 
     @Override
@@ -85,8 +94,13 @@ public class WeStoreCodeConfigServiceImpl extends ServiceImpl<WeStoreCodeConfigM
     }
 
     @Override
-    public WeStoreCodeConfig getWeStoreCodeConfig(Integer storeCodeType) {
-        return this.baseMapper.getWeStoreCodeConfig(storeCodeType);
+    public WeStoreCodeConfig getWeStoreCodeConfig(WxStoreCodeQuery wxStoreCodeQuery) {
+
+        if(wxStoreCodeQuery.getIsCount()){
+            iWeStoreCodeService.countUserBehavior(wxStoreCodeQuery);
+        }
+
+        return this.baseMapper.getWeStoreCodeConfig(wxStoreCodeQuery.getStoreCodeType());
     }
 
 
