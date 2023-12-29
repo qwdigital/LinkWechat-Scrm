@@ -1,7 +1,6 @@
 package com.linkwechat.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,6 +46,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -115,6 +116,8 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
+
+
     @Override
     @Transactional
     public void createWeSop(WeSopBase weSopBase) {
@@ -126,21 +129,33 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     if(iWeSopPushTimeService.save(weSopPushTime)){
                         List<WeMessageTemplate> weMessageTemplates = weSopPushTime.getAttachments();
                         if(CollectionUtil.isNotEmpty(weMessageTemplates)){
-                            iWeSopAttachmentsService.saveBatchBySopBaseId(weSopPushTime.getId(),weSopBase.getId(),weMessageTemplates);
-                            //发送mq消息生成执行任务
-                            rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
-                                    WeSopBaseDto.builder()
-                                            .sopBaseId(weSopBase.getId())
-                                            .isCreateOrUpdate(true).loginUser(
-                                                    SecurityUtils.getLoginUser()
-                                            ).build()
-                            ));
+                            Integer tip
+                                    = iWeSopAttachmentsService
+                                    .saveBatchBySopBaseId(weSopPushTime.getId(), weSopBase.getId(), weMessageTemplates);
+                            if(tip!=null){
+                                //发送mq消息生成执行任务
+                                this.sendCreateSopMessage(weSopBase.getId());
+                            }
 
                         }
                     }
                 });
             }
         }
+    }
+
+
+    //最大尝试次数为 3，初始延迟为 1000 毫秒，倍数为 2，最大延迟为 6000 毫秒。
+    @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 6000))
+    public void sendCreateSopMessage(Long sopBaseId) {
+        //发送mq消息生成执行任务
+        rabbitTemplate.convertAndSend(rabbitMQSettingConfig.getSopEx(), rabbitMQSettingConfig.getSopRk(), JSONObject.toJSONString(
+                WeSopBaseDto.builder()
+                        .sopBaseId(sopBaseId)
+                        .isCreateOrUpdate(true).loginUser(
+                                SecurityUtils.getLoginUser()
+                        ).build()
+        ));
     }
 
 
@@ -296,16 +311,16 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                     //设置执行成员
                     WeSopExecuteUserConditVo executeWeUser = k.getExecuteWeUser();
                     if(Objects.isNull(executeWeUser)){//执行成员为空则查询当前系统所有员工
-
-                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
-
-                        if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
-
-                            weSopListsVo.setExecuteUser(
-                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
-                                            .stream().collect(Collectors.joining(","))
-                            );
-                        }
+                         weSopListsVo.setExecuteUser("全部");
+//                        AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.findAllSysUser(null,null,null);
+//
+//                        if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
+//
+//                            weSopListsVo.setExecuteUser(
+//                                    listAjaxResult.getData().stream().map(SysUser::getUserName).collect(Collectors.toSet())
+//                                            .stream().collect(Collectors.joining(","))
+//                            );
+//                        }
                     }else{//查询成员，或者部门岗位
                         StringBuilder sb=new StringBuilder();
                         //设置具体执行员工
@@ -522,7 +537,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         List<WeGroupSopContentVo> weGroupSopContentVos=new ArrayList<>();
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeState, sopBaseId,executeTargetId,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             groupExecuteContent.stream().collect(Collectors.groupingBy(WeGroupSopBaseContentVo::getPushTimePre))
                     .forEach((k,v)->{
@@ -579,7 +594,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
         }
 
         List<WeGroupSopBaseContentVo> groupExecuteContent
-                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true);
+                = this.baseMapper.findGroupExecuteContent(chatId, executeSubState, null,null,true,SecurityUtils.getLoginUser().getSysUser().getWeUserId());
 
         if(CollectionUtil.isNotEmpty(groupExecuteContent)){
             List<WeSendGroupSopContentVo.WeGroupSop> weGroupSops =new ArrayList<>();
@@ -736,56 +751,65 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public Map<String, List<LinkGroupChatListVo>> builderExecuteGroup(WeSopBase weSopBase,WeSopExecuteConditVo executeCustomerOrGroup, Set<String> executeWeUserIds) {
+    public Map<String, List<LinkGroupChatListVo>> builderExecuteGroup(WeSopBase weSopBase,String chatId) {
+
         Map<String,List<LinkGroupChatListVo>> weGroupMap=new HashMap<>();
 
 
-        WeGroupChatQuery weGroupChatQuery = WeGroupChatQuery.builder()
-                .userIds(StringUtils.join(executeWeUserIds, ","))
-                .build();
-        //查询全部群
-        if(Objects.nonNull(executeCustomerOrGroup)){
-
-            //时间
-            WeSopExecuteConditVo.WeSopExecuteGroupTimeCondit weSopExecuteGroupTimeCondit
-                    = executeCustomerOrGroup.getWeSopExecuteGroupTimeCondit();
-            if(Objects.nonNull(weSopExecuteGroupTimeCondit)&&weSopExecuteGroupTimeCondit.isChange()){
-                weGroupChatQuery.setBeginTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getBeginTime()));
-                weGroupChatQuery.setEndTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getEndTime()));
-            }
-
-            //标签
-            WeSopExecuteConditVo.WeSopExecuteGroupTagIdsCondit weSopExecuteGroupTagIdsCondit
-                    = executeCustomerOrGroup.getWeSopExecuteGroupTagIdsCondit();
-            if(Objects.nonNull(weSopExecuteGroupTagIdsCondit)&&weSopExecuteGroupTagIdsCondit.isChange()){
-                weGroupChatQuery.setTagIds(StringUtils.join(weSopExecuteGroupTagIdsCondit.getTagIds(),","));
-            }
-
-            //上线
-            WeSopExecuteConditVo.WeSopExecuteGroupMemberLimitCondit weSopExecuteGroupMemberLimitCondit
-                    = executeCustomerOrGroup.getWeSopExecuteGroupMemberLimitCondit();
-            if(Objects.nonNull(weSopExecuteGroupMemberLimitCondit)&&weSopExecuteGroupMemberLimitCondit.isChange()){
-                weGroupChatQuery.setGroupMemberUp(weSopExecuteGroupMemberLimitCondit.getGroupMemberUp());
-                weGroupChatQuery.setGroupMemberDown(weSopExecuteGroupMemberLimitCondit.getGroupMemberDown());
-            }
-
+        //新客群SOP创建的时候直接过滤相关（针对创建的情况）
+        if(StringUtils.isEmpty(chatId)&&new Integer(4).equals(weSopBase.getBusinessType())){
+             return weGroupMap;
         }
-        List<LinkGroupChatListVo> weGroups =  iWeGroupService.getPageList(weGroupChatQuery);
-        if(CollectionUtil.isNotEmpty(weGroups)){
 
-            if (weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XQPY.getSopKey())) {
+        //查询出对应的成员所在的群
+        Set<String> executeWeUserIds = this.builderExecuteWeUserIds(weSopBase.getExecuteWeUser());
 
-                weGroups =  weGroups.stream().filter(LinkGroupChatListVo ->
-                        DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopBase.getCreateTime())).getTime()
-                                <= DateUtils.parseDate(DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, LinkGroupChatListVo.getAddTime())).getTime()
-                ).collect(Collectors.toList());
+
+        if(CollectionUtil.isNotEmpty(executeWeUserIds)){
+            WeGroupChatQuery weGroupChatQuery = WeGroupChatQuery.builder()
+                    .memberIds(StringUtils.join(executeWeUserIds, ","))
+                    .build();
+            if(StringUtils.isNotEmpty(chatId)){
+                weGroupChatQuery.setChatId(chatId);
+            }
+
+            WeSopExecuteConditVo executeCustomerOrGroup = weSopBase.getExecuteCustomerOrGroup();
+
+            if(Objects.nonNull(executeCustomerOrGroup)){
+                //时间
+                WeSopExecuteConditVo.WeSopExecuteGroupTimeCondit weSopExecuteGroupTimeCondit
+                        = executeCustomerOrGroup.getWeSopExecuteGroupTimeCondit();
+                if(Objects.nonNull(weSopExecuteGroupTimeCondit)&&weSopExecuteGroupTimeCondit.isChange()){
+                    weGroupChatQuery.setBeginTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getBeginTime()));
+                    weGroupChatQuery.setEndTime( DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD, weSopExecuteGroupTimeCondit.getEndTime()));
+                }
+
+                //标签
+                WeSopExecuteConditVo.WeSopExecuteGroupTagIdsCondit weSopExecuteGroupTagIdsCondit
+                        = executeCustomerOrGroup.getWeSopExecuteGroupTagIdsCondit();
+                if(Objects.nonNull(weSopExecuteGroupTagIdsCondit)&&weSopExecuteGroupTagIdsCondit.isChange()){
+                    weGroupChatQuery.setTagIds(StringUtils.join(weSopExecuteGroupTagIdsCondit.getTagIds(),","));
+                }
+
+                //客群人数上限范围
+                WeSopExecuteConditVo.WeSopExecuteGroupMemberLimitCondit weSopExecuteGroupMemberLimitCondit
+                        = executeCustomerOrGroup.getWeSopExecuteGroupMemberLimitCondit();
+                if(Objects.nonNull(weSopExecuteGroupMemberLimitCondit)&&weSopExecuteGroupMemberLimitCondit.isChange()){
+                    weGroupChatQuery.setGroupMemberUp(weSopExecuteGroupMemberLimitCondit.getGroupMemberUp());
+                    weGroupChatQuery.setGroupMemberDown(weSopExecuteGroupMemberLimitCondit.getGroupMemberDown());
+                }
 
             }
+
+            List<LinkGroupChatListVo> weGroups =  iWeGroupService.selectChatByMember(weGroupChatQuery);
 
             weGroupMap.putAll(
-                    weGroups.stream().distinct().collect(Collectors.groupingBy(LinkGroupChatListVo::getOwner))
+                    weGroups.stream().distinct().collect(Collectors.groupingBy(LinkGroupChatListVo::getMemberId))
             );
         }
+
+
+
 
 
 
@@ -801,7 +825,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
         //1.查询执行成员
         if(Objects.isNull(executeWeUser)){//全部成员
-            AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.list(new SysUser());
+            AjaxResult<List<SysUser>> listAjaxResult = qwSysUserClient.listByQuery(new SysUser());
 
             if(null != listAjaxResult&&CollectionUtil.isNotEmpty(listAjaxResult.getData())){
                 executeWeUserIds.addAll(
@@ -854,7 +878,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     }
 
     @Override
-    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate, boolean buildXkSopPlan) {
+    public void builderExecuteCustomerSopPlan(WeSopBase weSopBase, Map<String, List<WeCustomersVo>> executeWeCustomers, boolean isCreateOrUpdate1, boolean buildXkSopPlan) {
         if(CollectionUtil.isNotEmpty(executeWeCustomers)){
             List<WeSopExecuteTarget> weSopExecuteTargets=new ArrayList<>();
             executeWeCustomers.forEach((k,v)->{
@@ -874,10 +898,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
             if(CollectionUtil.isNotEmpty(weSopExecuteTargets)){
 
                 //处理不满足当前条件的生效客户(针对客户sop编辑)
-                if(!isCreateOrUpdate){
-                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
-                }
+//                if(!isCreateOrUpdate){
+//                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
+//                }
 
 
                 if(executeTargetService.saveOrUpdateBatch(weSopExecuteTargets)){
@@ -997,12 +1021,13 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
             }
-        } else{
-
-            //处理不满足当前条件的生效客群(针对客客户sop编辑)
-            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                    new ArrayList<>());
         }
+//        else{
+//
+//            //处理不满足当前条件的生效客群(针对客客户sop编辑)
+//            executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                    new ArrayList<>());
+//        }
     }
 
     @Override
@@ -1030,11 +1055,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
             if(CollectionUtil.isNotEmpty(weSopExecuteTargets)) {
 
-                if(!isCreateOrUpdate){
-                    //处理不满足当前条件的生效客群(针对客群sop编辑)
-                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
-                }
+//                if(!isCreateOrUpdate){
+//                    //处理不满足当前条件的生效客群(针对客群sop编辑)
+//                    executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                            weSopExecuteTargets.stream().map(WeSopExecuteTarget::getTargetId).collect(Collectors.toList()));
+//                }
 
                 if (executeTargetService.saveOrUpdateBatch(weSopExecuteTargets)) {
 
@@ -1057,16 +1082,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
                                 if(weSopPushTimeDto.getPushTimeType()==2) {//设置推送时间,周期推送，先计算出当前时间至周日下的推送,后续客每周日运行定时任务生成下一周的执行计划
                                     //获取当天是周几
-//                                    int currentWeek = DateUtil.dayOfWeek(new Date());
-//
-//                                    if(currentWeek-1<=new Integer(weSopPushTimeDto.getPushTimePre())){//生成符合条件当前日期下到周日的具体时间
 
                                     Integer weekDay = Integer.parseInt(weSopPushTimeDto.getPushTimePre());
                                     weekDay = weekDay % 7 + 1;
 
-                                        //执行日期
-//                                    String executeData
-//                                            = WeekDateUtils.GetCurrentWeekAllDate().get(Integer.parseInt(weSopPushTimeDto.getPushTimePre()));
+                                    //执行日期
                                     String executeData
                                             = WeekDateUtils.GetCurrentWeekAllDate().get(weekDay);
 
@@ -1074,9 +1094,9 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                             Date pushEndTime
                                                     = DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS, executeData + " " + weSopPushTimeDto.getPushEndTime());
 
-                                                    if(new Date().before(
-                                                            pushEndTime
-                                                    )){
+//                                                    if(new Date().before(
+//                                                            pushEndTime
+//                                                    )){
 
                                                         attachments.setPushStartTime(
                                                                 DateUtils.dateTime(DateUtils.YYYY_MM_DD_HH_MM_SS,executeData+" "+weSopPushTimeDto.getPushStartTime())
@@ -1087,11 +1107,10 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
                                                         );
 
 
-                                                    }
+//                                                    }
 
                                         }
 
-//                                    }
 
 
 
@@ -1125,11 +1144,16 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
                                 if(weSopBase.getBusinessType().equals(SopType.SOP_TYPE_XQPY.getSopKey())){
-                                    if(buildXkSopPlan){
-                                        targetAttachments.add(attachments);
+                                    if(buildXkSopPlan) {
+                                        if (attachments.getPushStartTime() != null && attachments.getPushEndTime() != null){
+                                            targetAttachments.add(attachments);
+                                         }
                                     }
                                 }else{
-                                    targetAttachments.add(attachments);
+                                    if(attachments.getPushStartTime() != null && attachments.getPushEndTime() != null){
+                                        targetAttachments.add(attachments);
+                                    }
+
                                 }
 
 
@@ -1189,11 +1213,11 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
 
 
 
-        else{
-                //处理不满足当前条件的生效客群(针对客群sop编辑)
-                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
-                        new ArrayList<>());
-        }
+//        else{
+//                //处理不满足当前条件的生效客群(针对客群sop编辑)
+//                executeTargetService.editSopExceptionEnd(weSopBase.getId(),
+//                        new ArrayList<>());
+//        }
     }
 
 
@@ -1276,6 +1300,7 @@ public class WeSopBaseServiceImpl extends ServiceImpl<WeSopBaseMapper, WeSopBase
     public void updateSopState(String sopId, Integer sopState) {
         this.baseMapper.updateSopState(sopId,sopState);
     }
+
 
 
 }

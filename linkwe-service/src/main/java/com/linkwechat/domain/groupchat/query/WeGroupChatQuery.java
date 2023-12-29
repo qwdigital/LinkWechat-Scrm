@@ -19,27 +19,41 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WeGroupChatQuery{
 
-    @ApiModelProperty(value = "主键Id")
+    /**
+     * 主键Id
+     */
     private Long id;
 
-    @ApiModelProperty(value = "群聊Id")
+    /**
+     * 群聊Id
+     */
     private String chatId;
 
-    @ApiModelProperty(value = "群名")
+    /**
+     * 群名
+     */
     private String groupName;
 
-    @ApiModelProperty(value = "群主userId")
+    /**
+     * 群主userId
+     */
     private String userIds;
 
-    @ApiModelProperty(value = "标签ID")
+    /**
+     * 群成员id，多个使用逗号隔开
+     */
+    private String memberIds;
+
+    /**
+     * 标签ID
+     */
     private String tagIds;
 
     /** 开始时间 */
-    @ApiModelProperty("开始时间")
+
     private String beginTime;
 
     /** 结束时间 */
-    @ApiModelProperty("结束时间")
     private String endTime;
 
 
@@ -56,4 +70,7 @@ public class WeGroupChatQuery{
     private Integer groupMemberUp;
     //群人数下限
     private Integer groupMemberDown;
+
+    //群成员名称
+    private String memberName;
 }

@@ -51,5 +51,11 @@ public class SynchRecordConstants {
      * 离职分配
      */
     public static final int SYNCH_LEAVE_USER = 9;
+
+
+    /**
+     * 商品图册订单
+     */
+    public static final int SYNCH_SPTC_ORDER=10;
 }
 

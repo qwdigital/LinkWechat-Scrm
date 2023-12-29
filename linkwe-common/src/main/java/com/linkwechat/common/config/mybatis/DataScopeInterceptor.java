@@ -179,14 +179,16 @@ public class DataScopeInterceptor extends JsqlParserSupport implements InnerInte
         }
 
         SysUser sysUser = loginUser.getSysUser();
+
+
+
         StringBuilder sqlString = new StringBuilder();
 
         if(null != sysUser){
             DataScopeType type = DataScopeType.of(String.valueOf(sysUser.getDataScope()));
 
-
             switch (type){
-                 case DATA_SCOPE_ALL:
+                case DATA_SCOPE_ALL:
                     pearlDataScopeHandler.setWhereForAll(plainSelect, dataScope, sysUser);
                     return;
                 case DATA_SCOPE_CUSTOM:

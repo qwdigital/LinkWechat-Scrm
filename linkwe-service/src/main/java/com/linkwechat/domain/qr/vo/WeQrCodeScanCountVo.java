@@ -21,6 +21,18 @@ public class WeQrCodeScanCountVo {
     @ApiModelProperty("累计扫码次数")
     private Integer total = 0;
 
+    @ApiModelProperty("短链访问总数")
+    private Integer linkVisitsTotal = 0;
+
+    @ApiModelProperty("短链访问总人数")
+    private Integer linkVisitsPeopleTotal = 0;
+
+    @ApiModelProperty("短链今日访问总数")
+    private Integer todayLinkVisitsTotal = 0;
+
+    @ApiModelProperty("短链今日访问总人数")
+    private Integer todayLinkVisitsPeopleTotal = 0;
+
     @ApiModelProperty("时间横坐标")
     private List<String> xAxis;
 

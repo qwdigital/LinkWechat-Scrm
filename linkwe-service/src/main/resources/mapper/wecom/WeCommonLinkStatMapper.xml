@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeCommonLinkStatMapper">
+
+    <resultMap type="com.linkwechat.domain.WeCommonLinkStat" id="WeCommonLinkStatResult">
+                <result property="id" column="id" jdbcType="INTEGER"/>
+                <result property="shortId" column="short_id" jdbcType="INTEGER"/>
+                <result property="dateTime" column="date_time" jdbcType="VARCHAR"/>
+                <result property="type" column="type" jdbcType="VARCHAR"/>
+                <result property="pvNum" column="pv_num" jdbcType="INTEGER"/>
+                <result property="uvNum" column="uv_num" jdbcType="INTEGER"/>
+                <result property="openNum" column="open_num" jdbcType="INTEGER"/>
+                <result property="remark" column="remark" jdbcType="VARCHAR"/>
+                <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+                <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+                <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+                <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+                <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+                <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+                <result property="delFlg" column="del_flag" jdbcType="INTEGER"/>
+            </resultMap>
+
+    <sql id="selectWeCommonLinkStatVo">
+        select id, short_id, date_time, type, pv_num, uv_num, open_num, remark, create_by, create_by_id, create_time, update_by, update_by_id, update_time, del_flag from we_common_link_stat
+    </sql>
+
+</mapper>

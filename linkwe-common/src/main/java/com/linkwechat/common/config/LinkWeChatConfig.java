@@ -275,6 +275,15 @@ public class LinkWeChatConfig {
      * 混元大模型地区
      */
     private String txAiRegion;
+    /**
+     * 活码短链域名
+     */
+    private String qrShortLinkDomainName;
+
+    /**
+     * 群活码短链域名
+     */
+    private String qrGroupShortLinkDomainName;
 
     public String getName() {
         return name;

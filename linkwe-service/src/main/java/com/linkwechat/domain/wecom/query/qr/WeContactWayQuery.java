@@ -1,7 +1,10 @@
 package com.linkwechat.domain.wecom.query.qr;
 
 import com.linkwechat.domain.wecom.query.WeBaseQuery;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author danmo
@@ -9,6 +12,9 @@ import lombok.Data;
  * @date 2021/12/2 16:11
  **/
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeContactWayQuery extends WeBaseQuery {
     /**
      * 联系方式的配置id

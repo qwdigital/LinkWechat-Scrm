@@ -159,7 +159,7 @@ public class WeSensitiveServiceImpl extends ServiceImpl<WeSensitiveMapper, WeSen
                 if (scope.getScopeType().equals(WeConstans.USE_SCOP_BUSINESSID_TYPE_USER)) {
                     users.add(scope.getAuditScopeId());
                 } else {
-                    List<SysUser> userList = qwSysUserClient.list(SysUser.builder().deptId(Long.parseLong(scope.getAuditScopeId())).build()).getData();
+                    List<SysUser> userList = qwSysUserClient.listByQuery(SysUser.builder().deptId(Long.parseLong(scope.getAuditScopeId())).build()).getData();
                     if(CollectionUtil.isEmpty(userList)){
                         throw new WeComException("未查询到有效员工");
                     }

@@ -16,8 +16,10 @@ import com.linkwechat.common.constant.SiteStatsConstants;
 import com.linkwechat.common.enums.CategoryMediaType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.common.utils.ip.IpUtils;
 import com.linkwechat.domain.WeFormSurveyAnswer;
 import com.linkwechat.domain.WeFormSurveyCatalogue;
+import com.linkwechat.domain.WeFormSurveyCount;
 import com.linkwechat.domain.form.query.WeAddFormSurveyCatalogueQuery;
 import com.linkwechat.domain.form.query.WeFormSurveyCatalogueQuery;
 import com.linkwechat.domain.material.entity.WeCategory;
@@ -27,6 +29,7 @@ import com.linkwechat.mapper.WeCategoryMapper;
 import com.linkwechat.mapper.WeFormSurveyAnswerMapper;
 import com.linkwechat.mapper.WeFormSurveyCatalogueMapper;
 import com.linkwechat.service.IWeFormSurveyCatalogueService;
+import com.linkwechat.service.IWeFormSurveyCountService;
 import com.linkwechat.service.IWeFormSurveyStatisticsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,10 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
 
     @Resource
     private LinkWeChatConfig linkWeChatConfig;
+
+
+    @Resource
+    private IWeFormSurveyCountService iWeFormSurveyCountService;
 
     @Override
     public Long add(WeAddFormSurveyCatalogueQuery query) {
@@ -108,9 +115,14 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
         update(catalogue, new LambdaQueryWrapper<WeFormSurveyCatalogue>().eq(WeFormSurveyCatalogue::getId, query.getId()));
     }
 
+
     @Override
-    public WeFormSurveyCatalogue getInfo(Long id) {
+    public WeFormSurveyCatalogue getInfo(Long id,String ipAddress,String dataSource,boolean isCount) {
         WeFormSurveyCatalogue weFormSurveyCatalogue = weFormSurveyCatalogueMapper.getWeFormSurveyCatalogueById(id);
+        if(isCount){
+            iWeFormSurveyCountService.weFormCount(id,dataSource,ipAddress);
+        }
+
         return weFormSurveyCatalogue;
     }
 
@@ -144,19 +156,23 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
                     weFormSurveyCatalogue.setGroupName(category.getName());
                 }
                 //总访问量和有效收集量
-                String channelsName = weFormSurveyCatalogue.getChannelsName();
-                Integer pv = 0;
-                String[] split = channelsName.split(",");
-                for (String channelName : split) {
-                    //PV
-                    String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
-                    Object o = redisTemplate.opsForValue().get(pvKey);
-                    if (o != null) {
-                        pv += (Integer) o;
-                    }
-                }
+//                String channelsName = weFormSurveyCatalogue.getChannelsName();
+//                Integer pv = 0;
+//                String[] split = channelsName.split(",");
+//                for (String channelName : split) {
+//                    //PV
+//                    String pvKey = StringUtils.format(SiteStatsConstants.PREFIX_KEY_PV, weFormSurveyCatalogue.getId(), channelName);
+//                    Object o = redisTemplate.opsForValue().get(pvKey);
+//                    if (o != null) {
+//                        pv += (Integer) o;
+//                    }
+//                }
+
+
                 //总访问数
-                weFormSurveyCatalogue.setTotalVisits(pv);
+                weFormSurveyCatalogue.setTotalVisits(
+                        iWeFormSurveyCountService.sumTotalVisits(weFormSurveyCatalogue.getId())
+                );
                 //有效的收集量
                 QueryWrapper<WeFormSurveyAnswer> wrapper = new QueryWrapper<>();
                 wrapper.lambda().eq(WeFormSurveyAnswer::getBelongId, weFormSurveyCatalogue.getId());
@@ -253,6 +269,7 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
     public void updateByIdIgnoreTenantId(WeFormSurveyCatalogue weFormSurveyCatalogue) {
         weFormSurveyCatalogueMapper.updateByIdIgnoreTenantId(weFormSurveyCatalogue);
     }
+
 
 
 }

@@ -16,6 +16,7 @@ import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageExecuteUsertipVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -366,6 +367,12 @@ public interface IWeCustomerService extends IService<WeCustomer> {
      * @return
      */
     List<WeAddGroupMessageQuery.SenderInfo> findLimitSenderInfoWeCustomerList();
+
+
+
+
+    List<WeCustomerChannelCountVo> getCustomerNumByState(String state, Date startTime, Date endTime);
+
 
 
 

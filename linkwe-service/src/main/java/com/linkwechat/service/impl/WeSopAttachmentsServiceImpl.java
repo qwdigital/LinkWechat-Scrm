@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.domain.media.WeMessageTemplate;
 import com.linkwechat.domain.sop.WeSopAttachments;
 import com.linkwechat.domain.sop.vo.WeSopAttachmentVo;
@@ -27,16 +28,17 @@ public class WeSopAttachmentsServiceImpl extends ServiceImpl<WeSopAttachmentsMap
 implements IWeSopAttachmentsService {
 
     @Override
-    public void saveBatchBySopBaseId(Long sopPushTimeId,Long sopBaseId, List<WeMessageTemplate> attachments) {
+    public Integer saveBatchBySopBaseId(Long sopPushTimeId,Long sopBaseId, List<WeMessageTemplate> attachments) {
         List<WeSopAttachments> attachmentsList = Optional.ofNullable(attachments)
                 .orElseGet(ArrayList::new).stream().map(weQrAttachmentsQuery -> {
                     WeSopAttachments weQrAttachments = new WeSopAttachments();
                     BeanUtil.copyProperties(weQrAttachmentsQuery, weQrAttachments);
                     weQrAttachments.setSopBaseId(sopBaseId);
                     weQrAttachments.setSopPushTimeId(sopPushTimeId);
+                    weQrAttachments.setDelFlag(Constants.COMMON_STATE);
                     return weQrAttachments;
                 }).collect(Collectors.toList());
-        saveOrUpdateBatch(attachmentsList);
+        return this.baseMapper.insertBatchSomeColumn(attachmentsList);
     }
 
     @Override

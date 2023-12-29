@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.linkwechat.common.constant.WeConstans;
 import com.linkwechat.common.enums.WelcomeMsgTypeEnum;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -77,7 +78,18 @@ public class WeQrAddQuery {
     @ApiModelProperty(value = "渠道",hidden = true)
     private String state;
 
+    /**
+     * 欢迎语开关
+     */
+    @ApiModelProperty("欢迎语开关 1-不发送欢迎语，2-发送欢迎语")
+    private Integer qrWelcomeOpen;
 
+
+    /**
+     * 是否优先员工欢迎语
+     */
+    @ApiModelProperty("是否优先员工欢迎语 0-否，1-是（仅欢迎语开关为2是生效）")
+    private Integer qrPriorityUserWelcome;
 
     /**
      * 企微接口参数生成方法
@@ -85,12 +97,47 @@ public class WeQrAddQuery {
      * @return 企微接口参数实体类
      */
     public WeAddWayQuery getWeContactWay() {
+//        WeAddWayQuery weContactWay = new WeAddWayQuery();
+//        //根据类型生成相应的活码
+//        if(this.qrId == null){
+//            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
+//            this.state = WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + snowflake.nextIdStr();
+//            weContactWay.setState(state);
+//        }
+//        weContactWay.setIs_exclusive(BooleanUtils.toBoolean(this.isExclusive));
+//        weContactWay.setConfig_id(this.configId);
+//        weContactWay.setType(this.qrType);
+//        weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
+//        weContactWay.setSkip_verify(BooleanUtils.toBoolean(this.qrAutoAdd));
+//        if (CollectionUtil.isNotEmpty(qrUserInfos)) {
+//            //员工列表
+//            List<String> userIdArr = qrUserInfos.stream().map(WeQrUserInfoQuery::getUserIds)
+//                    .filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.toList());
+//            if (CollectionUtil.isNotEmpty(userIdArr)) {
+//                weContactWay.setUser(userIdArr);
+//            }
+//            //部门列表
+//            List<Long> partyArr = qrUserInfos.stream().map(WeQrUserInfoQuery::getPartys)
+//                    .filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.toList());
+//            if (CollectionUtil.isNotEmpty(partyArr)) {
+//                weContactWay.setParty(partyArr);
+//            }
+//        }
+//        return weContactWay;
+        return  getWeContactWayByState(WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6)).nextIdStr());
+    }
+
+
+    /**
+     * 设置渠道活码
+     * @param channelState
+     * @return
+     */
+    public WeAddWayQuery getWeContactWayByState(String channelState){
         WeAddWayQuery weContactWay = new WeAddWayQuery();
         //根据类型生成相应的活码
         if(this.qrId == null){
-            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-            this.state = WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + snowflake.nextIdStr();
-            weContactWay.setState(state);
+            weContactWay.setState(channelState);
         }
         weContactWay.setIs_exclusive(BooleanUtils.toBoolean(this.isExclusive));
         weContactWay.setConfig_id(this.configId);
@@ -114,7 +161,6 @@ public class WeQrAddQuery {
         return weContactWay;
     }
 
-
     /**
      * 获取数据表实体
      * @return
@@ -137,6 +183,8 @@ public class WeQrAddQuery {
         }
         weQrCode.setConfigId(configId);
         weQrCode.setQrCode(qrCode);
+        weQrCode.setQrWelcomeOpen(this.qrWelcomeOpen);
+        weQrCode.setQrPriorityUserWelcome(this.qrPriorityUserWelcome);
         return weQrCode;
     }
 

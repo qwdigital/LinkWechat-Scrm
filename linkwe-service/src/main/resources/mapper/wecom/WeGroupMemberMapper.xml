@@ -109,6 +109,24 @@
         </where>
     </select>
 
+    <select id="getMemberNumByState" resultType="com.linkwechat.domain.groupchat.vo.WeGroupChannelCountVo">
+        select
+        date_format(join_time,'%Y-%m-%d') as `date`,
+        count(distinct user_id) as member_number,
+        count(distinct case when del_flag = 0 then user_id end) as  efficient_number
+        from we_group_member
+        where id in (select id
+        from we_group_member where state=#{state}
+        <if test="startTime != null "><!-- 开始时间检索 -->
+            and date_format(join_time,'%y-%m-%d') &gt;= date_format(#{startTime},'%y-%m-%d')
+        </if>
+        <if test="endTime != null "><!-- 结束时间检索 -->
+            and date_format(join_time,'%y-%m-%d') &lt;= date_format(#{endTime},'%y-%m-%d')
+        </if>
+        )
+        group by join_time
+    </select>
+
     <update id="quitGroup">
         UPDATE we_group_member
         SET quit_scene = #{quitScene},
@@ -124,6 +142,35 @@
     <delete id="physicalDelete">
         DELETE FROM we_group_member where chat_id=#{chatId} AND user_id=#{userId} and del_flag =0
     </delete>
+
+    <select id="findWeCustomerDeduplication" resultType="com.linkwechat.domain.groupchat.vo.WeCustomerDeduplicationVo">
+        SELECT
+            wc.external_userid,
+            wc.customer_name,
+            wc.avatar,
+            wc.gender,
+            wc.customer_type,
+            wc.is_join_blacklist,
+            wc.update_time,
+            GROUP_CONCAT(DISTINCT su.we_user_id) AS weUserIds,
+            GROUP_CONCAT(DISTINCT su.user_name) AS addWeUserNames,
+            GROUP_CONCAT(DISTINCT wg.group_name) AS joinGroupNames,
+            count(DISTINCT wg.chat_id) as groupNumber
+        FROM
+            we_group_member wgm
+                LEFT JOIN we_customer wc ON wgm.user_id = wc.external_userid
+                LEFT JOIN sys_user su ON su.we_user_id = wc.add_user_id
+                LEFT JOIN we_group wg ON wg.chat_id = wgm.chat_id
+        WHERE
+            wc.external_userid IS NOT NULL and wgm.quit_scene is NULL
+        <if test="customerName != null and customerName !=''">
+           and  wc.customer_name LIKE CONCAT('%', #{customerName}, '%')
+        </if>
+        GROUP BY
+            wc.external_userid
+        HAVING
+            groupNumber > 1
+    </select>
 
 
 </mapper>

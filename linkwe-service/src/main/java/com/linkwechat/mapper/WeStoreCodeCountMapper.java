@@ -3,6 +3,8 @@ package com.linkwechat.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo;
 import com.linkwechat.domain.storecode.vo.drum.WeStoreGroupDrumVo;
@@ -24,7 +26,7 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      * @return
      */
 
-    WeStoreShopGuideTabVo countWeStoreShopGuideTab();
+    WeStoreShopGuideTabVo countWeStoreShopGuideTab(@Param("state") String state);
 
     /**
      * 门店统计-头部tab
@@ -33,7 +35,7 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      * @param groupCodeId
      * @return
      */
-    WeStoreTabVo countWeStoreTab(@Param("storeCodeId") Long storeCodeId, @Param("groupCodeId") Long groupCodeId);
+    WeStoreTabVo countWeStoreTab(@Param("storeCodeId") Long storeCodeId);
 
 
     /**
@@ -41,7 +43,7 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      *
      * @return
      */
-    WeStoreGroupTabVo countWeStoreGroupTab();
+    WeStoreGroupTabVo countWeStoreGroupTab(@Param("state") String state);
 
 
     /**
@@ -98,5 +100,13 @@ public interface WeStoreCodeCountMapper extends BaseMapper<WeStoreCodeCount> {
      * @return
      */
     List<WeStoreGroupTrendVo> countStoreGroupTrend(@Param("weStoreCode") WeStoreCode weStoreCode);
+
+
+    /**
+     * 获取数据明细
+     * @param weStoreCodeQuery
+     * @return
+     */
+    List<WeStoreCodeTableVo> findWeStoreCodeTables(@Param("query") WeStoreCodeQuery weStoreCodeQuery);
 
 }

@@ -61,28 +61,7 @@
         left join we_group_member wgm on wg.id = wgm.group_id and wgm.del_flag = 0
     </sql>
 
-<!--    <select id="getGroupChatIdList" resultType="java.lang.Long">-->
-<!--        select-->
-<!--            distinct wg.id from we_group wg-->
-<!--        left join we_group_member wgm on wg.id = wgm.group_id and wgm.del_flag = 0-->
-<!--        <where>-->
-<!--            <if test="chatId != null and chatId != ''">-->
-<!--                and wg.chat_id = #{chatId}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--    </select>-->
 
-<!--    <select id="getGroupChatListByIds" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatVo">-->
-<!--        <include refid="getDetail"/>-->
-<!--        <where>-->
-<!--            <if test="groupIdList != null and groupIdList.size > 0">-->
-<!--            and wg.id in-->
-<!--                <foreach item="groupId" collection="groupIdList" index="index" open="(" separator="," close=")">-->
-<!--                    #{groupId}-->
-<!--                </foreach>-->
-<!--            </if>-->
-<!--        </where>-->
-<!--    </select>-->
 
 
     <select id="findWeGroupListIds"  resultType="java.lang.String">
@@ -110,13 +89,12 @@
         <if test="query.groupLeaderName != null  and query.groupLeaderName != ''">
             and su.user_name like concat('%', #{query.groupLeaderName}, '%')
         </if>
+        <if test="query.beginTime != null and query.beginTime != '' and query.endTime != null and query.endTime != ''">
+            AND  date_format(wg.add_time,'%Y-%m-%d') BETWEEN #{query.beginTime} AND #{query.endTime}
+        </if>
 
-        <if test="query.beginTime != null and query.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(wg.add_time,'%y%m%d') &gt;= date_format(#{query.beginTime},'%y%m%d')
-        </if>
-        <if test="query.endTime != null and query.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(wg.add_time,'%y%m%d') &lt;= date_format(#{query.endTime},'%y%m%d')
-        </if>
+
+
         <if test="query.userIds != null and query.userIds !=''">
             <if test="query.userIds.indexOf(',') != -1">
                 AND wg.`owner` in
@@ -135,6 +113,7 @@
             </foreach>
         </if>
         GROUP BY wg.id
+        ORDER BY wg.add_time desc
         <if test="pageDomain !=null">
             <if test="pageDomain.pageNum !=null and pageDomain.pageSize !=null">
                 limit ${pageDomain.pageSize * (pageDomain.pageNum-1)}, #{pageDomain.pageSize}
@@ -408,15 +387,51 @@
             wgm.join_time
         FROM
             we_group wg
-                LEFT JOIN we_group_member wgm on wg.chat_id=wgm.chat_id
+        LEFT JOIN we_group_member wgm on wg.chat_id=wgm.chat_id
         where
-            wgm.quit_scene IS  NULL
-            <if test="chatUserId != null and chatUserId !=''">
-               and wgm.user_id = #{chatUserId}
+           wg.del_flag=0 and wgm.quit_scene IS  NULL
+            <if test="chatUserId !=null and chatUserId !=''">
+                AND wgm.user_id in
+                <foreach collection="chatUserId.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="state != null and state !=''">
                 AND wgm.state = #{state}
             </if>
+    </select>
+    <select id="selectChatByMember" resultType="com.linkwechat.domain.groupchat.vo.LinkGroupChatListVo">
+        SELECT
+            wg.chat_id,
+            wg.add_time,
+            wgm.user_id as memberId,
+            (SELECT count(wgmm.id) from we_group_member wgmm where wgmm.chat_id=wg.chat_id and wgmm.quit_scene IS NULL) as memberNum
+        FROM
+            we_group wg
+            LEFT JOIN we_group_member wgm ON wg.chat_id = wgm.chat_id and wgm.quit_scene is NULL
+            LEFT JOIN we_group_tag_rel wgtr ON wgtr.chat_id=wg.chat_id and wgtr.del_flag=0
+       where wg.del_flag=0
+            <if test="query.beginTime != null and query.beginTime != '' and query.endTime != null and query.endTime != ''">
+                AND  date_format(wg.add_time,'%Y-%m-%d') BETWEEN #{weCustomerList.beginTime} AND #{weCustomerList.endTime}
+            </if>
+            <if test="query.tagIds !=null and query.tagIds !=''">
+                AND  wgtr.tag_id in
+                <foreach collection="query.tagIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="query.memberIds !=null and query.memberIds !=''">
+                and wgm.user_id in
+                <foreach collection="query.memberIds.split(',')" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+           <if test="query.groupMemberUp != null and query.groupMemberDown != null">
+               and  memberNum BETWEEN #{query.groupMemberUp} and #{query.groupMemberDown}
+           </if>
+          <if test="query.chatId !=null and query.chatId !=''">
+              and wg.chat_id=#{query.chatId}
+          </if>
     </select>
 
 

@@ -201,7 +201,7 @@ public class WeSopController extends BaseController {
     @PutMapping("/updateWeSop")
     public AjaxResult updateWeSop(@RequestBody WeSopBase weSopBase){
         WeSopBase weSopBasee = iWeSopBaseService.getById(weSopBase.getId());
-        if(weSopBasee.getSopState().equals(2)){
+        if(weSopBasee.getSopState().equals(1)){
            return AjaxResult.error("当前sop为执行中不可修改");
         }
 

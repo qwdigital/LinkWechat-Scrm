@@ -1,6 +1,7 @@
 package com.linkwechat.fallback;
 
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.domain.wecom.query.WeCorpQrQuery;
 import com.linkwechat.domain.wecom.query.user.WeLeaveUserQuery;
 import com.linkwechat.domain.wecom.query.user.WeUserListQuery;
@@ -53,6 +54,11 @@ public class QwUserFallbackFactory implements QwUserClient {
 
     @Override
     public AjaxResult<WeLeaveUserVo> getUnassignedList(WeLeaveUserQuery query) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<SysUser> listByQuery(SysUser sysUser) {
         return null;
     }
 }
