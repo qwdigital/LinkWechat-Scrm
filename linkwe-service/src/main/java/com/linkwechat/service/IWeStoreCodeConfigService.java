@@ -2,6 +2,7 @@ package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
 import org.apache.ibatis.annotations.Param;
 
 import java.io.IOException;
@@ -18,9 +19,9 @@ public interface IWeStoreCodeConfigService extends IService<WeStoreCodeConfig> {
 
     /**
      * 获取对应的门店相关配置
-     * @param storeCodeType
+     * @param wxStoreCodeQuery
      * @return
      */
-    WeStoreCodeConfig getWeStoreCodeConfig(Integer storeCodeType);
+    WeStoreCodeConfig getWeStoreCodeConfig(WxStoreCodeQuery wxStoreCodeQuery);
 
 }

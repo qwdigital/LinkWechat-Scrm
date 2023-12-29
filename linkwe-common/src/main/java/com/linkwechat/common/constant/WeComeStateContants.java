@@ -20,4 +20,16 @@ public class WeComeStateContants {
      * 标签建群
      */
     public final static String BQJQ_STATE="bqjq_";
+
+
+    /**
+     * 门店活码导购渠道标识
+     */
+    public final static String MDDG_STATE="mddg_";
+
+
+    /**
+     * 门店群码渠道标识
+     */
+    public final static String MDQM_STATE="mdqm_";
 }
