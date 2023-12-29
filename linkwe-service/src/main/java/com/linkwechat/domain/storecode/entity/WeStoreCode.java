@@ -67,6 +67,7 @@ public class WeStoreCode extends BaseEntity {
      * 添加员工或群活码
      */
     @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
+    @ExcelIgnore
     private WeBuildUserOrGroupConditVo addWeUserOrGroupCode;
 
     @TableLogic
