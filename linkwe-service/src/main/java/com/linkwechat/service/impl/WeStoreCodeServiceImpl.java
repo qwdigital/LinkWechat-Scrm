@@ -351,5 +351,10 @@ public class WeStoreCodeServiceImpl extends ServiceImpl<WeStoreCodeMapper, WeSto
             return weStoreCodeCountMapper.findWeStoreCodeTables(weStoreCodeQuery);
         }
 
+    @Override
+    public void batchUpdateState(Integer storeState, List<Long> ids) {
+        this.baseMapper.batchUpdateState(storeState,ids);
+    }
+
 
 }
