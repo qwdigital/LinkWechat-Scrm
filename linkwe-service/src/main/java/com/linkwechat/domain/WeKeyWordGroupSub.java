@@ -40,6 +40,12 @@ public class WeKeyWordGroupSub extends BaseEntity {
      */
     private String chatIdList;
 
+
+    /**
+     *  实际群id，多个使用逗号隔开
+     */
+    private String groupCodeName;
+
     /**
      * 当群满了后，是否自动新建群。0-否；1-是。 默认为0
      */

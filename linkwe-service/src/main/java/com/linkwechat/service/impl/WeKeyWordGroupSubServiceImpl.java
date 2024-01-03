@@ -9,6 +9,7 @@ import com.linkwechat.common.enums.WeErrorCodeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.SnowFlakeUtil;
 import com.linkwechat.common.utils.StringUtils;
+import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.WeKeyWordGroupSub;
 import com.linkwechat.domain.groupcode.entity.WeGroupCode;
 import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatJoinWayQuery;
@@ -17,6 +18,7 @@ import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
 import com.linkwechat.service.IWeGroupCodeService;
+import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWeKeyWordGroupSubService;
 import com.linkwechat.mapper.WeKeyWordGroupSubMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
 * @author robin
@@ -42,29 +45,43 @@ public class WeKeyWordGroupSubServiceImpl extends ServiceImpl<WeKeyWordGroupSubM
     @Autowired
     QwCustomerClient qwCustomerClient;
 
+    @Autowired
+    private IWeGroupService iWeGroupService;
+
     @Override
     public void createWeKeyWordGroup(WeKeyWordGroupSub weKeyWordGroupSub) {
 
-        weKeyWordGroupSub.setId(SnowFlakeUtil.nextId());
-        weKeyWordGroupSub.setGroupCodeState(WeComeStateContants.GJCQ_STATE + weKeyWordGroupSub.getId());
-        //配置进群方式
-        WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
-                WeGroupCode.builder()
-                        .autoCreateRoom(weKeyWordGroupSub.getAutoCreateRoom())
-                        .roomBaseId(weKeyWordGroupSub.getRoomBaseId())
-                        .roomBaseName(weKeyWordGroupSub.getRoomBaseName())
-                        .chatIdList(weKeyWordGroupSub.getChatIdList())
-                        .state(weKeyWordGroupSub.getGroupCodeState())
-                        .build()
-        );
+        if(StringUtils.isNotEmpty(weKeyWordGroupSub.getChatIdList())){
 
-        if(null != addJoinWayVo && null != addJoinWayVo.getJoin_way()
-                && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())) {
+            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                    .in(WeGroup::getChatId, weKeyWordGroupSub.getChatIdList().split(",")));
+            if(CollectionUtil.isNotEmpty(weGroups)){
+                weKeyWordGroupSub.setGroupCodeName( weGroups.stream().map(WeGroup::getGroupName).collect(Collectors.joining(",")));
+            }
 
-            weKeyWordGroupSub.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
-            weKeyWordGroupSub.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
-            this.save(weKeyWordGroupSub);
+
+            weKeyWordGroupSub.setId(SnowFlakeUtil.nextId());
+            weKeyWordGroupSub.setGroupCodeState(WeComeStateContants.GJCQ_STATE + weKeyWordGroupSub.getId());
+            //配置进群方式
+            WeGroupChatGetJoinWayVo addJoinWayVo = iWeGroupCodeService.builderGroupCodeUrl(
+                    WeGroupCode.builder()
+                            .autoCreateRoom(weKeyWordGroupSub.getAutoCreateRoom())
+                            .roomBaseId(weKeyWordGroupSub.getRoomBaseId())
+                            .roomBaseName(weKeyWordGroupSub.getRoomBaseName())
+                            .chatIdList(weKeyWordGroupSub.getChatIdList())
+                            .state(weKeyWordGroupSub.getGroupCodeState())
+                            .build()
+            );
+
+            if(null != addJoinWayVo && null != addJoinWayVo.getJoin_way()
+                    && StringUtils.isNotEmpty(addJoinWayVo.getJoin_way().getQr_code())) {
+
+                weKeyWordGroupSub.setGroupCodeConfigId(addJoinWayVo.getJoin_way().getConfig_id());
+                weKeyWordGroupSub.setGroupCodeUrl(addJoinWayVo.getJoin_way().getQr_code());
+                this.save(weKeyWordGroupSub);
+            }
         }
+
 
 
     }
@@ -72,27 +89,36 @@ public class WeKeyWordGroupSubServiceImpl extends ServiceImpl<WeKeyWordGroupSubM
     @Override
     public void updateWeKeyWordGroup(WeKeyWordGroupSub weKeyWordGroupSub) {
 
-        WeKeyWordGroupSub oldWeKeyWordGroupSub = this.getById(weKeyWordGroupSub.getId());
-        if(null != oldWeKeyWordGroupSub){
-            //更新群活码
-            WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
-                    WeGroupChatUpdateJoinWayQuery.builder()
-                            .config_id(oldWeKeyWordGroupSub.getGroupCodeConfigId())
-                            .scene(2)
-                            .auto_create_room(weKeyWordGroupSub.getAutoCreateRoom())
-                            .room_base_id(weKeyWordGroupSub.getRoomBaseId())
-                            .room_base_name(weKeyWordGroupSub.getRoomBaseName())
-                            .chat_id_list(Arrays.asList(weKeyWordGroupSub.getChatIdList().split(",")))
-                            .build()
-            ).getData();
+        if(StringUtils.isNotEmpty(weKeyWordGroupSub.getChatIdList())){
+            List<WeGroup> weGroups = iWeGroupService.list(new LambdaQueryWrapper<WeGroup>()
+                    .in(WeGroup::getChatId, weKeyWordGroupSub.getChatIdList().split(",")));
+            if(CollectionUtil.isNotEmpty(weGroups)){
+                weKeyWordGroupSub.setGroupCodeName( weGroups.stream().map(WeGroup::getGroupName).collect(Collectors.joining(",")));
+            }
 
-            if(null != weResultVo && weResultVo.getErrCode()
-                    .equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
-                 this.updateById(weKeyWordGroupSub);
-            }else {
-                throw new WeComException(weResultVo.getErrMsg());
+            WeKeyWordGroupSub oldWeKeyWordGroupSub = this.getById(weKeyWordGroupSub.getId());
+            if(null != oldWeKeyWordGroupSub){
+                //更新群活码
+                WeResultVo weResultVo = qwCustomerClient.updateJoinWayForGroupChat(
+                        WeGroupChatUpdateJoinWayQuery.builder()
+                                .config_id(oldWeKeyWordGroupSub.getGroupCodeConfigId())
+                                .scene(2)
+                                .auto_create_room(weKeyWordGroupSub.getAutoCreateRoom())
+                                .room_base_id(weKeyWordGroupSub.getRoomBaseId())
+                                .room_base_name(weKeyWordGroupSub.getRoomBaseName())
+                                .chat_id_list(Arrays.asList(weKeyWordGroupSub.getChatIdList().split(",")))
+                                .build()
+                ).getData();
+
+                if(null != weResultVo && weResultVo.getErrCode()
+                        .equals(WeErrorCodeEnum.ERROR_CODE_0.getErrorCode())){
+                    this.updateById(weKeyWordGroupSub);
+                }else {
+                    throw new WeComException(weResultVo.getErrMsg());
+                }
             }
         }
+
 
     }
 
