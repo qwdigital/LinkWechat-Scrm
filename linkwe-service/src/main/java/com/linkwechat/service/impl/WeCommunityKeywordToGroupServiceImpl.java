@@ -103,14 +103,18 @@ public class WeCommunityKeywordToGroupServiceImpl  extends ServiceImpl<WeKeyword
 
         WeKeywordGroupTask weKeywordGroupTask = getById(groupTask.getId());
         if(null != weKeywordGroupTask){
-            //构造关键词群专属二维码
-            String contentUrl = MessageFormat.format(linkWeChatConfig.getKeyWordGroupUrl(), groupTask.getId().toString());
-            FileEntity fileEntity = qwFileClient.upload(QREncode.getQRCodeMultipartFile(contentUrl, null)).getData();
-            if (null != fileEntity) {
-                groupTask.setKeywordGroupUrl(contentUrl);
-                groupTask.setKeywordGroupQrUrl(fileEntity.getUrl());
-            }
+            groupTask.setKeywordGroupUrl(weKeywordGroupTask.getKeywordGroupUrl());
+            groupTask.setKeywordGroupQrUrl(weKeywordGroupTask.getKeywordGroupQrUrl());
         }
+          if(StringUtils.isEmpty(groupTask.getKeywordGroupUrl())||StringUtils.isEmpty(groupTask.getKeywordGroupQrUrl())){
+              //构造关键词群专属二维码
+              String contentUrl = MessageFormat.format(linkWeChatConfig.getKeyWordGroupUrl(), groupTask.getId().toString());
+              FileEntity fileEntity = qwFileClient.upload(QREncode.getQRCodeMultipartFile(contentUrl, null)).getData();
+              if (null != fileEntity) {
+                  groupTask.setKeywordGroupUrl(contentUrl);
+                  groupTask.setKeywordGroupQrUrl(fileEntity.getUrl());
+              }
+          }
         saveOrUpdate(groupTask);
     }
 
