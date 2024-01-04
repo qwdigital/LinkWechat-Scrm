@@ -606,17 +606,17 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             //需要新增的群成员信息列表
             List<WeGroupMember> needQuitMemberList = weGroupMemberService.list(new LambdaQueryWrapper<WeGroupMember>().eq(WeGroupMember::getChatId, chatId)
                     .in(WeGroupMember::getUserId, memeberList));
-
             log.info("成员退群 chatId：{},joinScene:{},memChangeCnt:{},needQuitMemberList:{}", chatId, quitScene, memChangeCnt, needQuitMemberList.size());
             if (CollectionUtil.isNotEmpty(needQuitMemberList)) {
-
                 needQuitMemberList.forEach(memeber -> {
                     memeber.setQuitScene(quitScene);
                     weGroupMemberService.quitGroup(quitScene,memeber.getUserId(),memeber.getChatId());
-                    //为被添加员工发送一条消息提醒
-                    iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(groupChat.getOwner()), "【客群动态】<br/><br/> 客户@" + memeber.getName() + " 刚刚退出群聊" + groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(), false);
-                    //添加消息通知
-                    weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),groupChat.getOwner(),MessageConstants.GROUP_DELETE,memeber.getName(),groupChat.getName());
+                    if(new Integer(0).equals(quitScene)){
+                        //为被添加员工发送一条消息提醒
+                        iWeMessagePushService.pushMessageSelfH5(ListUtil.toList(groupChat.getOwner()), "【客群动态】<br/><br/> 客户@" + memeber.getName() + " 刚刚退出群聊" + groupChat.getName(), MessageNoticeType.CUSTOMERADDCHAT.getType(), false);
+                        //添加消息通知
+                        weMessageNotificationService.save(MessageTypeEnum.GROUP.getType(),groupChat.getOwner(),MessageConstants.GROUP_DELETE,memeber.getName(),groupChat.getName());
+                    }
                 });
                 weCustomerTrajectoryService.createJoinOrExitGroupTrajectory(needQuitMemberList, groupChat.getName(), false);
             }
