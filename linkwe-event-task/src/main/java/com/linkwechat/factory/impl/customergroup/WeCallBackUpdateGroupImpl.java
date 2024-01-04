@@ -37,11 +37,11 @@ public class WeCallBackUpdateGroupImpl extends WeEventStrategy {
             String updateDetail = customerGroupInfo.getUpdateDetail();
             if (updateDetail.equals(GroupUpdateDetailEnum.ADD_MEMBER.getType())) {
                 //成员入群
-                weGroupService.addMember(customerGroupInfo.getChatId(),customerGroupInfo.getJoinScene(),customerGroupInfo.getMemChangeCnt());
+                weGroupService.addMember(customerGroupInfo.getChatId(),customerGroupInfo.getJoinScene(),customerGroupInfo.getMemChangeCnt(),customerGroupInfo.getMemChangeList().getItem());
                 //入群轨迹
             }else if(updateDetail.equals(GroupUpdateDetailEnum.DEL_MEMBER.getType())){
                 //成员入退群
-                weGroupService.delMember(customerGroupInfo.getChatId(),customerGroupInfo.getQuitScene(),customerGroupInfo.getMemChangeCnt());
+                weGroupService.delMember(customerGroupInfo.getChatId(),customerGroupInfo.getQuitScene(),customerGroupInfo.getMemChangeCnt(),customerGroupInfo.getMemChangeList().getItem());
             }else{
                 //群信息变更
                 weGroupService.changeGroup(customerGroupInfo.getChatId(),updateDetail);

@@ -52,6 +52,7 @@ public class WeKeywordGroupViewCountServiceImpl extends ServiceImpl<WeKeywordGro
         List<WeKeywordGroupViewCount> totalViewCounts = this.list(new LambdaQueryWrapper<WeKeywordGroupViewCount>()
                 .eq(WeKeywordGroupViewCount::getKeywordGroupId, keywordGroupId)
         );
+
         if(CollectionUtil.isNotEmpty(totalViewCounts)){
             groupViewCountVo.setTotalViewNumber(totalViewCounts.size());
             List<WeKeywordGroupViewCount> tdViewCounts = totalViewCounts.stream()

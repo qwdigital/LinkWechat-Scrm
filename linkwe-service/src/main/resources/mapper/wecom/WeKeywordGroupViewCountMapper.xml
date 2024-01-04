@@ -20,7 +20,7 @@
                         #{state}
                     </foreach>
                 </if>
-            ) AS totalJoinGroupNmber,
+            ) AS tdJoinGroupNmber,
             (
                 SELECT
                     count(DISTINCT vc.union_id)
@@ -31,7 +31,7 @@
                   <if test="keyWordGroupId != null">
                       AND vc.keyword_group_id=#{keyWordGroupId}
                   </if>
-            ) AS totalViewNumber
+            ) AS tdViewNumber
         FROM
             sys_dim_date sdd
         WHERE
@@ -50,7 +50,7 @@
             wc.add_user_id
         FROM
             we_group_member wgm
-                LEFT JOIN we_customer wc ON wgm.user_id=wc.external_userid
+        LEFT JOIN we_customer wc ON wgm.user_id=wc.external_userid
         <where>
             <if test="query.customerName !=null and query.customerName !=''">
                and wgm.name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
