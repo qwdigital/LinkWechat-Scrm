@@ -125,8 +125,7 @@ public class WeKeywordGroupViewCountServiceImpl extends ServiceImpl<WeKeywordGro
             );
             PageHelper.startPage(pageDomain.getPageNum(), pageDomain.getPageSize());
             List<WeCommunityKeyWordGroupTableVo> keyWordGroupTable = this.baseMapper.findKeyWordGroupTable(query);
-            setJoinGroupNumber(keyWordGroupTable,query.getStates());
-            pageInfo.setList(keyWordGroupTable);
+            pageInfo = new PageInfo<>(keyWordGroupTable);
         }
 
         return pageInfo;
@@ -152,7 +151,8 @@ public class WeKeywordGroupViewCountServiceImpl extends ServiceImpl<WeKeywordGro
 
 
     //设置入群数
-    private void setJoinGroupNumber(List<WeCommunityKeyWordGroupTableVo> keyWordGroupTable,List<String> states){
+    @Override
+    public void setJoinGroupNumber(List<WeCommunityKeyWordGroupTableVo> keyWordGroupTable,List<String> states){
         if(CollectionUtil.isNotEmpty(keyWordGroupTable)){
             keyWordGroupTable.stream().forEach(k->{
                 k.setJoinGroupNumber(

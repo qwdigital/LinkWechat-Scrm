@@ -540,7 +540,7 @@ public class WeGroupServiceImpl extends ServiceImpl<WeGroupMapper, WeGroup> impl
             WeGroupChatDetailVo.GroupChatDetail groupChat = groupChatDetail.getGroupChat();
             List<WeGroupMemberEntity> addMemberList = groupChat.getMemberList();
             //需要新增的群成员信息列表
-            List<WeGroupMemberEntity> needAddMemberList = addMemberList.stream().filter(addMember -> memeberList.stream().noneMatch(memberInfo -> ObjectUtil.equal(addMember.getUserId(), memberInfo))).collect(Collectors.toList());
+            List<WeGroupMemberEntity> needAddMemberList = addMemberList.stream().filter(item->memeberList.contains(item.getUserId())).collect(Collectors.toList());
             log.info("成员入群 chatId：{},joinScene:{},memChangeCnt:{},needAddMemberList:{}", chatId, joinScene, memChangeCnt, needAddMemberList.size());
             if (CollectionUtil.isNotEmpty(needAddMemberList)) {
                 List<WeGroupMember> members = needAddMemberList.stream().map(groupMember -> {

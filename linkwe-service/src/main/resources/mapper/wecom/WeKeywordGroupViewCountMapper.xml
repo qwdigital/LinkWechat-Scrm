@@ -51,7 +51,7 @@
         FROM
             we_group_member wgm
         LEFT JOIN we_customer wc ON wgm.user_id=wc.external_userid
-        <where>
+        where wgm.del_flag=0
             <if test="query.customerName !=null and query.customerName !=''">
                and wgm.name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
             </if>
@@ -75,8 +75,6 @@
                     </otherwise>
                 </choose>
             </if>
-
-        </where>
     </select>
 
 

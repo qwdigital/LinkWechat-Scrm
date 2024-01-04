@@ -49,4 +49,12 @@ public interface IWeKeywordGroupViewCountService extends IService<WeKeywordGroup
      * @return
      */
     List<WeCommunityKeyWordGroupTableVo> exprotKeyWordGroupTable(WeCommunityKeyWordGroupTableQuery query);
+
+
+    /**
+     * 设置客户所在客群数
+     * @param keyWordGroupTable
+     * @param states
+     */
+    void setJoinGroupNumber(List<WeCommunityKeyWordGroupTableVo> keyWordGroupTable,List<String> states);
 }

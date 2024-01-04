@@ -251,8 +251,12 @@ public class WeCommunityKeywordGroupController extends BaseController {
         PageInfo<WeCommunityKeyWordGroupTableVo> keyWordGroupTable =
                 iWeKeywordGroupViewCountService.findKeyWordGroupTable(query, TableSupport.buildPageRequest());
         tableDataInfo.setTotal(keyWordGroupTable.getTotal());
+        List<WeCommunityKeyWordGroupTableVo> groupTableList = keyWordGroupTable.getList();
+        if(CollectionUtil.isNotEmpty(groupTableList)){
+            iWeKeywordGroupViewCountService.setJoinGroupNumber(groupTableList,query.getStates());
+        }
         tableDataInfo.setRows(
-                keyWordGroupTable.getList()
+                groupTableList
         );
         return tableDataInfo;
     }
