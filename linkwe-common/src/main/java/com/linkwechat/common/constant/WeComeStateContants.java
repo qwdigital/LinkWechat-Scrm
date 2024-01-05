@@ -23,6 +23,12 @@ public class WeComeStateContants {
 
 
     /**
+     * 关键词群
+     */
+    public final static String GJCQ_STATE="gjcq_";
+
+
+    /**
      * 门店活码导购渠道标识
      */
     public final static String MDDG_STATE="mddg_";

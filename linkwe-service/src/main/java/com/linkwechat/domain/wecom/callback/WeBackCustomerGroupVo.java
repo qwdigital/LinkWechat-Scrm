@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author danmo
  * @description 客户群变更通知
@@ -27,4 +29,18 @@ public class WeBackCustomerGroupVo extends WeBackBaseVo {
 
     @ApiModelProperty("当是成员入群或退群时有值。表示成员变更数量")
     private Integer MemChangeCnt;
+
+
+    /**
+     * 当是成员入群或退群时有值。变更的成员列表
+     */
+    private MemChange MemChangeList;
+
+    @Data
+    public static class MemChange{
+
+        private List<String> Item;
+
+    }
+
 }

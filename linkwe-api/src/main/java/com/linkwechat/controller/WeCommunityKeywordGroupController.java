@@ -1,17 +1,45 @@
 package com.linkwechat.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.PageInfo;
+import com.linkwechat.common.annotation.Log;
+import com.linkwechat.common.constant.Constants;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
+import com.linkwechat.common.core.page.PageDomain;
 import com.linkwechat.common.core.page.TableDataInfo;
+import com.linkwechat.common.core.page.TableSupport;
+import com.linkwechat.common.enums.BusinessType;
+import com.linkwechat.common.utils.ServletUtils;
+import com.linkwechat.common.utils.SnowFlakeUtil;
+import com.linkwechat.common.utils.poi.LwExcelUtil;
+import com.linkwechat.domain.WeGroup;
+import com.linkwechat.domain.WeKeyWordGroupSub;
+import com.linkwechat.domain.WeKeywordGroupViewCount;
+import com.linkwechat.domain.community.WeCommunityNewGroup;
 import com.linkwechat.domain.community.WeKeywordGroupTask;
+import com.linkwechat.domain.community.query.WeCommunityKeyWordGroupTableQuery;
+import com.linkwechat.domain.community.query.WeCommunityNewGroupQuery;
+import com.linkwechat.domain.community.vo.WeCommunityKeyWordGroupTableVo;
+import com.linkwechat.domain.community.vo.WeKeywordGroupViewCountVo;
+import com.linkwechat.domain.customer.query.WeCustomersQuery;
+import com.linkwechat.domain.customer.vo.WeCustomersVo;
 import com.linkwechat.service.IWeCommunityKeywordToGroupService;
+import com.linkwechat.service.IWeGroupService;
+import com.linkwechat.service.IWeKeyWordGroupSubService;
+import com.linkwechat.service.IWeKeywordGroupViewCountService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -24,75 +52,255 @@ public class WeCommunityKeywordGroupController extends BaseController {
     @Autowired
     private IWeCommunityKeywordToGroupService keywordToGroupService;
 
+
+    @Autowired
+    private IWeKeyWordGroupSubService iWeKeyWordGroupSubService;
+
+    @Autowired
+    private IWeKeywordGroupViewCountService iWeKeywordGroupViewCountService;
+
+
+    @Autowired
+    private IWeGroupService iWeGroupService;
+
+
     /**
-     * 添加新任务
-     *
-     * @param task 添加任务所需的数据
-     * @return 结果
+     * 申请构建主键
+     * @return
      */
-    @PostMapping(path = "/")
-    public AjaxResult addTask(@RequestBody @Validated WeKeywordGroupTask task) {
-        if (keywordToGroupService.isNameOccupied(task.getTaskName())) {
-            return AjaxResult.error("关键词拉群任务名称"+ task.getTaskName() +"已存在");
+    @GetMapping("/applyToBuildPrimaryKey")
+    public AjaxResult<String> applyToBuildPrimaryKey(){
+
+
+        return AjaxResult.success(SnowFlakeUtil.nextId());
+    }
+
+
+    /**
+     * 新增或更新关键词群基础信息
+     * @param groupTask
+     * @return
+     */
+    @PostMapping("/createOrUpdateBaseInfo")
+    public AjaxResult<WeKeywordGroupTask> createOrUpdateBaseInfo(@RequestBody WeKeywordGroupTask groupTask) throws IOException {
+
+        if(groupTask.getId()==null){
+            return AjaxResult.error("关键词群主键不可为空");
         }
-        keywordToGroupService.save(task);
-        return AjaxResult.success();
+        keywordToGroupService.createOrUpdate(groupTask);
+        return AjaxResult.success(groupTask);
     }
 
+
     /**
-     * 根据id及更新数据对指定任务进行更新
+     * 点击取消时触发(避免还未新建,导致群活码创建过多占位)
+     * @param groupTask
+     * @return
      */
-    @PutMapping("/{taskId}")
-    public AjaxResult updateTask(@PathVariable("taskId") Long taskId, @RequestBody @Validated WeKeywordGroupTask task) {
-        task.setTaskId(taskId);
-        WeKeywordGroupTask oldGroupTask = keywordToGroupService.getById(task.getTaskId());
-        if(null != oldGroupTask){
-            if(!oldGroupTask.getTaskName().equals(task.getTaskName())){
-                if (keywordToGroupService.isNameOccupied(task.getTaskName())) {
-                    return AjaxResult.error("关键词拉群任务名称"+ task.getTaskName() +"已存在");
-                }
-            }
+    @PostMapping("/cancelCreateBaseInfo")
+    public AjaxResult cancelCreateBaseInfo(@RequestBody WeKeywordGroupTask groupTask){
+        if(groupTask.getId()==null){
+            return AjaxResult.error("关键词群主键不可为空");
         }
-        keywordToGroupService.updateById(task);
-        return AjaxResult.success();
-    }
+        WeKeywordGroupTask keywordGroupTask = keywordToGroupService.getById(groupTask.getId());
+        if(null == keywordGroupTask){
+            iWeKeyWordGroupSubService.batchRemoveWeKeyWordGroupByKeyWordId(groupTask.getId());
+        }
 
-    /**
-     * 通过id列表批量删除任务
-     *
-     * @param ids id列表
-     * @return 结果
-     */
-    @DeleteMapping(path = "/{ids}")
-    public AjaxResult batchDeleteTask(@PathVariable("ids") Long[] ids) {
-        keywordToGroupService.removeByIds(Arrays.asList(ids));
         return AjaxResult.success();
     }
 
 
-
     /**
-     * 根据过滤条件获取关键词拉群任务列表
+     * 获取关键词群列表
+     * @param task
+     * @return
      */
-    @ApiOperation(value = "获取关键词拉群任务列表")
-    @GetMapping(path = "/list")
-    public TableDataInfo<List<WeKeywordGroupTask>> list(WeKeywordGroupTask task) {
+    @GetMapping("/findLists")
+    public TableDataInfo<List<WeKeywordGroupTask>> findLists(WeKeywordGroupTask task){
         startPage();
-        List<WeKeywordGroupTask> taskList = keywordToGroupService.getTaskList(task);
-        return getDataTable(taskList);
+        List<WeKeywordGroupTask> groupTasks = keywordToGroupService.findLists(task);
+
+        return getDataTable(groupTasks);
     }
 
 
     /**
-     * 根据id获取任务详情
-     *
-     * @param taskId 任务id
-     * @return 任务详情
+     * 获取关键词群基础信息
+     * @param id
+     * @return
      */
-    @GetMapping(path = "/{taskId}")
-    public AjaxResult<WeKeywordGroupTask> getTask(@ApiParam("任务id") @PathVariable("taskId") Long taskId) {
-        return AjaxResult.success(keywordToGroupService.getTaskById(taskId));
+    @GetMapping("/getKeyWordGroupBaseInfo/{id}")
+    public AjaxResult<WeKeywordGroupTask> getKeyWordGroupBaseInfo(@PathVariable Long id){
+
+        return AjaxResult.success(
+                keywordToGroupService.findBaseInfo(id,null,false)
+        );
     }
+
+    /**
+     * 关键词群列表
+     * @return
+     */
+    @GetMapping("/findWeKeyWordGroupSubs")
+    public TableDataInfo<List<WeKeyWordGroupSub>> findWeKeyWordGroupSubs(WeKeyWordGroupSub keyWordGroupSub){
+                startPage();
+        List<WeKeyWordGroupSub> weKeyWordGroupSubs = iWeKeyWordGroupSubService.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
+                .eq(WeKeyWordGroupSub::getKeywordGroupId,keyWordGroupSub.getKeywordGroupId()));
+
+        return getDataTable(weKeyWordGroupSubs);
+    }
+
+    /**
+     * 创建关键词群
+     * @param weKeyWordGroupSub
+     * @return
+     */
+    @PostMapping("/createKeyWordGroupSub")
+    public AjaxResult<WeKeyWordGroupSub> createKeyWordGroupSub(@RequestBody WeKeyWordGroupSub weKeyWordGroupSub){
+
+        if(weKeyWordGroupSub.getKeywordGroupId()==null){
+            return AjaxResult.error("关键词群主键不可为空");
+        }
+
+        iWeKeyWordGroupSubService.createWeKeyWordGroup(weKeyWordGroupSub);
+
+        return AjaxResult.success(weKeyWordGroupSub);
+    }
+
+
+
+    /**
+     * 更新关键词群
+     * @param weKeyWordGroupSub
+     * @return
+     */
+    @PostMapping("/updateKeyWordGroupSub")
+    public AjaxResult<WeKeyWordGroupSub> updateKeyWordGroupSub(@RequestBody WeKeyWordGroupSub weKeyWordGroupSub){
+
+
+        iWeKeyWordGroupSubService.updateWeKeyWordGroup(weKeyWordGroupSub);
+
+        return AjaxResult.success(weKeyWordGroupSub);
+    }
+
+
+    /**
+     * 批量更新关键词群(主要针对顺序的调整)
+     * @param weKeywordGroupTask
+     * @return
+     */
+    @PostMapping("/batchUpdateKeyWordGroupSub")
+    public AjaxResult batchUpdateKeyWordGroupSub(@RequestBody WeKeywordGroupTask weKeywordGroupTask){
+
+        List<WeKeyWordGroupSub> keyWordGroupSubs = weKeywordGroupTask.getKeyWordGroupSubs();
+
+        if(CollectionUtil.isNotEmpty(keyWordGroupSubs)){
+            iWeKeyWordGroupSubService.updateBatchById(keyWordGroupSubs);
+        }
+        return AjaxResult.success();
+
+    }
+
+    /**
+     * 删除客户群活码
+     */
+    @DeleteMapping("/batchRemoveKeyWordGroupSub/{ids}")
+    public AjaxResult batchRemoveKeyWordGroupSub(@PathVariable Long[] ids) {
+
+        iWeKeyWordGroupSubService.batchRemoveWeKeyWordGroupByIds(Arrays.asList(ids));
+        return AjaxResult.success();
+    }
+
+
+    /**
+     * 获取详情头部统计
+     * @param keywordGroupId
+     * @return
+     */
+    @GetMapping("/countTab/{keywordGroupId}")
+    public AjaxResult<WeKeywordGroupViewCountVo> countTab(@PathVariable Long keywordGroupId){
+        return AjaxResult.success(
+                iWeKeywordGroupViewCountService.countTab(keywordGroupId)
+        );
+    }
+
+
+    /**
+     * 折线图统计
+     * @param groupViewCount
+     * @return
+     */
+    @GetMapping("/countTrend")
+    public AjaxResult<List<WeKeywordGroupViewCountVo>> countTrend(WeKeywordGroupViewCount groupViewCount){
+
+        return AjaxResult.success(
+                iWeKeywordGroupViewCountService.countTrend(groupViewCount)
+        );
+    }
+
+
+    /**
+     * 数据明细
+     * @param query
+     * @return
+     */
+    @GetMapping("/findKeyWordGroupTable")
+   public TableDataInfo<WeCommunityKeyWordGroupTableVo> findKeyWordGroupTable(WeCommunityKeyWordGroupTableQuery query){
+        TableDataInfo tableDataInfo=new TableDataInfo();
+        PageInfo<WeCommunityKeyWordGroupTableVo> keyWordGroupTable =
+                iWeKeywordGroupViewCountService.findKeyWordGroupTable(query, TableSupport.buildPageRequest());
+        tableDataInfo.setTotal(keyWordGroupTable.getTotal());
+        List<WeCommunityKeyWordGroupTableVo> groupTableList = keyWordGroupTable.getList();
+        if(CollectionUtil.isNotEmpty(groupTableList)){
+            iWeKeywordGroupViewCountService.setJoinGroupNumber(groupTableList,query.getStates());
+        }
+        tableDataInfo.setRows(
+                groupTableList
+        );
+        return tableDataInfo;
+    }
+
+
+    /**
+     * 关键词群数据明细导出
+     *
+     * @param query 请求参数
+     * @author WangYX
+     * @date 2023/08/23 14:00
+     */
+    @GetMapping("/exprotKeyWordGroupTable")
+    public void exprotKeyWordGroupTable(WeCommunityKeyWordGroupTableQuery query) {
+        List<WeCommunityKeyWordGroupTableVo> tableVos = iWeKeywordGroupViewCountService.exprotKeyWordGroupTable(query);
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeCommunityKeyWordGroupTableVo.class,tableVos,"关键词群_" + System.currentTimeMillis()
+        );
+    }
+
+
+    /**
+     * 获取当前客户对应的群
+     * @param query
+     * @return
+     */
+    @GetMapping("/findWeKeyWordGroupChatTable")
+    public TableDataInfo<WeGroup> findWeKeyWordGroupChatTable(WeCommunityKeyWordGroupTableQuery query){
+        List<WeGroup> weGroups =new ArrayList<>();
+        List<WeKeyWordGroupSub> weKeyWordGroupSubs = iWeKeyWordGroupSubService.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
+                .eq(WeKeyWordGroupSub::getKeywordGroupId, query.getKeywordGroupId()));
+
+        if(CollectionUtil.isNotEmpty(weKeyWordGroupSubs)){
+            startPage();
+            weGroups=iWeGroupService
+                    .findGroupByUserId(query.getExternalUserid()
+                            ,  weKeyWordGroupSubs.stream().map(WeKeyWordGroupSub::getGroupCodeState).collect(Collectors.joining(",")));
+        }
+
+        return getDataTable(weGroups);
+    }
+
+
+
 
 
 

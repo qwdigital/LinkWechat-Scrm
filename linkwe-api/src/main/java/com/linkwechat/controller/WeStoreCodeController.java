@@ -191,12 +191,7 @@ public class WeStoreCodeController extends BaseController {
      */
     @PutMapping("/batchStartOrStop/{ids}")
     public AjaxResult batchStartOrStop(@PathVariable("ids") Long[] ids,@RequestBody WeStoreCode weStoreCode){
-
-        iWeStoreCodeService.update(WeStoreCode.builder()
-                .storeState(weStoreCode.getStoreState())
-                .build(), new LambdaQueryWrapper<WeStoreCode>()
-                .in(WeStoreCode::getId,Arrays.asList(ids)));
-
+        iWeStoreCodeService.batchUpdateState(weStoreCode.getStoreState(),ListUtil.toList(ids));
         return AjaxResult.success();
 
     }

@@ -71,6 +71,7 @@
             wc.add_user_id,
             wc.add_time,
             wc.gender,
+            (SELECT GROUP_CONCAT(DISTINCT su.user_name) from sys_user su where su.we_user_id=wc.add_user_id) as addUserName,
             (SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState} and wgm.quit_scene  IS  NULL) as joinGroupNumber,
             IF((SELECT count(*) from we_group_member wgm WHERE wc.external_userid = wgm.user_id  and wgm.state=#{query.groupState}  and wgm.quit_scene  IS  NULL)>0,1,0) as isJoinGroup
         FROM

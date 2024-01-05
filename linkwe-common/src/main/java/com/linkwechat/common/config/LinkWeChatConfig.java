@@ -272,6 +272,12 @@ public class LinkWeChatConfig {
      */
     private String qrGroupShortLinkDomainName;
 
+
+    /**
+     * 关键词群h5链接
+     */
+    private String keyWordGroupUrl;
+
     public String getName() {
         return name;
     }

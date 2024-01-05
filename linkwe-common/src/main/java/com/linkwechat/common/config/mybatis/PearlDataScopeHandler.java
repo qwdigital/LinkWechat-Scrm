@@ -15,17 +15,11 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
  **/
 public class PearlDataScopeHandler implements DataScopeHandler {
 
-    @Override
-    public String setWhereForCustom(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser, Long roleId) {
-
-       return DataScopeSqlUtils.setWhereForRole(dataScope,roleId);
-    }
-
 
 
 
     @Override
-    public String setWhereForSysUser(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser){
+    public String setWhereForSysUser(DataScope dataScope, SysUser sysUser){
 
 
         return DataScopeSqlUtils.setWhereForSysUser(dataScope,sysUser);
@@ -33,20 +27,20 @@ public class PearlDataScopeHandler implements DataScopeHandler {
     }
 
     @Override
-    public String setWhereForDept(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser) {
+    public String setWhereForDept(DataScope dataScope, SysUser sysUser) {
 
 
         return DataScopeSqlUtils.setWhereForDept(dataScope, sysUser);
     }
 
     @Override
-    public String setWhereForDeptAndChild(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser) {
+    public String setWhereForDeptAndChild(DataScope dataScope, SysUser sysUser) {
 
         return DataScopeSqlUtils.setWhereForDeptAndChild(dataScope, sysUser);
     }
 
     @Override
-    public String setWhereForSelf(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser) {
+    public String setWhereForSelf(DataScope dataScope, SysUser sysUser) {
 
         return DataScopeSqlUtils.setWhereForSelf(dataScope, sysUser);
     }
