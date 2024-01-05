@@ -14,25 +14,23 @@ public interface DataScopeHandler {
     /**
      * 全部数据权限
      *
-     * @param plainSelect
      * @param dataScope   数据范围注解
      * @param sysUser
      * @throws JSQLParserException SQL解析异常
      */
-    default void setWhereForAll(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser){
+    default void setWhereForAll(DataScope dataScope, SysUser sysUser){
         // do nothing
     }
 
     /**
      * 自定数据权限(角色绑定部门)
      *
-     * @param plainSelect
      * @param dataScope   数据范围注解
      * @param sysUser
      * @param roleId
      * @throws JSQLParserException SQL解析异常
      */
-    String setWhereForCustom(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser, Long roleId); /*{
+    String setWhereForCustom(DataScope dataScope, SysUser sysUser, Long roleId); /*{
         throw new UnsupportedOperationException("暂不支持的数据权限类型");
     }*/
 
@@ -40,40 +38,36 @@ public interface DataScopeHandler {
     /**
      * 自定数据权限(员工绑定部门)
      *
-     * @param plainSelect
      * @param dataScope   数据范围注解
      * @param sysUser
      * @throws JSQLParserException SQL解析异常
      */
-    String setWhereForSysUser(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser);
+    String setWhereForSysUser(DataScope dataScope, SysUser sysUser);
 
     /**
      * 部门数据权限
      *
-     * @param plainSelect
      * @param dataScope   数据范围注解
      * @param sysUser
      * @throws JSQLParserException SQL解析异常
      */
-    String setWhereForDept(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser);
+    String setWhereForDept(DataScope dataScope, SysUser sysUser);
 
     /**
      * 部门及以下数据权限
      *
-     * @param plainSelect
      * @param dataScope   数据范围注解
      * @param sysUser
      * @throws JSQLParserException SQL解析异常
      */
-    String setWhereForDeptAndChild(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser);
+    String setWhereForDeptAndChild(DataScope dataScope, SysUser sysUser);
 
     /**
      * 仅本人数据权限
      *
-     * @param plainSelect
      * @param dataScope   数据范围注解
      * @param sysUser
      * @throws JSQLParserException SQL解析异常
      */
-    String setWhereForSelf(PlainSelect plainSelect, DataScope dataScope, SysUser sysUser);
+    String setWhereForSelf(DataScope dataScope, SysUser sysUser);
 }

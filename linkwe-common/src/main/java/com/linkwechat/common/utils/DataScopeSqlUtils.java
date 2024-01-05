@@ -59,12 +59,12 @@ public class DataScopeSqlUtils {
             DataColumn dataColumn = dataScope.value()[0];
             if(StringUtils.isNotEmpty(dataColumn.alias())){
                 sqlPart.append(StringUtils.format(
-                        " or {}.{} in ( select distinct su.{} from sys_user_manage_scop srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0 LEFT JOIN sys_user su ON su.we_user_id=sud.we_user_id where srd.user_id = {} )",
+                        " or {}.{} in ( SELECT DISTINCT {} FROM sys_user_dept WHERE del_flag=0 AND dept_id IN (SELECT dept_id FROM sys_user_manage_scop where user_id={}) )",
                         dataColumn.alias(), dataColumn.name(),dataColumn.userid(), sysUser.getUserId()));
             }else{
 
                 sqlPart.append(StringUtils.format(
-                        " or {} in ( select distinct su.{} from sys_user_manage_scop srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0 LEFT JOIN sys_user su ON su.we_user_id=sud.we_user_id where srd.user_id = {} )",
+                        " or {} in ( SELECT DISTINCT {} FROM sys_user_dept WHERE del_flag=0 AND dept_id IN (SELECT dept_id FROM sys_user_manage_scop where user_id={}) )",
                         dataColumn.name(),dataColumn.userid(), sysUser.getUserId()));
 
             }
