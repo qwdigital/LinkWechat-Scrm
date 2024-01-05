@@ -21,7 +21,6 @@ public class WeFormSurveyStatisticsVO implements Serializable {
     /**
      * 创建时间
      */
-    //@Excel(name = "日期", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @ExcelProperty("日期")
     private Date createTime;
 
@@ -29,21 +28,18 @@ public class WeFormSurveyStatisticsVO implements Serializable {
     /**
      * 总访问量
      */
-    //@Excel(name = "总访问量")
     @ExcelProperty("总访问量")
     private Integer totalVisits;
 
     /**
      * 总访问用户量
      */
-    //@Excel(name = "总访问用户量")
     @ExcelProperty("总访问用户量")
     private Integer totalUser;
 
     /**
      * 有效收集量
      */
-    //@Excel(name = "有效收集量")
     @ExcelProperty("有效收集量")
     private Integer collectionVolume;
 
@@ -51,7 +47,6 @@ public class WeFormSurveyStatisticsVO implements Serializable {
     /**
      * 收集率
      */
-    //@Excel(name = "收集率")
     @ExcelProperty("收集率")
     private String collectionRate;
 
@@ -59,7 +54,6 @@ public class WeFormSurveyStatisticsVO implements Serializable {
     /**
      * 平均完成时间
      */
-    //@Excel(name = "平均完成时间")
     @ExcelProperty("平均完成时间")
     private Integer averageTime;
 

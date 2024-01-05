@@ -9,6 +9,7 @@ import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.kf.query.WeKfChatMsgListQuery;
 import com.linkwechat.domain.wecom.callback.WeBackBaseVo;
+import com.linkwechat.domain.wecom.callback.WeBackKfVo;
 import com.linkwechat.domain.wecom.query.kf.WeKfGetMsgQuery;
 import com.linkwechat.domain.wecom.vo.kf.WeKfGetMsgVo;
 import com.linkwechat.factory.WeCallBackEventFactory;
@@ -54,14 +55,15 @@ public class WeKfMsgOrEventImpl implements WeCallBackEventFactory {
 
     @Override
     public void eventHandle(String message) {
-        WeBackBaseVo weBackBaseVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackBaseVo.class);
-        String corpId = weBackBaseVo.getToUserName();
+        WeBackKfVo weBackKfVo = XmlUtil.xmlToBean(XmlUtil.parseXml(message).getFirstChild(), WeBackKfVo.class);
+        String corpId = weBackKfVo.getToUserName();
         SecurityContextHolder.setCorpId(corpId);
         String nextCursor = weKfMsgCursorService.getKfMsgCursor(corpId);
         //读取会话消息
         WeKfGetMsgQuery weKfGetMsgQuery = new WeKfGetMsgQuery();
         weKfGetMsgQuery.setCursor(nextCursor);
-        weKfGetMsgQuery.setToken(weBackBaseVo.getToken());
+        weKfGetMsgQuery.setToken(weBackKfVo.getToken());
+        weKfGetMsgQuery.setOpen_kfid(weBackKfVo.getOpenKfId());
         WeKfGetMsgVo weKfGetMsgVo = qwKfClient.getSessionMsg(weKfGetMsgQuery).getData();
         nextCursor = weKfGetMsgVo.getNextCursor();
         weKfMsgCursorService.saveKfMsgCursor(corpId,nextCursor);

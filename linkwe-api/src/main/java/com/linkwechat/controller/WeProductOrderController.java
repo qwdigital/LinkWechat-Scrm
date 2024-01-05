@@ -82,7 +82,12 @@ public class WeProductOrderController extends BaseController {
                     weProductOrderVo.setRefundStateStr(ProductRefundOrderStateEnum.of(weProductOrderRefundVo.getRefundState()).getMsg());
                 }
                 //客户类型
-                weProductOrderVo.setExternalTypeStr(weProductOrderVo.getExternalType() == 1 ? "微信" : "企业微信");
+                if(weProductOrderVo.getExternalType()!=null){
+                    weProductOrderVo.setExternalTypeStr(weProductOrderVo.getExternalType() == 1 ? "微信" : "企业微信");
+                }else{
+                    weProductOrderVo.setExternalTypeStr("未知");
+                }
+
                 result.add(weProductOrderVo);
             }
         }

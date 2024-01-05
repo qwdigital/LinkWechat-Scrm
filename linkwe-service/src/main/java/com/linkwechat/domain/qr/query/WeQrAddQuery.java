@@ -97,12 +97,47 @@ public class WeQrAddQuery {
      * @return 企微接口参数实体类
      */
     public WeAddWayQuery getWeContactWay() {
+//        WeAddWayQuery weContactWay = new WeAddWayQuery();
+//        //根据类型生成相应的活码
+//        if(this.qrId == null){
+//            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
+//            this.state = WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + snowflake.nextIdStr();
+//            weContactWay.setState(state);
+//        }
+//        weContactWay.setIs_exclusive(BooleanUtils.toBoolean(this.isExclusive));
+//        weContactWay.setConfig_id(this.configId);
+//        weContactWay.setType(this.qrType);
+//        weContactWay.setScene(WeConstans.QR_CODE_EMPLE_CODE_SCENE);
+//        weContactWay.setSkip_verify(BooleanUtils.toBoolean(this.qrAutoAdd));
+//        if (CollectionUtil.isNotEmpty(qrUserInfos)) {
+//            //员工列表
+//            List<String> userIdArr = qrUserInfos.stream().map(WeQrUserInfoQuery::getUserIds)
+//                    .filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.toList());
+//            if (CollectionUtil.isNotEmpty(userIdArr)) {
+//                weContactWay.setUser(userIdArr);
+//            }
+//            //部门列表
+//            List<Long> partyArr = qrUserInfos.stream().map(WeQrUserInfoQuery::getPartys)
+//                    .filter(CollectionUtil::isNotEmpty).flatMap(Collection::stream).collect(Collectors.toList());
+//            if (CollectionUtil.isNotEmpty(partyArr)) {
+//                weContactWay.setParty(partyArr);
+//            }
+//        }
+//        return weContactWay;
+        return  getWeContactWayByState(WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6)).nextIdStr());
+    }
+
+
+    /**
+     * 设置渠道活码
+     * @param channelState
+     * @return
+     */
+    public WeAddWayQuery getWeContactWayByState(String channelState){
         WeAddWayQuery weContactWay = new WeAddWayQuery();
         //根据类型生成相应的活码
         if(this.qrId == null){
-            Snowflake snowflake = IdUtil.getSnowflake(RandomUtil.randomLong(6), RandomUtil.randomInt(6));
-            this.state = WelcomeMsgTypeEnum.WE_QR_CODE_PREFIX.getType() + snowflake.nextIdStr();
-            weContactWay.setState(state);
+            weContactWay.setState(channelState);
         }
         weContactWay.setIs_exclusive(BooleanUtils.toBoolean(this.isExclusive));
         weContactWay.setConfig_id(this.configId);
@@ -125,7 +160,6 @@ public class WeQrAddQuery {
         }
         return weContactWay;
     }
-
 
     /**
      * 获取数据表实体

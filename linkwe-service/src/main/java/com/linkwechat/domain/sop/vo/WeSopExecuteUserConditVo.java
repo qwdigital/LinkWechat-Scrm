@@ -35,6 +35,7 @@ public class WeSopExecuteUserConditVo {
         //员工id
         private List<String> weUserIds;
 
+
     }
 
     @Data

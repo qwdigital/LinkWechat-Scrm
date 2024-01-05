@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class WeAgentAddQuery {
 
+
     @ApiModelProperty("应用ID")
     @NotNull(message = "应用ID不能为空")
     private Integer agentId;

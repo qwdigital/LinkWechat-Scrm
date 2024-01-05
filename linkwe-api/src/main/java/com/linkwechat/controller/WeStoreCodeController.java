@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkwechat.common.annotation.Log;
 import com.linkwechat.common.core.controller.BaseController;
 import com.linkwechat.common.core.domain.AjaxResult;
-import com.linkwechat.common.core.domain.entity.SysDictData;
 import com.linkwechat.common.core.page.TableDataInfo;
 import com.linkwechat.common.enums.BusinessType;
 import com.linkwechat.common.utils.DateUtils;
@@ -18,12 +17,13 @@ import com.linkwechat.common.utils.StringUtils;
 import com.linkwechat.common.utils.file.FileUtils;
 import com.linkwechat.common.utils.poi.ExcelUtil;
 import com.linkwechat.common.utils.poi.LwExcelUtil;
-import com.linkwechat.domain.WeCustomerSeas;
-import com.linkwechat.domain.groupcode.entity.WeGroupCode;
+import com.linkwechat.domain.WeGroup;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeConfig;
 import com.linkwechat.domain.qr.WeQrAttachments;
-import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
+import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo;
@@ -34,14 +34,13 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
+import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWeQrAttachmentsService;
 import com.linkwechat.service.IWeStoreCodeConfigService;
 import com.linkwechat.service.IWeStoreCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -67,6 +66,9 @@ public class WeStoreCodeController extends BaseController {
     private IWeQrAttachmentsService attachmentsService;
 
     @Autowired
+    private IWeGroupService iWeGroupService;
+
+    @Autowired
     private MapUtils mapUtils;
 
 
@@ -86,6 +88,8 @@ public class WeStoreCodeController extends BaseController {
                             .eq(WeQrAttachments::getQrId, storeCodeConfig.getId())
                             .eq(WeQrAttachments::getBusinessType,2))
             );
+        }else{
+            storeCodeConfig=new WeStoreCodeConfig();
         }
 
         return AjaxResult.success(
@@ -187,12 +191,7 @@ public class WeStoreCodeController extends BaseController {
      */
     @PutMapping("/batchStartOrStop/{ids}")
     public AjaxResult batchStartOrStop(@PathVariable("ids") Long[] ids,@RequestBody WeStoreCode weStoreCode){
-
-        iWeStoreCodeService.update(WeStoreCode.builder()
-                .storeState(weStoreCode.getStoreState())
-                .build(), new LambdaQueryWrapper<WeStoreCode>()
-                .in(WeStoreCode::getId,Arrays.asList(ids)));
-
+        iWeStoreCodeService.batchUpdateState(weStoreCode.getStoreState(),ListUtil.toList(ids));
         return AjaxResult.success();
 
     }
@@ -264,6 +263,7 @@ public class WeStoreCodeController extends BaseController {
      */
     @GetMapping("/countStoreShopGuideTrend")
     public AjaxResult<List<WeStoreShopGuideTrendVo>> countStoreShopGuideTrend(WeStoreCode weStoreCode){
+
 
 
         return AjaxResult.success(
@@ -394,6 +394,64 @@ public class WeStoreCodeController extends BaseController {
     }
 
 
+    /**
+     * 数据明细获取
+     * @param weStoreCodeQuery
+     * @return
+     */
+    @GetMapping("/findWeStoreCodeTables")
+    public TableDataInfo<List<WeStoreCodeTableVo>>  findWeStoreCodeTables(WeStoreCodeQuery weStoreCodeQuery){
+        startPage();
+        return getDataTable(
+                iWeStoreCodeService.findWeStoreCodeTables(weStoreCodeQuery)
+        );
+    }
+
+
+    /**
+     * 数据明细导出
+     * @param weStoreCodeQuery
+     * @return
+     */
+    @GetMapping("/weStoreCodeTablesExport")
+    public void weStoreCodeTablesExport(WeStoreCodeQuery weStoreCodeQuery) {
+
+        List<WeStoreCodeTableVo> weStoreCodeTables = iWeStoreCodeService.findWeStoreCodeTables(weStoreCodeQuery);
+
+
+        LwExcelUtil.exprotForWeb(
+                ServletUtils.getResponse(), WeStoreCodeTableVo.class,weStoreCodeTables,"数据明细_" + System.currentTimeMillis()
+        );
+
+    }
+
+
+
+
+    /**
+     * 获取当前客户对应的群
+     * @param weStoreCodeQuery
+     * @return
+     */
+    @GetMapping("/findWeStoreCodeGroupTables")
+    public TableDataInfo<WeGroup> findWeStoreCodeGroupTables(WeStoreCodeQuery weStoreCodeQuery){
+        List<WeGroup> weGroups =new ArrayList<>();
+        WeStoreCode weStoreCode = iWeStoreCodeService.getById(weStoreCodeQuery.getStoreCodeId());
+
+        if(null != weStoreCode){
+            startPage();
+            if(StringUtils.isNotEmpty(weStoreCode.getGroupCodeState())){
+                weGroups=iWeGroupService
+                        .findGroupByUserId(weStoreCodeQuery.getExternalUserid()
+                                , weStoreCode.getGroupCodeState());
+            }
+
+        }
+
+        return getDataTable(weGroups);
+    }
+
+
     /***************************************************************
      **************************统计数据报表相关 end********************
      ****************************************************************/
@@ -463,9 +521,7 @@ public class WeStoreCodeController extends BaseController {
                     k.setLatitude(lMap.get(MapUtils.lat));
                     k.setLongitude(lMap.get(MapUtils.lng));
                 });
-//                List<WeStoreCode> weStoreCodeList = iWeStoreCodeService.getBaseMapper().selectList(new LambdaQueryWrapper<WeStoreCode>()
-//                        .eq(WeStoreCode::getDelFlag, 0));
-//                List<String> lst = weStoreCodeList.stream().map(WeStoreCode::getStoreName).collect(Collectors.toList());
+
                 deduplicationSeasNoRepeat = deduplicationSeasNoRepeat.stream().filter(item -> item.getStoreName().length()<30).collect(Collectors.toList());
                 if(iWeStoreCodeService.saveBatch(deduplicationSeasNoRepeat)){
                     tip = MessageFormat.format(tip, new Object[]{new Integer(deduplicationSeasNoRepeat.size()).toString()});
@@ -486,18 +542,14 @@ public class WeStoreCodeController extends BaseController {
 
     /**
      * 获取附件门店
-     * @param storeCodeType 门店码类型(1:门店导购码;2:门店群活码)
-     * @param unionid 微信unionid
-     * @param longitude 经度
-     * @param latitude 纬度
-     * @param area 区域
+     * @param wxStoreCodeQuery 门店码类型(1:门店导购码;2:门店群活码)
      * @return
      */
     @GetMapping("/findStoreCode")
-    public AjaxResult<WeStoreCodesVo> findStoreCode(Integer storeCodeType, String unionid, String longitude, String latitude, String area){
+    public AjaxResult<WeStoreCodesVo> findStoreCode(WxStoreCodeQuery wxStoreCodeQuery){
 
         return AjaxResult.success(
-                iWeStoreCodeService.findStoreCode(storeCodeType,unionid,longitude,latitude,area)
+                iWeStoreCodeService.findStoreCode(wxStoreCodeQuery)
         );
     }
 
@@ -509,23 +561,30 @@ public class WeStoreCodeController extends BaseController {
      */
     @GetMapping("/findWeStoreCodeConfig")
     public AjaxResult<WeStoreCodeConfig> findWeStoreCodeConfig(Integer storeCodeType){
+        WeStoreCodeConfig weStoreCodeConfig=new WeStoreCodeConfig();
+        List<WeStoreCodeConfig> weStoreCodeConfigList = iWeStoreCodeConfigService.list(new LambdaQueryWrapper<WeStoreCodeConfig>()
+                .eq(WeStoreCodeConfig::getStoreCodeType, storeCodeType));
+
+        if(CollectionUtil.isNotEmpty(weStoreCodeConfigList)){
+            weStoreCodeConfig=weStoreCodeConfigList.stream().findFirst().get();
+        }
 
 
         return AjaxResult.success(
-                iWeStoreCodeConfigService.getWeStoreCodeConfig(storeCodeType)
+                weStoreCodeConfig
         );
     }
 
 
-    /**
-     * 记录用户扫码行为
-     * @return
-     */
-    @PostMapping("/countUserBehavior")
-    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
-        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
-        return AjaxResult.success();
-    }
+//    /**
+//     * 记录用户扫码行为
+//     * @return
+//     */
+//    @PostMapping("/countUserBehavior")
+//    public AjaxResult countUserBehavior(@RequestBody WeStoreCodeCount weStoreCodeCount){
+//        iWeStoreCodeService.countUserBehavior(weStoreCodeCount);
+//        return AjaxResult.success();
+//    }
 
 
 

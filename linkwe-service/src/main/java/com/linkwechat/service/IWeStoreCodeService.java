@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.storecode.entity.WeStoreCode;
 import com.linkwechat.domain.storecode.entity.WeStoreCodeCount;
+import com.linkwechat.domain.storecode.query.WeStoreCodeQuery;
+import com.linkwechat.domain.storecode.query.WxStoreCodeQuery;
+import com.linkwechat.domain.storecode.vo.WeStoreCodeTableVo;
 import com.linkwechat.domain.storecode.vo.WeStoreCodesVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreGroupReportVo;
 import com.linkwechat.domain.storecode.vo.datareport.WeStoreShopGuideReportVo;
@@ -14,6 +17,7 @@ import com.linkwechat.domain.storecode.vo.tab.WeStoreShopGuideTabVo;
 import com.linkwechat.domain.storecode.vo.tab.WeStoreTabVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreGroupTrendVo;
 import com.linkwechat.domain.storecode.vo.trend.WeStoreShopGuideTrendVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -113,19 +117,31 @@ public interface IWeStoreCodeService extends IService<WeStoreCode> {
 
     /**
      * 根据定位获取门店
-     * @param storeCodeType
-     * @param unionid
-     * @param longitude
-     * @param latitude
-     * @Param area
+     * @param wxStoreCodeQuery
      * @return
      */
-    WeStoreCodesVo findStoreCode(Integer storeCodeType, String unionid, String longitude, String latitude, String area);
+    WeStoreCodesVo findStoreCode(WxStoreCodeQuery wxStoreCodeQuery);
 
 
     /**
      * 记录用户扫码行为
-     * @param weStoreCodeCount
+     * @param wxStoreCodeQuery
      */
-    void countUserBehavior(WeStoreCodeCount weStoreCodeCount);
+    void countUserBehavior(WxStoreCodeQuery wxStoreCodeQuery);
+
+
+  /**
+   * 数据明细获取
+   * @param weStoreCodeQuery
+   * @return
+   */
+  List<WeStoreCodeTableVo> findWeStoreCodeTables(WeStoreCodeQuery weStoreCodeQuery);
+
+
+ /**
+  * 批量更新状态
+  * @param storeState
+  * @param ids
+  */
+  void batchUpdateState(Integer storeState,List<Long> ids);
 }
