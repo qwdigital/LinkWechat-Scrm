@@ -22,17 +22,7 @@ public interface DataScopeHandler {
         // do nothing
     }
 
-    /**
-     * 自定数据权限(角色绑定部门)
-     *
-     * @param dataScope   数据范围注解
-     * @param sysUser
-     * @param roleId
-     * @throws JSQLParserException SQL解析异常
-     */
-    String setWhereForCustom(DataScope dataScope, SysUser sysUser, Long roleId); /*{
-        throw new UnsupportedOperationException("暂不支持的数据权限类型");
-    }*/
+
 
 
     /**

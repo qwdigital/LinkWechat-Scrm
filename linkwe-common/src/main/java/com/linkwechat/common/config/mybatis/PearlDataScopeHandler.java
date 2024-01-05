@@ -15,12 +15,6 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
  **/
 public class PearlDataScopeHandler implements DataScopeHandler {
 
-    @Override
-    public String setWhereForCustom(DataScope dataScope, SysUser sysUser, Long roleId) {
-
-       return DataScopeSqlUtils.setWhereForRole(dataScope,roleId);
-    }
-
 
 
 
