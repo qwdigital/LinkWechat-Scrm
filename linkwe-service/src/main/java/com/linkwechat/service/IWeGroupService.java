@@ -126,16 +126,18 @@ public interface IWeGroupService extends IService<WeGroup> {
      * @param chatId 群ID
      * @param joinScene 入群方式
      * @param memChangeCnt 成员变更数量
+     * @param memeberList 入群成员id
      */
-    void addMember(String chatId, Integer joinScene, Integer memChangeCnt);
+    void addMember(String chatId, Integer joinScene, Integer memChangeCnt,List<String> memeberList);
 
     /**
      * 成员退群
      * @param chatId 群ID
      * @param quitScene 入群方式
      * @param memChangeCnt 成员变更数量
+     * @param memeberList 退群成员集合
      */
-    void delMember(String chatId, Integer quitScene, Integer memChangeCnt);
+    void delMember(String chatId, Integer quitScene, Integer memChangeCnt,List<String> memeberList);
 
     /**
      * 群信息变更

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeKeywordGroupViewCountMapper">
+
+    <select id="countTrend" resultType="com.linkwechat.domain.community.vo.WeKeywordGroupViewCountVo">
+        SELECT
+            sdd.date,
+            (
+                SELECT
+                    count(DISTINCT wgm.user_id)
+                FROM
+                    we_group_member wgm
+                WHERE
+                    DATE_FORMAT( wgm.join_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
+                <if test="states != null and states.size() > 0">
+                   AND wgm.state in
+                   <foreach collection="states" item="state" open="(" separator="," close=")">
+                        #{state}
+                    </foreach>
+                </if>
+            ) AS tdJoinGroupNmber,
+            (
+                SELECT
+                    count(DISTINCT vc.union_id)
+                FROM
+                    we_keyword_group_view_count vc
+                WHERE
+                        DATE_FORMAT( vc.create_time, '%Y-%m-%d' )= DATE_FORMAT( sdd.date, '%Y-%m-%d' )
+                  <if test="keyWordGroupId != null">
+                      AND vc.keyword_group_id=#{keyWordGroupId}
+                  </if>
+            ) AS tdViewNumber
+        FROM
+            sys_dim_date sdd
+        WHERE
+            DATE_FORMAT( sdd.date, '%Y-%m-%d' ) BETWEEN #{beginTime} AND #{endTime}
+    </select>
+
+    <select id="findKeyWordGroupTable" resultType="com.linkwechat.domain.community.vo.WeCommunityKeyWordGroupTableVo">
+        SELECT
+            wgm.name as customerName,
+            wc.avatar,
+            wc.customer_type,
+            (SELECT GROUP_CONCAT(DISTINCT su.user_name) from sys_user su where su.we_user_id=wc.add_user_id) as addUserName,
+            wc.gender,
+            wc.add_time,
+            wc.external_userid,
+            wc.add_user_id
+        FROM
+            we_group_member wgm
+        LEFT JOIN we_customer wc ON wgm.user_id=wc.external_userid
+        where wgm.del_flag=0
+            <if test="query.customerName !=null and query.customerName !=''">
+               and wgm.name  LIKE CONCAT('%',#{query.customerName,jdbcType=VARCHAR},'%')
+            </if>
+
+            <if test="query.states != null and query.states.size() > 0">
+                AND wgm.state in
+                <foreach collection="query.states" item="state" open="(" separator="," close=")">
+                    #{state}
+                </foreach>
+            </if>
+            <if test="query.beginTime !=null and query.beginTime !='' and query.endTime !=null and query.endTime !=''">
+                date_format(wc.add_time,'%Y-%m-%d') BETWEEN #{query.beginTime} AND #{query.endTime}
+            </if>
+            <if test="query.friend != null">
+                <choose>
+                   <when test="query.friend">
+                       wc.external_userid IS NOT NULL
+                   </when>
+                    <otherwise>
+                        wc.external_userid IS NULL
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
+
+</mapper>
