@@ -123,10 +123,10 @@ public class DataScopeSqlUtils {
             DataColumn dataColumn = dataScope.value()[0];
             if(StringUtils.isNotEmpty(dataColumn.alias())){
                 sqlPart.append(StringUtils.format(" or {}.{} in ( SELECT sud.{} FROM sys_user_dept sud WHERE sud.dept_id IN (SELECT dept_id FROM sys_dept WHERE FIND_IN_SET({},ancestors) or dept_id={} ) ) ",
-                        dataColumn.alias(), dataColumn.name(),dataColumn.userid(),sysUser.getDeptId()));
+                        dataColumn.alias(), dataColumn.name(),dataColumn.userid(),sysUser.getDeptId(),sysUser.getDeptId()));
             }else{
                 sqlPart.append(StringUtils.format(" or {} in ( SELECT sud.{} FROM sys_user_dept sud WHERE sud.dept_id IN (SELECT dept_id FROM sys_dept WHERE FIND_IN_SET({},ancestors)  or dept_id={} ) ) ",
-                        dataColumn.name(),dataColumn.userid(),sysUser.getDeptId()));
+                        dataColumn.name(),dataColumn.userid(),sysUser.getDeptId(),sysUser.getDeptId()));
             }
         }
         return sqlPart.toString();
