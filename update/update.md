@@ -320,3 +320,80 @@
                 `del_flag` tinyint(1) DEFAULT '0' COMMENT '0:正常;1:删除;',
                  PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+## V5.0.6 (2024-01-05)
+     ● 升级日志
+         1.关键词群功能全新升级。
+         2.系统数据权限功能升级优化。
+         3.识客码状态启动关闭时数据丢失等相关bug修复。
+
+     ● yml文件更新 
+        linkwe-common.yml
+             linkwechat:
+                 keyWordGroupUrl: ${linkwechat.h5Domain}/#/keywords?id={0} #关键词群
+    ● 菜单更新日志
+       UPDATE `sys_menu` SET `menu_name` = '关键词群', `parent_id` = 2100, `order_num` = 50, `path` = 'keywords', `component` = 'Layout', `is_frame` = 1, `menu_type` = 'M', `visible` = '0', `status` = '0', `perms` = '', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-12-30 21:31:17', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2023-02-28 18:36:00', `remark` = '' WHERE `menu_id` = 2103;
+       UPDATE `sys_menu` SET `menu_name` = '{新增}', `parent_id` = 2103, `order_num` = 10, `path` = 'aev', `component` = 'communityOperating/keywords/aev', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = 'communityOperating/keywords/aev', `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2020-12-31 19:38:49', `update_by` = 'admin', `update_by_id` = NULL, `update_time` = '2024-01-04 11:17:36', `remark` = '' WHERE `menu_id` = 2108;
+       UPDATE `sys_menu` SET `menu_name` = '列表', `parent_id` = 2103, `order_num` = 5, `path` = 'list', `component` = 'communityOperating/keywords/list', `is_frame` = 1, `menu_type` = 'C', `visible` = '1', `status` = '0', `perms` = NULL, `icon` = '#', `create_by` = 'admin', `create_by_id` = NULL, `create_time` = '2023-02-28 18:36:26', `update_by` = NULL, `update_by_id` = NULL, `update_time` = NULL, `remark` = '' WHERE `menu_id` = 2377;
+       INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `is_frame`, `menu_type`, `visible`, `status`, `perms`, `icon`, `create_by`, `create_by_id`, `create_time`, `update_by`, `update_by_id`, `update_time`, `remark`) VALUES (2483, '详情', 2103, 15, 'detail', 'communityOperating/keywords/detail', 1, 'C', '1', '0', NULL, '#', 'admin', NULL, '2023-12-26 23:23:14', NULL, NULL, NULL, '');
+  
+    ● sql更新日志
+        DROP TABLE IF EXISTS `we_key_word_group_sub`;
+        CREATE TABLE `we_key_word_group_sub` (
+            `id` bigint(20) NOT NULL COMMENT '主键',
+            `keyword` varchar(255) DEFAULT NULL COMMENT '关键词',
+            `code_name` varchar(100) CHARACTER SET utf8 DEFAULT NULL COMMENT '活码名称',
+            `keyword_group_id` bigint(20) DEFAULT NULL COMMENT '关键词主表主键',
+            `chat_id_list` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '实际群id，多个使用逗号隔开',
+            `auto_create_room` tinyint(1) DEFAULT '0' COMMENT '当群满了后，是否自动新建群。0-否；1-是。 默认为0',
+            `room_base_name` varchar(255) DEFAULT NULL COMMENT '自动建群的群名前缀，当auto_create_room为1时有效。最长40个utf8字符',
+            `room_base_id` int(11) DEFAULT NULL COMMENT '自动建群的群起始序号，当auto_create_room为1时有效',
+            `group_code_config_id` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码企微信的configId\n',
+            `group_code_state` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码渠道标识\n',
+            `group_code_url` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '群活码图片地址\n',
+            `group_code_name` varchar(255) DEFAULT NULL COMMENT '群名',
+            `sort` tinyint(4) DEFAULT '0' COMMENT '排序',
+            `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+            `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+            `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+            `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+            `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id ',
+            `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+            `del_flag` int(1) DEFAULT '0' COMMENT '0:正常;1:删除;',
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='关键词群子表';
+
+        DROP TABLE IF EXISTS `we_keyword_group`;
+        CREATE TABLE `we_keyword_group` (
+            `id` bigint(20) NOT NULL COMMENT '关键词拉群任务主键',
+            `title` varchar(100) NOT NULL COMMENT '标题',
+            `descrition` varchar(255) DEFAULT NULL COMMENT '描述',
+            `keyword_group_url` varchar(255) DEFAULT NULL COMMENT '关键词群链接二维码链接',
+            `keyword_group_qr_url` varchar(255) DEFAULT NULL COMMENT '关键词群链接二维码链接',
+            `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+            `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+            `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+            `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+            `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+            `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+            `del_flag` char(1) NOT NULL DEFAULT '0' COMMENT '删除标记 0 未删除 1已删除',
+            PRIMARY KEY (`id`) USING BTREE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='关键词拉群任务表';
+        
+        
+        DROP TABLE IF EXISTS `we_keyword_group_view_count`;
+        CREATE TABLE `we_keyword_group_view_count` (
+            `id` bigint(20) NOT NULL COMMENT '主键',
+            `view_num` int(11) DEFAULT '0' COMMENT '访问数量',
+            `keyword_group_id` bigint(20) DEFAULT NULL COMMENT '关键词主表主键',
+            `union_id` varchar(255) DEFAULT NULL COMMENT 'unionld',
+            `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+            `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+            `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+            `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+            `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id ',
+            `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+            `del_flag` int(1) DEFAULT '0' COMMENT '0:正常;1:删除;',
+            PRIMARY KEY (`id`) USING BTREE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='关键词群访问统计';
+
+
