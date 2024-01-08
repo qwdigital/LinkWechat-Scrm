@@ -139,16 +139,12 @@ public class WeKeyWordGroupSubServiceImpl extends ServiceImpl<WeKeyWordGroupSubM
     @Override
     @Transactional
     public void batchRemoveWeKeyWordGroupByKeyWordId(Long keyWordId) {
-        List<WeKeyWordGroupSub> weKeyWordGroupSubs = this.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
-                .eq(WeKeyWordGroupSub::getKeywordGroupId, keyWordId));
+        if(keywordToGroupService.removeById(keyWordId)){
+            this.batchRemoves(
+                    this.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
+                            .eq(WeKeyWordGroupSub::getKeywordGroupId, keyWordId))
+            );
 
-        if(CollectionUtil.isNotEmpty(weKeyWordGroupSubs)){
-            if(keywordToGroupService.removeById(keyWordId)){
-                this.batchRemoves(
-                        weKeyWordGroupSubs
-                );
-
-            }
         }
 
     }
