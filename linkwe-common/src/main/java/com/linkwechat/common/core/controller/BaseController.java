@@ -54,6 +54,23 @@ public class BaseController {
         }
     }
 
+    protected void startPage(Integer pageNum, Integer pageSize) {
+        if (StringUtils.isNotNull(pageNum) && StringUtils.isNotNull(pageSize)) {
+            startPage(pageNum,pageSize,"","");
+        }
+    }
+
+    protected void startPage(Integer pageNum, Integer pageSize, String orderByColumn, String isAsc) {
+        if (StringUtils.isNotNull(pageNum) && StringUtils.isNotNull(pageSize)) {
+            String orderBy = "";
+            if (StringUtils.isNotEmpty(orderByColumn))
+            {
+                orderBy = SqlUtil.escapeOrderBySql(StringUtils.toUnderScoreCase(orderByColumn) + " " + (StringUtils.isEmpty(isAsc)?"asc":isAsc));
+            }
+            PageHelper.startPage(pageNum, pageSize, orderBy);
+        }
+    }
+
     /**
      * 响应请求分页数据
      */

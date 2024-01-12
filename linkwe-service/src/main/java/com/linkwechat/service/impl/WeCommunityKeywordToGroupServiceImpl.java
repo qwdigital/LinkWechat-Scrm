@@ -2,6 +2,7 @@ package com.linkwechat.service.impl;
 
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.config.LinkWeChatConfig;
@@ -118,33 +119,6 @@ public class WeCommunityKeywordToGroupServiceImpl  extends ServiceImpl<WeKeyword
         saveOrUpdate(groupTask);
     }
 
-
-//    @Override
-//    public boolean isNameOccupied(String taskName) {
-//
-//        List<WeKeywordGroupTask> groupTasks = this.list(new LambdaQueryWrapper<WeKeywordGroupTask>()
-//                .eq(WeKeywordGroupTask::getTaskName, taskName)
-//        );
-//        if(CollectionUtil.isNotEmpty(groupTasks)){
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    @Override
-//    public List<WeKeywordGroupTask> getTaskList(WeKeywordGroupTask task) {
-//        return this.baseMapper.getTaskList(task);
-//    }
-//
-//    @Override
-//    public WeKeywordGroupTask getTaskById(Long taskId) {
-//        return this.baseMapper.getTaskById(taskId);
-//    }
-//
-//    @Override
-//    public List<WeKeywordGroupTask> filterByNameOrKeyword(String word) {
-//        return this.baseMapper.filterByNameOrKeyword(word);
-//    }
 
 
 }

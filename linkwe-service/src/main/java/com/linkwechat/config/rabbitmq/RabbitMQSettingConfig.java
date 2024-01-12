@@ -88,6 +88,14 @@ public class RabbitMQSettingConfig {
     @Value("${wecom.mq.exchange.group-add-user:Ex_GroupAddUser}")
     private String groupAddUserEx;
 
+
+    /**
+     * ai消息交换机
+     */
+    @Value("${wecom.mq.exchange.ai-msg:Ex_AiMsg}")
+    private String aiMsgEx;
+
+
     /**
      * -------------------路由------------------------------------
      */
@@ -498,7 +506,11 @@ public class RabbitMQSettingConfig {
     private String groupAddUserCodeQu;
 
 
-
+    /**
+     * ai消息队列
+     */
+    @Value("${wecom.mq.queue.ai-msg:Qu_AiMsg}")
+    private String aiMsgQu;
 
 
 

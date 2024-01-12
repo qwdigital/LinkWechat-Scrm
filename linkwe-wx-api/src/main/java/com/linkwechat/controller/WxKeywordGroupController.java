@@ -62,7 +62,8 @@ public class WxKeywordGroupController extends BaseController {
         startPage();
         List<WeKeyWordGroupSub> weKeyWordGroupSubs = iWeKeyWordGroupSubService.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
                         .like(StringUtils.isNotEmpty(keyWordGroupSub.getKeyword()),WeKeyWordGroupSub::getKeyword,keyWordGroupSub.getKeyword())
-                .eq(WeKeyWordGroupSub::getKeywordGroupId,keyWordGroupSub.getKeywordGroupId()));
+                .eq(WeKeyWordGroupSub::getKeywordGroupId,keyWordGroupSub.getKeywordGroupId())
+                .orderByAsc(WeKeyWordGroupSub::getSort));
         return getDataTable(weKeyWordGroupSubs);
     }
 

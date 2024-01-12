@@ -396,4 +396,46 @@
             PRIMARY KEY (`id`) USING BTREE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='关键词群访问统计';
 
+## V5.1.0 (2024-01-12)
+     ● 升级日志
+         1.系统全面接入AI【目前仅支持:腾讯混元】
+         2.系统相关bug修复。
+     ● yml文件更新 
+        linkwe-common.yml
+             linkwechat:
+                 txAiSecretId: 
+                 txAiSecretKey: 
+                 txAiRegion: 
+        linkwe-ai.yml
+              server:
+                 port: 6060
+              servlet:
+                 context-path: /ai
+              tomcat:
+              uri-encoding: UTF-8
+ 
+    ● sql更新日志
+        CREATE TABLE `we_ai_msg` (
+                `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+                `session_id` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '会话ID',
+                `msg_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'AI对话ID',
+                `user_id` bigint(20) NOT NULL COMMENT '员工ID',
+                `role` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '角色',
+                `content` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内容',
+                `request_id` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '结果ID',
+                `send_time` datetime NOT NULL COMMENT '发送时间',
+                `note` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '免责声明',
+                `collection` tinyint(4) NOT NULL DEFAULT '0' COMMENT '收藏 0-未收藏 1-收藏',
+                `prompt_tokens` int(11) DEFAULT '0' COMMENT '请求消耗token数',
+                `completion_tokens` int(11) DEFAULT '0' COMMENT '回复消耗token数',
+                `total_tokens` int(11) DEFAULT '0' COMMENT '总消耗token数',
+                `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                `create_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
+                `create_by_id` bigint(11) DEFAULT NULL COMMENT '创建人id',
+                `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                `update_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
+                `update_by_id` bigint(11) DEFAULT NULL COMMENT '更新人id',
+                `del_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否删除:0有效,1删除',
+                PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ai助手消息表';
 
