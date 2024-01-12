@@ -8,6 +8,7 @@ import com.linkwechat.common.core.domain.entity.SysRole;
 import com.linkwechat.common.core.domain.entity.SysUser;
 import com.linkwechat.common.core.domain.model.LoginUser;
 import com.linkwechat.common.enums.DataScopeType;
+import com.linkwechat.common.utils.DataScopeSqlUtils;
 import com.linkwechat.common.utils.SecurityUtils;
 import com.linkwechat.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -44,87 +45,11 @@ public class DataScopeAspect {
         if (StringUtils.isNotNull(loginUser)) {
             SysUser currentUser = loginUser.getSysUser();
             // 如果是超级管理员，则不过滤数据
-//        SysUser currentUser = new SysUser();
-//        currentUser.setUserId(new Long(168));
-//        currentUser.setDataScope(5);
             if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin()) {
                 dataScopeFilterForSysUser(joinPoint, currentUser, controllerDataScope);
             }
         }
     }
-
-//    /**
-//     * 数据范围过滤(角色绑定数据权限)
-//     *
-//     * @param joinPoint 切点
-//     * @param user      用户
-//     * @param controllerDataScope 部门别名
-//     */
-//    public static void dataScopeFilterForRole(JoinPoint joinPoint, SysUser user, DataScope controllerDataScope) {
-//        StringBuilder sqlString = new StringBuilder();
-//
-//        String type = controllerDataScope.type();
-//
-//        for (SysRole role : user.getRoles()) {
-//            String dataScope = role.getDataScope();
-//            if (DataScopeType.DATA_SCOPE_ALL.equals(dataScope)) {
-//                sqlString = new StringBuilder();
-//                break;
-//            } else if (DataScopeType.DATA_SCOPE_CUSTOM.equals(dataScope)) {
-//                if(type.equals("1")){
-//                    sqlString.append(StringUtils.format(
-//                            " OR {}.dept_id IN ( SELECT dept_id FROM sys_role_dept WHERE role_id = {} ) ", controllerDataScope.deptAlias(),
-//                            role.getRoleId()));
-//                }else {
-//                    DataColumn dataColumn = controllerDataScope.value()[0];
-//                    sqlString.append(StringUtils.format(
-//                            " or {}.{} in ( select distinct sud.{} from sys_role_dept srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0  where srd.role_id = {} )",
-//                            dataColumn.alias(), dataColumn.name(),dataColumn.userid(), role.getRoleId()));
-//                }
-//            } else if (DataScopeType.DATA_SCOPE_DEPT.equals(dataScope)) {
-//                if(type.equals("1")){
-//                    sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", controllerDataScope.deptAlias(), user.getDeptId()));
-//                }else {
-//                    DataColumn dataColumn = controllerDataScope.value()[0];
-//                    sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user_dept where dept_id= {}  and del_flag = 0 ) ",
-//                            dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDept()));
-//                }
-//            } else if (DataScopeType.DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope)) {
-//                if(type.equals("1")){
-//                    sqlString.append(StringUtils.format(
-//                            " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
-//                            controllerDataScope.deptAlias(), user.getDeptId(), user.getDeptId()));
-//                }else {
-//                    DataColumn dataColumn = controllerDataScope.value()[0];
-//                    sqlString.append(StringUtils.format(
-//                            " or {}.{} in ( select distinct sud.{} from sys_dept sd inner join sys_user_dept sud on sd.dept_id = sud.dept_id and sud.del_flag = 0 where (sd.dept_id = {} or find_in_set( {} , sd.ancestors )) and sd.del_flag = 0 ) ",
-//                            dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getDeptId(), user.getDeptId()));
-//                }
-//            } else if (DataScopeType.DATA_SCOPE_SELF.equals(dataScope)) {
-//                if(type.equals("1")){
-//                    if (StringUtils.isNotBlank(controllerDataScope.userAlias())) {
-//                        sqlString.append(StringUtils.format(" OR {}.user_id = {} ", controllerDataScope.userAlias(), user.getUserId()));
-//                    } else {
-//                        // 数据权限为仅本人且没有userAlias别名不查询任何数据
-//                        sqlString.append(" OR 1=0 ");
-//                    }
-//                }else {
-//                    DataColumn dataColumn = controllerDataScope.value()[0];
-//                    sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user where user_id = {} and del_flag = 0 ) ",
-//                            dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getUserId()));
-//                }
-//            }
-//        }
-//
-//        if (StringUtils.isNotBlank(sqlString.toString()) && joinPoint.getArgs().length > 0) {
-//            Object params = joinPoint.getArgs()[0];
-//            if (StringUtils.isNotNull(params) && params instanceof BaseEntity) {
-//                BaseEntity baseEntity = (BaseEntity) params;
-//                baseEntity.getParams().put(DATA_SCOPE, " (" + sqlString.substring(4) + ")");
-//            }
-//        }
-//    }
-
 
     /**
      * 数据范围过滤(员工绑定数据权限)
@@ -141,84 +66,19 @@ public class DataScopeAspect {
             log.error("DataScopeType"+type);
             switch (type){
                 case DATA_SCOPE_ALL:
-                    sqlString = new StringBuilder();
+                    sqlString=new StringBuilder();
                     return;
                 case DATA_SCOPE_CUSTOM:
-                    if(controllerDataScope.type().equals("1")){
-                        sqlString.append(StringUtils.format(
-                                " OR {}.dept_id IN ( SELECT dept_id FROM sys_user_manage_scop WHERE user_id = {} ) ", controllerDataScope.deptAlias(),
-                                user.getUserId()));
-                    }else {
-                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
-                            DataColumn dataColumn = controllerDataScope.value()[0];
-                            sqlString.append(StringUtils.format(
-                                    " or {}.{} in ( select distinct sud.{} from sys_user_manage_scop srd inner join sys_user_dept sud on srd.dept_id= sud.dept_id and sud.del_flag = 0  where srd.user_id = {} )",
-                                    dataColumn.alias(), dataColumn.name(),dataColumn.userid(), user.getUserId()));
-                        }
-
-                    }
+                    sqlString.append( DataScopeSqlUtils.setWhereForSysUser(controllerDataScope,user));
                     break;
                 case DATA_SCOPE_DEPT:
-                    if(controllerDataScope.type().equals("1")){
-                        sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", controllerDataScope.deptAlias(), user.getDeptId()));
-                    }else {
-
-
-                        if(StringUtils.isNotEmpty(user.getDeptIds())){
-                            if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
-                                DataColumn dataColumn = controllerDataScope.value()[0];
-                                sqlString.append(StringUtils.format(" or {}.{} in (  SELECT {} from sys_user_dept where dept_id in ({}) ) ",
-                                        dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDeptIds()));
-                            }
-
-
-                        }else{
-                            if(user.getDeptId() != null){
-                                if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
-                                    DataColumn dataColumn = controllerDataScope.value()[0];
-                                    sqlString.append(StringUtils.format(" or {}.{} in ( SELECT {} from sys_user_dept where dept_id in ({}) ) ",
-                                            dataColumn.alias(), dataColumn.name(),dataColumn.userid(),user.getDeptId()));
-                                }
-
-                            }
-                        }
-
-
-                    }
+                    sqlString.append(DataScopeSqlUtils.setWhereForDept(controllerDataScope, user));
                     break;
                 case DATA_SCOPE_DEPT_AND_CHILD:
-                    if(controllerDataScope.type().equals("1")){
-                        sqlString.append(StringUtils.format(
-                                " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
-                                controllerDataScope.deptAlias(), user.getDeptId(), user.getDeptId()));
-                    }else {
-                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
-
-                            DataColumn dataColumn = controllerDataScope.value()[0];
-                            sqlString.append(StringUtils.format(
-                                    " or {}.{} in ( select distinct sud.{} from sys_dept sd inner join sys_user_dept sud on sd.dept_id = sud.dept_id and sud.del_flag = 0 where (sd.dept_id = {} or find_in_set( {} , sd.ancestors )) and sd.del_flag = 0 ) ",
-                                    dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getDeptId(), user.getDeptId()));
-                        }
-
-                    }
+                    sqlString.append(DataScopeSqlUtils.setWhereForDeptAndChild(controllerDataScope, user));
                     break;
                 case DATA_SCOPE_SELF:
-                    if(controllerDataScope.type().equals("1")){
-                        if (StringUtils.isNotBlank(controllerDataScope.userAlias())) {
-                            sqlString.append(StringUtils.format(" AND {}.user_id = {} ", controllerDataScope.userAlias(), user.getUserId()));
-                        } else {
-                            // 数据权限为仅本人且没有userAlias别名不查询任何数据
-                            sqlString.append(" OR 1=0 ");
-                        }
-                    }else {
-
-                        if(ArrayUtil.isNotEmpty(controllerDataScope.value())){
-                            DataColumn dataColumn = controllerDataScope.value()[0];
-                            sqlString.append(StringUtils.format(" or {}.{} in ( select {} from sys_user where user_id = {} and del_flag = 0 ) ",
-                                    dataColumn.alias(), dataColumn.name(), dataColumn.userid(), user.getUserId()));
-                        }
-
-                    }
+                    sqlString.append(DataScopeSqlUtils.setWhereForSelf(controllerDataScope, user));
                     break;
                 default:
                     break;

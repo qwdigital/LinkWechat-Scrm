@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author danmo
  * @description 回调验证XML对象
@@ -36,5 +38,7 @@ public class WeBackBaseVo {
 
     @ApiModelProperty("应用ID")
     private String AgentID;
+
+
 
 }

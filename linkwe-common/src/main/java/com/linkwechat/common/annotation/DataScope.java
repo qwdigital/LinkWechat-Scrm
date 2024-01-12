@@ -18,7 +18,7 @@ public @interface DataScope
 {
 
     /**
-     * 业务类型 1-system 2-api
+     * 业务类型 1-按照部门查询 2-按照员工id查询
      * @return
      */
     public String type() default "1";

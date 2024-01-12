@@ -1,21 +1,20 @@
 package com.linkwechat.domain.community.vo;
 
-
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.common.converter.SexConverter;
-import com.linkwechat.common.converter.WhetherConverter;
 import com.linkwechat.converter.CustomerTypeConverter;
-import com.linkwechat.domain.wecom.query.kf.WeUpgradeServiceQuery;
 import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * 关键词群数据明细
+ */
 @Data
-public class WeCommunityNewGroupTableVo {
+public class WeCommunityKeyWordGroupTableVo {
 
     /**
      * 头像
@@ -72,37 +71,11 @@ public class WeCommunityNewGroupTableVo {
 
 
 
-//    /**
-//     * 群id
-//     */
-//    private String chatId;
-//
-//    /**
-//     * 入群时间
-//     */
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-//    private Date joinTime;
-//
-//
-//    /**
-//     * 群名称
-//     */
-//    private String groupName;
-
     /**
      * 进群数
      */
     @ExcelProperty(value = "进群数")
     private int joinGroupNumber;
-
-
-    /**
-     * 是否进群，1:是 0:否
-     */
-    @ExcelProperty(value = "是否进群", converter = WhetherConverter.class)
-    private Integer isJoinGroup;
-
-
 
 
 

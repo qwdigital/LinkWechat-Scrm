@@ -136,4 +136,12 @@ public interface IWeStoreCodeService extends IService<WeStoreCode> {
    * @return
    */
   List<WeStoreCodeTableVo> findWeStoreCodeTables(WeStoreCodeQuery weStoreCodeQuery);
+
+
+ /**
+  * 批量更新状态
+  * @param storeState
+  * @param ids
+  */
+  void batchUpdateState(Integer storeState,List<Long> ids);
 }
