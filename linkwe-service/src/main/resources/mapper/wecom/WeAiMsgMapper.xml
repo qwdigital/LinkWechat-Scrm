@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkwechat.mapper.WeAiMsgMapper">
+
+    <!--<cache type="yiche.scrm.config.mybatis.MybatisRedisCache"/>-->
+
+    <resultMap type="com.linkwechat.domain.WeAiMsg" id="WeAiMsgResult">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="sessionId" column="session_id" jdbcType="VARCHAR"/>
+        <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="role" column="role" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="requestId" column="request_id" jdbcType="VARCHAR"/>
+        <result property="sendTime" column="send_time" jdbcType="TIMESTAMP"/>
+        <result property="note" column="note" jdbcType="VARCHAR"/>
+        <result property="collection" column="collection" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createById" column="create_by_id" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateById" column="update_by_id" jdbcType="INTEGER"/>
+        <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectWeAiMsgVo">
+        select id,
+               session_id,
+               msg_id,
+               user_id,
+               role,
+               content,
+               request_id,
+               send_time,
+               note,
+               collection,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_ai_msg
+    </sql>
+
+    <select id="getSessionList" resultMap="WeAiMsgResult">
+        select id,
+               session_id,
+               msg_id,
+               user_id,
+               role,
+               content,
+               request_id,
+               send_time,
+               note,
+               collection,
+               create_time,
+               create_by,
+               create_by_id,
+               update_time,
+               update_by,
+               update_by_id,
+               del_flag
+        from we_ai_msg
+        where id in (select max(id)
+                     from we_ai_msg
+                     where user_id = #{userId}
+                     <if test="content !=null and content != ''">
+                         and content like concat('%', #{content}, '%')
+                     </if>
+                     and role = 'user'
+                     and del_flag = 0
+                     group by session_id)
+        order by id desc
+    </select>
+
+    <select id="collectionMsgIdByQuery" resultType="java.lang.String">
+        select distinct msg_id from  we_ai_msg
+        <where>
+            and user_id = #{userId}
+            <if test="content !=null and content != ''">
+                and content like concat('%', #{content}, '%')
+            </if>
+            and collection = 1
+        </where>
+        order by id desc
+    </select>
+
+    <select id="collectionList" resultMap="WeAiMsgResult">
+        <include refid="selectWeAiMsgVo"/>
+        <where>
+           and msg_id in
+            <foreach collection="msgIds" item="msgId" open="(" separator="," close=")">
+                #{msgId}
+            </foreach>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="computeTodayToken" resultType="java.lang.Integer">
+        SELECT sum(total_tokens) as token_total from we_ai_msg where DATE_FORMAT(send_time,'%Y-%m-%d') =  DATE_FORMAT(now(),'%Y-%m-%d')
+    </select>
+
+</mapper>

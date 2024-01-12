@@ -17,11 +17,13 @@ import com.linkwechat.domain.wecom.query.customer.groupchat.WeGroupChatUpdateJoi
 import com.linkwechat.domain.wecom.vo.WeResultVo;
 import com.linkwechat.domain.wecom.vo.customer.groupchat.WeGroupChatGetJoinWayVo;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.service.IWeCommunityKeywordToGroupService;
 import com.linkwechat.service.IWeGroupCodeService;
 import com.linkwechat.service.IWeGroupService;
 import com.linkwechat.service.IWeKeyWordGroupSubService;
 import com.linkwechat.mapper.WeKeyWordGroupSubMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,9 @@ public class WeKeyWordGroupSubServiceImpl extends ServiceImpl<WeKeyWordGroupSubM
     @Autowired
     private IWeGroupService iWeGroupService;
 
+    @Autowired
+    @Lazy
+    private IWeCommunityKeywordToGroupService keywordToGroupService;
     @Override
     public void createWeKeyWordGroup(WeKeyWordGroupSub weKeyWordGroupSub) {
 
@@ -134,10 +139,13 @@ public class WeKeyWordGroupSubServiceImpl extends ServiceImpl<WeKeyWordGroupSubM
     @Override
     @Transactional
     public void batchRemoveWeKeyWordGroupByKeyWordId(Long keyWordId) {
-         this.batchRemoves(
-                 this.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
-                         .eq(WeKeyWordGroupSub::getKeywordGroupId, keyWordId))
-         );
+        if(keywordToGroupService.removeById(keyWordId)){
+            this.batchRemoves(
+                    this.list(new LambdaQueryWrapper<WeKeyWordGroupSub>()
+                            .eq(WeKeyWordGroupSub::getKeywordGroupId, keyWordId))
+            );
+
+        }
 
     }
 

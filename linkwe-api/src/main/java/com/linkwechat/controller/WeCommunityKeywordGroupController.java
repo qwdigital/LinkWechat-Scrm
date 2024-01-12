@@ -1,6 +1,7 @@
 package com.linkwechat.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageInfo;
 import com.linkwechat.common.annotation.Log;
@@ -200,6 +201,20 @@ public class WeCommunityKeywordGroupController extends BaseController {
         }
         return AjaxResult.success();
 
+    }
+
+
+    /**
+     * 删除关键词群
+     * @param ids
+     * @return
+     */
+    @DeleteMapping("/batchRemoveKeyWordGroup/{ids}")
+    public AjaxResult batchRemoveKeyWordGroup(@PathVariable Long[] ids){
+        ListUtil.toList(ids).forEach(id->{
+            iWeKeyWordGroupSubService.batchRemoveWeKeyWordGroupByKeyWordId(id);
+        });
+        return AjaxResult.success();
     }
 
     /**

@@ -818,7 +818,7 @@ public class RabbitMQConfig {
     @Bean
     public Exchange sopEx() {
         // 声明路由交换机，durable:在rabbitmq重启后，交换机还在
-        return ExchangeBuilder.directExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
+        return ExchangeBuilder.fanoutExchange(rabbitMQSettingConfig.getSopEx()).durable(true).build();
     }
 
 
@@ -1020,6 +1020,31 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(quWeTasksDelay()).to(delayEx()).with(rabbitMQSettingConfig.getWeTasksDelayRk()).noargs();
     }
 
+    /**
+     * AI消息队列
+     * @return
+     */
+    @Bean
+    public Queue quAiMsg() {
+        return new Queue(rabbitMQSettingConfig.getAiMsgQu());
+    }
 
+    /**
+     * AI广播交换机
+     * @return
+     */
+    @Bean
+    public Exchange aiMsgEx() {
+        return ExchangeBuilder.topicExchange(rabbitMQSettingConfig.getAiMsgEx()).durable(true).build();
+    }
+
+    /**
+     * 绑定AI队列
+     * @return
+     */
+    @Bean
+    public Binding bindingWeAiMsg() {
+        return BindingBuilder.bind(quAiMsg()).to(aiMsgEx()).with("").noargs();
+    }
 }
 
