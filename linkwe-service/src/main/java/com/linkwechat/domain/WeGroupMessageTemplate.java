@@ -30,7 +30,7 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
     /**
      * 主键id
      */
-    @TableId(type = IdType.AUTO)
+    @TableId
     private Long id;
 
 
@@ -96,9 +96,42 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
     private Integer delFlag;
 
 
-    /**
-     * 客户查询条件
+    /*
+     *客户或客群查询条件
      */
     @TableField(updateStrategy = FieldStrategy.IGNORED,typeHandler = FastjsonTypeHandler.class)
-    private WeCustomersQuery weCustomersQuery;
+    private WeCustomersOrGroupQuery weCustomersOrGroupQuery;
+
+
+
+
+    @Data
+    public static class WeCustomersOrGroupQuery{
+
+        /**
+         * 群发送查询条件
+         */
+        private WeGroupQuery weGroupQuery;
+
+        /**
+         * 客户发送查询条件
+         */
+        private WeCustomersQuery weCustomersQuery;
+
+    }
+
+    @Data
+    public static class WeGroupQuery{
+
+        /**
+         * 群主id,多个使用逗号隔开
+         */
+        private String owners;
+
+        /**
+         * 群主名称，多个使用逗号隔开
+         */
+        private String ownerNames;
+
+    }
 }
