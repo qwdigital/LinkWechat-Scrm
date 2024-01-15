@@ -52,6 +52,14 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
     private Integer msgSource=1;
 
 
+    /**
+     * 客户查询条件
+     */
+
+    private WeCustomersQuery weCustomersQuery;
+
+
+
 
     public void setCurrentUserInfo(LoginUser loginUser) {
         this.loginUser = loginUser;
