@@ -3,6 +3,8 @@ package com.linkwechat.common.resolver;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.linkwechat.common.utils.ReflectionUtils;
+import org.aspectj.apache.bcel.classfile.Constant;
+
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -178,28 +180,6 @@ public class PlaceholderResolver {
         return resolveByRule(content, placeholderValue -> String.valueOf(ReflectionUtils.getValueByFieldPath(obj, placeholderValue)));
     }
 
-    /**
-     * 格式化字符串，可以使用类似${obj.name}的形式来取map里面的值，如果没有取到对应的值，则不做任何修改， 这个方法是我自己写的，其他的方法都是大佬写的<br/>
-     * 如：str="姓名：${name}，出生年月：${year}",map={name="张三丰",year=1990}，则format(str,map) = "姓名：张三丰，出生年月：1990"
-     * @param str 包含${obj.value}的字符串
-     * @param map 包含所有对象属性的map
-     * @return
-     */
-    @NotNull
-    public static String format(String str, Map<String, Object> map) {
-        StringBuilder sb = new StringBuilder(str);
-        Pattern p = Pattern.compile("\\$\\{\\w+\\}");
-        Matcher matcher = p.matcher(str);
-        while (matcher.find()) {
-            String param = matcher.group();
-            String key = param.substring(param.indexOf("{")+1,param.lastIndexOf("}"));
-            if (map.containsKey(key)) {
-                int start = sb.indexOf(param);
-                sb.replace(start,start + param.length(), StrUtil.toString(map.get(key)));
-            }
-        }
-        return sb.toString();
-    }
 
     /**
      * 将List<Map<String,Object>>形式的对象中的下划线的键转成驼峰大小写的键的形式
@@ -252,27 +232,7 @@ public class PlaceholderResolver {
         return builder.toString();
     }
 
-    /**
-     * 将 驼峰形式的字符串 转成 全小写/大写以下划线分割形式的字符串
-     * @param text
-     * @param defaultConfig true,全转成大写; 默认小写
-     * @return
-     */
-    public static String camelCaseToUnderline(String text,Boolean ...defaultConfig){
-        Matcher matcher = Pattern.compile("[A-Z]").matcher(text);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, "_" + matcher.group().toLowerCase());
-        }
-        matcher.appendTail(sb);
-        if (sb.toString().startsWith("_")) {
-            sb.delete(0, 1);
-        }
-        if (defaultConfig.length>0 && defaultConfig[0]) {
-            return sb.toString().toUpperCase();
-        }
-        return sb.toString();
-    }
+
 
     /**
      * 把long型的秒数转成localDateTime
