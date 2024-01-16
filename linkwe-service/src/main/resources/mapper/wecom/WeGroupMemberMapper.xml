@@ -170,6 +170,7 @@
             wc.external_userid
         HAVING
             groupNumber > 1
+        ORDER BY wc.update_time DESC
     </select>
 
 
