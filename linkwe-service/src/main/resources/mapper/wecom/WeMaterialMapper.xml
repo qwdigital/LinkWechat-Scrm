@@ -109,7 +109,7 @@
             <if test="pixelSize != null ">and t.pixel_size &lt;= #{pixelSize}</if>
             <if test="memorySize != null ">and t.memory_size &lt;= #{memorySize}</if>
         </where>
-        order by t.create_time desc
+        order by t.update_time desc
     </select>
 
     <select id="getWeMaterialAnalyseTop" resultType="com.linkwechat.domain.material.vo.WeMaterialAnalyseVo"

@@ -138,6 +138,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
             router.setPath(getRouterPath(menu));
             router.setComponent(getComponent(menu));
             router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
+            router.setOrderNum(Integer.parseInt(menu.getOrderNum()));
             List<SysMenu> cMenus = menu.getChildren();
             if (!cMenus.isEmpty() && cMenus.size() > 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
                 router.setAlwaysShow(true);
@@ -150,12 +151,21 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 children.setComponent(menu.getComponent());
                 children.setName(StringUtils.capitalize(menu.getPath()));
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
+                children.setOrderNum(Integer.parseInt(menu.getOrderNum()));
                 childrenList.add(children);
-                router.setChildren(childrenList);
+                router.setChildren(this.sortByOrderNum(
+                        childrenList
+                ));
             }
             routers.add(router);
         }
-        return routers;
+        return this.sortByOrderNum(routers);
+    }
+
+    private List<RouterVo> sortByOrderNum(List<RouterVo> routerVoList) {
+        return routerVoList.stream()
+                .sorted(Comparator.comparingInt(RouterVo::getOrderNum))
+                .collect(Collectors.toList());
     }
 
     /**
