@@ -367,7 +367,7 @@ public class WeCustomerServiceImpl extends ServiceImpl<WeCustomerMapper, WeCusto
                 weCustomer.setAvatar(externalContact.getAvatar());
                 weCustomer.setGender(externalContact.getGender());
                 weCustomer.setUnionid(externalContact.getUnionId());
-                weCustomer.setCorpName(followInfo.getRemarkCompany());
+                weCustomer.setCorpName(StringUtils.isNotEmpty(externalContact.getCorpFullName())?externalContact.getCorpFullName():externalContact.getCorpName());
                 weCustomer.setAddUserId(followInfo.getUserId());
                 weCustomer.setAddTime(new Date(followInfo.getCreateTime() * 1000L));
                 weCustomer.setAddMethod(followInfo.getAddWay());
