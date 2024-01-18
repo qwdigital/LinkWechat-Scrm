@@ -2,6 +2,7 @@ package com.linkwechat;
 
 
 import com.linkwechat.common.config.fegin.FeginConfig;
+import com.linkwechat.common.constant.WeServerNameConstants;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -19,7 +20,7 @@ public class LinkWechatGatewayApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(LinkWechatGatewayApplication.class)
                 .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-gateway")
+                .properties("spring.application.name="+ WeServerNameConstants.linkweGateway)
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-gateway启动成功   ლ(´ڡ`ლ)ﾞ ");
     }

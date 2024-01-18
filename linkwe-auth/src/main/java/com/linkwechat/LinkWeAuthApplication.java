@@ -2,6 +2,7 @@ package com.linkwechat;
 
 import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 import com.linkwechat.common.config.fegin.FeginConfig;
+import com.linkwechat.common.constant.WeServerNameConstants;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -22,7 +23,7 @@ public class LinkWeAuthApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(LinkWeAuthApplication.class)
                 .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-auth")
+                .properties("spring.application.name="+ WeServerNameConstants.linkweAuth)
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-auth启动成功   ლ(´ڡ`ლ)ﾞ ");
     }
