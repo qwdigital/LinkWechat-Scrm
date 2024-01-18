@@ -1,6 +1,7 @@
 package com.linkwechat.scheduler;
 
 import com.linkwechat.common.config.fegin.FeginConfig;
+import com.linkwechat.common.constant.WeServerNameConstants;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -17,7 +18,7 @@ public class LinkWechatSchedulerApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(LinkWechatSchedulerApplication.class)
                 .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-scheduler")
+                .properties("spring.application.name="+ WeServerNameConstants.linkweScheduler)
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-scheduler启动成功   ლ(´ڡ`ლ)ﾞ ");
     }

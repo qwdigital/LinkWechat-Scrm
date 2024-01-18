@@ -2,6 +2,7 @@ package com.linkwechat;
 
 import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 import com.linkwechat.common.config.fegin.FeginConfig;
+import com.linkwechat.common.constant.WeServerNameConstants;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -18,7 +19,7 @@ public class LinkWeApiApplication {
 
         new SpringApplicationBuilder(LinkWeApiApplication.class)
                 .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-api")
+                .properties("spring.application.name="+ WeServerNameConstants.linkweApi)
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-api启动成功   ლ(´ڡ`ლ)ﾞ ");
 
