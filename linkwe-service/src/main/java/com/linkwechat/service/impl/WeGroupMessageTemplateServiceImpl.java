@@ -191,6 +191,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         checkSenderList(query, senderList);
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
+        weGroupMessageTemplate.setId(null);
         if (query.getSendTime() == null) {
             weGroupMessageTemplate.setSendTime(new Date());
         }
