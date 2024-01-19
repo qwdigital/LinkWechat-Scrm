@@ -507,7 +507,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
                         if(weFission.getIsTip().equals(new Integer(2))){
                             weFission.setIsTip(1);
                             WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
-                            messageQuery.setAll(false);
+                            messageQuery.setIsAll(false);
                             messageQuery.setMsgSource(4);
                             messageQuery.setIsTask(0);
                             messageQuery.setLoginUser(SecurityUtils.getLoginUser());

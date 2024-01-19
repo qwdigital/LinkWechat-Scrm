@@ -127,7 +127,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         detailVo.setRefreshTime(weGroupMessageTemplate.getRefreshTime());
         detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
         detailVo.setContent(weGroupMessageTemplate.getContent());
-        detailVo.setIsAll(weGroupMessageTemplate.isAll());
+        detailVo.setIsAll(weGroupMessageTemplate.isAllSend());
         detailVo.setWeCustomersOrGroupQuery(weGroupMessageTemplate.getWeCustomersOrGroupQuery());
         List<WeGroupMessageAttachments> attachmentsList = attachmentsService.lambdaQuery().eq(WeGroupMessageAttachments::getMsgTemplateId, id).list();
         detailVo.setAttachments(attachmentsList);
@@ -158,7 +158,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     public void addGroupMsgTemplate(WeAddGroupMessageQuery query) {
         log.info("addGroupMsgTemplate 入参：query:{}", JSONObject.toJSONString(query));
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
-
+        query.setAllSend(query.getIsAll());
         if(query.getChatType().equals(new Integer(1))){ //发送客户
             query.setWeCustomersOrGroupQuery(
                     WeGroupMessageTemplate.WeCustomersOrGroupQuery.builder()
@@ -278,7 +278,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     }
 
     private void checkSenderList(WeAddGroupMessageQuery query, List<WeAddGroupMessageQuery.SenderInfo> senderList) {
-        if (query.isAll() && CollectionUtil.isEmpty(senderList)) {
+        if (query.getIsAll() && CollectionUtil.isEmpty(senderList)) {
             if (query.getChatType() == 1) {
                 List<WeAddGroupMessageQuery.SenderInfo> limitSenderInfoWeCustomerList = weCustomerService.findLimitSenderInfoWeCustomerList();
 
@@ -304,9 +304,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                     throw new WeComException("暂无客户群可发送");
                 }
             }
-        } else if (!query.isAll() && CollectionUtil.isEmpty(senderList)) {
+        } else if (!query.getIsAll() && CollectionUtil.isEmpty(senderList)) {
             throw new WeComException("无指定接收消息的成员及对应客户列表");
-        } else if (!query.isAll() && CollectionUtil.isNotEmpty(senderList) && query.getChatType() == 2) {
+        } else if (!query.getIsAll() && CollectionUtil.isNotEmpty(senderList) && query.getChatType() == 2) {
             List<String> userIds = senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.toList());
             List<WeGroup> groupList = weGroupService.list(new LambdaQueryWrapper<WeGroup>().in(WeGroup::getOwner, userIds).eq(WeGroup::getDelFlag, 0));
             if (CollectionUtil.isNotEmpty(groupList)) {
