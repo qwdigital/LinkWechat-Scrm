@@ -127,6 +127,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         detailVo.setRefreshTime(weGroupMessageTemplate.getRefreshTime());
         detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
         detailVo.setContent(weGroupMessageTemplate.getContent());
+        detailVo.setIsAll(weGroupMessageTemplate.getIsAll());
+        detailVo.setWeCustomersOrGroupQuery(weGroupMessageTemplate.getWeCustomersOrGroupQuery());
         List<WeGroupMessageAttachments> attachmentsList = attachmentsService.lambdaQuery().eq(WeGroupMessageAttachments::getMsgTemplateId, id).list();
         detailVo.setAttachments(attachmentsList);
         List<WeGroupMessageTask> taskList = messageTaskService.lambdaQuery().eq(WeGroupMessageTask::getMsgTemplateId, id).list();
