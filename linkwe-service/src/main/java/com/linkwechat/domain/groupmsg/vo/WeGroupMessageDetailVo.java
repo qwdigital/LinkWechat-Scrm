@@ -64,7 +64,7 @@ public class WeGroupMessageDetailVo {
     /**
      * 是否全部发送
      */
-    private boolean isAll=true;
+    private Boolean isAll=true;
 
 
     private WeGroupMessageTemplate.WeCustomersOrGroupQuery weCustomersOrGroupQuery;
