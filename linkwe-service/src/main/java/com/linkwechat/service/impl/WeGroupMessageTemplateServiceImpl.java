@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
 import com.linkwechat.common.constant.Constants;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MessageType;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
@@ -19,9 +20,14 @@ import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageDetailVo;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
+import com.linkwechat.fegin.QwAuthClient;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QwSysUserClient;
+import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.mapper.WeGroupMessageTemplateMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +76,9 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
 
     @Autowired
     private QwCustomerClient qwCustomerClient;
+
+    @Autowired
+    private QwSysUserClient qwSysUserClient;
 
 
 
@@ -147,6 +156,35 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     public void addGroupMsgTemplate(WeAddGroupMessageQuery query) {
         log.info("addGroupMsgTemplate 入参：query:{}", JSONObject.toJSONString(query));
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
+
+        if(query.getChatType().equals(new Integer(1))){ //发送客户
+            query.setWeCustomersOrGroupQuery(
+                    WeGroupMessageTemplate.WeCustomersOrGroupQuery.builder()
+                            .weCustomersQuery(query.getWeCustomersQuery())
+                            .build()
+            );
+        }else if(query.getChatType().equals(new Integer(2))){ //发送客群
+
+
+            if(CollectionUtil.isNotEmpty(senderList)){
+                AjaxResult<List<SysUserVo>> sysUserVos = qwSysUserClient.getUserListByWeUserIds(SysUserQuery.builder()
+                        .weUserIds(senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.toList()))
+                        .build());
+
+                query.setWeCustomersOrGroupQuery(
+                        WeGroupMessageTemplate.WeCustomersOrGroupQuery.builder()
+                                .weGroupQuery(
+                                        WeGroupMessageTemplate.WeGroupQuery.builder()
+                                                .owners(senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.joining(",")))
+                                                .ownerNames(CollectionUtil.isNotEmpty(sysUserVos.getData())?sysUserVos.getData().stream().map(SysUserVo::getUserName).collect(Collectors.joining(",")):null)
+                                                .build()
+                                )
+                                .build()
+                );
+            }
+
+
+        }
 
         checkSenderList(query, senderList);
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();

@@ -8,7 +8,10 @@ import com.linkwechat.common.core.domain.BaseEntity;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -91,6 +94,12 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
 
 
     /**
+     * 是否全部发送
+     */
+    private Boolean isAll=true;
+
+
+    /**
      * 删除标识 0 有效 1删除
      */
     private Integer delFlag;
@@ -106,6 +115,9 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
 
 
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class WeCustomersOrGroupQuery{
 
         /**
@@ -118,9 +130,13 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
          */
         private WeCustomersQuery weCustomersQuery;
 
+
     }
 
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class WeGroupQuery{
 
         /**
