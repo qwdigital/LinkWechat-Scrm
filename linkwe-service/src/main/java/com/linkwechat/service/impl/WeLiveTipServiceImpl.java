@@ -57,7 +57,7 @@ implements IWeLiveTipService {
                             WeAddGroupMessageQuery messageQuery = new WeAddGroupMessageQuery();
                             messageQuery.setIsTask(0);
                             messageQuery.setMsgSource(3);
-                            messageQuery.setIsAll(false);
+                            messageQuery.setAll(false);
                             messageQuery.setBusinessIds(weLive.getId().toString());
                             LoginUser loginUser=new LoginUser();
                             loginUser.setUserName(SecurityUtils.getUserName());

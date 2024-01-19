@@ -25,7 +25,7 @@ import java.util.Date;
 @ApiModel
 @Data
 @SuppressWarnings("serial")
-@TableName("we_group_message_template")
+@TableName(value="we_group_message_template",autoResultMap = true)
 public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L; //1
@@ -96,7 +96,7 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
     /**
      * 是否全部发送
      */
-    private Boolean isAll=true;
+    private boolean isAll=true;
 
 
     /**
