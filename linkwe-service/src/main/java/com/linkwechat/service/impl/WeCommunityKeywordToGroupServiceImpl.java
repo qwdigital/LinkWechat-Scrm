@@ -48,7 +48,8 @@ public class WeCommunityKeywordToGroupServiceImpl  extends ServiceImpl<WeKeyword
     public List<WeKeywordGroupTask> findLists(WeKeywordGroupTask task) {
 
         List<WeKeywordGroupTask> groupTasks = this.list(new LambdaQueryWrapper<WeKeywordGroupTask>()
-                .like(StringUtils.isNotEmpty(task.getTitle()), WeKeywordGroupTask::getTitle, task.getTitle()));
+                .like(StringUtils.isNotEmpty(task.getTitle()), WeKeywordGroupTask::getTitle, task.getTitle())
+                .orderByDesc(WeKeywordGroupTask::getUpdateTime));
 
 
         if(CollectionUtil.isNotEmpty(groupTasks)){

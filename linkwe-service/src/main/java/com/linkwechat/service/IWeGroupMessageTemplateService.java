@@ -1,12 +1,14 @@
 package com.linkwechat.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.domain.WeGroupMessageAttachments;
 import com.linkwechat.domain.WeGroupMessageSendResult;
 import com.linkwechat.domain.WeGroupMessageTask;
 import com.linkwechat.domain.WeGroupMessageTemplate;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageDetailVo;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -71,25 +73,10 @@ public interface IWeGroupMessageTemplateService extends IService<WeGroupMessageT
 
 
     /**
-     * 通过业务ID查询模板信息
-     * @param businessIds 业务ID
-     * @param source 来源
+     * 根据群发id获取群发内容明细数据
+     * @param id
+     * @return
      */
-    List<WeGroupMessageTemplate> getGroupMsgTemplateByBid(List<Long> businessIds, int source);
+    WeAddGroupMessageQuery findGroupMessageDetail(Long id);
 
-    /**
-     * 通过业务ID查询发送结果
-     * @param businessIds 业务ID
-     * @param source 来源
-     */
-    Map<Long,List<WeGroupMessageSendResult>> getGroupMsgSendResultByBid(List<Long> businessIds, Integer source);
-
-    /**
-     * 通过业务ID查询发送附件
-     * @param businessIds
-     * @param source
-     */
-    List<WeGroupMessageAttachments>  getGroupMsgAttachmentsByBid(Long businessIds, Integer source);
-
-    void syncGroupMsgSendResultByBids(List<Long> businessIds, Integer source);
 }

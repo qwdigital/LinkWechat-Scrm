@@ -202,7 +202,7 @@ public class WePresTagGroupTaskServiceImpl extends ServiceImpl<WePresTagGroupTas
                 .like(StringUtils.isNotEmpty(groupTask.getTaskName())
                         , WePresTagGroupTask::getTaskName,
                         groupTask.getTaskName())
-                .orderByDesc(WePresTagGroupTask::getCreateTime));
+                .orderByDesc(WePresTagGroupTask::getUpdateTime));
         if(CollectionUtil.isNotEmpty(groupTasks)){
 
             groupTasks.forEach(this::getTaskCodeInfo);

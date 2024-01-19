@@ -1,6 +1,7 @@
 package com.linkwechat.gateway.config;
 
 import com.linkwechat.gateway.handler.LogoutHandler;
+import com.linkwechat.gateway.handler.ServerStateHandler;
 import com.linkwechat.gateway.handler.ValidateCodeHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,9 @@ public class RouterFunctionConfiguration {
     @Resource
     private LogoutHandler logoutHandler;
 
+    @Resource
+    private ServerStateHandler serverStateHandler;
+
     @SuppressWarnings("rawtypes")
     @Bean
     public RouterFunction routerFunction() {
@@ -35,5 +39,12 @@ public class RouterFunctionConfiguration {
     public RouterFunction logoutFunction() {
         return RouterFunctions.route(
                 RequestPredicates.POST("/logout").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), logoutHandler);
+    }
+
+
+    @Bean
+    public RouterFunction serverStateFunction() {
+        return RouterFunctions.route(RequestPredicates.GET("/serverState").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),
+                serverStateHandler);
     }
 }

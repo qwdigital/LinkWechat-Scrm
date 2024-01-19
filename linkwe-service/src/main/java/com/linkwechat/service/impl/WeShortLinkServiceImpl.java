@@ -202,7 +202,7 @@ public class WeShortLinkServiceImpl extends ServiceImpl<WeShortLinkMapper, WeSho
                 .eq(Objects.nonNull(query.getTouchType()), WeShortLink::getTouchType, query.getTouchType())
                 .eq(Objects.nonNull(query.getExtensionType()), WeShortLink::getExtensionType, query.getExtensionType())
                 .eq(Objects.nonNull(query.getType()), WeShortLink::getType, query.getType())
-                .orderByDesc(BaseEntity::getCreateTime)
+                .orderByDesc(WeShortLink::getUpdateTime)
         );
         if (CollectionUtil.isNotEmpty(shortLinkList)) {
             List<WeShortLinkListVo> list = shortLinkList.stream().map(shortLink -> {

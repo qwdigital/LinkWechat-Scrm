@@ -439,3 +439,107 @@
                 PRIMARY KEY (`id`)
         ) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ai助手消息表';
 
+## V5.1.1 (2024-01-19)
+     ● 升级日志
+         1.系统新增群发一键复制功能。
+         2.系统新增AI服务校验,如果linkwe-ai服务未启动,则关闭隐藏前端ai相关功能。
+         3.系统相关bug修复等
+     ● yml文件更新 
+        gateway-router #以下直接覆盖即可
+              [{
+                    "id": "linkwe-auth",
+                    "order": 0,
+                    "predicates": [{
+                        "args": {
+                            "pattern": "/auth/**"
+                        },
+                        "name": "Path"
+                    }],
+                    "filters":[{
+                        "name":"ValidateCodeFilter"
+                    },{
+                        "name":"CacheRequestFilter"
+                    }
+                    ],
+                    "uri": "lb://linkwe-auth"
+                },{
+                "id": "linkwe-auth-system",
+                "order": 0,
+                "predicates": [{
+                "args": {
+                "pattern": "/system/**"
+                },
+                "name": "Path"
+                }],
+                "uri": "lb://linkwe-auth"
+                },{
+                "id": "linkwe-wecom",
+                "order": 2,
+                "predicates": [{
+                "args": {
+                "pattern": "/wecom/**"
+                },
+                "name": "Path"
+                }],
+                "filters":[{
+                "args": {
+                "_genkey_0":"1"
+                },
+                "name":"StripPrefix"
+                }],
+                "uri": "lb://linkwe-wecom"
+                },{
+                "id": "linkwe-api",
+                "order": 3,
+                "predicates": [{
+                "args": {
+                "pattern": "/open/**"
+                },
+                "name": "Path"
+                }],
+                "uri": "lb://linkwe-api"
+                },{
+                "id": "linkwe-file",
+                "order": 4,
+                "predicates": [{
+                "args": {
+                "pattern": "/file/**"
+                },
+                "name": "Path"
+                }],
+                "uri": "lb://linkwe-file"
+                },{
+                "id": "linkwe-auth-common",
+                "order": 0,
+                "predicates": [{
+                "args": {
+                "pattern": "/common/**"
+                },
+                "name": "Path"
+                }],
+                "uri": "lb://linkwe-auth"
+                },{
+                "id": "linkwe-wx-api",
+                "order": 3,
+                "predicates": [{
+                "args": {
+                "pattern": "/wx-api/**"
+                },
+                "name": "Path"
+                }],
+                "uri": "lb://linkwe-wx-api"
+                },{
+                "id": "linkwe-ai",
+                "order": 6,
+                "predicates": [{
+                "args": {
+                "pattern": "/ai/**"
+                },
+                "name": "Path"
+                }],
+                "uri": "lb://linkwe-ai"
+                }]
+ 
+    ● sql更新日志
+       ALTER TABLE we_group_message_template ADD COLUMN all_send tinyint;
+       ALTER TABLE we_group_message_template ADD COLUMN we_customers_or_group_query text;
