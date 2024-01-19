@@ -93,16 +93,17 @@ public class WeGroupMessageTemplate extends BaseEntity implements Serializable {
     private String businessIds;
 
 
-    /**
-     * 是否全部发送
-     */
-    private boolean isAll=true;
 
 
     /**
      * 删除标识 0 有效 1删除
      */
     private Integer delFlag;
+
+    /**
+     * 是否全部发送 true 是 false 否
+     */
+    private boolean allSend;
 
 
     /*
