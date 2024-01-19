@@ -105,7 +105,7 @@ implements IWeSopExecuteTargetAttachmentsService {
                     messageQuery.setBusinessIds(
                             String.join(",",vv.stream().map(WeSopPushTaskDto::getExcuteTargetAttachId).collect(Collectors.toList()))
                     );
-                    messageQuery.setIsAll(false);
+                    messageQuery.setAll(false);
                     messageQuery.setIsTask(0);
                     LoginUser loginUser=new LoginUser();
                     loginUser.setUserName(weCorpAccount.getCreateBy());
