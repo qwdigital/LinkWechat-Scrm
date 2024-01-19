@@ -2,7 +2,6 @@ package com.linkwechat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -11,11 +10,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkwechat.common.annotation.DataColumn;
 import com.linkwechat.common.annotation.DataScope;
 import com.linkwechat.common.constant.Constants;
-import com.linkwechat.common.constant.WeConstans;
-import com.linkwechat.common.context.SecurityContextHolder;
-import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.common.core.domain.AjaxResult;
 import com.linkwechat.common.enums.MessageType;
-import com.linkwechat.common.enums.QwGroupMsgBusinessTypeEnum;
 import com.linkwechat.common.exception.wecom.WeComException;
 import com.linkwechat.common.utils.DateUtils;
 import com.linkwechat.common.utils.SecurityUtils;
@@ -24,23 +20,22 @@ import com.linkwechat.config.rabbitmq.RabbitMQSettingConfig;
 import com.linkwechat.domain.*;
 import com.linkwechat.domain.groupmsg.query.WeAddGroupMessageQuery;
 import com.linkwechat.domain.groupmsg.vo.WeGroupMessageDetailVo;
-import com.linkwechat.domain.media.WeMessageTemplate;
-import com.linkwechat.domain.wecom.query.customer.msg.WeAddCustomerMsgQuery;
+import com.linkwechat.domain.system.user.query.SysUserQuery;
+import com.linkwechat.domain.system.user.vo.SysUserVo;
 import com.linkwechat.domain.wecom.query.customer.msg.WeGetGroupMsgListQuery;
-import com.linkwechat.domain.wecom.vo.customer.msg.WeAddCustomerMsgVo;
 import com.linkwechat.domain.wecom.vo.customer.msg.WeGroupMsgListVo;
-import com.linkwechat.domain.wecom.vo.media.WeMediaVo;
+import com.linkwechat.fegin.QwAuthClient;
 import com.linkwechat.fegin.QwCustomerClient;
+import com.linkwechat.fegin.QwSysUserClient;
+import com.linkwechat.fegin.QwUserClient;
 import com.linkwechat.mapper.WeGroupMessageTemplateMapper;
 import com.linkwechat.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,7 +78,11 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     private QwCustomerClient qwCustomerClient;
 
     @Autowired
-    private IWeMaterialService weMaterialService;
+    private QwSysUserClient qwSysUserClient;
+
+
+
+
 
 
     @Override
@@ -128,6 +127,8 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         detailVo.setRefreshTime(weGroupMessageTemplate.getRefreshTime());
         detailVo.setSendTime(weGroupMessageTemplate.getSendTime());
         detailVo.setContent(weGroupMessageTemplate.getContent());
+        detailVo.setIsAll(weGroupMessageTemplate.isAllSend());
+        detailVo.setWeCustomersOrGroupQuery(weGroupMessageTemplate.getWeCustomersOrGroupQuery());
         List<WeGroupMessageAttachments> attachmentsList = attachmentsService.lambdaQuery().eq(WeGroupMessageAttachments::getMsgTemplateId, id).list();
         detailVo.setAttachments(attachmentsList);
         List<WeGroupMessageTask> taskList = messageTaskService.lambdaQuery().eq(WeGroupMessageTask::getMsgTemplateId, id).list();
@@ -157,10 +158,40 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     public void addGroupMsgTemplate(WeAddGroupMessageQuery query) {
         log.info("addGroupMsgTemplate 入参：query:{}", JSONObject.toJSONString(query));
         List<WeAddGroupMessageQuery.SenderInfo> senderList = query.getSenderList();
+        query.setAllSend(query.getIsAll());
+        if(query.getChatType().equals(new Integer(1))){ //发送客户
+            query.setWeCustomersOrGroupQuery(
+                    WeGroupMessageTemplate.WeCustomersOrGroupQuery.builder()
+                            .weCustomersQuery(query.getWeCustomersQuery())
+                            .build()
+            );
+        }else if(query.getChatType().equals(new Integer(2))){ //发送客群
+
+
+            if(CollectionUtil.isNotEmpty(senderList)){
+                AjaxResult<List<SysUserVo>> sysUserVos = qwSysUserClient.getUserListByWeUserIds(SysUserQuery.builder()
+                        .weUserIds(senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.toList()))
+                        .build());
+
+                query.setWeCustomersOrGroupQuery(
+                        WeGroupMessageTemplate.WeCustomersOrGroupQuery.builder()
+                                .weGroupQuery(
+                                        WeGroupMessageTemplate.WeGroupQuery.builder()
+                                                .owners(senderList.stream().map(WeAddGroupMessageQuery.SenderInfo::getUserId).collect(Collectors.joining(",")))
+                                                .ownerNames(CollectionUtil.isNotEmpty(sysUserVos.getData())?sysUserVos.getData().stream().map(SysUserVo::getUserName).collect(Collectors.joining(",")):null)
+                                                .build()
+                                )
+                                .build()
+                );
+            }
+
+
+        }
 
         checkSenderList(query, senderList);
         WeGroupMessageTemplate weGroupMessageTemplate = new WeGroupMessageTemplate();
         BeanUtil.copyProperties(query, weGroupMessageTemplate);
+        weGroupMessageTemplate.setId(null);
         if (query.getSendTime() == null) {
             weGroupMessageTemplate.setSendTime(new Date());
         }
@@ -255,18 +286,7 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
                 if(CollectionUtil.isNotEmpty(limitSenderInfoWeCustomerList)){
 
                     senderList.addAll(limitSenderInfoWeCustomerList);
-//                List<WeCustomer> customerList = weCustomerService.list(new LambdaQueryWrapper<WeCustomer>()
-//                        .select(WeCustomer::getExternalUserid, WeCustomer::getAddUserId)
-//                        .eq(WeCustomer::getDelFlag, 0).groupBy(WeCustomer::getExternalUserid, WeCustomer::getAddUserId));
-//                if (CollectionUtil.isNotEmpty(customerList)) {
-//                    Map<String, List<WeCustomer>> customerMap = customerList.stream().collect(Collectors.groupingBy(WeCustomer::getAddUserId));
-//                    customerMap.forEach((userId, customers) -> {
-//                        List<String> eids = customers.stream().map(WeCustomer::getExternalUserid).collect(Collectors.toList());
-//                        WeAddGroupMessageQuery.SenderInfo senderInfo = new WeAddGroupMessageQuery.SenderInfo();
-//                        senderInfo.setCustomerList(eids);
-//                        senderInfo.setUserId(userId);
-//                        senderList.add(senderInfo);
-//                    });
+
 
                 } else {
                     throw new WeComException("暂无客户可发送");
@@ -357,14 +377,6 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
         messageSendResultService.addOrUpdateBatchByCondition(sendResultlist);
     }
 
-    @Override
-    public void syncGroupMsgSendResultByBids(List<Long> businessIds, Integer source) {
-        List<WeGroupMessageTemplate> groupMsgTemplatList = getGroupMsgTemplateByBid(businessIds, source);
-        if (CollectionUtil.isNotEmpty(groupMsgTemplatList)) {
-            List<Long> ids = groupMsgTemplatList.parallelStream().map(WeGroupMessageTemplate::getId).collect(Collectors.toList());
-            syncGroupMsgSendResultByIds(ids);
-        }
-    }
 
     @Override
     public List<WeGroupMessageTask> groupMsgTaskList(WeGroupMessageTask task) {
@@ -410,77 +422,19 @@ public class WeGroupMessageTemplateServiceImpl extends ServiceImpl<WeGroupMessag
     }
 
     @Override
-    public List<WeGroupMessageTemplate> getGroupMsgTemplateByBid(List<Long> businessIds, int source) {
-        return list(new LambdaQueryWrapper<WeGroupMessageTemplate>()
-                .in(WeGroupMessageTemplate::getBusinessId, businessIds)
-                .eq(WeGroupMessageTemplate::getSource, source));
-    }
-
-    @Override
-    public Map<Long, List<WeGroupMessageSendResult>> getGroupMsgSendResultByBid(List<Long> businessIds, Integer source) {
-        Map<Long, List<WeGroupMessageSendResult>> resultMap = new HashMap<>();
-        if (CollectionUtil.isEmpty(businessIds)) {
-            return resultMap;
+    public WeAddGroupMessageQuery findGroupMessageDetail(Long id) {
+        WeAddGroupMessageQuery groupMessageQuery=new WeAddGroupMessageQuery();
+        WeGroupMessageTemplate weGroupMessageTemplate
+                = this.getById(id);
+        if(null != weGroupMessageTemplate){
+            BeanUtil.copyProperties(weGroupMessageTemplate,groupMessageQuery);
+            groupMessageQuery.setWeGroupMessageAttachmentsVo(
+                    attachmentsService.list(new LambdaQueryWrapper<WeGroupMessageAttachments>()
+                            .eq(WeGroupMessageAttachments::getMsgTemplateId,id))
+            );
         }
-        List<WeGroupMessageTemplate> templateList = getGroupMsgTemplateByBid(businessIds, source);
-        if (CollectionUtil.isNotEmpty(templateList)) {
-            Map<Long, Set<Long>> bidAndTidMap = templateList.parallelStream().collect(Collectors.groupingBy(WeGroupMessageTemplate::getBusinessId,
-                    Collectors.mapping(WeGroupMessageTemplate::getId, Collectors.toSet())));
-            List<Long> templateIds = bidAndTidMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(templateIds)) {
-                WeGroupMessageSendResult result = new WeGroupMessageSendResult();
-                result.setMsgTemplateIds(templateIds);
-                List<WeGroupMessageSendResult> sendResults = groupMsgSendResultList(result);
-                if (CollectionUtil.isNotEmpty(sendResults)) {
-                    bidAndTidMap.forEach((businessId, tids) -> {
-                        List<WeGroupMessageSendResult> tempResult = sendResults.stream()
-                                .filter(sendResultItem -> tids.contains(sendResultItem.getMsgTemplateId()))
-                                .collect(Collectors.toList());
-                        resultMap.put(businessId, tempResult);
-                    });
-                }
 
-            }
-        }
-        return resultMap;
+        return groupMessageQuery;
     }
 
-    @Override
-    public List<WeGroupMessageAttachments> getGroupMsgAttachmentsByBid(Long businessId, Integer source) {
-        List<WeGroupMessageAttachments> attachmentsList = new LinkedList<>();
-        List<WeGroupMessageTemplate> templateList = getGroupMsgTemplateByBid(Collections.singletonList(businessId), source);
-        if (CollectionUtil.isNotEmpty(templateList)) {
-            WeGroupMessageTemplate weGroupMessageTemplate = templateList.get(0);
-            List<WeGroupMessageAttachments> attachments = attachmentsService.list(new LambdaQueryWrapper<WeGroupMessageAttachments>()
-                    .eq(WeGroupMessageAttachments::getMsgTemplateId, weGroupMessageTemplate.getId()));
-            attachmentsList.addAll(attachments);
-        }
-        return attachmentsList;
-    }
-
-    void getMediaId(List<WeMessageTemplate> messageTemplates) {
-        Optional.ofNullable(messageTemplates).orElseGet(ArrayList::new).forEach(messageTemplate -> {
-            if (ObjectUtil.equal(MessageType.IMAGE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.MINIPROGRAM.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getPicUrl()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getPicUrl()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.VIDEO.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            } else if (ObjectUtil.equal(MessageType.FILE.getMessageType(), messageTemplate.getMsgType())) {
-                WeMediaVo weMedia = weMaterialService.uploadTemporaryMaterial(messageTemplate.getMediaId()
-                        , MessageType.IMAGE.getMessageType()
-                        , FileUtil.getName(messageTemplate.getMediaId()));
-                messageTemplate.setMediaId(weMedia.getMediaId());
-            }
-        });
-    }
 }

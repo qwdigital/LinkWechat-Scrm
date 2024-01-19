@@ -1,6 +1,7 @@
 package com.linkwechat.domain.groupmsg.query;
 
 import com.linkwechat.common.core.domain.model.LoginUser;
+import com.linkwechat.domain.WeGroupMessageAttachments;
 import com.linkwechat.domain.WeGroupMessageTemplate;
 import com.linkwechat.domain.customer.query.WeCustomersQuery;
 import com.linkwechat.domain.media.WeMessageTemplate;
@@ -20,19 +21,33 @@ import java.util.List;
 @Data
 public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
 
-    @ApiModelProperty("是否全部发送")
+    /**
+     * 是否全部发送
+     */
     private Boolean isAll=true;
+
+
+
     /**
      * 指定接收消息的成员及对应客户列表
      */
-    @ApiModelProperty("指定接收消息的成员及对应客户列表")
     private List<SenderInfo> senderList;
 
 
-    @ApiModelProperty("附件列表")
+    /**
+     * 附件列表(新建编辑入参)
+     */
     private List<WeMessageTemplate> attachmentsList;
 
-    @ApiModelProperty(value = "当前用户",hidden = true)
+
+    /**
+     * 附件列表展示
+     */
+    private List<WeGroupMessageAttachments> weGroupMessageAttachmentsVo;
+
+    /**
+     * 当前用户
+     */
     private LoginUser loginUser;
 
 
@@ -43,7 +58,11 @@ public class WeAddGroupMessageQuery extends WeGroupMessageTemplate {
     /**
      * 客户查询条件
      */
+
     private WeCustomersQuery weCustomersQuery;
+
+
+
 
     public void setCurrentUserInfo(LoginUser loginUser) {
         this.loginUser = loginUser;

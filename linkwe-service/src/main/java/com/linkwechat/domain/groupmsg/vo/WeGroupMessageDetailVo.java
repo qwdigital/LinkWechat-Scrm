@@ -1,7 +1,11 @@
 package com.linkwechat.domain.groupmsg.vo;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linkwechat.domain.WeGroupMessageAttachments;
+import com.linkwechat.domain.WeGroupMessageTemplate;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -55,4 +59,13 @@ public class WeGroupMessageDetailVo {
 
     @ApiModelProperty("未送达客户数")
     private Integer toBeSendCustomerNum;
+
+
+    /**
+     * 是否全部发送
+     */
+    private Boolean isAll=true;
+
+
+    private WeGroupMessageTemplate.WeCustomersOrGroupQuery weCustomersOrGroupQuery;
 }

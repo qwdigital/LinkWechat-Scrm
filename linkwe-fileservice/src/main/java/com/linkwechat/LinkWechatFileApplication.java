@@ -1,5 +1,6 @@
 package com.linkwechat;
 
+import com.linkwechat.common.constant.WeServerNameConstants;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -19,7 +20,7 @@ public class LinkWechatFileApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(LinkWechatFileApplication.class)
                 .properties("spring.config.name:bootstrap", "config/run/bootstrap.yml")
-                .properties("spring.application.name=linkwe-file")
+                .properties("spring.application.name="+ WeServerNameConstants.linkweFile)
                 .build().run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  LinkWe-file启动成功   ლ(´ڡ`ლ)ﾞ ");
     }

@@ -136,7 +136,7 @@ public class WeFormSurveyCatalogueServiceImpl extends ServiceImpl<WeFormSurveyCa
         queryWrapper.apply(Objects.nonNull(query.getCreateTime()), "date_format(create_time,'%Y-%m-%d') = " + "'" + DateUtil.formatDate(query.getCreateTime()) + "'");
         queryWrapper.between(Objects.nonNull(query.getStartDate()) && Objects.nonNull(query.getEndDate()), WeFormSurveyCatalogue::getCreateTime, DateUtil.formatDate(query.getStartDate()) + " 00:00:00", DateUtil.formatDate(query.getEndDate()) + " 23:59:59");
         queryWrapper.eq(WeFormSurveyCatalogue::getDelFlag, 0);
-        queryWrapper.orderByDesc(WeFormSurveyCatalogue::getCreateTime);
+        queryWrapper.orderByDesc(WeFormSurveyCatalogue::getUpdateTime);
         List<WeFormSurveyCatalogue> catalogueList = list(queryWrapper);
         if (CollectionUtil.isNotEmpty(catalogueList)) {
             //分组

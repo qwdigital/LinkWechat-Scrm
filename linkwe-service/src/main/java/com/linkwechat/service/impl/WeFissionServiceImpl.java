@@ -494,7 +494,7 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
 
 
                     //如果当前时间在裂变结束时间之前,则裂变结束
-                    if(weFission.getFassionEndTime().getTime()<new Date().getTime()){
+                    if(weFission.getFassionEndTime().getTime()<System.currentTimeMillis()){
                         weFission.setFassionState(3);
                     }
 

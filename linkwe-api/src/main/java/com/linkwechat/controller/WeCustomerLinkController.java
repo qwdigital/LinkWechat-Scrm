@@ -47,7 +47,8 @@ public class WeCustomerLinkController  extends BaseController {
         startPage();
         return getDataTable(
                 iWeCustomerLinkService.list(new LambdaQueryWrapper<WeCustomerLink>()
-                        .like(StringUtils.isNotEmpty(weCustomerLink.getLinkName()),WeCustomerLink::getLinkName,weCustomerLink.getLinkName()))
+                        .like(StringUtils.isNotEmpty(weCustomerLink.getLinkName()),WeCustomerLink::getLinkName,weCustomerLink.getLinkName())
+                        .orderByDesc(WeCustomerLink::getUpdateTime))
         );
 
     }

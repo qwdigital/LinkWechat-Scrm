@@ -170,7 +170,8 @@ public class WeCommunityNewGroupServiceImpl extends ServiceImpl<WeCommunityNewGr
     @Override
     public List<WeCommunityNewGroup> selectWeCommunityNewGroupList(WeCommunityNewGroup weCommunityNewGroup) {
         List<WeCommunityNewGroup> weCommunityNewGroups = this.list(new LambdaQueryWrapper<WeCommunityNewGroup>()
-                .like(StringUtils.isNotEmpty(weCommunityNewGroup.getCodeName()), WeCommunityNewGroup::getCodeName, weCommunityNewGroup.getCodeName()));
+                .like(StringUtils.isNotEmpty(weCommunityNewGroup.getCodeName()), WeCommunityNewGroup::getCodeName, weCommunityNewGroup.getCodeName())
+                .orderByDesc(WeCommunityNewGroup::getCreateTime));
         if (StringUtils.isNotEmpty(weCommunityNewGroups)) {
             weCommunityNewGroups.forEach(this::getCompleteEmplCodeInfo);
         }
