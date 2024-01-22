@@ -71,6 +71,7 @@
         <orika.version>1.5.2</orika.version>
         <redisson.version>3.20.0</redisson.version>
         <tencentcloud-sdk.version>3.1.915</tencentcloud-sdk.version>
+        <minio.version>8.3.3</minio.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -522,6 +523,12 @@
                 <groupId>com.tencentcloudapi</groupId>
                 <artifactId>tencentcloud-sdk-java</artifactId>
                 <version>${tencentcloud-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

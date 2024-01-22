@@ -9,7 +9,8 @@ public enum FileCosType {
 
     FILE_COS_TYPE_TENANT(1,"腾讯云COS"),
     FILE_COS_TYPE_ALI(2,"阿里云OSS"),
-    FILE_COS_TYPE_QN(3,"七牛云Kodo");
+    FILE_COS_TYPE_QN(3,"七牛云Kodo"),
+    FILE_COS_TYPE_MINIO(4,"minio存储");
 
     private Integer type;
 
