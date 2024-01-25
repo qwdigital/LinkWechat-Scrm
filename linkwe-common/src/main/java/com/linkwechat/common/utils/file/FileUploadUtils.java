@@ -280,6 +280,7 @@ public class FileUploadUtils {
                         PutObjectArgs.builder()
                                 .bucket(cosConfig.getBucketName())
                                 .object(fileName)
+                                .contentType(file.getContentType())
                                 .stream(inputStream, inputStream.available(), -1)
                                 .build());
             }catch (Exception e){
