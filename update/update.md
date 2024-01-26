@@ -543,3 +543,7 @@
     ● sql更新日志
        ALTER TABLE we_group_message_template ADD COLUMN all_send tinyint;
        ALTER TABLE we_group_message_template ADD COLUMN we_customers_or_group_query text;
+## V5.1.2 (2024-01-26)
+     ● 升级日志
+         1.文件上传新增适配minio
+         2.系统相关bug修复等
