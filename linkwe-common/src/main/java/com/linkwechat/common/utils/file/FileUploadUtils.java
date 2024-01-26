@@ -3,6 +3,9 @@ package com.linkwechat.common.utils.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import cn.hutool.core.io.FileUtil;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -25,6 +28,8 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
+import io.minio.*;
+import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -186,22 +191,26 @@ public class FileUploadUtils {
 
 
 
+    /**
+     * 上传阿里云存储中
+     * @param file
+     * @param cosConfig
+     * @return
+     */
+    public static final String uploadMinio(MultipartFile file , CosConfig cosConfig) throws IOException {
+
+        try {
+            return uploadCos( file, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION,cosConfig,FileCosType.FILE_COS_TYPE_MINIO.getType());
+        } catch (Exception e) {
+            throw new IOException(e.getMessage(), e);
+        }
+
+    }
 
 
 
 
-//    /**
-//     * 通过流进行文件上传
-//     * @param in 流
-//     * @throws IOException
-//     */
-//    public static String uploadTenantCos(InputStream in, String fileExtension, CosConfig cosConfig) throws IOException {
-//        try {
-//            return uploadTenantCos( in, fileExtension, MimeTypeUtils.DEFAULT_ALLOWED_EXTENSION, cosConfig);
-//        } catch (Exception e) {
-//            throw new IOException(e.getMessage(), e);
-//        }
-//    }
+
 
 
     /**
@@ -217,7 +226,7 @@ public class FileUploadUtils {
      */
     public static final String uploadCos(MultipartFile file, String[] allowedExtension, CosConfig cosConfig,Integer fileCosType)
             throws FileSizeLimitExceededException, IOException, FileNameLengthLimitExceededException,
-            InvalidExtensionException {
+            InvalidExtensionException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         int fileNamelength = file.getOriginalFilename().length();
         if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
             throw new FileNameLengthLimitExceededException(FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
@@ -250,25 +259,38 @@ public class FileUploadUtils {
 
             // 创建OSSClient实例。
             OSS ossClient = new OSSClientBuilder().build(cosConfig.getRegion(), cosConfig.getSecretId(), cosConfig.getSecretKey());
-
-
             // 上传文件
             ossClient.putObject(cosConfig.getBucketName(), fileName, file.getInputStream());
             ossClient.shutdown();
+        }else if(FileCosType.FILE_COS_TYPE_MINIO.getType().equals(fileCosType)){ //minio存储
+
+            try {
+                MinioClient minioClient = MinioClient.builder()
+                        .endpoint(cosConfig.getRegion())
+                        .credentials(cosConfig.getSecretId(), cosConfig.getSecretKey())
+                        .build();
+                //判断我们要上传到的 bucket 是否存在
+                boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(cosConfig.getBucketName()).build());
+                //存储桶不存在则构建一个
+                if (!found) {
+                    minioClient.makeBucket(MakeBucketArgs.builder().bucket(cosConfig.getBucketName()).build());
+                }
+                InputStream inputStream = file.getInputStream();
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket(cosConfig.getBucketName())
+                                .object(fileName)
+                                .contentType(file.getContentType())
+                                .stream(inputStream, inputStream.available(), -1)
+                                .build());
+            }catch (Exception e){
+                log.error("minio文件上传失败"+e.getMessage());
+            }
+
+
+
+
         }
-//        else if(FileCosType.FILE_COS_TYPE_QN.getType().equals(fileCosType)){ //七牛云存储
-//
-//            // 构造一个带指定Zone对象的配置类,不同的七云牛存储区域调用不同的zone
-//            Configuration cfg = new Configuration(Zone.zone0());
-//            // ...其他参数参考类注释
-//            UploadManager uploadManager = new UploadManager(cfg);
-//
-//
-//
-//
-//        }
-
-
 
         return fileName;
     }
