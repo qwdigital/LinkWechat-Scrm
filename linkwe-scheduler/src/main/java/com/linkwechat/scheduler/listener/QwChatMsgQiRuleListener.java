@@ -59,7 +59,7 @@ public class QwChatMsgQiRuleListener {
 
     //！！！为了保证消息顺序性，不可有多个队列监听
     @RabbitHandler
-    @RabbitListener(queues = "${wecom.mq.queue.chat-msg-qi-rule:Qu_ChatMsgQiRule}")
+    @RabbitListener(queues = "${wecom.mq.queue.chat-msg-qi-rule:Qu_ChatMsgQiRule}",exclusive = true, concurrency = "1")
     public void subscribe(String msg, Channel channel, Message message) throws IOException {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
