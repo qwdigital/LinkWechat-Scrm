@@ -320,32 +320,5 @@ public class CrowdAttributesServiceImpl extends AbstractCrowdService {
     }
 
 
-    public static void main(String[] args) {
-//        String value = "20-30";
-//        String[] values = value.split("-");
-//        DateTime endTime = DateUtil.offset(new Date(), DateField.YEAR, -Integer.parseInt(values[0]));
-//        DateTime startTime = DateUtil.offset(new Date(), DateField.YEAR, -Integer.parseInt(values[1]));
-//        String s1 = DateUtils.parseDateToStr(DateUtils.YYYY, startTime);
-//        String s2 = DateUtils.parseDateToStr(DateUtils.YYYY, endTime);
-//        System.out.println(s1);
-//        System.out.println(s2);
-//        StringBuilder stringBuilder = new StringBuilder("add_user_id ");
-//        AddUserIdSpecial(stringBuilder,"woiGuBCgAAKeUHeD-8gWKNonqEWP1z0w,woiGuBCgAAGOKAiiP5gRmo22mRFi6BBA",RelationEnum.NOT_EQUAL);
-//        System.out.println(stringBuilder);
-//        String value = "1-2";
-//        if(StringUtils.isNotEmpty(value)){
-//            if(value.contains("-")){
-//                String[] values = value.split("-");
-//                DateTime startTime = DateUtil.offset(new Date(), DateField.YEAR, -Integer.parseInt(values[0]));
-//                DateTime endTime = DateUtil.offset(new Date(), DateField.YEAR, -Integer.parseInt(values[1]));
-//                System.out.println(startTime);
-//                System.out.println(endTime);
-//            }else {
-//                DateTime dateTime = DateUtil.offset(new Date(), DateField.YEAR, -Integer.parseInt(value));
-//                System.out.println(dateTime);
-//            }
-//        }
 
-
-    }
 }
