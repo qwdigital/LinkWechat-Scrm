@@ -129,7 +129,11 @@
                 <version>${jib.maven.plugin.version}</version>
                 <configuration>
                     <to>
-                        <image>linkwe-file</image>
+                        <image>${docker.harbor.addr}/${docker.harbor.project}/${project.artifactId}:${docker.harbor.tag.version}</image>
+                        <auth>
+                            <username>${docker.harbor.username}</username>
+                            <password>${docker.harbor.password}</password>
+                        </auth>
                     </to>
                 </configuration>
             </plugin>

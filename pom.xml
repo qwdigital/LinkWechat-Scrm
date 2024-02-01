@@ -610,7 +610,7 @@
                 <docker.harbor.project>supplier-ewscrm/linwechat-api</docker.harbor.project>
                 <docker.harbor.username>xu.xuejun</docker.harbor.username>
                 <docker.harbor.password>TiUL0EFq</docker.harbor.password>
-                <docker.harbor.tag.version>dev1</docker.harbor.tag.version>
+                <docker.harbor.tag.version>dev3</docker.harbor.tag.version>
             </properties>
         </profile>
     </profiles>
