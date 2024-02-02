@@ -119,8 +119,7 @@ public class Finance {
             System.loadLibrary("libssl-1_1-x64");
             System.loadLibrary("WeWorkFinanceSdk");
         } else {
-
-            System.load("/usr/local/app/linwechat-api/libWeWorkFinanceSdk_Java.so");
+            System.load(System.getProperty("java.library.path")+"/libWeWorkFinanceSdk_Java.so");
         }
 
     }

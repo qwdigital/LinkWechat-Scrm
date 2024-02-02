@@ -1,0 +1,17 @@
+当前os文件是企业微信官方提供用于解析会话存档内容，切记勿修改名称等。
+
+sdk官方下载地址:https://developer.work.weixin.qq.com/document/path/91774
+
+会话存档公钥私钥生成器 http://web.chacuo.net/netrsakeypair/
+生成密钥位数：2048位(bit) 密钥格式:PKCS#1  输出格式：PEM/Base64
+
+1：系统如果原生jar部署，将该文件复制到linux服务器的 /app/lib下，目录如果不存在新建，然后将libWeWorkFinanceSdk_Java.so放进去
+
+2：如果是dokcer部署，系统打包成docker镜像，会自动将libWeWorkFinanceSdk_Java.so 复制到/app/lib下，无需做处理。
+
+
+3：如果是windows欢迎部署运行自行处理，将sdk中的以下.dll文件直接放入C:\Windows\System32目录下，然后在环境变量的Path中添加该目录。
+         libcrypto-1_1-x64
+         libcurl-x64
+         libssl-1_1-x64
+         WeWorkFinanceSdk

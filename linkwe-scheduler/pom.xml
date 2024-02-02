@@ -134,6 +134,21 @@
                             <password>${docker.harbor.password}</password>
                         </auth>
                     </to>
+                    <container>
+                        <!-- 容器配置 -->
+                        <jvmFlags>
+                            <jvmFlag>-Djava.library.path=/app/lib</jvmFlag>
+                        </jvmFlags>
+                    </container>
+                    <extraDirectories>
+                        <!-- 包含额外文件的目录配置 -->
+                        <paths>
+                            <path>
+                                <from>../config/lib</from> <!-- .so文件所在目录 -->
+                                <into>/app/lib</into> <!-- 将.so文件放置到容器中的目录 -->
+                            </path>
+                        </paths>
+                    </extraDirectories>
                 </configuration>
             </plugin>
         </plugins>
