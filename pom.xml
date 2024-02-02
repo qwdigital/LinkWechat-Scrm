@@ -72,6 +72,8 @@
         <redisson.version>3.20.0</redisson.version>
         <tencentcloud-sdk.version>3.1.915</tencentcloud-sdk.version>
         <minio.version>8.3.3</minio.version>
+        <jib.maven.plugin.version>3.1.4</jib.maven.plugin.version>
+        <springboot.maven.version>2.3.3.RELEASE</springboot.maven.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -559,12 +561,6 @@
     </modules>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -574,7 +570,56 @@
                 <directory>../config/run</directory>
             </resource>
         </resources>
+
+        <plugins>
+            <!-- 配置Spring Boot Maven插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.maven.version}</version>
+            </plugin>
+
+            <!-- 配置jib-maven-plugin插件 -->
+            <!--  【Docker本地打镜像tar包命令】:mvn clean package -Ptest jib:buildTar -f pom.xml-->
+            <!--  【Docker把镜像push到本地docker命令】clean package -Ptest jib:dockerBuild -f pom.xml-->
+            <!--  【Docker把镜像push到远程镜像仓库命令】clean package -Ptest jib:build -Djib.httpTimeout=200000 -DsendCredentialsOverHttp=true -f pom.xml-->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.maven.plugin.version}</version>
+                <configuration>
+                    <from>
+                        <image>openjdk:11-jdk</image>
+                    </from>
+                    <to>
+                        <image>${docker.harbor.addr}/${docker.harbor.project}/${project.artifactId}:${docker.harbor.tag.version}</image>
+                        <auth>
+                            <username>${docker.harbor.username}</username>
+                            <password>${docker.harbor.password}</password>
+                        </auth>
+                    </to>
+                </configuration>
+            </plugin>
+        </plugins>
+
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <docker.harbor.addr>demo.linkwechat.net</docker.harbor.addr>
+                <docker.harbor.project>linkWechatScrm/linwechat-api</docker.harbor.project>
+                <docker.harbor.username>root</docker.harbor.username>
+                <docker.harbor.password>root</docker.harbor.password>
+                <docker.harbor.tag.version>dev3</docker.harbor.tag.version>
+            </properties>
+        </profile>
+    </profiles>
+
+
+
+
 
     <!--项目本身的jar从指定镜像下载-->
     <repositories>
@@ -602,5 +647,8 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
+
+
 
 </project>

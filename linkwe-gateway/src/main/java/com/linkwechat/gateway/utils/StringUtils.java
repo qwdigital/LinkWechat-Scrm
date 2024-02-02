@@ -477,9 +477,4 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return matcher.match(pattern, url);
     }
 
-    public static void main(String[] args) {
-        Integer[] arrays = {1, 2, 3, 4, 5, 6, 7};
-        String join = join(arrays, ",");
-        System.out.println(join);// 1,2,3,4,5,6,7
-    }
 }

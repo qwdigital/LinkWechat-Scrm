@@ -677,6 +677,13 @@ public class WeFissionServiceImpl extends ServiceImpl<WeFissionMapper, WeFission
         this.baseMapper.updateBatchFissionIsTipNoSend(weFissions);
     }
 
+    @Override
+    public void getXX() {
+        String currentDir = System.getProperty("user.dir");
+        String libPath = currentDir + "/resources/libWeWorkFinanceSdk_Java.so";
+        System.load(libPath);
+    }
+
     private void handleFissionRecord(String fissionInviterRecordId,WeFissionInviterRecordSub weFissionInviterRecordSub){
 
         WeFissionInviterRecord weFissionInviterRecord

@@ -205,8 +205,5 @@ public class VideoFirstFrameUtils {
     }
 
 
-    public static void main(String[] args) {
-
-    }
 
 }
