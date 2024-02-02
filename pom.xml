@@ -581,6 +581,9 @@
             </plugin>
 
             <!-- 配置jib-maven-plugin插件 -->
+            <!--  【Docker本地打镜像tar包命令】:mvn clean package -Ptest jib:buildTar -f pom.xml-->
+            <!--  【Docker把镜像push到本地docker命令】clean package -Ptest jib:dockerBuild -f pom.xml-->
+            <!--  【Docker把镜像push到远程镜像仓库命令】clean package -Ptest jib:build -Djib.httpTimeout=200000 -DsendCredentialsOverHttp=true -f pom.xml-->
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
