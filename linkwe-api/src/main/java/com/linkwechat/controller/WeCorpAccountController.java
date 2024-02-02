@@ -53,6 +53,7 @@ public class WeCorpAccountController extends BaseController {
             return AjaxResult.error("当前为演示环境,无法修改配置");
         }
         weCorpAccount.setKfSecret(weCorpAccount.getAgentSecret());
+        weCorpAccount.setContactSecret(weCorpAccount.getAgentSecret());
         iWeCorpAccountService.addOrUpdate(weCorpAccount);
         return AjaxResult.success();
     }
