@@ -606,10 +606,10 @@
         <profile>
             <id>dev</id>
             <properties>
-                <docker.harbor.addr>harbor.iyuhu.com</docker.harbor.addr>
-                <docker.harbor.project>supplier-ewscrm/linwechat-api</docker.harbor.project>
-                <docker.harbor.username>xu.xuejun</docker.harbor.username>
-                <docker.harbor.password>TiUL0EFq</docker.harbor.password>
+                <docker.harbor.addr>demo.linkwechat.net</docker.harbor.addr>
+                <docker.harbor.project>linkWechatScrm/linwechat-api</docker.harbor.project>
+                <docker.harbor.username>root</docker.harbor.username>
+                <docker.harbor.password>root</docker.harbor.password>
                 <docker.harbor.tag.version>dev3</docker.harbor.tag.version>
             </properties>
         </profile>
