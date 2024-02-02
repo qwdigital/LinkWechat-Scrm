@@ -5,7 +5,7 @@
     <property name="app_name" value="linkwe-api"/>
 
     <!-- 日志输出格式 -->
-    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS,CTT} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %thread | %logger{36}:%L | %M | %msg%n" />
 
     <!--  邮件 -->
     <!-- SMTP server的地址，必需指定。如网易的SMTP服务器地址是： smtp.163.com -->
