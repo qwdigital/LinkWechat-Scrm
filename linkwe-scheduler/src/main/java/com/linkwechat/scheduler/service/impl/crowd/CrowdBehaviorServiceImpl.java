@@ -70,8 +70,4 @@ public class CrowdBehaviorServiceImpl extends AbstractCrowdService {
         return null;
     }
 
-    public static void main(String[] args) {
-        String startTime = DateUtil.beginOfDay(DateUtil.parseDate("2022-08-01")).toString();
-        System.out.println(startTime);
-    }
 }

@@ -311,14 +311,23 @@
 
     </dependencies>
 
+
+
     <build>
         <plugins>
+            <!-- 引用Spring Boot Maven插件 -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.maven.version}</version>
+            </plugin>
+            <!-- 引用jib-maven-plugin插件 -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.maven.plugin.version}</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>

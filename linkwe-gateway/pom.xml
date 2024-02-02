@@ -105,13 +105,15 @@
 
     </dependencies>
 
+
     <build>
         <finalName>lw-gateway</finalName>
         <plugins>
+            <!-- 引用Spring Boot Maven插件 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.3.3.RELEASE</version>
+                <version>${springboot.maven.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -120,6 +122,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- 引用jib-maven-plugin插件 -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.maven.plugin.version}</version>
+                <configuration>
+                    <to>
+                        <image>${docker.harbor.addr}/${docker.harbor.project}/${project.artifactId}:${docker.harbor.tag.version}</image>
+                        <auth>
+                            <username>${docker.harbor.username}</username>
+                            <password>${docker.harbor.password}</password>
+                        </auth>
+                    </to>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
 </project>
