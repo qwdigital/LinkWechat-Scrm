@@ -36,17 +36,6 @@
 
 ---
 
-# 版权声明
-
-开源不代表免费，LinkWeChat 遵循 [GPL-3.0](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE) 开源协议发布，并提供技术交流学习，但**绝不允许修改后和衍生的代码做为闭源的商业软件发布和销售！** 如果需要将本产品在本地进行任何附带商业化性质行为使用，**请联系项目负责人进行商业授权**，以遵守 GPL 协议保证您的正常使用。
-
-[帮助手册——LinkWeChat 需要付费吗？](https://www.yuque.com/linkwechat/help/xql2ts)
-
-目前在国内 GPL 协议**具备合同特征，是一种民事法律行为** ，属于我国《中华人民共和国民法典》调整的范围。LinkWeChat 项目团队保留一切诉讼权利。
-
-[相关案例：违反 GPL 协议赔偿 50 万，国内首例!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
-
-LinkWeChat 开源团队拥有对本开源协议的最终解释权。
 
 # 一、 关于 LinkWeChat
 
@@ -106,19 +95,6 @@ LinkWeChat 不做私域营销专家，而是通过开源让每个企业都是自
 * 与企业微信共同助力企业数字化转型
 
 # 二、关于项目
-
-## 2.1 在线体验
-
-开源演示地址：[http://demo.linkwechat.net/](http://demo.linkwechat.net/)
-
-默认账号密码：lw，123456
-
-目前支持两种方式体验：
-
-* 在首页扫码二维码申请加入测试企业，申请通过后即可扫码登录，体验系统的完整功能；
-* 点击账密登录并勾选`演示账号登录`即可在线体验后台系统，但不支持体验移动端相关功能；
-
-_（注意：演示环境已屏蔽管理权限和相关操作）_
 
 
 ## 2.2 系统架构
@@ -225,59 +201,8 @@ LinkWeChat 凭借着出色的产品能力和专业的技术能力，已经获取
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150256_14f4ba8d_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_40.png")
 
-# 六、联系我们
 
-如果你想加入我们的开源交流群，请扫码添加 LinkWeChat 项目作者，加入群聊：
 
-![输入图片说明](readme-pic/contact1.png)
-
-如果你有任何 LinkWeChat 产品上的想法、意见或建议，或商务上的合作需求，请扫码添加 LinkWeChat 项目团队进一步沟通：
-
-![输入图片说明](readme-pic/contact2.png)
-
-# 七、捐赠支持
-
-## 7.1 来一杯卡布奇洛
-
-如果您觉得我们的开源项目 `LinkWeChat` 对您有帮助，那就请项目开发者们来一杯卡布奇诺吧！当前我们接受来自于**微信**、**支付宝**或者**码云**的捐赠，请在捐赠时备注自己的昵称或附言。
-
-您的捐赠将用于支付该项目的一些费用支出，并激励开发者们以便更好的推动项目的发展，同时欢迎捐赠**公网服务器**用于提高在线演示系统体验。
-
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0222/221344_727a0e80_1480777.png "image-20210222214357456.png")
-
-## 7.2 长期捐赠
-
-如果您是企业的经营者并且有计划将 `LinkWeChat` 用在公司的经营产品中，欢迎进行长期捐赠。长期捐赠有商业上的益处有：
-
-* 积极响应，快速维护，及时更新；
-* 企业名称、Logo 及官网链接将长期展示在开源仓库、`LinkWeChat` 官网及宣发材料中；
-* 捐赠金额同比例抵扣未来 `LinkWeChat` 的付费产品价格。
-
-如果您对长期赞助 `LinkWeChat` 团队感兴趣，或者有其他好想法，欢迎联系开发团队微信 `sxjiangdongqin`，或发送邮件到 iamxiarui@foxmail.com。
-
-## 7.3 捐赠记录
-
-`LinkWeChat` 全体开发团队感谢以下全部小伙伴们的赞助（排名不分先后）：
-
-[LinkWeChat 捐赠记录](https://www.yuque.com/linkwechat/help/vhqs4i?singleDoc)
-
-## 7.4 优秀开源社区
-
-[IoTSharp](https://gitee.com/IoTSharp) IoTSharp 是一个 基于.Net Core 开源的物联网基础平台， 支持 HTTP、MQTT 、CoAp 协议
-
-[流之云](https://gitee.com/ntdgg) 信息化、数字化服务提供商
-
-[translate.js](https://gitee.com/mail_osc/translate) 网页自动翻译，页面无需另行改造，加入两行js即可让你的网页快速具备多国语言切换能力！
-
-## 7.5 社会价值
-
-LinkWeChat 开源团队将目前所收项目捐赠全额捐出，仅尽绵薄之力，在此我们也感谢大家的捐赠和支持，希望河南尽早渡过难关。
-
-同时也希望 LinkWeChat 不仅能为国内开源社区建设做一点贡献，也能为社会产生一些价值。
-
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150157_2762cfc4_1480777.png "屏幕截图.png")
-
----
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
 
