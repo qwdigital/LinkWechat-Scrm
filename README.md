@@ -24,10 +24,6 @@
 
 ---
 
-**<p align="center">【📣最近通知】还有什么想要产品/技术上友好的建议或意见，<a href="https://docs.qq.com/sheet/DZWxGU0JGVFRVdWZV" target="_blank">点击告诉我们~</a>一经采纳，将纳入开源贡献者并官网致谢，还会收到社区奖励的小礼品哦！~</p>**
-
-**<p align="center">LinkWeChat V5.0 正式发布啦，即将全面接入AI大模型，更多能力逐步升级，欢迎大家提前体验！<a href="http://demo.linkwechat.net/" target="_blank">点击立即体验~</a></p>**
-
 **<p align="center">LinkWeChat 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
 
 
