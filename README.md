@@ -11,23 +11,12 @@
 [![license](http://img.shields.io/badge/license-GPL%203.0-orange)](https://gitee.com/LinkWeChat/link-wechat/blob/master/LICENSE)
 [![木兰社区](https://img.shields.io/badge/Mulan-incubating-blue)](https://portal.mulanos.cn//)
 
-[项目手册](https://www.yuque.com/linkwechat/help) | [用户手册](https://docs.qq.com/pdf/DZUpLbEVZR3RLdmxO?) | [常见问题](https://www.yuque.com/linkwechat/help/qk5gl6) 
-
 </div>
 
 <p></p>
 <p></p>
 <p></p>
 <p></p>
-
----
-
-**<p align="center">LinkWeChat 采用前后端分离架构，前端项目请点击<a href="https://gitee.com/LinkWeChat/link-we-chat-front" target="_blank">LinkWeChat-Front</a></p>**
-
-
-**<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
-
----
 
 
 # 一、 关于 LinkWeChat
@@ -41,8 +30,6 @@ LinkWeChat 是基于企业微信的开源 SCRM 系统，是企业私域流量管
 LinkWeChat 基于企业微信开放能力，不仅集成了企微强大的后台管理及基础的客户管理功能，而且提供了多种渠道、多个方式连接微信客户。并通过客情维系、聊天增强等灵活高效的客户运营模块，让客户与企业之间建立强链接，从而进一步通过多元化的营销工具，帮助企业提高客户运营效率，强化营销能力，拓展盈利空间。
 
 主要运用于电商、零售、教育、金融、政务等服务行业领域。
-
-[更多 LinkWeChat 的故事](https://www.yuque.com/linkwechat/help/dsatfs)
 
 ## 1.2 能力
 
@@ -128,10 +115,6 @@ LinkWeChat 自 V3.0 起架构升级，全面升级为微服务架构，整体系
 
 ## 2.5 项目部署
 
-点击下方链接进入官方语雀帮助手册查看项目部署方式：
-
-[帮助手册——如何快速部署 LinkWeChat](https://www.yuque.com/linkwechat/help/gt1myw)
-
 建议服务器最低配置：
 
 | 类型 | 配置 |
@@ -147,10 +130,6 @@ LinkWeChat 自 V3.0 起架构升级，全面升级为微服务架构，整体系
 由于 LinkWeChat 项目基于企业微信官方第三方应用开发文档，所以请各位小伙伴在学习和使用 LinkWeChat 之前， **务必仔细了解并熟悉** 官方 API 已有功能。
 
 [企业微信-企业内部开发-API 文档](https://open.work.weixin.qq.com/api/doc/90000/90003/90556)
-
-点击下方链接进入官方语雀帮助手册查看常见问题的相关描述及更多帮助：
-
-[帮助手册——常见问题](https://www.yuque.com/linkwechat/help/qk5gl6)
 
 # 四、最近更新
 
@@ -177,10 +156,6 @@ LinkWeChat 自 V3.0 起架构升级，全面升级为微服务架构，整体系
 - [x] 修复了一些已知问题；
 - [x] 其余各模块UI细节调优。
 
-点击下方链接进入官方语雀帮助手册查看历史版本更新日志：
-
-[帮助手册——历史更新](https://www.yuque.com/linkwechat/help/pcmd0o)
-
 # 五、奖项荣誉
 
 LinkWeChat 凭借着出色的产品能力和专业的技术能力，已经获取如下奖项：
@@ -191,8 +166,7 @@ LinkWeChat 凭借着出色的产品能力和专业的技术能力，已经获取
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1108/150256_14f4ba8d_1480777.png "仟微助手企业微信SCRM智能营销系统-V1.5_40.png")
 
-
-
+---
 
 **<p align="center">如果您觉得我们的开源项目很有帮助，请点击 :star: Star 支持 LinkWeChat 开源团队:heart:</p>**
 
